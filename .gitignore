@@ -9,6 +9,10 @@
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
+!.gitkeep
+
+# 워크스페이스 하위 node_modules 전부
+**/node_modules/
 
 # testing
 /coverage
@@ -39,3 +43,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Turborepo cache
+.turbo/
