@@ -47,3 +47,6 @@ next-env.d.ts
 
 # Turborepo cache
 .turbo/
+
+*storybook.log
+storybook-static

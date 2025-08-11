@@ -18,6 +18,7 @@
   "include": [
     "**/*.ts",
     "**/*.tsx",
+    ".storybook/**/*.ts",
     "next-env.d.ts",
     ".next/types/**/*.ts"
   ],
