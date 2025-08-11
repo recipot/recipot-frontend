@@ -1,5 +1,8 @@
 import { delay, http, HttpResponse } from 'msw';
-import { mockDietaryRestrictions, mockHealthStatus, mockUsers } from '../data/users.mock';
+
+import { mockDietaryRestrictions, mockUsers } from '../data/users.mock';
+
+import type { mockHealthStatus } from '../data/users.mock';
 
 export const authHandlers = [
   // 카카오 로그인
@@ -14,10 +17,10 @@ export const authHandlers = [
     await delay(1000);
     return HttpResponse.json(
       {
-        user,
         accessToken: `kakao_mock_token_${Date.now()}`,
-        refreshToken: `kakao_mock_refresh_${Date.now()}`,
         expiresIn: 3600,
+        refreshToken: `kakao_mock_refresh_${Date.now()}`,
+        user,
       },
       { status: 200 },
     );
@@ -35,10 +38,10 @@ export const authHandlers = [
     await delay(800);
     return HttpResponse.json(
       {
-        user,
         accessToken: `google_mock_token_${Date.now()}`,
-        refreshToken: `google_mock_refresh_${Date.now()}`,
         expiresIn: 3600,
+        refreshToken: `google_mock_refresh_${Date.now()}`,
+        user,
       },
       { status: 200 },
     );
@@ -47,14 +50,14 @@ export const authHandlers = [
   // 로그아웃
   http.post('/api/auth/logout', async () => {
     await delay(300);
-    return HttpResponse.json({ success: true, message: '로그아웃되었습니다.' }, { status: 200 });
+    return HttpResponse.json({ message: '로그아웃되었습니다.', success: true }, { status: 200 });
   }),
 
   // 토큰 갱신
   http.post('/api/auth/refresh', async ({ request }) => {
     const { refreshToken } = (await request.json()) as { refreshToken?: string };
 
-    if (!refreshToken || !refreshToken.includes('mock_refresh')) {
+    if (!refreshToken?.includes('mock_refresh')) {
       return HttpResponse.json({ error: '유효하지 않은 리프레시 토큰입니다.' }, { status: 401 });
     }
 
@@ -66,7 +69,7 @@ export const authHandlers = [
   http.get('/api/auth/me', async ({ request }) => {
     const authHeader = request.headers.get('Authorization');
 
-    if (!authHeader || !authHeader.includes('mock_token')) {
+    if (!authHeader?.includes('mock_token')) {
       return HttpResponse.json({ error: '인증이 필요합니다.' }, { status: 401 });
     }
 
@@ -91,9 +94,9 @@ export const authHandlers = [
     await delay(600);
     return HttpResponse.json(
       {
-        success: true,
         message: '못먹는 음식이 저장되었습니다.',
         savedRestrictions: restrictions,
+        success: true,
       },
       { status: 200 },
     );
@@ -104,7 +107,7 @@ export const authHandlers = [
     const healthStatus = (await request.json()) as typeof mockHealthStatus;
     await delay(700);
     return HttpResponse.json(
-      { success: true, message: '건강 상태가 저장되었습니다.', savedStatus: healthStatus },
+      { message: '건강 상태가 저장되었습니다.', savedStatus: healthStatus, success: true },
       { status: 200 },
     );
   }),
@@ -114,7 +117,7 @@ export const authHandlers = [
     const { userId } = params as { userId: string };
     await delay(500);
     return HttpResponse.json(
-      { success: true, message: '온보딩이 완료되었습니다!', userId, completedAt: new Date() },
+      { completedAt: new Date(), message: '온보딩이 완료되었습니다!', success: true, userId },
       { status: 200 },
     );
   }),
@@ -126,13 +129,13 @@ export const authHandlers = [
     await delay(400);
     return HttpResponse.json(
       {
-        userId,
+        completedAt: isCompleted ? new Date('2024-08-01') : null,
         isCompleted,
         steps: {
           dietaryRestrictions: isCompleted,
           healthStatus: isCompleted,
         },
-        completedAt: isCompleted ? new Date('2024-08-01') : null,
+        userId,
       },
       { status: 200 },
     );
@@ -142,7 +145,7 @@ export const authHandlers = [
   http.post('/api/auth/error-test', async () => {
     await delay(1000);
     return HttpResponse.json(
-      { error: '서버 오류가 발생했습니다.', code: 'INTERNAL_SERVER_ERROR' },
+      { code: 'INTERNAL_SERVER_ERROR', error: '서버 오류가 발생했습니다.' },
       { status: 500 },
     );
   }),

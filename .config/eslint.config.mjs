@@ -15,6 +15,22 @@ const compat = new FlatCompat({
 });
 
 export default [
+  {
+    ignores: [
+      'node_modules/**',
+      '.next/**',
+      'out/**',
+      'build/**',
+      // shadcn 컴포넌트 제외
+      'src/components/ui/**',
+      'src/lib/utils.ts',
+      // MSW 관련 파일 제외  
+      'src/mocks/**',
+      // 기타 제외할 파일들
+      '**/*.config.{js,ts,mjs}',
+      'public/**',
+    ],
+  },
   // Base configurations for Next.js, React, and accessibility
   ...compat.extends(
     'next',
@@ -22,7 +38,7 @@ export default [
     'plugin:react/recommended',
     'plugin:react-hooks/recommended',
     'plugin:jsx-a11y/recommended',
-    '@typescript-eslint/recommended',
+    'plugin:@typescript-eslint/recommended',
   ),
 
   // Main configuration
@@ -166,7 +182,7 @@ export default [
         {
           type: 'alphabetical',
           order: 'asc',
-          'partition-by-comment': true,
+          partitionByComment: true,
         },
       ],
       'perfectionist/sort-imports': 'off', // Using simple-import-sort instead

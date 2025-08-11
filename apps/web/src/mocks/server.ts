@@ -1,4 +1,5 @@
 import { setupServer } from 'msw/node';
+
 import { handlers } from './handlers';
 
 // Node.js 환경용 MSW 서버 (Jest 테스트에서 사용)
@@ -47,7 +48,7 @@ export const mswTestHelpers = {
 
   // 지연 시뮬레이션
   simulateDelay: (endpoint: string, delay: number) => {
-    const { http, HttpResponse, delay: sleep } = require('msw');
+    const { delay: sleep, http, HttpResponse } = require('msw');
     return http.all(endpoint, async () => {
       await sleep(delay);
       return HttpResponse.json({ delayed: true });

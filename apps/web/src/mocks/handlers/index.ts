@@ -29,9 +29,9 @@ export const handlerCounts = {
 // MSW 상태 확인용 헬퍼
 export const getMswStatus = () => {
   return {
-    isEnabled: process.env.NODE_ENV === 'development',
-    handlersCount: handlers.length,
     domains: ['auth'], // 완성된 도메인들
+    handlersCount: handlers.length,
+    isEnabled: process.env.NODE_ENV === 'development',
     // domains: ['auth', 'ingredient', 'recipe', 'profile'], // 모든 도메인 완성 후
   };
 };

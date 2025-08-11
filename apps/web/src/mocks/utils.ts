@@ -13,13 +13,13 @@ export const generateRandomDate = (daysFromNow: number = 7) => {
 // 랜덤 사용자 데이터 생성
 export const generateMockUser = (overrides: any = {}) => {
   return {
-    id: generateId('user_'),
-    email: `test${Date.now()}@example.com`,
-    name: `테스트유저${Math.floor(Math.random() * 1000)}`,
     avatar: `https://picsum.photos/100/100?random=${Math.floor(Math.random() * 1000)}`,
-    provider: Math.random() > 0.5 ? 'kakao' : 'google',
-    joinDate: generateRandomDate(-30), // 30일 전부터
     cookingLevel: ['beginner', 'intermediate', 'advanced'][Math.floor(Math.random() * 3)],
+    email: `test${Date.now()}@example.com`,
+    id: generateId('user_'),
+    joinDate: generateRandomDate(-30), // 30일 전부터
+    name: `테스트유저${Math.floor(Math.random() * 1000)}`,
+    provider: Math.random() > 0.5 ? 'kakao' : 'google',
     ...overrides,
   };
 };
@@ -31,13 +31,13 @@ export const generateMockIngredient = (overrides: any = {}) => {
   const units = ['g', 'kg', '개', '컵', 'ml'];
   
   return {
-    id: generateId('ingredient_'),
-    name: names[Math.floor(Math.random() * names.length)],
     category: categories[Math.floor(Math.random() * categories.length)],
+    expiryDate: generateRandomDate(14), // 2주 내
+    id: generateId('ingredient_'),
+    image: `https://picsum.photos/150/150?random=${Math.floor(Math.random() * 1000)}`,
+    name: names[Math.floor(Math.random() * names.length)],
     quantity: Math.floor(Math.random() * 500) + 50,
     unit: units[Math.floor(Math.random() * units.length)],
-    expiryDate: generateRandomDate(14), // 2주 내
-    image: `https://picsum.photos/150/150?random=${Math.floor(Math.random() * 1000)}`,
     ...overrides,
   };
 };
@@ -55,19 +55,19 @@ export const getNetworkDelay = (type: 'fast' | 'normal' | 'slow' = 'normal') => 
 // 에러 응답 생성기
 export const createErrorResponse = (message: string, code?: string, status: number = 400) => {
   return {
-    error: message,
     code: code || 'BAD_REQUEST',
-    timestamp: new Date().toISOString(),
+    error: message,
     path: 'mock-api',
+    timestamp: new Date().toISOString(),
   };
 };
 
 // 성공 응답 생성기
 export const createSuccessResponse = (data: any, message?: string) => {
   return {
-    success: true,
     data,
     message: message || 'Success',
+    success: true,
     timestamp: new Date().toISOString(),
   };
 };
@@ -90,12 +90,12 @@ export const paginateData = (data: any[], page: number = 1, limit: number = 10) 
   return {
     data: paginatedData,
     pagination: {
-      page,
-      limit,
-      total: data.length,
-      totalPages: Math.ceil(data.length / limit),
       hasNext: endIndex < data.length,
       hasPrev: page > 1,
+      limit,
+      page,
+      total: data.length,
+      totalPages: Math.ceil(data.length / limit),
     },
   };
 };
