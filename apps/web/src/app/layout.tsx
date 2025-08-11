@@ -1,7 +1,3 @@
-'use client';
-
-import { useEffect } from 'react';
-
 import type { Metadata } from 'next';
 import { Noto_Sans_KR } from 'next/font/google';
 import './globals.css';
@@ -23,14 +19,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      import('../mocks/browser').then(({ startMswWorker }) => {
-        startMswWorker();
-      });
-    }
-  }, []);
-
   return (
     <html lang="en">
       <body className={`${notoSansKr.variable} antialiased`}>
