@@ -3,7 +3,7 @@ name: UI 컴포넌트 요청
 about: 공통 UI 컴포넌트 개발 요청 
 title: '[UI] 컴포넌트명'
 labels: ['ui-component']
-assignees: '' # D 담당자 GitHub ID
+assignees: '@twtwkim' # D 담당자 GitHub ID
 ---
 
 ## 📋 컴포넌트 정보
