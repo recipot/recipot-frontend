@@ -25,6 +25,15 @@
     "jsx": "preserve",
 
     // 성능 최적화
-    "incremental": true
+    "incremental": true,
+    "paths": {
+      "@recipot/api": ["./packages/api/src"],
+      "@recipot/constants": ["./packages/constants/src"],
+      "@recipot/hooks": ["./packages/hooks/src"],
+      "@recipot/types": ["./packages/types/src"],
+      "@recipot/utils": ["./packages/utils/src"],
+      "@recipot/validators": ["./packages/validators/src"]
+      // ... 다른 패키지들도 추가
+    }
   }
 }
