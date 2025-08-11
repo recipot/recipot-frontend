@@ -16,7 +16,6 @@ export const metadata: Metadata = {
   title: 'Create Next App',
 };
 
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -30,5 +29,3 @@ export default function RootLayout({
     </html>
   );
 }
-
-

@@ -1,11 +1,10 @@
-
 'use client';
 
+import { useEffect, useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import type { PropsWithChildren } from 'react';
-import { useEffect, useState } from 'react';
 
+import type { PropsWithChildren } from 'react';
 
 export default function Providers({ children }: PropsWithChildren) {
   const [queryClient] = useState(() => new QueryClient());
@@ -13,7 +12,7 @@ export default function Providers({ children }: PropsWithChildren) {
   // 개발 환경에서만 MSW 워커 시작
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
-      import('../mocks/browser').then(({ startMswWorker }) => {
+      import('@/mocks/browser').then(({ startMswWorker }) => {
         startMswWorker();
       });
     }
@@ -22,11 +21,7 @@ export default function Providers({ children }: PropsWithChildren) {
   return (
     <QueryClientProvider client={queryClient}>
       {children}
-      {process.env.NODE_ENV === 'development' ? (
-        <ReactQueryDevtools initialIsOpen={false} />
-      ) : null}
+      {process.env.NODE_ENV === 'development' ? <ReactQueryDevtools initialIsOpen={false} /> : null}
     </QueryClientProvider>
   );
 }
-
-

@@ -1,5 +1,3 @@
 export default function Home() {
-  return <div>(WEB)main page</div>;
+  return <div>hello</div>;
 }
-
-

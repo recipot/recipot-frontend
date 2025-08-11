@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "packageManager": "pnpm@8.15.4",
-  "prettier": "packages/config/.prettierrc",
   "scripts": {
     "dev": "turbo run dev --parallel",
     "dev:web": "turbo run dev --filter=web",
