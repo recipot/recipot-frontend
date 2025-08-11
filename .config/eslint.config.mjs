@@ -24,7 +24,7 @@ export default [
       // shadcn 컴포넌트 제외
       'src/components/ui/**',
       'src/lib/utils.ts',
-      // MSW 관련 파일 제외  
+      // MSW 관련 파일 제외
       'src/mocks/**',
       // 기타 제외할 파일들
       '**/*.config.{js,ts,mjs}',
@@ -38,7 +38,7 @@ export default [
     'plugin:react/recommended',
     'plugin:react-hooks/recommended',
     'plugin:jsx-a11y/recommended',
-    'plugin:@typescript-eslint/recommended',
+    'plugin:@typescript-eslint/recommended'
   ),
 
   // Main configuration

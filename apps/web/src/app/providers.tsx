@@ -12,6 +12,7 @@ export default function Providers({ children }: PropsWithChildren) {
   // 개발 환경에서만 MSW 워커 시작
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line import/no-relative-parent-imports
       import('@/mocks/browser').then(({ startMswWorker }) => {
         startMswWorker();
       });
