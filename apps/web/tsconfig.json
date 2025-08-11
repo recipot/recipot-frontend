@@ -3,6 +3,10 @@
   "compilerOptions": {
     "jsx": "preserve",
     "allowJs": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
     "plugins": [{ "name": "next" }]
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
