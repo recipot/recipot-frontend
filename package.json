@@ -6,13 +6,20 @@
   "prettier": "packages/config/.prettierrc",
   "scripts": {
     "dev": "turbo run dev --parallel",
+    "dev:web": "turbo run dev --filter=web",
+    "dev:mobile": "turbo run dev --filter=mobile",
     "build": "turbo run build",
+    "test": "turbo run test",
+    "test:ci": "turbo run test -- --coverage",
     "start": "turbo run start",
     "lint": "turbo run lint",
+    "lint:fix": "turbo run lint -- --fix",
     "format": "prettier --write .",
     "typecheck": "turbo run typecheck",
+    "type-check": "turbo run typecheck",
     "web": "pnpm --filter web",
-    "mobile": "pnpm --filter mobile"
+    "mobile": "pnpm --filter mobile",
+    "clean": "rm -rf node_modules apps/*/node_modules packages/*/node_modules"
   },
   "dependencies": {
     "next": "15.3.1",

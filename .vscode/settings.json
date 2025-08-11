@@ -8,5 +8,5 @@
     "source.fixAll": "explicit",
     "source.organizeImports": "explicit"
   },
-  "prettier.configPath": "packages/config/.prettierrc"
+  "prettier.configPath": "../.config/.prettierrc"
 }

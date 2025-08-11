@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    // 타겟 및 모듈 설정
+    "target": "ES2022",
+    "module": "ESNext",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "moduleResolution": "bundler", // 최신 번들러 지원
+
+    // 엄격한 타입 체크
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+
+    // 모듈 관련
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+
+    // 경로 및 베이스
+    "baseUrl": ".",
+
+    // JSX 설정 (각 패키지에서 오버라이드)
+    "jsx": "preserve",
+
+    // 성능 최적화
+    "incremental": true
+  }
+}
