@@ -12,12 +12,6 @@
     "isolatedModules": true,
     "noEmit": true,
 
-    "baseUrl": ".",
-    "paths": {
-      "@shared/*": ["../../shared/src/*"],
-      "@ui/*": ["../../ui/src/*"],
-      "@lib/*": ["../../lib/src/*"],
-      "@types/*": ["../../types/src/*"]
-    }
+    "baseUrl": "."
   }
 }

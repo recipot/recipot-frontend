@@ -21,9 +21,10 @@
       }
     ],
     "paths": {
+      "@core/*": ["packages/core/*"],
+      "@types/*": ["packages/types/*"],
       "@ui/*": ["packages/ui/*"],
-      "@lib/*": ["packages/lib/*"],
-      "@types/*": ["packages/types/*"]
+      "@lib/*": ["packages/lib/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
