@@ -1,5 +1,6 @@
+import '@testing-library/jest-dom';
+
 import { afterAll, afterEach, beforeAll } from '@jest/globals';
-import '@testing-library/jest-dom/extend-expect';
 
 // MSW v2 테스트 서버 셋업
 import { server } from './src/mocks/server';
