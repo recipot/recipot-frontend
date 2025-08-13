@@ -1,14 +1,16 @@
 import './globals.css';
 
-import { Noto_Sans_KR } from 'next/font/google';
+import localFont from 'next/font/local';
 
 import Providers from './providers';
 
 import type { Metadata } from 'next';
 
-const notoSansKr = Noto_Sans_KR({
-  subsets: ['latin'],
-  variable: '--font-noto',
+const pretendard = localFont({
+  display: 'swap',
+  src: '../../public/fonts/pretendard/PretendardVariable.woff2',
+  variable: '--font-pretendard',
+  weight: '100 900',
 });
 
 export const metadata: Metadata = {
@@ -22,8 +24,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${notoSansKr.variable} antialiased`}>
+    <html lang="ko" className={`${pretendard.variable} antialiased`}>
+      <body>
         <Providers>{children}</Providers>
       </body>
     </html>
