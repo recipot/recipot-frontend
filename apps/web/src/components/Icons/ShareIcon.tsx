@@ -1,11 +1,11 @@
 import React from 'react';
 
-interface NaviShareIconProps extends React.SVGProps<SVGSVGElement> {
+interface ShareIconProps extends React.SVGProps<SVGSVGElement> {
   size?: number;
   color?: string;
 }
 
-const NaviShareIcon: React.FC<NaviShareIconProps> = ({ color = '#868E96', size = 24, ...props }) => {
+const ShareIcon: React.FC<ShareIconProps> = ({ color = '#868E96', size = 24, ...props }) => {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
       <path
@@ -30,4 +30,4 @@ const NaviShareIcon: React.FC<NaviShareIconProps> = ({ color = '#868E96', size =
   );
 };
 
-export default NaviShareIcon;
+export default ShareIcon;

@@ -55,9 +55,9 @@ function MyComponent() {
 #### 단계 아이콘들
 
 - `Step1Icon` - 1단계 (24x24)
-- `Step2Icon` - 2단계 (24x24)
-- `Step3Icon` - 3단계 (24x24)
-- `Step4Icon` - 4단계 (24x24)
+- `CookwareIcon` - 2단계 (24x24)
+- `CookOrderIcon` - 3단계 (24x24)
+- `ReviewIcon` - 4단계 (24x24)
 
 #### 카드 아이콘들
 
@@ -66,8 +66,8 @@ function MyComponent() {
 #### 네비게이션 아이콘들
 
 - `NaviMyIcon` - 내 정보 (24x24)
-- `NaviRefreshIcon` - 새로고침 (24x24)
-- `NaviShareIcon` - 공유 (24x24)
+- `RefreshIcon` - 새로고침 (24x24)
+- `ShareIcon` - 공유 (24x24)
 
 #### 소셜 로그인 아이콘들
 
@@ -76,7 +76,7 @@ function MyComponent() {
 
 #### 찜 아이콘
 
-- `ZzimIcon` - 찜하기 (24x24)
+- `HeartIcon` - 찜하기 (24x24)
 
 ## 커스터마이징
 

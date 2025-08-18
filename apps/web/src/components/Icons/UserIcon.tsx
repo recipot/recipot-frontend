@@ -1,11 +1,11 @@
 import React from 'react';
 
-interface NaviMyIconProps extends React.SVGProps<SVGSVGElement> {
+interface UserIconProps extends React.SVGProps<SVGSVGElement> {
   size?: number;
   color?: string;
 }
 
-const NaviMyIcon: React.FC<NaviMyIconProps> = ({ color = '#868E96', size = 24, ...props }) => {
+const UserIcon: React.FC<UserIconProps> = ({ color = '#868E96', size = 24, ...props }) => {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" {...props}>
       <g clipPath="url(#clip0_1248_12101)">
@@ -31,4 +31,4 @@ const NaviMyIcon: React.FC<NaviMyIconProps> = ({ color = '#868E96', size = 24, .
   );
 };
 
-export default NaviMyIcon;
+export default UserIcon;

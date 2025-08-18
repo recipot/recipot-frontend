@@ -6,24 +6,24 @@ import {
   CheckIcon,
   CloseIcon,
   CookIcon,
+  CookOrderIcon,
+  CookwareIcon,
   EmotionBadIcon,
   EmotionGoodIcon,
   EmotionNeutralIcon,
   GoogleIcon,
+  HeartIcon,
+  IngredientIcon,
   KakaoIcon,
   MyFileIcon,
   MyOpenFileIcon,
-  NaviMyIcon,
-  NaviRefreshIcon,
-  NaviShareIcon,
+  RefreshIcon,
+  ReviewIcon,
   SearchIcon,
   SettingsIcon,
+  ShareIcon,
   SourceIcon,
-  Step1Icon,
-  Step2Icon,
-  Step3Icon,
-  Step4Icon,
-  ZzimIcon,
+  UserIcon,
 } from '../components/Icons';
 
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
@@ -149,20 +149,20 @@ export const StepIcons: Story = {
   render: (args: { size?: number; color?: string }) => (
     <div className="grid grid-cols-4 gap-4 p-6">
       <div className="flex flex-col items-center space-y-2">
-        <Step1Icon {...args} />
-        <span className="text-sm text-gray-600">Step1Icon</span>
+        <IngredientIcon {...args} />
+        <span className="text-sm text-gray-600">IngredientIcon</span>
       </div>
       <div className="flex flex-col items-center space-y-2">
-        <Step2Icon {...args} />
-        <span className="text-sm text-gray-600">Step2Icon</span>
+        <CookwareIcon {...args} />
+        <span className="text-sm text-gray-600">CookwareIcon</span>
       </div>
       <div className="flex flex-col items-center space-y-2">
-        <Step3Icon {...args} />
-        <span className="text-sm text-gray-600">Step3Icon</span>
+        <CookOrderIcon {...args} />
+        <span className="text-sm text-gray-600">CookOrderIcon</span>
       </div>
       <div className="flex flex-col items-center space-y-2">
-        <Step4Icon {...args} />
-        <span className="text-sm text-gray-600">Step4Icon</span>
+        <ReviewIcon {...args} />
+        <span className="text-sm text-gray-600">ReviewIcon</span>
       </div>
     </div>
   ),
@@ -193,16 +193,16 @@ export const NavigationIcons: Story = {
   render: (args: { size?: number; color?: string }) => (
     <div className="grid grid-cols-3 gap-6 p-6">
       <div className="flex flex-col items-center space-y-2">
-        <NaviMyIcon {...args} />
-        <span className="text-sm text-gray-600">NaviMyIcon</span>
+        <UserIcon {...args} />
+        <span className="text-sm text-gray-600">UserIcon</span>
       </div>
       <div className="flex flex-col items-center space-y-2">
-        <NaviRefreshIcon {...args} />
-        <span className="text-sm text-gray-600">NaviRefreshIcon</span>
+        <RefreshIcon {...args} />
+        <span className="text-sm text-gray-600">RefreshIcon</span>
       </div>
       <div className="flex flex-col items-center space-y-2">
-        <NaviShareIcon {...args} />
-        <span className="text-sm text-gray-600">NaviShareIcon</span>
+        <ShareIcon {...args} />
+        <span className="text-sm text-gray-600">ShareIcon</span>
       </div>
     </div>
   ),
@@ -228,7 +228,7 @@ export const SocialIcons: Story = {
 };
 
 // 찜 아이콘
-export const ZzimIconStory: Story = {
+export const HeartIconStory: Story = {
   args: {
     active: false,
     color: '#868E96',
@@ -237,8 +237,8 @@ export const ZzimIconStory: Story = {
   render: (args: { active?: boolean; size?: number; color?: string }) => (
     <div className="grid grid-cols-1 gap-4 p-6">
       <div className="flex flex-col items-center space-y-2">
-        <ZzimIcon {...args} />
-        <span className="text-sm text-gray-600">ZzimIcon</span>
+        <HeartIcon {...args} />
+        <span className="text-sm text-gray-600">HeartIcon</span>
       </div>
     </div>
   ),
@@ -330,20 +330,20 @@ export const AllIcons: Story = {
         <h3 className="text-lg font-semibold mb-4 text-gray-800">단계 아이콘들</h3>
         <div className="grid grid-cols-4 gap-4">
           <div className="flex flex-col items-center space-y-2">
-            <Step1Icon {...args} />
-            <span className="text-xs text-gray-600">Step1Icon</span>
+            <IngredientIcon {...args} />
+            <span className="text-xs text-gray-600">IngredientIcon</span>
           </div>
           <div className="flex flex-col items-center space-y-2">
-            <Step2Icon {...args} />
-            <span className="text-xs text-gray-600">Step2Icon</span>
+            <CookwareIcon {...args} />
+            <span className="text-xs text-gray-600">CookwareIcon</span>
           </div>
           <div className="flex flex-col items-center space-y-2">
-            <Step3Icon {...args} />
-            <span className="text-xs text-gray-600">Step3Icon</span>
+            <CookOrderIcon {...args} />
+            <span className="text-xs text-gray-600">CookOrderIcon</span>
           </div>
           <div className="flex flex-col items-center space-y-2">
-            <Step4Icon {...args} />
-            <span className="text-xs text-gray-600">Step4Icon</span>
+            <ReviewIcon {...args} />
+            <span className="text-xs text-gray-600">ReviewIcon</span>
           </div>
         </div>
       </div>
@@ -362,16 +362,16 @@ export const AllIcons: Story = {
         <h3 className="text-lg font-semibold mb-4 text-gray-800">네비게이션 아이콘들</h3>
         <div className="grid grid-cols-3 gap-6">
           <div className="flex flex-col items-center space-y-2">
-            <NaviMyIcon {...args} />
-            <span className="text-xs text-gray-600">NaviMyIcon</span>
+            <UserIcon {...args} />
+            <span className="text-xs text-gray-600">UserIcon</span>
           </div>
           <div className="flex flex-col items-center space-y-2">
-            <NaviRefreshIcon {...args} />
-            <span className="text-xs text-gray-600">NaviRefreshIcon</span>
+            <RefreshIcon {...args} />
+            <span className="text-xs text-gray-600">RefreshIcon</span>
           </div>
           <div className="flex flex-col items-center space-y-2">
-            <NaviShareIcon {...args} />
-            <span className="text-xs text-gray-600">NaviShareIcon</span>
+            <ShareIcon {...args} />
+            <span className="text-xs text-gray-600">ShareIcon</span>
           </div>
         </div>
       </div>
@@ -394,8 +394,8 @@ export const AllIcons: Story = {
         <h3 className="text-lg font-semibold mb-4 text-gray-800">찜 아이콘</h3>
         <div className="grid grid-cols-1 gap-4">
           <div className="flex flex-col items-center space-y-2">
-            <ZzimIcon {...args} active />
-            <span className="text-xs text-gray-600">ZzimIcon</span>
+            <HeartIcon {...args} active />
+            <span className="text-xs text-gray-600">HeartIcon</span>
           </div>
         </div>
       </div>

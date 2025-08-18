@@ -1,11 +1,11 @@
 import React from 'react';
 
-interface Step4IconProps extends React.SVGProps<SVGSVGElement> {
+interface ReviewIconProps extends React.SVGProps<SVGSVGElement> {
   size?: number;
   color?: string;
 }
 
-const Step4Icon: React.FC<Step4IconProps> = ({ color = '#68982D', size = 24, ...props }) => {
+const ReviewIcon: React.FC<ReviewIconProps> = ({ color = '#68982D', size = 24, ...props }) => {
   return (
     <svg width={size} height={size} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
       <path
@@ -16,4 +16,4 @@ const Step4Icon: React.FC<Step4IconProps> = ({ color = '#68982D', size = 24, ...
   );
 };
 
-export default Step4Icon;
+export default ReviewIcon;

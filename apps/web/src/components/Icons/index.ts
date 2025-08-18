@@ -19,22 +19,22 @@ export { default as SettingsIcon } from './SettingsIcon';
 export { default as SourceIcon } from './SourceIcon';
 
 // 단계 아이콘들
-export { default as Step1Icon } from './Step1Icon';
-export { default as Step2Icon } from './Step2Icon';
-export { default as Step3Icon } from './Step3Icon';
-export { default as Step4Icon } from './Step4Icon';
+export { default as CookOrderIcon } from './CookOrderIcon';
+export { default as CookwareIcon } from './CookwareIcon';
+export { default as IngredientIcon } from './IngredientIcon';
+export { default as ReviewIcon } from './ReviewIcon';
 
 // 카드 아이콘들
 export { default as CardTimeIcon } from './CardTimeIcon';
 
 // 네비게이션 아이콘들
-export { default as NaviMyIcon } from './NaviMyIcon';
-export { default as NaviRefreshIcon } from './NaviRefreshIcon';
-export { default as NaviShareIcon } from './NaviShareIcon';
+export { default as RefreshIcon } from './RefreshIcon';
+export { default as ShareIcon } from './ShareIcon';
+export { default as UserIcon } from './UserIcon';
 
 // 소셜 로그인 아이콘들
 export { default as GoogleIcon } from './GoogleIcon';
 export { default as KakaoIcon } from './KakaoIcon';
 
 // 찜 아이콘
-export { default as ZzimIcon } from './ZzimIcon';
+export { default as HeartIcon } from './HeartIcon';

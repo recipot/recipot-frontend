@@ -1,12 +1,12 @@
 import React from 'react';
 
-interface ZzimIconProps extends React.SVGProps<SVGSVGElement> {
+interface HeartIconProps extends React.SVGProps<SVGSVGElement> {
   size?: number;
   color?: string;
   active?: boolean;
 }
 
-const ZzimIcon: React.FC<ZzimIconProps> = ({ active = false, color = '#FF6B6B', size = 24, ...props }) => {
+const HeartIcon: React.FC<HeartIconProps> = ({ active = false, color = '#FF6B6B', size = 24, ...props }) => {
   return (
     <>
       {active && (
@@ -33,4 +33,4 @@ const ZzimIcon: React.FC<ZzimIconProps> = ({ active = false, color = '#FF6B6B', 
   );
 };
 
-export default ZzimIcon;
+export default HeartIcon;

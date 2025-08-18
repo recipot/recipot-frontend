@@ -1,11 +1,11 @@
 import React from 'react';
 
-interface NaviRefreshIconProps extends React.SVGProps<SVGSVGElement> {
+interface RefreshIconProps extends React.SVGProps<SVGSVGElement> {
   size?: number;
   color?: string;
 }
 
-const NaviRefreshIcon: React.FC<NaviRefreshIconProps> = ({ color = '#868E96', size = 24, ...props }) => {
+const RefreshIcon: React.FC<RefreshIconProps> = ({ color = '#868E96', size = 24, ...props }) => {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
       <g clipPath="url(#clip0_1248_12096)">
@@ -31,4 +31,4 @@ const NaviRefreshIcon: React.FC<NaviRefreshIconProps> = ({ color = '#868E96', si
   );
 };
 
-export default NaviRefreshIcon;
+export default RefreshIcon;
