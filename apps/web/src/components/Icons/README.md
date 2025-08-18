@@ -54,7 +54,7 @@ function MyComponent() {
 
 #### 단계 아이콘들
 
-- `Step1Icon` - 1단계 (24x24)
+- `IngredientIcon` - 1단계 (24x24)
 - `CookwareIcon` - 2단계 (24x24)
 - `CookOrderIcon` - 3단계 (24x24)
 - `ReviewIcon` - 4단계 (24x24)
@@ -65,7 +65,7 @@ function MyComponent() {
 
 #### 네비게이션 아이콘들
 
-- `NaviMyIcon` - 내 정보 (24x24)
+- `UserIcon` - 내 정보 (24x24)
 - `RefreshIcon` - 새로고침 (24x24)
 - `ShareIcon` - 공유 (24x24)
 
