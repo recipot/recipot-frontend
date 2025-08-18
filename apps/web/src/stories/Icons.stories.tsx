@@ -220,7 +220,7 @@ export const SocialIcons: Story = {
         <span className="text-sm text-gray-600">GoogleIcon</span>
       </div>
       <div className="flex flex-col items-center space-y-2">
-        <KakaoIcon {...args} />
+        <KakaoIcon {...args} color="#000000" />
         <span className="text-sm text-gray-600">KakaoIcon</span>
       </div>
     </div>
