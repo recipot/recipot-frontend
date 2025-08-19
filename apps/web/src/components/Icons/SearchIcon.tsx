@@ -1,11 +1,8 @@
 import React from 'react';
 
-interface SearchIconProps extends React.SVGProps<SVGSVGElement> {
-  size?: number;
-  color?: string;
-}
+import type { IconProps } from '@/types/Icon.types';
 
-const SearchIcon: React.FC<SearchIconProps> = ({ color = '#868E96', size = 24, ...props }) => {
+const SearchIcon: React.FC<IconProps> = ({ color = '#868E96', size = 24, ...props }) => {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
       <path

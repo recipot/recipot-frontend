@@ -1,11 +1,8 @@
 import React from 'react';
 
-interface MyFileIconProps extends React.SVGProps<SVGSVGElement> {
-  size?: number;
-  color?: string;
-}
+import type { IconProps } from '@/types/Icon.types';
 
-const MyFileIcon: React.FC<MyFileIconProps> = ({ color = '#868E96', size = 18, ...props }) => {
+const MyFileIcon: React.FC<IconProps> = ({ color = '#868E96', size = 18, ...props }) => {
   return (
     <svg width={size} height={size} viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
       <path

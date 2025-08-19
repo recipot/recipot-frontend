@@ -1,11 +1,8 @@
 import React from 'react';
 
-interface CookIconProps extends React.SVGProps<SVGSVGElement> {
-  size?: number;
-  color?: string;
-}
+import type { IconProps } from '@/types/Icon.types';
 
-const CookIcon: React.FC<CookIconProps> = ({ color = '#68982D', size = 24, ...props }) => {
+const CookIcon: React.FC<IconProps> = ({ color = '#68982D', size = 24, ...props }) => {
   return (
     <svg width={size} height={size} viewBox="0 0 20 22" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
       <path

@@ -1,8 +1,8 @@
 import React from 'react';
 
-interface HeartIconProps extends React.SVGProps<SVGSVGElement> {
-  size?: number;
-  color?: string;
+import type { IconProps } from '@/types/Icon.types';
+
+interface HeartIconProps extends IconProps {
   active?: boolean;
 }
 

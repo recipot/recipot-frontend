@@ -1,11 +1,8 @@
 import React from 'react';
 
-interface KakaoIconProps extends React.SVGProps<SVGSVGElement> {
-  size?: number;
-  color?: string;
-}
+import type { IconProps } from '@/types/Icon.types';
 
-const KakaoIcon: React.FC<KakaoIconProps> = ({ color = '#000000', size = 24, ...props }) => {
+const KakaoIcon: React.FC<IconProps> = ({ color = '#000000', size = 24, ...props }) => {
   return (
     <svg width={size} height={size} viewBox="0 0 20 22" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
       <path

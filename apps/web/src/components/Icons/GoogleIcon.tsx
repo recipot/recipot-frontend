@@ -1,10 +1,8 @@
 import React from 'react';
 
-interface GoogleIconProps extends React.SVGProps<SVGSVGElement> {
-  size?: number;
-}
+import type { IconProps } from '@/types/Icon.types';
 
-const GoogleIcon: React.FC<GoogleIconProps> = ({ size = 24, ...props }) => {
+const GoogleIcon: React.FC<IconProps> = ({ size = 24, ...props }) => {
   return (
     <svg width={size} height={size} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
       <g clipPath="url(#clip0_1248_12099)">

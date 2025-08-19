@@ -1,11 +1,8 @@
 import React from 'react';
 
-interface IngredientIconProps extends React.SVGProps<SVGSVGElement> {
-  size?: number;
-  color?: string;
-}
+import type { IconProps } from '@/types/Icon.types';
 
-const IngredientIcon: React.FC<IngredientIconProps> = ({ color = '#68982D', size = 24, ...props }) => {
+const IngredientIcon: React.FC<IconProps> = ({ color = '#68982D', size = 24, ...props }) => {
   return (
     <svg width={size} height={size} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
       <path
