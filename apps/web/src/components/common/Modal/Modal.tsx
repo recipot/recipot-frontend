@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 
 import {
     Dialog,
@@ -10,39 +10,17 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
-export interface ModalProps
-    extends React.ComponentPropsWithoutRef<typeof Dialog> {
-    /**
-     * Modal title displayed in the header
-     */
+import type { ComponentPropsWithoutRef } from "react";
+
+export interface ModalProps extends ComponentPropsWithoutRef<typeof Dialog> {
     title?: string;
-    /**
-     * Optional description text displayed below the title
-     */
     description?: string;
-    /**
-     * Size variant of the modal
-     * @default 'default'
-     */
     size?: "sm" | "default" | "lg" | "xl" | "full";
-    /**
-     * Whether to show the close button
-     * @default true
-     */
     showCloseButton?: boolean;
-    /**
-     * Custom class name for the content container
-     */
     contentClassName?: string;
-    /**
-     * Footer content to be rendered at the bottom of the modal
-     */
     footer?: React.ReactNode;
-    /**
-     * Whether to prevent closing the modal when clicking the overlay
-     * @default false
-     */
     disableOverlayClick?: boolean;
+    titleClassName?: string;
 }
 
 const sizeClasses = {
@@ -53,11 +31,7 @@ const sizeClasses = {
     xl: "max-w-4xl"
 } as const;
 
-/**
- * A reusable modal component that provides a consistent look and feel for dialogs.
- * Built on top of Radix UI's Dialog for accessibility and focus management.
- */
-export const Modal = ({
+export function Modal({
     children,
     contentClassName,
     description,
@@ -66,55 +40,83 @@ export const Modal = ({
     onOpenChange,
     size = "default",
     title,
+    titleClassName,
     ...props
-}: ModalProps) => {
-    const handleOpenChange = React.useCallback(
-        (open: boolean) => {
-            if (onOpenChange) {
-                onOpenChange(open);
-            }
-        },
-        [onOpenChange]
-    );
+}: ModalProps) {
+    const ALLOWED_SIZES = new Set<keyof typeof sizeClasses>([
+        "default",
+        "full",
+        "lg",
+        "sm",
+        "xl"
+    ]);
 
-    const handleOverlayClick = React.useCallback(
-        (e: React.MouseEvent) => {
-            if (disableOverlayClick) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
-        },
-        [disableOverlayClick]
-    );
+    const safeSize: keyof typeof sizeClasses = ALLOWED_SIZES.has(size)
+        ? size
+        : "default";
+
+    const handleOpenChange = (open: boolean) => {
+        if (onOpenChange) {
+            onOpenChange(open);
+        }
+    };
+
+    const handleOverlayClick: React.MouseEventHandler<HTMLDivElement> = (
+        event
+    ) => {
+        if (disableOverlayClick) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+    };
+
+    let sizeClass: (typeof sizeClasses)[keyof typeof sizeClasses];
+    switch (safeSize) {
+        case "sm":
+            sizeClass = sizeClasses.sm;
+            break;
+        case "lg":
+            sizeClass = sizeClasses.lg;
+            break;
+        case "xl":
+            sizeClass = sizeClasses.xl;
+            break;
+        case "full":
+            sizeClass = sizeClasses.full;
+            break;
+        default:
+            sizeClass = sizeClasses.default;
+    }
 
     return (
         <Dialog onOpenChange={handleOpenChange} {...props}>
             <DialogPortal>
                 <DialogOverlay
-                    className="fixed inset-0 z-50 bg-gray-300 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
+                    className="fixed inset-0 z-50 bg-gray-300 backdrop-blur-sm"
                     onClick={handleOverlayClick}
                 />
                 <DialogContent
                     className={cn(
-                        "fixed left-[50%] top-[50%] z-50 grid w-full translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg",
-                        // eslint-disable-next-line security/detect-object-injection
-                        sizeClasses[size],
+                        "fixed left-[50%] top-[50%] z-50 grid w-[320px] h-[156px] translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background px-6 pt-[30px] shadow-lg duration-200 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 rounded-3xl",
+                        sizeClass,
                         contentClassName
                     )}
                 >
-                    <div className="flex flex-col space-y-2">
-                        <div className="flex items-center justify-center">
-                            <div>
-                                <h2 className="text-[17px] font-normal leading-none tracking-tight font-pretendard">
-                                    {title}
-                                </h2>
-                                {description && (
-                                    <p className="text-sm text-muted-foreground font-pretendard">
-                                        {description}
-                                    </p>
-                                )}
-                            </div>
-                        </div>
+                    <div className="flex flex-col space-y-2 text-center">
+                        <h2
+                            className={cn(
+                                "font-normal leading-none tracking-tight",
+                                "text-[14px]",
+                                titleClassName
+                            )}
+                        >
+                            {title}
+                        </h2>
+                        {description && (
+                            <p className="text-sm text-muted-foreground">
+                                {description}
+                            </p>
+                        )}
                     </div>
 
                     <div className="py-1 text-[17px] font-pretendard">
@@ -130,7 +132,7 @@ export const Modal = ({
             </DialogPortal>
         </Dialog>
     );
-};
+}
 
 // Export the Dialog components for more flexible usage
 export { Dialog as ModalRoot };

@@ -21,6 +21,7 @@ const ShareRecipeModal = ({ onOpenChange, open }: ModalProps) => {
             open={open}
             onOpenChange={onOpenChange}
             title="해당 레시피를 공유해보세요."
+            titleClassName="text-[17px]"
         >
             <div className="space-y-4 flex justify-center">
                 <Button onClick={handleCopyClick} size="lg" variant="default">
@@ -38,8 +39,13 @@ const LoginRequiredModal = ({ onOpenChange, open }: ModalProps) => (
         title="로그인이 필요한 서비스입니다."
     >
         <div className="space-y-4">
-            <div className="pt-2">
-                <Button className="w-full">로그인하기</Button>
+            <div className="pt-2 flex justify-center space-x-2">
+                <Button className="w-full" variant="default">
+                    확인
+                </Button>
+                <Button className="w-full" variant="outline">
+                    취소
+                </Button>
             </div>
         </div>
     </Modal>
@@ -62,7 +68,6 @@ const LeavePageWarningModal = ({ onOpenChange, open }: ModalProps) => (
     </Modal>
 );
 
-// 스토리북 메타데이터
 const meta = {
     component: Modal,
     parameters: {
@@ -86,9 +91,6 @@ const ShareRecipeStory = () => {
 };
 
 export const ShareRecipe: Story = {
-    args: {
-        title: "레시피 공유"
-    },
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         await userEvent.click(
@@ -113,9 +115,6 @@ const LoginRequiredStory = () => {
 };
 
 export const LoginRequired: Story = {
-    args: {
-        title: "로그인이 필요합니다"
-    },
     render: () => <LoginRequiredStory />
 };
 
