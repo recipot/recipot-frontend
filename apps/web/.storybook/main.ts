@@ -24,6 +24,15 @@ const config: StorybookConfig = {
     '../src/stories/**/*.mdx',
     '../src/components/ui/**/*.stories.@(js|jsx|mjs|ts|tsx)',
     '../src/components/common/**/*.stories.@(js|jsx|mjs|ts|tsx)',
+    '../src/stories/**/*.stories.@(js|jsx|mjs|ts|tsx)',
   ],
+  viteFinal: async (config) => {
+    config.resolve = config.resolve ?? {};
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': join(__dirname, '../src'),
+    };
+    return config;
+  },
 };
 export default config;
