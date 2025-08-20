@@ -6,14 +6,14 @@ import type { mockHealthStatus } from '../data/users.mock';
 
 export const authHandlers = [
   // 카카오 로그인
-  http.post('/api/auth/kakao', async ({ request }) => {
+  http.post('/v1/login/kakao', async ({ request }) => {
     const { code } = (await request.json()) as { code?: string };
 
     if (!code) {
       return HttpResponse.json({ error: '카카오 인증 코드가 필요합니다.' }, { status: 400 });
     }
 
-    const user = mockUsers.find((u) => u.provider === 'kakao');
+    const user = mockUsers.find((u) => u.data.provider === 'kakao');
     await delay(1000);
     return HttpResponse.json(
       {
@@ -22,19 +22,19 @@ export const authHandlers = [
         refreshToken: `kakao_mock_refresh_${Date.now()}`,
         user,
       },
-      { status: 200 },
+      { status: 200 }
     );
   }),
 
   // 구글 로그인
-  http.post('/api/auth/google', async ({ request }) => {
+  http.post('/v1/login/google', async ({ request }) => {
     const { token } = (await request.json()) as { token?: string };
 
     if (!token) {
       return HttpResponse.json({ error: '구글 토큰이 필요합니다.' }, { status: 400 });
     }
 
-    const user = mockUsers.find((u) => u.provider === 'google');
+    const user = mockUsers.find((u) => u.data.provider === 'google');
     await delay(800);
     return HttpResponse.json(
       {
@@ -43,7 +43,7 @@ export const authHandlers = [
         refreshToken: `google_mock_refresh_${Date.now()}`,
         user,
       },
-      { status: 200 },
+      { status: 200 }
     );
   }),
 
@@ -98,17 +98,17 @@ export const authHandlers = [
         savedRestrictions: restrictions,
         success: true,
       },
-      { status: 200 },
+      { status: 200 }
     );
   }),
 
-  // 온보딩: 상태 선택 저장 
+  // 온보딩: 상태 선택 저장
   http.post('/api/onboarding/health-status', async ({ request }) => {
     const healthStatus = (await request.json()) as typeof mockHealthStatus;
     await delay(700);
     return HttpResponse.json(
       { message: '건강 상태가 저장되었습니다.', savedStatus: healthStatus, success: true },
-      { status: 200 },
+      { status: 200 }
     );
   }),
 
@@ -118,7 +118,7 @@ export const authHandlers = [
     await delay(500);
     return HttpResponse.json(
       { completedAt: new Date(), message: '온보딩이 완료되었습니다!', success: true, userId },
-      { status: 200 },
+      { status: 200 }
     );
   }),
 
@@ -137,17 +137,14 @@ export const authHandlers = [
         },
         userId,
       },
-      { status: 200 },
+      { status: 200 }
     );
   }),
 
   // 에러 시뮬레이션을 위한 핸들러 (개발/테스트용)
   http.post('/api/auth/error-test', async () => {
     await delay(1000);
-    return HttpResponse.json(
-      { code: 'INTERNAL_SERVER_ERROR', error: '서버 오류가 발생했습니다.' },
-      { status: 500 },
-    );
+    return HttpResponse.json({ code: 'INTERNAL_SERVER_ERROR', error: '서버 오류가 발생했습니다.' }, { status: 500 });
   }),
 
   // 네트워크 에러 시뮬레이션

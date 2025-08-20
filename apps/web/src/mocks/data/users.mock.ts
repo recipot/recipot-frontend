@@ -1,49 +1,60 @@
-export const mockUsers = [
+import type { UserInfoResponse } from '@recipot/types';
+
+// UserInfoResponse를 확장하여 provider 필드 추가
+interface ExtendedUserInfoResponse extends UserInfoResponse {
+  data: UserInfoResponse['data'] & {
+    provider: 'kakao' | 'google';
+  };
+}
+
+export const mockUsers: ExtendedUserInfoResponse[] = [
   {
-    avatar: 'https://picsum.photos/100/100?random=1',
-    cookingLevel: 'intermediate' as const,
-    email: 'test@kakao.com',
-    id: '1',
-    joinDate: new Date('2024-01-15'),
-    name: '김철수',
-    provider: 'kakao' as const,
-    providerUserId: 'kakao_123456',
+    status: 200,
+    data: {
+      id: 1,
+      email: 'test@test.com',
+      nickname: 'test',
+      profile_image_url: 'https://test.com/test.png',
+      recipe_complete_count: 0,
+      is_first_entry: true,
+      unavailable_ingredients: [],
+      created_at: '2021-01-01',
+      updated_at: '2021-01-01',
+      provider: 'kakao',
+    },
   },
   {
-    avatar: 'https://picsum.photos/100/100?random=2', 
-    cookingLevel: 'beginner' as const,
-    email: 'test@google.com',
-    id: '2',
-    joinDate: new Date('2024-02-20'),
-    name: '이영희',
-    provider: 'google' as const,
-    providerUserId: 'google_789012',
+    status: 200,
+    data: {
+      id: 2,
+      email: 'google@test.com',
+      nickname: 'google_user',
+      profile_image_url: 'https://test.com/google.png',
+      recipe_complete_count: 5,
+      is_first_entry: false,
+      unavailable_ingredients: [
+        { id: 1, name: '우유' },
+        { id: 2, name: '견과류' },
+      ],
+      created_at: '2021-02-01',
+      updated_at: '2021-02-01',
+      provider: 'google',
+    },
   },
-  {
-    avatar: 'https://picsum.photos/100/100?random=3',
-    cookingLevel: 'advanced' as const, 
-    email: 'chef@example.com',
-    id: '3',
-    joinDate: new Date('2024-01-01'),
-    name: '박요리사',
-    provider: 'kakao' as const,
-    providerUserId: 'kakao_345678',
-  }
 ];
 
 export const mockDietaryRestrictions = [
-  { category: 'allergy' as const, id: '1', name: '견과류' },
-  { category: 'allergy' as const, id: '2', name: '갑각류' },
-  { category: 'allergy' as const, id: '3', name: '유제품' },
-  { category: 'religion' as const, id: '4', name: '돼지고기' },
-  { category: 'religion' as const, id: '5', name: '소고기' },
-  { category: 'preference' as const, id: '6', name: '매운음식' },
-  { category: 'preference' as const, id: '7', name: '생선' },
+  { id: 1, name: '우유', category: 'dairy' },
+  { id: 2, name: '견과류', category: 'nuts' },
+  { id: 3, name: '해산물', category: 'seafood' },
+  { id: 4, name: '글루텐', category: 'gluten' },
+  { id: 5, name: '달걀', category: 'eggs' },
+  { id: 6, name: '대두', category: 'soy' },
 ];
 
 export const mockHealthStatus = {
-  additionalInfo: '',
-  breastfeeding: false,
-  diet: 'normal' as const, // 'normal' | 'diet' | 'bulk'
-  pregnancy: false,
+  allergies: ['우유', '견과류'],
+  dietaryPreferences: ['비건'],
+  healthConditions: ['당뇨'],
+  medications: ['인슐린'],
 };
