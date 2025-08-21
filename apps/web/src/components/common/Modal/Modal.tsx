@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import {
     Dialog,
@@ -25,7 +25,7 @@ export interface ModalProps extends ComponentPropsWithoutRef<typeof Dialog> {
 
 const sizeClasses = {
     default: "max-w-md",
-    full: "max-w-[95vw] max-h-[90vh] w-full",
+    full: "max-w-[95vw] w-full",
     lg: "max-w-2xl",
     sm: "max-w-sm",
     xl: "max-w-4xl"
@@ -55,11 +55,31 @@ export function Modal({
         ? size
         : "default";
 
-    const handleOpenChange = (open: boolean) => {
-        if (onOpenChange) {
-            onOpenChange(open);
+    const lockBodyScroll = (lock: boolean) => {
+        const html = document.documentElement;
+        const { body } = document;
+        if (lock) {
+            html.style.overflow = "hidden";
+            body.style.overflow = "hidden";
+            body.style.overscrollBehavior = "contain";
+        } else {
+            html.style.overflow = "";
+            body.style.overflow = "";
+            body.style.overscrollBehavior = "";
         }
     };
+
+    const handleOpenChange = (open: boolean) => {
+        lockBodyScroll(open);
+        if (onOpenChange) onOpenChange(open);
+    };
+
+    useEffect(() => {
+        const initiallyOpen = props.open;
+        if (initiallyOpen) lockBodyScroll(true);
+        return () => lockBodyScroll(false);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const handleOverlayClick: React.MouseEventHandler<HTMLDivElement> = (
         event
@@ -97,7 +117,7 @@ export function Modal({
                 />
                 <DialogContent
                     className={cn(
-                        "fixed left-[50%] top-[50%] z-50 grid w-[320px] h-[156px] translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background px-6 pt-[30px] shadow-lg duration-200 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 rounded-3xl",
+                        "fixed left-[50%] top-[50%] z-50 grid w-[320px] translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background px-6 pt-[30px] shadow-lg duration-200 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 rounded-3xl",
                         sizeClass,
                         contentClassName
                     )}
