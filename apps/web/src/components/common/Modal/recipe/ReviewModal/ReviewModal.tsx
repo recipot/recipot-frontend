@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 
 import { Button } from "@/components/common/Button/Button";
-import { CheckIcon } from "@/components/Icons";
+import { CheckIcon, EmotionGoodIcon } from "@/components/Icons";
 import { Dialog, DialogClose, DialogContent } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
@@ -161,8 +161,8 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
 
                         {feeling === "good" && (
                             <div className="w-full">
-                                <div className="mb-4 rounded-2xl bg-[#FFE2E2] py-3 text-center text-[#D25D5D] font-semibold">
-                                    😊 또 해먹을래요
+                                <div className="flex justify-center mb-4 rounded-2xl bg-[#FFE2E2] py-3 text-center text-[#D25D5D] font-semibold">
+                                    <EmotionGoodIcon/> 또 해먹을래요
                                 </div>
 
                                 <p className="mb-3 text-[17px] font-semibold">

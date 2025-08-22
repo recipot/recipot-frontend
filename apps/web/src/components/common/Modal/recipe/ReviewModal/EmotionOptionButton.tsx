@@ -30,16 +30,16 @@ export const EmotionOptionButton: React.FC<FeelingPillProps> = ({ color, disable
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        "flex h-20 w-[94px] flex-col items-center justify-center rounded-2xl text-sm font-semibold transition-colors",
+        "flex h-20 w-[94px] flex-col items-center justify-center rounded-2xl text-sm font-semibold",
         disabled && "opacity-60 cursor-not-allowed",
         selected ? selectedByColor[color] : baseByColor[color]
       )}
       aria-pressed={!!selected}
     >
-      <span className="text-2xl leading-none mb-1">
-        {color === "blue" && <EmotionGoodIcon />}
+      <span className="text-2xl leading-none">
+        {color === "blue" && <EmotionBadIcon />}
         {color === "yellow" && <EmotionNeutralIcon />}
-        {color === "red" && <EmotionBadIcon />}
+        {color === "red" && <EmotionGoodIcon />}
       </span>
       <span>{label}</span>
     </button>
