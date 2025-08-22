@@ -26,7 +26,7 @@ const Template = () => {
                 open={open}
                 onOpenChange={setOpen}
                 recipeTitle="양배추 계란 샐러드"
-                recipeImageUrl="https://images.unsplash.com/photo-1540420773420-3366772f4999?w=256&q=80&auto=format&fit=crop"
+                recipeImageUrl="/recipeImage.png"
                 timesCooked={2}
             />
         </div>
@@ -37,8 +37,7 @@ export const Initial: Story = {
     args: {
         onOpenChange: () => {},
         open: true,
-        recipeImageUrl:
-            "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=256&q=80&auto=format&fit=crop",
+        recipeImageUrl: '/recipeImage.png',
         recipeTitle: "양배추 계란 샐러드",
         timesCooked: 2
     },
@@ -55,8 +54,7 @@ export const AfterGoodSelected: Story = {
     args: {
         onOpenChange: () => {},
         open: true,
-        recipeImageUrl:
-            "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=256&q=80&auto=format&fit=crop",
+        recipeImageUrl: '/recipeImage.png',
         recipeTitle: "양배추 계란 샐러드",
         timesCooked: 2
     },
@@ -81,8 +79,7 @@ export const ProsSelected: Story = {
     args: {
         onOpenChange: () => {},
         open: true,
-        recipeImageUrl:
-            "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=256&q=80&auto=format&fit=crop",
+        recipeImageUrl: '/recipeImage.png',
         recipeTitle: "양배추 계란 샐러드",
         timesCooked: 2
     },
@@ -92,7 +89,6 @@ export const ProsSelected: Story = {
             canvas.getByRole("button", { name: "리뷰 모달 열기" })
         );
         const portal = within(canvasElement.ownerDocument.body);
-        // '또 해먹을래요' 선택
 
         expect(
             portal.getByRole("button", { name: "후기 등록하기" })
