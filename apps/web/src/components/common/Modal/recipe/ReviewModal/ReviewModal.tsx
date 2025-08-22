@@ -129,12 +129,11 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
 
                         <div className="w-full mb-6">
                             {feeling === null ? (
-                                <p className="mb-3 text-center text-[17px] font-semibold">
+                                <p className="my-3 text-center text-[17px] font-semibold">
                                     식사는 어떠셨나요?
                                 </p>
                             ) : (
-                               // 숨겨야 함
-															 <div className="h-10" />
+															 <div className="h-5" />
                             )}
                             <div className="flex w-full items-center justify-between gap-[10px]">
                                 <EmotionOptionButton
@@ -181,15 +180,15 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
                                                     className={cn(
                                                         "flex w-full items-center gap-3 px-3 text-left",
                                                         checked
-                                                            ? "border-[#68982D] bg-[#F4FAEC]"
+                                                            ? ""
                                                             : "border-neutral-200 bg-white"
                                                     )}
                                                 >
                                                     <span
                                                         className={cn(
-                                                            "grid h-5 w-5 place-items-center rounded-full border text-white",
+                                                            "grid h-5 w-5 place-items-center rounded-full border text-[#68982D]",
                                                             checked
-                                                                ? "border-[#68982D] bg-[#68982D]"
+                                                                ? ""
                                                                 : "border-neutral-300 bg-white"
                                                         )}
                                                         aria-hidden
@@ -216,7 +215,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
 
                 <div className="sticky bottom-0 w-full bg-white pt-4 pb-[calc(env(safe-area-inset-bottom)+20px)]">
                     <Button
-                        className="w-full bg-[#6FAA2E] hover:bg-[#629c2a]"
+                        className="w-full "
                         onClick={handleSubmit}
                         disabled={!canSubmit}
                     >
