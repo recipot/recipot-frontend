@@ -2,69 +2,13 @@ import React, { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 
 import { Button } from "@/components/common/Button/Button";
-import {
-    CheckIcon,
-    EmotionBadIcon,
-    EmotionGoodIcon,
-    EmotionNeutralIcon
-} from "@/components/Icons";
+import { CheckIcon } from "@/components/Icons";
 import { Dialog, DialogClose, DialogContent } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
-export type ReviewFeeling = "bad" | "soso" | "good";
+import { EmotionOptionButton } from "./EmotionOptionButton";
 
-export interface ReviewModalProps {
-    open: boolean;
-    onOpenChange: (open: boolean) => void;
-    recipeTitle: string;
-    recipeImageUrl: string;
-    timesCooked?: number;
-}
-
-const FeelingPill: React.FC<{
-    label: string;
-    color: "blue" | "yellow" | "red";
-    selected?: boolean;
-    disabled?: boolean;
-    onClick?: () => void;
-}> = ({ color, disabled, label, onClick, selected }) => {
-    const baseByColor: Record<typeof color, string> = {
-        blue: "bg-[#E9F0FF] text-[#5B74C8]",
-        red: "bg-[#FFE2E2] text-[#D25D5D]",
-        yellow: "bg-[#FFF6C7] text-[#A08C26]"
-    };
-
-    const selectedByColor: Record<typeof color, string> = {
-        blue: "bg-[#EDEFF3] text-neutral-400",
-        red: "bg-[#FFD4D4] text-[#D25D5D]",
-        yellow: "bg-[#EDEFF3] text-neutral-400"
-    };
-
-    return (
-        <button
-            type="button"
-            onClick={onClick}
-            disabled={disabled}
-            className={cn(
-                "flex h-20 w-[94px] flex-col items-center justify-center rounded-2xl border border-transparent text-sm font-semibold transition-colors",
-                disabled && "opacity-60 cursor-not-allowed",
-                selected ? selectedByColor[color] : baseByColor[color]
-            )}
-            aria-pressed={!!selected}
-        >
-            <span className="text-2xl leading-none mb-1">
-                {color === "blue" && <EmotionGoodIcon />}
-                {color === "yellow" && <EmotionNeutralIcon />}
-                {color === "red" && <EmotionBadIcon />}
-            </span>
-            <span>{label}</span>
-        </button>
-    );
-};
-
-const SectionDivider: React.FC = () => (
-    <div className="my-4 border-t border-neutral-200" />
-);
+import type { ReviewFeeling, ReviewModalProps } from "./types";
 
 export const ReviewModal: React.FC<ReviewModalProps> = ({
     onOpenChange,
@@ -107,16 +51,16 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
         );
     };
 
-    // feeling이 good이면 pros가 1개 이상이어야 제출 가능
+
     const canSubmit = !!feeling && (feeling !== "good" || pros.length > 0);
     const goodFeeling = feeling === "good";
 
     const handleSubmit = () => {
-        // TODO: submit hook 연결 지점
+
         onOpenChange(false);
     };
 
-    // Body scroll lock while modal is open (since this component uses ui/dialog directly)
+
     useEffect(() => {
         const html = document.documentElement;
         const { body } = document;
@@ -158,7 +102,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
 
                 {/* Content area - no scrolling, padded to avoid footer overlap */}
                 <div className="w-full">
-                    <div className="mx-auto flex max-w-[292px] flex-col items-center gap-6 pb-24">
+                    <div className="mx-auto flex max-w-[292px] flex-col items-center">
                         {cookedBadge && (
                             <div className="rounded-full bg-neutral-100 px-3 py-1 text-xs text-neutral-600">
                                 {cookedBadge}
@@ -173,36 +117,39 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
                                 <Image
                                     src={recipeImageUrl}
                                     alt={recipeTitle}
-                                    width={48}
-                                    height={48}
-                                    className="h-12 w-12 rounded-md object-cover shadow"
+                                    width={72}
+                                    height={72}
+                                    className="rounded-md"
                                 />
                             )}
                         </div>
 
-                        <SectionDivider />
 
-                        {/* 1단계: 기분 선택 */}
+
+
                         <div className="w-full mb-6">
-                            {feeling === null && (
+                            {feeling === null ? (
                                 <p className="mb-3 text-center text-[17px] font-semibold">
                                     식사는 어떠셨나요?
                                 </p>
+                            ) : (
+                               // 숨겨야 함
+															 <div className="h-10" />
                             )}
-                            <div className="flex w-full items-center justify-between">
-                                <FeelingPill
+                            <div className="flex w-full items-center justify-between gap-[10px]">
+                                <EmotionOptionButton
                                     label="별로예요"
                                     color="blue"
                                     onClick={() => handleFeelingClick("bad")}
                                     selected={feeling === "bad"}
                                 />
-                                <FeelingPill
+                                <EmotionOptionButton
                                     label="그저 그래요"
                                     color="yellow"
                                     onClick={() => handleFeelingClick("soso")}
                                     selected={feeling === "soso"}
                                 />
-                                <FeelingPill
+                                <EmotionOptionButton
                                     label="또 해먹을래요"
                                     color="red"
                                     onClick={() => handleFeelingClick("good")}
@@ -211,7 +158,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
                             </div>
                         </div>
 
-                        {/* 2단계: 긍정 선택 시 추가 질문 */}
+
                         {feeling === "good" && (
                             <div className="w-full">
                                 <div className="mb-4 rounded-2xl bg-[#FFE2E2] py-3 text-center text-[#D25D5D] font-semibold">
@@ -266,7 +213,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
                     </div>
                 </div>
 
-                {/* Footer (always visible) */}
+
                 <div className="sticky bottom-0 w-full bg-white pt-4 pb-[calc(env(safe-area-inset-bottom)+20px)]">
                     <Button
                         className="w-full bg-[#6FAA2E] hover:bg-[#629c2a]"
