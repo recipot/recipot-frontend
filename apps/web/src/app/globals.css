@@ -50,7 +50,7 @@
     --secondary-soft-orange: 30 100% 91%; /* #FFE9D4 */
     --secondary-light-orange: 20 100% 96%; /* #FFF4ED */
     --secondary-soft-red: 0 100% 92%; /* #FFD7D4 */
-    --secondary-light-red: 0 0% 100%; /* #FFEEEE */
+    --secondary-light-red: 0 0% 97%; /* #FFEEEE */
 
     /* Feel */
     --feel-tired-text: 221 46% 47%; /* #4164AE */
@@ -74,16 +74,16 @@
     --gray-50: 210 50% 97%; /* #F8F9FA */
 
     /* Typography */
-    --heading-24: 24px;
-    --heading-22: 22px;
-    --heading-20: 20px;
-    --body-18: 18px;
-    --body-17: 17px;
-    --body-15: 15px;
-    --paragraph-18: 18px;
-    --paragraph-16: 16px;
-    --paragraph-15: 15px;
-    --paragraph-14: 14px;
+    --heading-24: 1.5rem; /* 24px */
+    --heading-22: 1.375rem; /* 22px */
+    --heading-20: 1.25rem; /* 20px */
+    --body-18: 1.125rem; /* 18px */
+    --body-17: 1.0625rem; /* 17px */
+    --body-15: 0.9375rem; /* 15px */
+    --paragraph-18: 1.125rem; /* 18px */
+    --paragraph-16: 1rem; /* 16px */
+    --paragraph-15: 0.9375rem; /* 15px */
+    --paragraph-14: 0.875rem; /* 14px */
   }
   .dark {
     --background: 0 0% 3.9%;
