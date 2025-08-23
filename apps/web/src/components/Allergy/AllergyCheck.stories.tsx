@@ -1,4 +1,4 @@
-import AllergyCheck from './AllergyCheck';
+import AllergyCheckContainer from './AllergyCheckContainer';
 
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
@@ -9,7 +9,7 @@ const meta = {
       description: '폼 제출 시 호출되는 콜백 함수',
     },
   },
-  component: AllergyCheck,
+  component: AllergyCheckContainer,
   parameters: {
     docs: {
       description: {
@@ -21,7 +21,7 @@ const meta = {
   },
   tags: ['autodocs'],
   title: 'Allergy/AllergyCheck',
-} satisfies Meta<typeof AllergyCheck>;
+} satisfies Meta<typeof AllergyCheckContainer>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

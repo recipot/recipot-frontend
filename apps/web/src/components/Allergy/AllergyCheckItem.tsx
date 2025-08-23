@@ -1,5 +1,7 @@
 'use client';
 
+import { memo } from 'react';
+
 import { cn } from '@/lib/utils';
 
 import type { AllergyCheckItem } from './Allergy.constants';
@@ -12,7 +14,7 @@ import type { AllergyCheckItem } from './Allergy.constants';
  * @param onItemToggle - (itemId: number) => void
  * @returns AllergyCheckItem component
  */
-export default function AllergyCheckItem({
+function AllergyCheckItem({
   items,
   label,
   onItemToggle,
@@ -51,3 +53,5 @@ export default function AllergyCheckItem({
     </div>
   );
 }
+
+export default memo(AllergyCheckItem);

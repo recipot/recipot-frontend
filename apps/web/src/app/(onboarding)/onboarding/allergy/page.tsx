@@ -3,7 +3,7 @@
 import { allergyPost } from '@recipot/api';
 import { useMutation } from '@tanstack/react-query';
 
-import AllergyCheck from '@/components/Allergy/AllergyCheck';
+import { AllergyCheckContainer } from '@/components/Allergy';
 
 export default function AllergyPage() {
   const allergyMutation = useMutation({
@@ -22,7 +22,7 @@ export default function AllergyPage() {
 
   return (
     <div className="container mx-auto max-w-4xl p-6">
-      <AllergyCheck onSubmit={handleSubmit} />
+      <AllergyCheckContainer onSubmit={handleSubmit} />
     </div>
   );
 }
