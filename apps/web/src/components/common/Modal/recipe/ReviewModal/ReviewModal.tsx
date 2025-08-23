@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 
 import { Button } from "@/components/common/Button/Button";
-import { CheckIcon, CloseIcon, EmotionGoodIcon } from "@/components/Icons";
+import { ProsSection } from "@/components/common/Modal/recipe/ProsSection";
+import { CloseIcon } from "@/components/Icons";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
-import { EmotionOptionButton } from "./EmotionOptionButton";
+import EmotionSelector from "./EmotionSelector";
 
 import type { ReviewFeeling, ReviewModalProps } from "./types";
 
@@ -25,14 +26,6 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
         if (timesCooked <= 1) return `첫 해먹기 레시피예요!`;
         return `${timesCooked}번째 해먹기 완료한 레시피네요!`;
     };
-
-    const prosCandidates = [
-        "간단해서 빨리 만들 수 있어요",
-        "재료가 집에 있는 걸로 충분해요",
-        "맛 균형이 좋아요",
-        "다음에도 또 해먹고 싶어요",
-        "아이도 잘 먹어요"
-    ];
 
     const togglePro = (text: string) => {
         setPros((prev) =>
@@ -98,86 +91,13 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
                             )}
                         </div>
 
-                        <div className="w-full mb-6">
-                            {feeling === null ? (
-                                <p className="my-3 text-center text-[17px] font-semibold">
-                                    식사는 어떠셨나요?
-                                </p>
-                            ) : (
-                                <div className="h-5" />
-                            )}
-                            <div className="flex w-full items-center justify-between gap-[10px]">
-                                <EmotionOptionButton
-                                    label="별로예요"
-                                    color="blue"
-                                    onClick={() => handleFeelingClick("bad")}
-                                    selected={feeling === "bad"}
-                                />
-                                <EmotionOptionButton
-                                    label="그저 그래요"
-                                    color="yellow"
-                                    onClick={() => handleFeelingClick("soso")}
-                                    selected={feeling === "soso"}
-                                />
-                                <EmotionOptionButton
-                                    label="또 해먹을래요"
-                                    color="red"
-                                    onClick={() => handleFeelingClick("good")}
-                                    selected={feeling === "good"}
-                                />
-                            </div>
-                        </div>
+                        <EmotionSelector
+                            selectedFeeling={feeling}
+                            onFeelingSelect={handleFeelingClick}
+                        />
 
                         {feeling === "good" && (
-                            <div className="w-full">
-                                <div className="flex justify-center mb-4 rounded-2xl bg-[#FFE2E2] py-3 text-center text-[#D25D5D] font-semibold">
-                                    <EmotionGoodIcon /> 또 해먹을래요
-                                </div>
-
-                                <p className="mb-3 text-[17px] font-semibold text-center">
-                                    어떤점이 좋았나요?
-                                </p>
-                                <ul className="flex flex-col gap-3 ">
-                                    {prosCandidates.map((text) => {
-                                        const checked = pros.includes(text);
-                                        return (
-                                            <li key={text}>
-                                                <button
-                                                    type="button"
-                                                    onClick={() =>
-                                                        togglePro(text)
-                                                    }
-                                                    className={cn(
-                                                        "flex w-full items-center gap-3 px-3 text-left",
-                                                        checked
-                                                            ? ""
-                                                            : "border-neutral-200 bg-white"
-                                                    )}
-                                                >
-                                                    <span
-                                                        className={cn(
-                                                            "grid h-5 w-5 place-items-center rounded-md border text-brand-primary",
-                                                            checked
-                                                                ? "bg-secondary-soft-green"
-                                                                : "border-neutral-300 bg-white"
-                                                        )}
-                                                        aria-hidden
-                                                    >
-                                                        {checked ? (
-                                                            <CheckIcon />
-                                                        ) : (
-                                                            ""
-                                                        )}
-                                                    </span>
-                                                    <span className="text-[16px]">
-                                                        {text}
-                                                    </span>
-                                                </button>
-                                            </li>
-                                        );
-                                    })}
-                                </ul>
-                            </div>
+                            <ProsSection pros={pros} onTogglePro={togglePro} />
                         )}
                     </div>
                 </div>
