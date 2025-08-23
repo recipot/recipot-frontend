@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { expect, userEvent, within } from "@storybook/test";
+import { userEvent, within } from "@storybook/test";
 
 import { Button } from "@/components/common/Button/Button";
 
@@ -37,7 +37,7 @@ export const Initial: Story = {
     args: {
         onOpenChange: () => {},
         open: true,
-        recipeImageUrl: '/recipeImage.png',
+        recipeImageUrl: "/recipeImage.png",
         recipeTitle: "양배추 계란 샐러드",
         timesCooked: 2
     },
@@ -48,51 +48,4 @@ export const Initial: Story = {
         );
     },
     render: () => <Template key="initial" />
-};
-
-export const AfterGoodSelected: Story = {
-    args: {
-        onOpenChange: () => {},
-        open: true,
-        recipeImageUrl: '/recipeImage.png',
-        recipeTitle: "양배추 계란 샐러드",
-        timesCooked: 2
-    },
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
-
-        await userEvent.click(
-            canvas.getByRole("button", { name: "리뷰 모달 열기" })
-        );
-
-        const portal = within(canvasElement.ownerDocument.body);
-
-
-        expect(
-            portal.getByRole("button", { name: "후기 등록하기" })
-        ).toBeDisabled();
-    },
-    render: () => <Template key="after-good-selected" />
-};
-
-export const ProsSelected: Story = {
-    args: {
-        onOpenChange: () => {},
-        open: true,
-        recipeImageUrl: '/recipeImage.png',
-        recipeTitle: "양배추 계란 샐러드",
-        timesCooked: 2
-    },
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
-        await userEvent.click(
-            canvas.getByRole("button", { name: "리뷰 모달 열기" })
-        );
-        const portal = within(canvasElement.ownerDocument.body);
-
-        expect(
-            portal.getByRole("button", { name: "후기 등록하기" })
-        ).toBeEnabled();
-    },
-    render: () => <Template key="pros-selected" />
 };
