@@ -58,7 +58,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
                 role="dialog"
                 aria-modal="true"
                 className={cn(
-                    `fixed bottom-0 left-1/2 w-[370px] h-[649px] -translate-x-1/2 rounded-t-3xl bg-white ${goodFeeling ? "h-[90vh]" : "h-[80vh]"} px-6 pt-6 pb-8 shadow-lg min-h-[400px] flex flex-col overflow-hidden`,
+                    `fixed bottom-0 left-1/2 w-[370px] -translate-x-1/2 rounded-t-3xl bg-white ${goodFeeling ? "h-[90vh]" : "h-[80vh]"} px-6 pt-6 pb-8 shadow-lg min-h-[400px] flex flex-col overflow-hidden`,
                     "transition-all duration-300 ease-out transform",
                     "data-[state=open]:animate-in data-[state=open]:slide-in-from-bottom-full data-[state=open]:duration-300",
                     "data-[state=closed]:animate-out data-[state=closed]:slide-out-to-bottom-full data-[state=closed]:duration-300"
