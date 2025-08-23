@@ -6,29 +6,84 @@
   :root {
     --background: 0 0% 100%;
     --foreground: 0 0% 3.9%;
+
     --card: 0 0% 100%;
     --card-foreground: 0 0% 3.9%;
+
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
+
+    --primary: var(--brand-primary);
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: var(--secondary-soft-green);
     --secondary-foreground: 0 0% 9%;
+
     --muted: 0 0% 96.1%;
     --muted-foreground: 0 0% 45.1%;
+
     --accent: 0 0% 96.1%;
     --accent-foreground: 0 0% 9%;
+
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
+
     --border: 0 0% 89.8%;
     --input: 0 0% 89.8%;
     --ring: 0 0% 3.9%;
+
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
+
     --radius: 0.5rem;
+
+    /* Primary */
+    --brand-primary: 87 54% 39%; /* #68982D */
+    --brand-primary-pressed: 0 0% 20%;
+
+    /* Secondary */
+    --secondary-soft-green: 93 48% 86%; /* #D7E8C2 */
+    --secondary-light-green: 96 100% 95%; /* #F6FFEC */
+    --secondary-soft-orange: 30 100% 91%; /* #FFE9D4 */
+    --secondary-light-orange: 20 100% 96%; /* #FFF4ED */
+    --secondary-soft-red: 0 100% 92%; /* #FFD7D4 */
+    --secondary-light-red: 0 0% 97%; /* #FFEEEE */
+
+    /* Feel */
+    --feel-tired-text: 221 46% 47%; /* #4164AE */
+    --feel-soso-text: 49 76% 45%; /* #AD7E06 */
+    --feel-free-text: 357 70% 66%; /* #DF6567 */
+    --feel-back-default: 80 100% 91%; /* #E8FFD0 */
+    --feel-back-tired: 223 100% 92%; /* #D4E0FF */
+    --feel-back-soso: 53 100% 88%; /* #FFF7C4 */
+    --feel-back-free: 358 100% 93%; /* #FFDBDC */
+
+    /* Gray scale */
+    --gray-900: 210 10% 15%; /* #212529 */
+    --gray-800: 210 7% 25%; /* #343A40 */
+    --gray-700: 210 10% 30%; /* #495057 */
+    --gray-600: 210 6% 45%; /* #868E96 */
+    --gray-500: 210 8% 56%; /* #ADB5BD */
+    --gray-400: 210 16% 80%; /* #CED4DA */
+    --gray-300: 210 17% 90%; /* #DEE2E6 */
+    --gray-200: 210 20% 94%; /* #E9ECEF */
+    --gray-100: 210 33% 96%; /* #F1F3F5 */
+    --gray-50: 210 50% 97%; /* #F8F9FA */
+
+    /* Typography */
+    --heading-24: 1.5rem; /* 24px */
+    --heading-22: 1.375rem; /* 22px */
+    --heading-20: 1.25rem; /* 20px */
+    --body-18: 1.125rem; /* 18px */
+    --body-17: 1.0625rem; /* 17px */
+    --body-15: 0.9375rem; /* 15px */
+    --paragraph-18: 1.125rem; /* 18px */
+    --paragraph-16: 1rem; /* 16px */
+    --paragraph-15: 0.9375rem; /* 15px */
+    --paragraph-14: 0.875rem; /* 14px */
   }
   .dark {
     --background: 0 0% 3.9%;
@@ -58,8 +113,6 @@
   }
 }
 
-
-
 @layer base {
   * {
     @apply border-border;
@@ -68,5 +121,3 @@
     @apply bg-background text-foreground;
   }
 }
-
-
