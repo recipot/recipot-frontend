@@ -84,6 +84,8 @@
     --paragraph-16: 1rem; /* 16px */
     --paragraph-15: 0.9375rem; /* 15px */
     --paragraph-14: 0.875rem; /* 14px */
+
+    --font-pretendard: 'Pretendard', sans-serif;
   }
   .dark {
     --background: 0 0% 3.9%;
@@ -115,7 +117,7 @@
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border text-gray-900 font-pretendard;
   }
   body {
     @apply bg-background text-foreground;
