@@ -4,7 +4,7 @@ import Image from "next/image";
 import { Button } from "@/components/common/Button/Button";
 import { ProsSection } from "@/components/common/Modal/recipe/ProsSection";
 import { CloseIcon } from "@/components/Icons";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogClose, DialogContent } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
 import EmotionSelector from "./EmotionSelector";
@@ -64,9 +64,9 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
                     "data-[state=closed]:animate-out data-[state=closed]:slide-out-to-bottom-full data-[state=closed]:duration-300"
                 )}
             >
-                <div className="absolute right-3 top-3">
+                <DialogClose className="absolute right-3 top-3">
                     <CloseIcon />
-                </div>
+                </DialogClose>
 
                 <div className="w-full">
                     <div className="mx-auto flex max-w-[292px] flex-col items-center">
