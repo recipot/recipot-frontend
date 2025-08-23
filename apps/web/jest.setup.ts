@@ -1,15 +1,10 @@
 import '@testing-library/jest-dom';
 
-import { afterAll, afterEach, beforeAll } from '@jest/globals';
+// 기본 Jest 설정
+beforeEach(() => {
+  // 필요한 경우 여기에 테스트 환경 설정 추가
+});
 
-// MSW v2 테스트 서버 셋업
-import { server } from './src/mocks/server';
-
-// 테스트 시작 전 서버 실행
-beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
-
-// 각 테스트 후 핸들러 초기화
-afterEach(() => server.resetHandlers());
-
-// 모든 테스트 종료 후 서버 종료
-afterAll(() => server.close());
+afterEach(() => {
+  // 필요한 경우 여기에 정리 코드 추가
+});

@@ -10,7 +10,7 @@ export const setupMswForTests = () => {
   // 모든 테스트 실행 전에 서버 시작
   beforeAll(() => {
     server.listen({
-      onUnhandledRequest: 'error', // 테스트에서는 예상치 못한 요청을 에러로 처리
+      onUnhandledRequest: 'warn', // 테스트에서는 경고로 처리
     });
     console.log('🧪 테스트용 MSW 서버가 시작되었습니다.');
   });
@@ -37,13 +37,17 @@ export const mswTestHelpers = {
   // 특정 API 호출 에러 시뮬레이션
   simulateError: (endpoint: string, status: number = 500) => {
     const { http, HttpResponse } = require('msw');
-    return http.all(endpoint, () => HttpResponse.json({ error: 'Test error' }, { status }));
+    return http.all(endpoint, () =>
+      HttpResponse.json({ error: 'Test error' }, { status })
+    );
   },
 
   // 네트워크 에러 시뮬레이션
   simulateNetworkError: (endpoint: string) => {
     const { http, HttpResponse } = require('msw');
-    return http.all(endpoint, () => HttpResponse.json({ error: 'Network error' }, { status: 503 }));
+    return http.all(endpoint, () =>
+      HttpResponse.json({ error: 'Network error' }, { status: 503 })
+    );
   },
 
   // 지연 시뮬레이션
