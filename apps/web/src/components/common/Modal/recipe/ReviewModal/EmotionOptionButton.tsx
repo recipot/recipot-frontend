@@ -15,13 +15,13 @@ export interface FeelingPillProps {
     onClick?: () => void;
 }
 
-export const EmotionOptionButton: React.FC<FeelingPillProps> = ({
+export const EmotionOptionButton = ({
     color,
     disabled,
     label,
     onClick,
     selected
-}) => {
+}: FeelingPillProps) => {
     const baseByColor: Record<FeelingPillProps["color"], string> = {
         blue: "bg-[#D4E2FF] text-feel-tired-text",
         red: "bg-[#FFE2E2] text-[#D25D5D]",
