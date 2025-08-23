@@ -1,4 +1,5 @@
 import { authHandlers } from './auth.handlers';
+import { algorithCheckHandlers } from './algorithCheck.handlers';
 // 추후 다른 도메인 핸들러들을 추가할 예정
 // import { ingredientHandlers } from './ingredient.handlers';
 // import { recipeHandlers } from './recipe.handlers';
@@ -6,13 +7,15 @@ import { authHandlers } from './auth.handlers';
 
 export const handlers = [
   ...authHandlers,
+  ...algorithCheckHandlers, // 알고리즘 체크 핸들러 추가
   // ...ingredientHandlers,    // B 담당자가 완성 후 추가
-  // ...recipeHandlers,        // C 담당자가 완성 후 추가  
+  // ...recipeHandlers,        // C 담당자가 완성 후 추가
   // ...profileHandlers,       // D 담당자가 완성 후 추가
 ];
 
 // 도메인별로 핸들러를 분리해서 export (디버깅용)
 export { authHandlers };
+export { algorithCheckHandlers };
 // export { ingredientHandlers };
 // export { recipeHandlers };
 // export { profileHandlers };
@@ -20,6 +23,7 @@ export { authHandlers };
 // 핸들러 개수 확인용 (개발 시 유용)
 export const handlerCounts = {
   auth: authHandlers.length,
+  algorithCheck: algorithCheckHandlers.length,
   // ingredient: ingredientHandlers.length,
   // recipe: recipeHandlers.length,
   // profile: profileHandlers.length,
@@ -29,9 +33,9 @@ export const handlerCounts = {
 // MSW 상태 확인용 헬퍼
 export const getMswStatus = () => {
   return {
-    domains: ['auth'], // 완성된 도메인들
+    domains: ['auth', 'algorithCheck'], // 완성된 도메인들
     handlersCount: handlers.length,
     isEnabled: process.env.NODE_ENV === 'development',
-    // domains: ['auth', 'ingredient', 'recipe', 'profile'], // 모든 도메인 완성 후
+    // domains: ['auth', 'algorithCheck', 'ingredient', 'recipe', 'profile'], // 모든 도메인 완성 후
   };
 };
