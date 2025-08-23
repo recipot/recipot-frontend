@@ -73,18 +73,6 @@
     --gray-100: 210 33% 96%; /* #F1F3F5 */
     --gray-50: 210 50% 97%; /* #F8F9FA */
 
-    /* Typography */
-    --heading-24: 1.5rem; /* 24px */
-    --heading-22: 1.375rem; /* 22px */
-    --heading-20: 1.25rem; /* 20px */
-    --body-18: 1.125rem; /* 18px */
-    --body-17: 1.0625rem; /* 17px */
-    --body-15: 0.9375rem; /* 15px */
-    --paragraph-18: 1.125rem; /* 18px */
-    --paragraph-16: 1rem; /* 16px */
-    --paragraph-15: 0.9375rem; /* 15px */
-    --paragraph-14: 0.875rem; /* 14px */
-
     --font-pretendard: 'Pretendard', sans-serif;
   }
   .dark {
@@ -117,9 +105,70 @@
 
 @layer base {
   * {
-    @apply border-border text-gray-900 font-pretendard;
+    @apply border-border font-pretendard text-gray-900;
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Typography Utilities */
+@layer utilities {
+  .text-24 {
+    line-height: 140%;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+  .text-22 {
+    line-height: 140%;
+    font-size: 1.375rem;
+    font-weight: 600;
+  }
+  .text-20 {
+    line-height: 140%;
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+  .text-18 {
+    line-height: 150%;
+    font-size: 1.125rem;
+  }
+  .text-18sb {
+    line-height: 150%;
+    font-size: 1.125rem;
+    font-weight: 600;
+  }
+  .text-17 {
+    line-height: 140%;
+    font-size: 1.0625rem;
+  }
+  .text-17sb {
+    line-height: 140%;
+    font-size: 1.0625rem;
+    font-weight: 600;
+  }
+  .text-16 {
+    line-height: 150%;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+  .text-15 {
+    line-height: 150%;
+    font-size: 0.9375rem;
+  }
+  .text-15sb {
+    line-height: 150%;
+    font-size: 0.9375rem;
+    font-weight: 600;
+  }
+  .text-14 {
+    line-height: 150%;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+  .text-14b {
+    line-height: 150%;
+    font-size: 0.875rem;
+    font-weight: 700;
   }
 }
