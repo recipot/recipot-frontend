@@ -1,77 +1,53 @@
 'use client';
 
-import { Checkbox } from '@/components/ui/checkbox';
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
+import { cn } from '@/lib/utils';
 
-import type { AllergyCheckItem, AllergyFormSchema } from './Allergy.constants';
-import type { Control } from 'react-hook-form';
-import type { z } from 'zod';
+import type { AllergyCheckItem } from './Allergy.constants';
 
 /**
  * AllergyCheckItem
- * @param control - react-hook-form control
  * @param items - AllergyCheckItem[]
  * @param label - string
+ * @param selectedItems - number[]
+ * @param onItemToggle - (itemId: number) => void
  * @returns AllergyCheckItem component
  */
 export default function AllergyCheckItem({
-  control,
   items,
   label,
+  onItemToggle,
+  selectedItems,
 }: {
   items: AllergyCheckItem[];
-  control: Control<z.infer<typeof AllergyFormSchema>>;
   label: string;
+  selectedItems: number[];
+  onItemToggle: (itemId: number) => void;
 }) {
   return (
-    <FormField
-      control={control}
-      name="items"
-      render={() => (
-        <FormItem>
-          <FormLabel>{label}</FormLabel>
-          {items.map(item => (
-            <FormField
-              key={item.id}
-              control={control}
-              name="items"
-              render={({ field }) => {
-                return (
-                  <FormItem
-                    key={item.id}
-                    className="flex flex-row items-center gap-2"
-                  >
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value?.includes(item.id)}
-                        onCheckedChange={checked => {
-                          return checked
-                            ? field.onChange([...field.value, item.id])
-                            : field.onChange(
-                                field.value?.filter(
-                                  (value: number) => value !== item.id
-                                )
-                              );
-                        }}
-                      />
-                    </FormControl>
-                    <FormLabel className="text-sm font-normal">
-                      {item.label}
-                    </FormLabel>
-                  </FormItem>
-                );
-              }}
-            />
-          ))}
-          <FormMessage />
-        </FormItem>
-      )}
-    />
+    <div className="space-y-4">
+      <label className="text-18sb" htmlFor={label} id={label}>
+        {label}
+      </label>
+      <div className="text-15sb grid grid-cols-3 gap-3">
+        {items.map(item => (
+          // TODO : 추후 공통 컴포넌트로 변경 필요
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => onItemToggle(item.id)}
+            className={cn(
+              // 공통 스타일
+              'h-10 w-full rounded-[10px] border-[1.2px] p-3 leading-none transition-all duration-200',
+              // 상태별 스타일
+              selectedItems.includes(item.id)
+                ? 'border-secondary-soft-green bg-secondary-light-green text-primary'
+                : 'border-gray-300 bg-white hover:border-gray-300'
+            )}
+          >
+            {item.label}
+          </button>
+        ))}
+      </div>
+    </div>
   );
 }

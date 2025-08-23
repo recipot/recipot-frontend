@@ -1,14 +1,13 @@
 'use client';
 
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
-import { Form } from '@/components/ui/form';
 
-import { AllergyFormSchema, categories } from './Allergy.constants';
+import { categories } from './Allergy.constants';
 import AllergyCheckItem from './AllergyCheckItem';
 
+import type { AllergyFormSchema } from './Allergy.constants';
 import type { z } from 'zod';
 
 /**
@@ -21,26 +20,37 @@ export default function AllergyCheck({
 }: {
   onSubmit: (data: z.infer<typeof AllergyFormSchema>) => void;
 }) {
-  const form = useForm<z.infer<typeof AllergyFormSchema>>({
-    defaultValues: {
-      items: [],
-    },
-    resolver: zodResolver(AllergyFormSchema),
-  });
+  const [selectedItems, setSelectedItems] = useState<number[]>([]);
+
+  const handleItemToggle = (itemId: number) => {
+    setSelectedItems(prev => {
+      if (prev.includes(itemId)) {
+        return prev.filter(id => id !== itemId);
+      } else {
+        return [...prev, itemId];
+      }
+    });
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // 선택된 항목들을 ID 순서대로 정렬하여 전송
+    const sortedItems = [...selectedItems].sort((a, b) => a - b);
+    onSubmit({ items: sortedItems });
+  };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        {categories.map(category => (
-          <AllergyCheckItem
-            key={category.title}
-            control={form.control}
-            items={category.items}
-            label={category.title}
-          />
-        ))}
-        <Button type="submit">Submit</Button>
-      </form>
-    </Form>
+    <form onSubmit={handleSubmit} className="space-y-8">
+      {categories.map(category => (
+        <AllergyCheckItem
+          key={category.title}
+          items={category.items}
+          label={category.title}
+          selectedItems={selectedItems}
+          onItemToggle={handleItemToggle}
+        />
+      ))}
+      <Button type="submit">Submit</Button>
+    </form>
   );
 }
