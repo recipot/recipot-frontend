@@ -3,8 +3,8 @@
 import { allergyPost } from '@recipot/api';
 import { useMutation } from '@tanstack/react-query';
 
-import { AlgorithCheck } from '@/components/Algorith';
-import type { AlgorithFormSchema } from '@/components/Algorith/Algorith.constants';
+import { AllergyCheck } from '@/components/Allergy';
+import type { AllergyFormSchema } from '@/components/Allergy/Allergy.constants';
 
 import type { z } from 'zod';
 
@@ -13,14 +13,14 @@ export default function Home() {
     mutationFn: allergyPost,
   });
 
-  const handleSubmit = (data: z.infer<typeof AlgorithFormSchema>) => {
+  const handleSubmit = (data: z.infer<typeof AllergyFormSchema>) => {
     // mutation을 직접 호출
     mutate({ categories: data.items });
   };
 
   return (
     <div>
-      <AlgorithCheck onSubmit={handleSubmit} />
+      <AllergyCheck onSubmit={handleSubmit} />
     </div>
   );
 }

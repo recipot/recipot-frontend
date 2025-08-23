@@ -6,29 +6,33 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
 
-import { AlgorithFormSchema, categories } from './Algorith.constants';
-import AlgorithCheckItem from './AlgorithCheckItem';
+import { AllergyFormSchema, categories } from './Allergy.constants';
+import AllergyCheckItem from './AllergyCheckItem';
 
 import type { z } from 'zod';
 
 /**
- * AlgorithCheck
+ * AllergyCheck
  * @param onSubmit - onSubmit function
- * @returns AlgorithCheck component
+ * @returns AllergyCheck component
  */
-export default function AlgorithCheck({ onSubmit }: { onSubmit: (data: z.infer<typeof AlgorithFormSchema>) => void }) {
-  const form = useForm<z.infer<typeof AlgorithFormSchema>>({
+export default function AllergyCheck({
+  onSubmit,
+}: {
+  onSubmit: (data: z.infer<typeof AllergyFormSchema>) => void;
+}) {
+  const form = useForm<z.infer<typeof AllergyFormSchema>>({
     defaultValues: {
       items: [],
     },
-    resolver: zodResolver(AlgorithFormSchema),
+    resolver: zodResolver(AllergyFormSchema),
   });
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        {categories.map((category) => (
-          <AlgorithCheckItem
+        {categories.map(category => (
+          <AllergyCheckItem
             key={category.title}
             control={form.control}
             items={category.items}

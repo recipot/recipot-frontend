@@ -1,11 +1,11 @@
 import { z } from 'zod';
 
-export type AlgorithCheckItem = {
+export type AllergyCheckItem = {
   id: number;
   label: string;
 };
 
-export const itemsSeafood: AlgorithCheckItem[] = [
+export const itemsSeafood: AllergyCheckItem[] = [
   {
     id: 1,
     label: '어류',
@@ -28,7 +28,7 @@ export const itemsSeafood: AlgorithCheckItem[] = [
   },
 ] as const;
 
-export const itemsAnimal: AlgorithCheckItem[] = [
+export const itemsAnimal: AllergyCheckItem[] = [
   {
     id: 6,
     label: '돼지고기',
@@ -51,7 +51,7 @@ export const itemsAnimal: AlgorithCheckItem[] = [
   },
 ] as const;
 
-export const categories: { items: AlgorithCheckItem[]; title: string }[] = [
+export const categories: { items: AllergyCheckItem[]; title: string }[] = [
   {
     items: itemsSeafood,
     title: '해산물류',
@@ -62,6 +62,6 @@ export const categories: { items: AlgorithCheckItem[]; title: string }[] = [
   },
 ];
 
-export const AlgorithFormSchema = z.object({
+export const AllergyFormSchema = z.object({
   items: z.array(z.number()),
 });
