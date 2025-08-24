@@ -40,7 +40,7 @@ export const EmotionOptionButton = ({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        "flex h-20 w-[94px] flex-col items-center justify-center rounded-2xl text-sm font-semibold",
+        "flex h-20 w-[94px] flex-col items-center justify-center rounded-2xl text-sm font-semibold gap-[6px]",
         disabled && "opacity-60 cursor-not-allowed",
         selected ? selectedByColor[color] : baseByColor[color]
       )}
