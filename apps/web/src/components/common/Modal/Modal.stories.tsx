@@ -91,14 +91,6 @@ const ShareRecipeStory = () => {
 };
 
 export const ShareRecipe: Story = {
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await userEvent.click(
-      canvas.getByRole('button', {
-        name: '레시피 공유 모달 열기',
-      })
-    );
-  },
   render: () => <ShareRecipeStory />,
 };
 
