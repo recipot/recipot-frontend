@@ -78,7 +78,6 @@ export function Modal({
     const initiallyOpen = props.open;
     if (initiallyOpen) lockBodyScroll(true);
     return () => lockBodyScroll(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleOverlayClick: React.MouseEventHandler<HTMLDivElement> = event => {
@@ -135,7 +134,7 @@ export function Modal({
             )}
           </div>
 
-          <div className="py-1 text-[17px] font-pretendard">{children}</div>
+          <div className="py-1 text-body17 font-pretendard">{children}</div>
 
           {footer && (
             <div className="flex justify-end space-x-2 pt-4 border-t">

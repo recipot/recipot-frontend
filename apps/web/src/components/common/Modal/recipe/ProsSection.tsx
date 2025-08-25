@@ -14,7 +14,7 @@ const PROS_OPTIONS = [
   '아이도 잘 먹어요',
 ] as const;
 
-export const ProsSection = ({ onTogglePro, pros }: ProsSectionProps) => {
+export function ProsSection({ onTogglePro, pros }: ProsSectionProps) {
   return (
     <div className="w-full">
       <div className="flex justify-center items-center mb-4 rounded-2xl bg-[#FFE2E2] py-3 text-center text-[#D25D5D] font-semibold">
@@ -22,7 +22,7 @@ export const ProsSection = ({ onTogglePro, pros }: ProsSectionProps) => {
         <span>또 해먹을래요</span>
       </div>
 
-      <p className="mb-3 text-[17px] font-semibold text-center">
+      <p className="mb-3 text-body17 font-semibold text-center">
         어떤점이 좋았나요?
       </p>
 
@@ -60,4 +60,4 @@ export const ProsSection = ({ onTogglePro, pros }: ProsSectionProps) => {
       </ul>
     </div>
   );
-};
+}

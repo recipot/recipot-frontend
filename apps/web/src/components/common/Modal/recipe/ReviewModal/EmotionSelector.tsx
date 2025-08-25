@@ -7,20 +7,20 @@ interface EmotionSelectorProps {
   onFeelingSelect: (feeling: ReviewFeeling) => void;
 }
 
-export const EmotionSelector: React.FC<EmotionSelectorProps> = ({
+export function EmotionSelector({
   onFeelingSelect,
   selectedFeeling,
-}) => {
+}: EmotionSelectorProps) {
   return (
-    <div className="w-full mb-6">
+    <div className="w-[342px] mb-6 gap-10 pt-5 px-6">
       {selectedFeeling === null ? (
-        <p className="my-3 text-center text-[17px] font-semibold">
+        <p className="my-3 text-center text-[22px] font-semibold">
           식사는 어떠셨나요?
         </p>
       ) : (
         <div className="h-5" />
       )}
-      <div className="flex w-full items-center justify-between gap-[10px]">
+      <div className="flex w-full items-center justify-between gap-3">
         <EmotionOptionButton
           label="별로예요"
           color="blue"
@@ -42,6 +42,6 @@ export const EmotionSelector: React.FC<EmotionSelectorProps> = ({
       </div>
     </div>
   );
-};
+}
 
 export default EmotionSelector;
