@@ -78,7 +78,7 @@ export function Modal({
     const initiallyOpen = props.open;
     if (initiallyOpen) lockBodyScroll(true);
     return () => lockBodyScroll(false);
-  }, []);
+  }, [props.open]);
 
   const handleOverlayClick: React.MouseEventHandler<HTMLDivElement> = event => {
     if (disableOverlayClick) {
