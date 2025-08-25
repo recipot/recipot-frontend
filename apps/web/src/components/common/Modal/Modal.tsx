@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect } from 'react';
 
 import {
   Dialog,
@@ -6,16 +6,16 @@ import {
   DialogContent,
   DialogOverlay,
   DialogPortal,
-  DialogTrigger
-} from "@/components/ui/dialog";
-import { cn } from "@/lib/utils";
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { cn } from '@/lib/utils';
 
-import type { ComponentPropsWithoutRef } from "react";
+import type { ComponentPropsWithoutRef } from 'react';
 
 export interface ModalProps extends ComponentPropsWithoutRef<typeof Dialog> {
   title?: string;
   description?: string;
-  size?: "sm" | "default" | "lg" | "xl" | "full";
+  size?: 'sm' | 'default' | 'lg' | 'xl' | 'full';
   showCloseButton?: boolean;
   contentClassName?: string;
   footer?: React.ReactNode;
@@ -24,11 +24,11 @@ export interface ModalProps extends ComponentPropsWithoutRef<typeof Dialog> {
 }
 
 const sizeClasses = {
-  default: "max-w-md",
-  full: "max-w-[95vw] w-full",
-  lg: "max-w-2xl",
-  sm: "max-w-sm",
-  xl: "max-w-4xl"
+  default: 'max-w-md',
+  full: 'max-w-[95vw] w-full',
+  lg: 'max-w-2xl',
+  sm: 'max-w-sm',
+  xl: 'max-w-4xl',
 } as const;
 
 export function Modal({
@@ -38,34 +38,34 @@ export function Modal({
   disableOverlayClick = false,
   footer,
   onOpenChange,
-  size = "default",
+  size = 'default',
   title,
   titleClassName,
   ...props
 }: ModalProps) {
   const ALLOWED_SIZES = new Set<keyof typeof sizeClasses>([
-    "default",
-    "full",
-    "lg",
-    "sm",
-    "xl"
+    'default',
+    'full',
+    'lg',
+    'sm',
+    'xl',
   ]);
 
   const safeSize: keyof typeof sizeClasses = ALLOWED_SIZES.has(size)
     ? size
-    : "default";
+    : 'default';
 
   const lockBodyScroll = (lock: boolean) => {
     const html = document.documentElement;
     const { body } = document;
     if (lock) {
-      html.style.overflow = "hidden";
-      body.style.overflow = "hidden";
-      body.style.overscrollBehavior = "contain";
+      html.style.overflow = 'hidden';
+      body.style.overflow = 'hidden';
+      body.style.overscrollBehavior = 'contain';
     } else {
-      html.style.overflow = "";
-      body.style.overflow = "";
-      body.style.overscrollBehavior = "";
+      html.style.overflow = '';
+      body.style.overflow = '';
+      body.style.overscrollBehavior = '';
     }
   };
 
@@ -81,9 +81,7 @@ export function Modal({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleOverlayClick: React.MouseEventHandler<HTMLDivElement> = (
-    event
-  ) => {
+  const handleOverlayClick: React.MouseEventHandler<HTMLDivElement> = event => {
     if (disableOverlayClick) {
       event.preventDefault();
       event.stopPropagation();
@@ -92,16 +90,16 @@ export function Modal({
 
   let sizeClass: (typeof sizeClasses)[keyof typeof sizeClasses];
   switch (safeSize) {
-    case "sm":
+    case 'sm':
       sizeClass = sizeClasses.sm;
       break;
-    case "lg":
+    case 'lg':
       sizeClass = sizeClasses.lg;
       break;
-    case "xl":
+    case 'xl':
       sizeClass = sizeClasses.xl;
       break;
-    case "full":
+    case 'full':
       sizeClass = sizeClasses.full;
       break;
     default:
@@ -117,7 +115,7 @@ export function Modal({
         />
         <DialogContent
           className={cn(
-            "fixed left-[50%] top-[50%] z-50 grid w-[320px] translate-x-[-50%] translate-y-[-50%] gap-[30px] border bg-background px-6 pt-[30px] shadow-lg duration-200 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 rounded-3xl",
+            'fixed left-[50%] top-[50%] z-50 grid w-[320px] translate-x-[-50%] translate-y-[-50%] gap-[30px] border bg-background px-6 pt-[30px] shadow-lg duration-200 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 rounded-3xl',
             sizeClass,
             contentClassName
           )}
@@ -125,8 +123,8 @@ export function Modal({
           <div className="flex flex-col space-y-2 text-center">
             <h2
               className={cn(
-                "font-normal leading-none tracking-tight",
-                "text-[14px]",
+                'font-normal leading-none tracking-tight',
+                'text-[14px]',
                 titleClassName
               )}
             >

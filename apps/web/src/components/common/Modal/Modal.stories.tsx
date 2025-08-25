@@ -1,10 +1,10 @@
-import { useState } from "react";
-import { userEvent, within } from "@storybook/test";
+import { useState } from 'react';
+import { userEvent, within } from '@storybook/test';
 
-import { Button } from "@/components/common/Button/Button";
-import { Modal } from "@/components/common/Modal/Modal";
+import { Button } from '@/components/common/Button/Button';
+import { Modal } from '@/components/common/Modal/Modal';
 
-import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 interface ModalProps {
   open: boolean;
@@ -14,7 +14,7 @@ interface ModalProps {
 const ShareRecipeModal = ({ onOpenChange, open }: ModalProps) => {
   const handleCopyClick = () => {
     onOpenChange(false);
-    navigator.clipboard.writeText("https://recipot.com/recipes/12345");
+    navigator.clipboard.writeText('https://recipot.com/recipes/12345');
   };
   return (
     <Modal
@@ -71,10 +71,10 @@ const LeavePageWarningModal = ({ onOpenChange, open }: ModalProps) => (
 const meta = {
   component: Modal,
   parameters: {
-    layout: "centered"
+    layout: 'centered',
   },
-  tags: ["autodocs"],
-  title: "Common/Modal"
+  tags: ['autodocs'],
+  title: 'Common/Modal',
 } satisfies Meta<typeof Modal>;
 
 export default meta;
@@ -94,12 +94,12 @@ export const ShareRecipe: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await userEvent.click(
-      canvas.getByRole("button", {
-        name: "레시피 공유 모달 열기"
+      canvas.getByRole('button', {
+        name: '레시피 공유 모달 열기',
       })
     );
   },
-  render: () => <ShareRecipeStory />
+  render: () => <ShareRecipeStory />,
 };
 
 const LoginRequiredStory = () => {
@@ -115,7 +115,7 @@ const LoginRequiredStory = () => {
 };
 
 export const LoginRequired: Story = {
-  render: () => <LoginRequiredStory />
+  render: () => <LoginRequiredStory />,
 };
 
 const LeavePageWarningStory = () => {
@@ -131,5 +131,5 @@ const LeavePageWarningStory = () => {
 };
 
 export const LeavePageWarning: Story = {
-  render: () => <LeavePageWarningStory />
+  render: () => <LeavePageWarningStory />,
 };

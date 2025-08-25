@@ -1,6 +1,6 @@
-import EmotionOptionButton from "./EmotionOptionButton";
+import EmotionOptionButton from './EmotionOptionButton';
 
-import type { ReviewFeeling } from "./types";
+import type { ReviewFeeling } from './types';
 
 interface EmotionSelectorProps {
   selectedFeeling: ReviewFeeling | null;
@@ -9,7 +9,7 @@ interface EmotionSelectorProps {
 
 export const EmotionSelector: React.FC<EmotionSelectorProps> = ({
   onFeelingSelect,
-  selectedFeeling
+  selectedFeeling,
 }) => {
   return (
     <div className="w-full mb-6">
@@ -24,20 +24,20 @@ export const EmotionSelector: React.FC<EmotionSelectorProps> = ({
         <EmotionOptionButton
           label="별로예요"
           color="blue"
-          onClick={() => onFeelingSelect("bad")}
-          selected={selectedFeeling === "bad"}
+          onClick={() => onFeelingSelect('bad')}
+          selected={selectedFeeling === 'bad'}
         />
         <EmotionOptionButton
           label="그저 그래요"
           color="yellow"
-          onClick={() => onFeelingSelect("soso")}
-          selected={selectedFeeling === "soso"}
+          onClick={() => onFeelingSelect('soso')}
+          selected={selectedFeeling === 'soso'}
         />
         <EmotionOptionButton
           label="또 해먹을래요"
           color="red"
-          onClick={() => onFeelingSelect("good")}
-          selected={selectedFeeling === "good"}
+          onClick={() => onFeelingSelect('good')}
+          selected={selectedFeeling === 'good'}
         />
       </div>
     </div>

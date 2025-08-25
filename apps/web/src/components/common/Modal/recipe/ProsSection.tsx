@@ -1,8 +1,5 @@
-// ProsSection.tsx
-import React from "react";
-
-import { CheckIcon, EmotionGoodIcon } from "@/components/Icons";
-import { cn } from "@/lib/utils";
+import { CheckIcon, EmotionGoodIcon } from '@/components/Icons';
+import { cn } from '@/lib/utils';
 
 interface ProsSectionProps {
   pros: string[];
@@ -10,11 +7,11 @@ interface ProsSectionProps {
 }
 
 const PROS_OPTIONS = [
-  "간단해서 빨리 만들 수 있어요",
-  "재료가 집에 있는 걸로 충분해요",
-  "맛 균형이 좋아요",
-  "다음에도 또 해먹고 싶어요",
-  "아이도 잘 먹어요"
+  '간단해서 빨리 만들 수 있어요',
+  '재료가 집에 있는 걸로 충분해요',
+  '맛 균형이 좋아요',
+  '다음에도 또 해먹고 싶어요',
+  '아이도 잘 먹어요',
 ] as const;
 
 export const ProsSection = ({ onTogglePro, pros }: ProsSectionProps) => {
@@ -30,7 +27,7 @@ export const ProsSection = ({ onTogglePro, pros }: ProsSectionProps) => {
       </p>
 
       <ul className="flex flex-col gap-2">
-        {PROS_OPTIONS.map((text) => {
+        {PROS_OPTIONS.map(text => {
           const isSelected = pros.includes(text);
           return (
             <li key={text}>
@@ -38,18 +35,18 @@ export const ProsSection = ({ onTogglePro, pros }: ProsSectionProps) => {
                 type="button"
                 onClick={() => onTogglePro(text)}
                 className={cn(
-                  "flex w-full items-center gap-3 px-3 py-2 rounded-md transition-colors",
-                  isSelected ? "bg-neutral-50" : "hover:bg-neutral-50"
+                  'flex w-full items-center gap-3 px-3 py-2 rounded-md transition-colors',
+                  isSelected ? 'bg-neutral-50' : 'hover:bg-neutral-50'
                 )}
                 aria-checked={isSelected}
                 role="checkbox"
               >
                 <span
                   className={cn(
-                    "grid h-5 w-5 place-items-center rounded-md border shrink-0",
+                    'grid h-5 w-5 place-items-center rounded-md border shrink-0',
                     isSelected
-                      ? "bg-secondary-soft-green border-transparent text-brand-primary"
-                      : "border-neutral-300 bg-white"
+                      ? 'bg-secondary-soft-green border-transparent text-brand-primary'
+                      : 'border-neutral-300 bg-white'
                   )}
                   aria-hidden
                 >

@@ -1,6 +1,6 @@
-import type { StaticImageData } from "next/image";
+import type { StaticImageData } from 'next/image';
 
-export type ReviewFeeling = "bad" | "soso" | "good";
+export type ReviewFeeling = 'bad' | 'soso' | 'good';
 
 export interface ReviewModalProps {
   open: boolean;
