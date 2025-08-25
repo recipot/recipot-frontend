@@ -14,7 +14,7 @@ const PROS_OPTIONS = [
   '아이도 잘 먹어요',
 ] as const;
 
-export function ProsSection({ onTogglePro, pros }: ProsSectionProps) {
+export function RecipeProsSelector({ onTogglePro, pros }: ProsSectionProps) {
   return (
     <div className="w-full">
       <div className="flex justify-center items-center mb-4 rounded-2xl bg-[#FFE2E2] py-3 text-center text-[#D25D5D] font-semibold">

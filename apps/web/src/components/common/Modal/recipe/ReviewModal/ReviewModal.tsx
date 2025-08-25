@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 
 import { Button } from '@/components/common/Button/Button';
-import { ProsSection } from '@/components/common/Modal/recipe/ProsSection';
+
 import { CloseIcon } from '@/components/Icons';
 import { Drawer, DrawerClose, DrawerContent } from '@/components/ui/drawer';
 import { cn } from '@/lib/utils';
@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import EmotionSelector from './EmotionSelector';
 
 import type { ReviewFeeling, ReviewModalProps } from './types';
+import { RecipeProsSelector } from '../ProsSection';
 
 export function ReviewModal({
   onOpenChange,
@@ -92,7 +93,7 @@ export function ReviewModal({
               />
 
               {feeling === 'good' && (
-                <ProsSection pros={pros} onTogglePro={togglePro} />
+                <RecipeProsSelector pros={pros} onTogglePro={togglePro} />
               )}
 
               <div className="fixed bottom-[30px] left-0 w-full px-6">
