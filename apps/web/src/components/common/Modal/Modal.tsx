@@ -115,7 +115,7 @@ export function Modal({
         />
         <DialogContent
           className={cn(
-            'fixed left-[50%] top-[50%] z-50 grid w-[320px] translate-x-[-50%] translate-y-[-50%] gap-[30px] border bg-background px-6 pt-[30px] shadow-lg duration-200 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 rounded-3xl',
+            'fixed left-[50%] top-[50%] z-50 grid w-[320px] translate-x-[-50%] translate-y-[-50%] gap-[30px] border bg-background px-5 pb-5 pt-[30px] shadow-lg duration-200 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 rounded-3xl',
             sizeClass,
             contentClassName
           )}
@@ -124,7 +124,7 @@ export function Modal({
             <h2
               className={cn(
                 'font-normal leading-none tracking-tight',
-                'text-[14px]',
+                'text-body17',
                 titleClassName
               )}
             >
