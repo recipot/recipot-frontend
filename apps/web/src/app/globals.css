@@ -135,11 +135,16 @@
     font-size: 1.0625rem; /* 17px */
     font-weight: 600;
   }
-  .text-16 {
+  .text-16sb {
     line-height: 150%;
     font-size: 1rem; /* 16px */
     font-weight: 600;
   }
+	.text-16{
+		line-height: 150%;
+		font-size: 1rem; /* 16px */
+		font-weight: 400;
+	}
   .text-15 {
     line-height: 150%;
     font-size: 0.9375rem; /* 15px */
