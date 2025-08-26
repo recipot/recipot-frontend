@@ -15,10 +15,16 @@ const typographyStyles = [
   'text-14b',
 ];
 
-function getWeightLabel(style: string) {
-  if (style.endsWith('sb')) return 'Semi-Bold (600)';
-  if (style.endsWith('b')) return 'Bold (700)';
-  return 'Normal (400)';
+function getWeightLabel(style: string): string {
+  if (style === 'text-20' || style === 'text-14b') {
+    return 'Bold (700)';
+  }
+
+  if (style === 'text-18' || style === 'text-17' || style === 'text-15') {
+    return 'Normal (400)';
+  }
+
+  return 'Semi-Bold (600)';
 }
 
 const meta: Meta = {
