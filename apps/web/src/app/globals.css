@@ -72,18 +72,6 @@
     --gray-200: 210 20% 94%; /* #E9ECEF */
     --gray-100: 210 33% 96%; /* #F1F3F5 */
     --gray-50: 210 50% 97%; /* #F8F9FA */
-
-    /* Typography */
-    --heading-24: 1.5rem; /* 24px */
-    --heading-22: 1.375rem; /* 22px */
-    --heading-20: 1.25rem; /* 20px */
-    --body-18: 1.125rem; /* 18px */
-    --body-17: 1.0625rem; /* 17px */
-    --body-15: 0.9375rem; /* 15px */
-    --paragraph-18: 1.125rem; /* 18px */
-    --paragraph-16: 1rem; /* 16px */
-    --paragraph-15: 0.9375rem; /* 15px */
-    --paragraph-14: 0.875rem; /* 14px */
   }
   .dark {
     --background: 0 0% 3.9%;
@@ -110,6 +98,66 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+  }
+}
+
+@layer utilities {
+  .text-24 {
+    line-height: 140%;
+    font-size: 1.5rem; /* 24px */
+    font-weight: 600;
+  }
+  .text-22 {
+    line-height: 140%;
+    font-size: 1.375rem; /* 22px */
+    font-weight: 600;
+  }
+  .text-20 {
+    line-height: 140%;
+    font-size: 1.25rem; /* 20px */
+    font-weight: 700;
+  }
+  .text-18 {
+    line-height: 150%;
+    font-size: 1.125rem; /* 18px */
+  }
+  .text-18sb {
+    line-height: 150%;
+    font-size: 1.125rem; /* 18px */
+    font-weight: 600;
+  }
+  .text-17 {
+    line-height: 140%;
+    font-size: 1.0625rem; /* 17px */
+  }
+  .text-17sb {
+    line-height: 140%;
+    font-size: 1.0625rem; /* 17px */
+    font-weight: 600;
+  }
+  .text-16 {
+    line-height: 150%;
+    font-size: 1rem; /* 16px */
+    font-weight: 600;
+  }
+  .text-15 {
+    line-height: 150%;
+    font-size: 0.9375rem; /* 15px */
+  }
+  .text-15sb {
+    line-height: 150%;
+    font-size: 0.9375rem; /* 15px */
+    font-weight: 600;
+  }
+  .text-14 {
+    line-height: 150%;
+    font-size: 0.875rem; /* 14px */
+    font-weight: 600;
+  }
+  .text-14b {
+    line-height: 150%;
+    font-size: 0.875rem; /* 14px */
+    font-weight: 700;
   }
 }
 
