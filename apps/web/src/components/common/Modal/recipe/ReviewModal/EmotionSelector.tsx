@@ -14,7 +14,7 @@ export function EmotionSelector({
   return (
     <div className="w-[342px] mb-6 gap-10 pt-5 px-6">
       {selectedFeeling === null ? (
-        <p className="my-3 text-center text-[22px] font-semibold">
+        <p className="my-3 text-center text-heading22 font-semibold">
           식사는 어떠셨나요?
         </p>
       ) : (

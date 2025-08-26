@@ -35,8 +35,7 @@ export function RecipeProsSelector({ onTogglePro, pros }: ProsSectionProps) {
                 type="button"
                 onClick={() => onTogglePro(text)}
                 className={cn(
-                  'flex w-full items-center gap-3 px-3 py-2 rounded-md transition-colors',
-                  isSelected ? 'bg-neutral-50' : 'hover:bg-neutral-50'
+                  'flex w-full items-center gap-3 px-3 py-2 rounded-md transition-colors'
                 )}
                 aria-checked={isSelected}
                 role="checkbox"
@@ -52,7 +51,7 @@ export function RecipeProsSelector({ onTogglePro, pros }: ProsSectionProps) {
                 >
                   {isSelected && <CheckIcon />}
                 </span>
-                <span className="text-[16px] text-left">{text}</span>
+                <span className="text-16 text-left">{text}</span>
               </button>
             </li>
           );

@@ -20,7 +20,6 @@ export interface ModalProps extends ComponentPropsWithoutRef<typeof Dialog> {
   contentClassName?: string;
   footer?: React.ReactNode;
   disableOverlayClick?: boolean;
-  titleClassName?: string;
 }
 
 const sizeClasses = {
@@ -40,7 +39,6 @@ export function Modal({
   onOpenChange,
   size = 'default',
   title,
-  titleClassName,
   ...props
 }: ModalProps) {
   const ALLOWED_SIZES = new Set<keyof typeof sizeClasses>([
@@ -123,8 +121,7 @@ export function Modal({
             <h2
               className={cn(
                 'font-normal leading-none tracking-tight',
-                'text-body17',
-                titleClassName
+                'text-body17'
               )}
             >
               {title}

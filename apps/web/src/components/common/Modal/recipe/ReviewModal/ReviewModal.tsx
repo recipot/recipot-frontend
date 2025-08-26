@@ -86,7 +86,7 @@ export function ReviewModal({
               </div>
             </div>
 
-            <div className="flex flex-col items-center gap-[159px]">
+            <div className="flex flex-col items-center">
               <EmotionSelector
                 selectedFeeling={feeling}
                 onFeelingSelect={handleFeelingClick}
@@ -96,7 +96,7 @@ export function ReviewModal({
                 <RecipeProsSelector pros={pros} onTogglePro={togglePro} />
               )}
 
-              <div className="fixed bottom-[30px] left-0 w-full px-6">
+              <div className="fixed bottom-[30px] left-0 w-full px-6 gap-[155px]">
                 <Button
                   className="w-full"
                   onClick={handleSubmit}
