@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { userEvent, within } from '@storybook/test';
 
 import { Button } from '@/components/common/Button/Button';
 import { Modal } from '@/components/common/Modal/Modal';
@@ -21,7 +20,6 @@ const ShareRecipeModal = ({ onOpenChange, open }: ModalProps) => {
       open={open}
       onOpenChange={onOpenChange}
       title="해당 레시피를 공유해보세요."
-      titleClassName="text-body17"
     >
       <div className="space-y-4 flex justify-center">
         <Button onClick={handleCopyClick} size="lg" variant="default">
