@@ -1,16 +1,17 @@
-import * as React from "react";
+import * as React from 'react';
 
-import { Button } from "@/components/common/Button/Button";
-import { cn } from "@/lib/utils";
-
-import type { ButtonProps } from "../Button.types";
+import { Button } from '@/components/common/Button/Button';
+import type { ButtonProps } from '@/components/common/Button/Button.types';
+import { cn } from '@/lib/utils';
 
 export const FloatingButton = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ children, className, ...props }, ref) => {
+  function FloatingButton({ children, className, ...props }, ref) {
     return (
       <Button
         ref={ref}
-        className={cn("fixed right-5 h-12 w-12 rounded-full z-50", className)}
+        size="icon"
+        shape="round"
+        className={cn('fixed right-5 z-50 h-12 w-12', className)}
         {...props}
       >
         {children}
@@ -18,4 +19,4 @@ export const FloatingButton = React.forwardRef<HTMLButtonElement, ButtonProps>(
     );
   }
 );
-FloatingButton.displayName = "FloatingButton";
+FloatingButton.displayName = 'FloatingButton';

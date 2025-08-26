@@ -1,18 +1,16 @@
 import * as React from 'react';
 
 import { Button } from '@/components/common/Button/Button';
-
-export interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'outline' | 'solid';
+import type { ButtonProps } from '@/components/common/Button/Button.types';
+export interface IconButtonProps extends Omit<ButtonProps, 'size'> {
   children: React.ReactNode;
+  size?: 'icon' | 'icon-xl';
 }
 
 export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
-  ({ children, variant = 'outline', ...props }, ref) => {
-    const buttonVariant = variant === 'outline' ? 'icon-outline' : 'icon-solid';
-
+  function IconButton({ children, size = 'icon', ...props }, ref) {
     return (
-      <Button ref={ref} variant={buttonVariant} size="icon" {...props}>
+      <Button ref={ref} size={size} {...props}>
         {children}
       </Button>
     );

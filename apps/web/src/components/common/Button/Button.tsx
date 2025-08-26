@@ -1,63 +1,116 @@
 import * as React from 'react';
+import { Slot } from '@radix-ui/react-slot';
 import { cva } from 'class-variance-authority';
 import { Loader2 } from 'lucide-react';
 
-import { Button as ShadcnButton } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 import type { ButtonProps } from './Button.types';
 
 export const buttonVariants = cva(
-  'inline-flex items-center justify-center whitespace-nowrap rounded-full text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+  'inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none',
   {
     defaultVariants: {
+      shape: 'round',
       size: 'lg',
       variant: 'default',
     },
     variants: {
+      shape: {
+        round: 'rounded-full',
+        square: 'rounded-lg',
+      },
       size: {
-        icon: 'h-[52px] w-[52px]',
-        lg: 'h-[52px] px-6 font-semibold text-base',
-        md: 'h-[40px] px-4 text-sm',
+        full: 'h-[3.25rem] w-full text-base font-semibold', // 52px
+        icon: 'h-[3.25rem] w-[3.25rem]', // 52px
+        'icon-xl': 'h-[3.875rem] w-[3.875rem]', // 62px
+        lg: 'h-[3.25rem] px-6 text-base font-semibold', // 52px
+        md: 'h-[2.9375rem] px-5 text-sm', // 47px
+        sm: 'h-[1.6875rem] px-3 text-xs', // 27px
       },
       variant: {
         default:
-          'font-semibold bg-[#68982D] text-white hover:bg-[#5A8627] disabled:bg-neutral-200 disabled:text-neutral-500',
-        'icon-outline': 'rounded-full border border-white bg-transparent hover:bg-accent text-xl',
-        'icon-solid': 'rounded-full bg-neutral-600 text-white hover:bg-gray-300 text-xl',
-        kakao: 'bg-[#FCE40B] text-black hover:bg-yellow-500 disabled:bg-neutral-200',
+          'font-semibold bg-primary text-primary-foreground disabled:bg-neutral-200 disabled:text-neutral-500',
+        ghost: 'hover:bg-accent hover:text-accent-foreground',
         outline:
-          'border border-input bg-background text-neutral-900 hover:bg-accent hover:text-accent-foreground disabled:bg-neutral-200',
+          'border border-neutral-400 bg-background text-neutral-900 disabled:bg-muted disabled:text-muted-foreground',
         toggle:
-          'bg-neutral-100 py-2 text-neutral-600 font-semibold hover:bg-gray-200 data-[state=active]:bg-neutral-900 data-[state=active]:text-white',
+          'bg-neutral-100 text-neutral-600 font-semibold data-[state=active]:bg-neutral-900 data-[state=active]:text-white',
       },
     },
   }
 );
 
-export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  (
-    { asChild = false, children, className, icon, iconPosition = 'left', isLoading = false, size, variant, ...props },
+// Button Root
+const ButtonRoot = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  function Button(
+    {
+      asChild = false,
+      children,
+      className,
+      isLoading = false,
+      shape,
+      size,
+      variant,
+      ...props
+    },
     ref
-  ) => {
+  ) {
+    const Comp = asChild ? Slot : 'button';
     return (
-      <ShadcnButton
-        className={cn(buttonVariants({ className, size, variant }))}
+      <Comp
+        className={cn(buttonVariants({ className, shape, size, variant }))}
         ref={ref}
-        asChild={asChild}
         disabled={isLoading || props.disabled}
-        {...props}>
-        {isLoading ? (
-          <Loader2 className="h-5 w-5 animate-spin" />
-        ) : (
-          <div className="flex items-center gap-1.5">
-            {icon && iconPosition === 'left' && <div className="flex justify-center items-center w-5 h-5">{icon}</div>}
-            {children}
-            {icon && iconPosition === 'right' && <div className="flex justify-center items-center w-5 h-5">{icon}</div>}
+        {...props}
+      >
+        {isLoading && (
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+            <Loader2 className="h-5 w-5 animate-spin" />
           </div>
         )}
-      </ShadcnButton>
+        <span
+          className={cn(
+            'inline-flex items-center justify-center',
+            isLoading && 'invisible'
+          )}
+        >
+          {children}
+        </span>
+      </Comp>
     );
   }
 );
-Button.displayName = 'Button';
+ButtonRoot.displayName = 'Button';
+
+// Button Text
+const ButtonText = React.forwardRef<
+  HTMLSpanElement,
+  React.HTMLAttributes<HTMLSpanElement>
+>(function ButtonText({ className, ...props }, ref) {
+  return <span ref={ref} className={cn('mx-1.5', className)} {...props} />;
+});
+ButtonText.displayName = 'Button.Text';
+
+// Button Icon
+const ButtonIcon = React.forwardRef<
+  HTMLSpanElement,
+  React.HTMLAttributes<HTMLSpanElement>
+>(function ButtonIcon({ className, ...props }, ref) {
+  return (
+    <span
+      ref={ref}
+      className={cn(
+        'inline-flex h-5 w-5 items-center justify-center',
+        className
+      )}
+      {...props}
+    />
+  );
+});
+ButtonIcon.displayName = 'Button.Icon';
+
+export const Button = Object.assign(ButtonRoot, {
+  Icon: ButtonIcon,
+  Text: ButtonText,
+});
