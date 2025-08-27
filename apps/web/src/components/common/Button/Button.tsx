@@ -27,13 +27,13 @@ export const buttonVariants = cva(
       },
       variant: {
         default:
-          'font-semibold bg-primary text-primary-foreground disabled:bg-neutral-200 disabled:text-neutral-500 active:bg-primary-pressed',
+          'font-semibold bg-primary text-primary-foreground disabled:bg-gray-200 disabled:text-gray-500 active:bg-primary-pressed',
         destructive:
           'bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90',
         ghost: 'hover:bg-accent hover:text-accent-foreground',
         link: 'text-primary underline-offset-4 hover:underline',
         outline:
-          'border border-neutral-400 bg-background text-neutral-900 disabled:bg-muted disabled:text-muted-foreground',
+          'border bg-background text-neutral-900 disabled:bg-muted disabled:text-muted-foreground',
         secondary: 'bg-secondary text-white active:bg-secondary-pressed',
         toggle:
           'bg-neutral-100 text-neutral-600 font-semibold data-[state=active]:bg-neutral-900 data-[state=active]:text-white',

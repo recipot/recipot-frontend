@@ -2,6 +2,8 @@ import React from 'react';
 import { Loader2Icon, MessageCircle, Plus, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 
+import { GoogleIcon, KakaoIcon } from '@/components/Icons';
+
 import { Button } from './Button';
 
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
@@ -144,15 +146,16 @@ export const SnsIconShowcase: Story = {
   name: 'SNS Icon',
   render: () => (
     <div className="flex items-center gap-4">
-      <Button size="icon-xl" shape="round" className="bg-[#FEE500] text-black">
-        <MessageCircle />
+      <Button size="icon-xl" shape="round" className="bg-[#FEE500]">
+        <KakaoIcon size={28} />
       </Button>
       <Button
         size="icon-xl"
         shape="round"
-        className="bg-white text-black border border-input"
+        variant="outline"
+        className="bg-white"
       >
-        <p className="font-bold text-2xl">G</p>
+        <GoogleIcon />
       </Button>
     </div>
   ),
