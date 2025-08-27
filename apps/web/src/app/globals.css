@@ -134,8 +134,6 @@
     font-size: 1.0625rem; /* 17px */
   }
   .text-17sb {
-    line-height: 140%;
-    font-size: 1.0625rem; /* 17px */
     @apply text-17;
     font-weight: 600;
   }
