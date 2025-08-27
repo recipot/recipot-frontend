@@ -43,7 +43,19 @@ export function ReviewModal({
   const canSubmit = !!feeling && (feeling !== 'good' || pros.length > 0);
   const goodFeeling = feeling === 'good';
 
-  const handleSubmit = () => {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // TODO: 서버에 제출할 데이터 구조
+    const reviewData = {
+      feeling,
+      pros,
+      timesCooked,
+      // 기타 필요한 데이터 추가
+    };
+
+    console.log(reviewData, 'reviewData');
+
     onOpenChange(false);
   };
 
@@ -87,24 +99,26 @@ export function ReviewModal({
             </div>
 
             <div className="flex flex-col items-center">
-              <EmotionSelector
-                selectedFeeling={feeling}
-                onFeelingSelect={handleFeelingClick}
-              />
+              <form onSubmit={handleSubmit} className="w-full">
+                <EmotionSelector
+                  selectedFeeling={feeling}
+                  onFeelingSelect={handleFeelingClick}
+                />
 
-              {feeling === 'good' && (
-                <RecipeProsSelector pros={pros} onTogglePro={togglePro} />
-              )}
+                {feeling === 'good' && (
+                  <RecipeProsSelector pros={pros} onTogglePro={togglePro} />
+                )}
 
-              <div className="fixed bottom-[30px] left-0 w-full px-6 gap-[155px]">
-                <Button
-                  className="w-full"
-                  onClick={handleSubmit}
-                  disabled={!canSubmit}
-                >
-                  후기 등록하기
-                </Button>
-              </div>
+                <div className="fixed bottom-[30px] left-0 w-full px-6 gap-[155px]">
+                  <Button
+                    type="submit"
+                    disabled={!canSubmit}
+                    className="w-full"
+                  >
+                    후기 등록하기
+                  </Button>
+                </div>
+              </form>
             </div>
           </div>
         </div>
