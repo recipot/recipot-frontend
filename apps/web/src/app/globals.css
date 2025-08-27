@@ -4,6 +4,8 @@
 
 @layer base {
   :root {
+    --font-pretendard: 'Pretendard', sans-serif;
+
     --background: 0 0% 100%;
     --foreground: 0 0% 3.9%;
 
@@ -134,6 +136,7 @@
   .text-17sb {
     line-height: 140%;
     font-size: 1.0625rem; /* 17px */
+    @apply text-17;
     font-weight: 600;
   }
   .text-16 {
@@ -141,8 +144,7 @@
     font-size: 1rem; /* 16px */
   }
   .text-16sb {
-    line-height: 150%;
-    font-size: 1rem; /* 16px */
+    @apply text-16;
     font-weight: 600;
   }
   .text-15 {
@@ -150,8 +152,7 @@
     font-size: 0.9375rem; /* 15px */
   }
   .text-15sb {
-    line-height: 150%;
-    font-size: 0.9375rem; /* 15px */
+    @apply text-15;
     font-weight: 600;
   }
   .text-14 {
@@ -160,15 +161,14 @@
     font-weight: 600;
   }
   .text-14b {
-    line-height: 150%;
-    font-size: 0.875rem; /* 14px */
+    @apply text-14;
     font-weight: 700;
   }
 }
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border font-pretendard;
   }
   body {
     @apply bg-background text-foreground;

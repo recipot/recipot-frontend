@@ -18,10 +18,10 @@ export const buttonVariants = cva(
         square: 'rounded-lg',
       },
       size: {
-        full: 'h-[3.25rem] w-full text-base font-semibold', // 52px
+        full: 'h-[3.25rem] w-full text-17sb', // 52px
         icon: 'h-[3.25rem] w-[3.25rem]', // 52px
         'icon-xl': 'h-[3.875rem] w-[3.875rem]', // 62px
-        lg: 'h-[3.25rem] px-6 text-base font-semibold', // 52px
+        lg: 'h-[3.25rem] px-6 text-17sb', // 52px
         md: 'h-[2.9375rem] px-5 text-sm', // 47px
         sm: 'h-[1.6875rem] px-3 text-xs', // 27px
       },
@@ -29,14 +29,14 @@ export const buttonVariants = cva(
         default:
           'font-semibold bg-primary text-primary-foreground disabled:bg-gray-200 disabled:text-gray-500 active:bg-primary-pressed',
         destructive:
-          'bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90',
+          'bg-destructive text-destructive-foreground',
         ghost: 'hover:bg-accent hover:text-accent-foreground',
         link: 'text-primary underline-offset-4 hover:underline',
         outline:
-          'border bg-background text-neutral-900 disabled:bg-muted disabled:text-muted-foreground',
+          'border bg-background text-gray-900 disabled:bg-muted disabled:text-muted-foreground',
         secondary: 'bg-secondary text-white active:bg-secondary-pressed',
         toggle:
-          'bg-neutral-100 text-neutral-600 font-semibold data-[state=active]:bg-neutral-900 data-[state=active]:text-white',
+          'bg-gray-100 text-gray-600 data-[state=active]:bg-gray-900 data-[state=active]:text-white',
       },
     },
   }
@@ -53,7 +53,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const Comp = asChild ? Slot : 'button';
     return (
       <Comp
-        className={cn(buttonVariants({ className, shape, size, variant }))}
+        className={cn(buttonVariants({  shape, size, variant }), className)}
         ref={ref}
         {...props}
       />
