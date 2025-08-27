@@ -1,17 +1,14 @@
-import React, { useState } from 'react';
-import { MessageCircle, Plus, Trash2 } from 'lucide-react';
-
-import { IconButton } from '@/components/common/Button/variants/IconButton';
+import React from 'react';
+import { Loader2Icon, MessageCircle, Plus, Trash2 } from 'lucide-react';
+import Link from 'next/link';
 
 import { Button } from './Button';
-import { FloatingButton } from './variants';
 
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 const meta = {
   argTypes: {
     disabled: { control: 'boolean' },
-    isLoading: { control: 'boolean' },
     shape: {
       control: 'select',
       options: ['square', 'round'],
@@ -22,7 +19,15 @@ const meta = {
     },
     variant: {
       control: 'select',
-      options: ['default', 'outline', 'ghost', 'toggle'],
+      options: [
+        'default',
+        'destructive',
+        'ghost',
+        'link',
+        'outline',
+        'secondary',
+        'toggle',
+      ],
     },
   },
   component: Button,
@@ -38,7 +43,10 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    children: <Button.Text>기본 버튼</Button.Text>,
+    children: '기본 버튼',
+    shape: 'round',
+    size: 'lg',
+    variant: 'default',
   },
 };
 
@@ -47,68 +55,74 @@ export const WithIcon: Story = {
     size: 'lg',
     variant: 'default',
   },
-  render: args => (
-    <Button {...args}>
-      <Button.Icon>
-        <MessageCircle />
-      </Button.Icon>
-      <Button.Text>아이콘과 함께</Button.Text>
+  render: () => (
+    <Button>
+      <MessageCircle />
+      아이콘과 함께
     </Button>
   ),
 };
 
 export const FullWidth: Story = {
   args: {
-    children: <Button.Text>꽉 찬 너비 버튼</Button.Text>,
+    children: '꽉 찬 너비 버튼',
+    shape: 'round',
     size: 'full',
+    variant: 'default',
   },
   parameters: {
     layout: 'padded',
   },
 };
 
-export const RoundShape: Story = {
+export const SquareShape: Story = {
   args: {
-    children: <Button.Text>사각 모양 버튼</Button.Text>,
+    children: '사각 모양 버튼',
     shape: 'square',
+    size: 'lg',
+    variant: 'default',
   },
 };
 
 export const Ghost: Story = {
   args: {
-    children: <Button.Text>고스트 버튼</Button.Text>,
+    children: '고스트 버튼',
+    shape: 'round',
+    size: 'lg',
     variant: 'ghost',
   },
 };
 
 export const Toggle: Story = {
-  render: function Render(args) {
-    const [isActive, setIsActive] = useState(false);
+  render: () => {
     return (
-      <Button
-        {...args}
-        variant="toggle"
-        data-state={isActive ? 'active' : 'inactive'}
-        onClick={() => setIsActive(!isActive)}
-      >
-        <Button.Text>토글 버튼</Button.Text>
-      </Button>
+      <>
+        <Button variant="toggle" data-state="active">
+          토글 버튼(active)
+        </Button>
+        <Button variant="toggle" data-state="inactive">
+          토글 버튼(inactive)
+        </Button>
+      </>
     );
   },
 };
 
 export const Loading: Story = {
-  args: {
-    children: <Button.Text>로딩중</Button.Text>,
-    isLoading: true,
-    size: 'lg',
-  },
+  render: () => (
+    <Button disabled size="lg" variant="default" shape="round">
+      <Loader2Icon className="animate-spin" /> 로딩중
+    </Button>
+  ),
 };
 
 export const Disabled: Story = {
   args: {
-    children: <Button.Text>비활성화 버튼</Button.Text>,
+    children: '비활성화 버튼',
     disabled: true,
+    shape: 'round',
+    size: 'lg',
+    variant: 'default',
   },
 };
 
@@ -116,12 +130,12 @@ export const IconOnly: Story = {
   name: 'IconButton',
   render: () => (
     <div className="flex items-center gap-4">
-      <IconButton variant="outline" shape="round">
+      <Button variant="outline" shape="round" size="icon">
         <Trash2 />
-      </IconButton>
-      <IconButton variant="default" shape="round">
+      </Button>
+      <Button variant="default" shape="round" size="icon">
         <Plus />
-      </IconButton>
+      </Button>
     </div>
   ),
 };
@@ -130,20 +144,16 @@ export const SnsIconShowcase: Story = {
   name: 'SNS Icon',
   render: () => (
     <div className="flex items-center gap-4">
-      <IconButton
-        size="icon-xl"
-        shape="round"
-        className="bg-[#FEE500] text-black"
-      >
+      <Button size="icon-xl" shape="round" className="bg-[#FEE500] text-black">
         <MessageCircle />
-      </IconButton>
-      <IconButton
+      </Button>
+      <Button
         size="icon-xl"
         shape="round"
         className="bg-white text-black border border-input"
       >
         <p className="font-bold text-2xl">G</p>
-      </IconButton>
+      </Button>
     </div>
   ),
 };
@@ -159,9 +169,85 @@ export const Floating: Story = {
       <p className="text-center text-gray-500">
         스크롤을 내려도 버튼은 우측에 고정됩니다.
       </p>
-      <FloatingButton variant="default">
+      <Button
+        variant="default"
+        shape="round"
+        size="icon-xl"
+        className="fixed bottom-4 right-4"
+      >
         <Plus />
-      </FloatingButton>
+      </Button>
+    </div>
+  ),
+};
+
+export const LinkButton: Story = {
+  render: () => (
+    <Button variant="link" asChild>
+      <Link href="/">링크버튼</Link>
+    </Button>
+  ),
+};
+
+export const Outline: Story = {
+  args: {
+    children: '아웃라인 버튼',
+    shape: 'round',
+    size: 'lg',
+    variant: 'outline',
+  },
+};
+
+export const Secondary: Story = {
+  args: {
+    children: '세컨더리 버튼',
+    shape: 'round',
+    size: 'lg',
+    variant: 'secondary',
+  },
+};
+
+export const Destructive: Story = {
+  args: {
+    children: '삭제 버튼',
+    shape: 'round',
+    size: 'lg',
+    variant: 'destructive',
+  },
+};
+
+export const Pressed: Story = {
+  name: 'Pressed State',
+  render: () => (
+    <div className="flex items-center gap-4">
+      <Button variant="default" size="lg" shape="round">
+        일반 상태
+      </Button>
+      <Button
+        variant="default"
+        size="lg"
+        shape="round"
+        className="active:bg-primary-pressed"
+      >
+        눌린 상태 (클릭해보세요)
+      </Button>
+    </div>
+  ),
+};
+
+export const Sizes: Story = {
+  name: 'Size Variants',
+  render: () => (
+    <div className="flex items-center gap-4 flex-wrap">
+      <Button variant="default" size="sm" shape="round">
+        Small
+      </Button>
+      <Button variant="default" size="md" shape="round">
+        Medium
+      </Button>
+      <Button variant="default" size="lg" shape="round">
+        Large
+      </Button>
     </div>
   ),
 };

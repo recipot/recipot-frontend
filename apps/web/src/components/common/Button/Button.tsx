@@ -1,14 +1,11 @@
 import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
-import { cva } from 'class-variance-authority';
-import { Loader2 } from 'lucide-react';
+import { cva, type VariantProps } from 'class-variance-authority';
 
 import { cn } from '@/lib/utils';
 
-import type { ButtonProps } from './Button.types';
-
 export const buttonVariants = cva(
-  'inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none',
+  'inline-flex items-center justify-center gap-[0.375rem] whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none',
   {
     defaultVariants: {
       shape: 'round',
@@ -30,10 +27,14 @@ export const buttonVariants = cva(
       },
       variant: {
         default:
-          'font-semibold bg-primary text-primary-foreground disabled:bg-neutral-200 disabled:text-neutral-500',
+          'font-semibold bg-primary text-primary-foreground disabled:bg-neutral-200 disabled:text-neutral-500 active:bg-primary-pressed',
+        destructive:
+          'bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90',
         ghost: 'hover:bg-accent hover:text-accent-foreground',
+        link: 'text-primary underline-offset-4 hover:underline',
         outline:
           'border border-neutral-400 bg-background text-neutral-900 disabled:bg-muted disabled:text-muted-foreground',
+        secondary: 'bg-secondary text-white active:bg-secondary-pressed',
         toggle:
           'bg-neutral-100 text-neutral-600 font-semibold data-[state=active]:bg-neutral-900 data-[state=active]:text-white',
       },
@@ -41,76 +42,24 @@ export const buttonVariants = cva(
   }
 );
 
-// Button Root
-const ButtonRoot = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  function Button(
-    {
-      asChild = false,
-      children,
-      className,
-      isLoading = false,
-      shape,
-      size,
-      variant,
-      ...props
-    },
-    ref
-  ) {
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean;
+}
+
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ asChild = false, className, shape, size, variant, ...props }, ref) => {
     const Comp = asChild ? Slot : 'button';
     return (
       <Comp
         className={cn(buttonVariants({ className, shape, size, variant }))}
         ref={ref}
-        disabled={isLoading || props.disabled}
         {...props}
-      >
-        {isLoading && (
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-            <Loader2 className="h-5 w-5 animate-spin" />
-          </div>
-        )}
-        <span
-          className={cn(
-            'inline-flex items-center justify-center',
-            isLoading && 'invisible'
-          )}
-        >
-          {children}
-        </span>
-      </Comp>
+      />
     );
   }
 );
-ButtonRoot.displayName = 'Button';
+Button.displayName = 'Button';
 
-// Button Text
-const ButtonText = React.forwardRef<
-  HTMLSpanElement,
-  React.HTMLAttributes<HTMLSpanElement>
->(function ButtonText({ className, ...props }, ref) {
-  return <span ref={ref} className={cn('mx-1.5', className)} {...props} />;
-});
-ButtonText.displayName = 'Button.Text';
-
-// Button Icon
-const ButtonIcon = React.forwardRef<
-  HTMLSpanElement,
-  React.HTMLAttributes<HTMLSpanElement>
->(function ButtonIcon({ className, ...props }, ref) {
-  return (
-    <span
-      ref={ref}
-      className={cn(
-        'inline-flex h-5 w-5 items-center justify-center',
-        className
-      )}
-      {...props}
-    />
-  );
-});
-ButtonIcon.displayName = 'Button.Icon';
-
-export const Button = Object.assign(ButtonRoot, {
-  Icon: ButtonIcon,
-  Text: ButtonText,
-});
+export { Button };
