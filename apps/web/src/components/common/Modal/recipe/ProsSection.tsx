@@ -1,5 +1,5 @@
-import { CheckIcon, EmotionGoodIcon } from '@/components/Icons';
-import { cn } from '@/lib/utils';
+import { EmotionGoodIcon } from '@/components/Icons';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface ProsSectionProps {
   pros: string[];
@@ -31,28 +31,17 @@ export function RecipeProsSelector({ onTogglePro, pros }: ProsSectionProps) {
           const isSelected = pros.includes(text);
           return (
             <li key={text}>
-              <button
-                type="button"
-                onClick={() => onTogglePro(text)}
-                className={cn(
-                  'flex w-full items-center gap-3 px-3 py-2 rounded-md transition-colors'
-                )}
-                aria-checked={isSelected}
-                role="checkbox"
+              <label
+                htmlFor={text}
+                className="flex w-full cursor-pointer items-center gap-3 rounded-md px-3 py-2"
               >
-                <span
-                  className={cn(
-                    'grid h-5 w-5 place-items-center rounded-md border shrink-0',
-                    isSelected
-                      ? 'bg-secondary-soft-green border-transparent text-brand-primary'
-                      : 'border-neutral-300 bg-white'
-                  )}
-                  aria-hidden
-                >
-                  {isSelected && <CheckIcon />}
-                </span>
+                <Checkbox
+                  id={text}
+                  checked={isSelected}
+                  onCheckedChange={() => onTogglePro(text)}
+                />
                 <span className="text-16 text-left">{text}</span>
-              </button>
+              </label>
             </li>
           );
         })}
