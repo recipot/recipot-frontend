@@ -5,7 +5,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
 export const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-[0.375rem] whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none',
+  'inline-flex items-center justify-center gap-[0.375rem] whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none',
   {
     defaultVariants: {
       shape: 'round',
@@ -27,9 +27,8 @@ export const buttonVariants = cva(
       },
       variant: {
         default:
-          'font-semibold bg-primary text-primary-foreground disabled:bg-gray-200 disabled:text-gray-500 active:bg-primary-pressed',
-        destructive:
-          'bg-destructive text-destructive-foreground',
+          'bg-primary text-primary-foreground disabled:bg-gray-200 disabled:text-gray-500 active:bg-primary-pressed',
+        destructive: 'bg-destructive text-destructive-foreground',
         ghost: 'hover:bg-accent hover:text-accent-foreground',
         link: 'text-primary underline-offset-4 hover:underline',
         outline:
@@ -53,7 +52,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const Comp = asChild ? Slot : 'button';
     return (
       <Comp
-        className={cn(buttonVariants({  shape, size, variant }), className)}
+        className={cn(buttonVariants({ shape, size, variant }), className)}
         ref={ref}
         {...props}
       />
