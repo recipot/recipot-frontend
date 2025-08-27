@@ -134,7 +134,8 @@
     font-size: 1.0625rem; /* 17px */
   }
   .text-17sb {
-    @apply text-17;
+    line-height: 140%;
+    font-size: 1.0625rem;
     font-weight: 600;
   }
   .text-16 {
@@ -142,7 +143,8 @@
     font-size: 1rem; /* 16px */
   }
   .text-16sb {
-    @apply text-16;
+    line-height: 150%;
+    font-size: 1rem;
     font-weight: 600;
   }
   .text-15 {
@@ -150,7 +152,8 @@
     font-size: 0.9375rem; /* 15px */
   }
   .text-15sb {
-    @apply text-15;
+    line-height: 150%;
+    font-size: 0.9375rem;
     font-weight: 600;
   }
   .text-14 {
@@ -159,7 +162,8 @@
     font-weight: 600;
   }
   .text-14b {
-    @apply text-14;
+    line-height: 150%;
+    font-size: 0.875rem;
     font-weight: 700;
   }
 }
