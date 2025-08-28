@@ -67,7 +67,7 @@ export function ReviewBottomSheet({
     >
       <DrawerContent
         className={cn(
-          `w-[390px] mx-auto rounded-t-3xl bg-white ${goodFeeling ? 'h-[90vh]' : 'h-[80vh]'} shadow-lg min-h-[400px] flex flex-col overflow-hidden`
+          `w-[390px] mx-auto rounded-t-3xl bg-white ${goodFeeling ? 'h-[844px]' : 'h-[659px]'} shadow-lg min-h-[400px] flex flex-col overflow-hidden`
         )}
       >
         <DrawerClose className="absolute right-3 top-3">
@@ -90,25 +90,27 @@ export function ReviewBottomSheet({
                 alt={recipeTitle}
                 width={72}
                 height={72}
-                className="rounded-md"
+                className="rounded-[10.67px]"
               />
             )}
           </div>
-          <div className="dashed border border-dashed h-[1px] border-neutral-100 mt-5 w-[342px]"></div>
+          <div className="border border-dashed h-[1px] border-neutral-100 mt-5 w-[342px]"></div>
 
           <div className="mx-auto flex max-w-[292px] flex-col justify-center items-center">
             <div className="flex flex-col items-center">
               <form onSubmit={handleSubmit} className="w-full">
-                <EmotionSelector
-                  selectedFeeling={feeling}
-                  onFeelingSelect={handleFeelingClick}
-                />
+                <div className="mb-[155px]">
+                  <EmotionSelector
+                    selectedFeeling={feeling}
+                    onFeelingSelect={handleFeelingClick}
+                  />
 
-                {feeling === 'good' && (
-                  <RecipeProsSelector pros={pros} onTogglePro={togglePro} />
-                )}
+                  {feeling === 'good' && (
+                    <RecipeProsSelector pros={pros} onTogglePro={togglePro} />
+                  )}
+                </div>
 
-                <div className="fixed bottom-[30px] left-0 w-full px-6 gap-[155px]">
+                <div className="fixed bottom-[30px] left-0 w-full px-6">
                   <Button
                     type="submit"
                     disabled={!canSubmit}
