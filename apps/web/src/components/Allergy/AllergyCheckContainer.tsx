@@ -9,11 +9,14 @@ import type { z } from 'zod';
 /**
  * AllergyCheckContainer
  * @param onSubmit - onSubmit function
+ * @param formId - form의 고유 ID (외부 버튼에서 사용)
  * @returns AllergyCheckPresenter component
  */
 export default function AllergyCheckContainer({
+  formId,
   onSubmit,
 }: {
+  formId?: string;
   onSubmit: (data: z.infer<typeof AllergyFormSchema>) => void;
 }) {
   const { handleItemToggle, selectedItems } = useAllergyCheck();
@@ -30,6 +33,7 @@ export default function AllergyCheckContainer({
       selectedItems={selectedItems}
       onItemToggle={handleItemToggle}
       onSubmit={handleSubmit}
+      formId={formId}
     />
   );
 }

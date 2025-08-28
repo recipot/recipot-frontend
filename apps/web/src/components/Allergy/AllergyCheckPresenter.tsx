@@ -1,7 +1,5 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-
 import { categories } from './Allergy.constants';
 import AllergyCheckItem from './AllergyCheckItem';
 
@@ -10,9 +8,11 @@ import AllergyCheckItem from './AllergyCheckItem';
  * @param selectedItems - number[]
  * @param onItemToggle - (itemId: number) => void
  * @param onSubmit - (e: React.FormEvent) => void
+ * @param formId - form의 고유 ID (외부 버튼에서 사용)
  * @returns AllergyCheckPresenter component
  */
 export default function AllergyCheckPresenter({
+  formId,
   onItemToggle,
   onSubmit,
   selectedItems,
@@ -20,9 +20,10 @@ export default function AllergyCheckPresenter({
   selectedItems: number[];
   onItemToggle: (itemId: number) => void;
   onSubmit: (e: React.FormEvent) => void;
+  formId?: string;
 }) {
   return (
-    <form onSubmit={onSubmit} className="w-full space-y-8">
+    <form id={formId} onSubmit={onSubmit} className="w-full space-y-8">
       {categories.map(category => (
         <AllergyCheckItem
           key={category.title}
@@ -32,7 +33,6 @@ export default function AllergyCheckPresenter({
           onItemToggle={onItemToggle}
         />
       ))}
-      <Button type="submit">Submit</Button>
     </form>
   );
 }
