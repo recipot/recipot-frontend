@@ -65,10 +65,10 @@ export function Modal({
         />
         <DialogContent
           className={cn(
-            'gap-[30px] border bg-background px-5 pb-5 pt-[30px] w-[320px] rounded-3xl'
+            'flex flex-col justify-center items-center gap-[30px] border bg-background px-5 pb-5 pt-[1.875rem] w-xs rounded-3xl'
           )}
         >
-          <div className="text-center w-[280px]">
+          <div className="text-center w-[17.5rem]">
             <h2 className="text-17">{title}</h2>
           </div>
 
@@ -79,7 +79,6 @@ export function Modal({
   );
 }
 
-// Export the Dialog components for more flexible usage
-export { Dialog as ModalRoot };
-export { DialogTrigger as ModalTrigger };
-export { DialogClose as ModalClose };
+// export { Dialog as ModalRoot };
+// export { DialogTrigger as ModalTrigger };
+// export { DialogClose as ModalClose };
