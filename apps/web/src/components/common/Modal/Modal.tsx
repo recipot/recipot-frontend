@@ -65,7 +65,7 @@ export function Modal({
         />
         <DialogContent
           className={cn(
-            'w-[320px] gap-[30px] border bg-background px-5 pb-5 pt-[30px] w-[320px] rounded-3xl'
+            'gap-[30px] border bg-background px-5 pb-5 pt-[30px] w-[320px] rounded-3xl'
           )}
         >
           <div className="text-center w-[280px]">
