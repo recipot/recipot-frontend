@@ -88,8 +88,8 @@ module.exports = {
         },
       },
       fontSize: {
-        14: ['0.875rem', { lineHeight: '150%', fontWeight: '600' }], // text-14
-        '14sb': ['0.875rem', { lineHeight: '150%', fontWeight: '400' }], // text-14sb
+        14: ['0.875rem', { lineHeight: '150%', fontWeight: '400' }], // text-14sb
+        '14sb': ['0.875rem', { lineHeight: '150%', fontWeight: '600' }], // text-14
         '14b': ['0.875rem', { lineHeight: '150%', fontWeight: '700' }], // text-14b
         15: ['0.9375rem', { lineHeight: '150%' }], // text-15
         '15sb': ['0.9375rem', { lineHeight: '150%', fontWeight: '600' }], // text-15sb
