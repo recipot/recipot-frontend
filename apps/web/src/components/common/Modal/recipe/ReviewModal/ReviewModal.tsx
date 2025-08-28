@@ -74,30 +74,29 @@ export function ReviewModal({
           <CloseIcon />
         </DrawerClose>
 
-        <div className="w-full">
-          <div className="mx-auto flex max-w-[292px] flex-col items-center">
-            <div className="px-6">
-              {/* 해먹은 횟수 */}
-              {cookedBadge(timesCooked) && (
-                <div className="w-[212px] h-[31px] flex justify-center items-center rounded-full bg-neutral-100 px-4 py-[5px] mb-5 text-xs text-neutral-600">
-                  {cookedBadge(timesCooked)}
-                </div>
-              )}
-              {/* 레시피 타이틀 + 이미지 */}
-              <div className="flex flex-col justify-center items-center overflow-y-auto">
-                <div className="text-lg font-semibold mb-2">{recipeTitle}</div>
-                {recipeImageUrl && (
-                  <Image
-                    src={recipeImageUrl}
-                    alt={recipeTitle}
-                    width={72}
-                    height={72}
-                    className="rounded-md"
-                  />
-                )}
-              </div>
+        <div className="w-full flex flex-col items-center justify-center">
+          {/* 해먹은 횟수 */}
+          {cookedBadge(timesCooked) && (
+            <div className="w-[212px] h-[31px] flex justify-center items-center rounded-full bg-neutral-100 px-4 py-[5px] mb-5 text-xs text-neutral-600">
+              {cookedBadge(timesCooked)}
             </div>
+          )}
+          {/* 레시피 타이틀 + 이미지 */}
+          <div className="flex flex-col justify-center items-center overflow-y-auto">
+            <div className="text-lg font-semibold mb-2">{recipeTitle}</div>
+            {recipeImageUrl && (
+              <Image
+                src={recipeImageUrl}
+                alt={recipeTitle}
+                width={72}
+                height={72}
+                className="rounded-md"
+              />
+            )}
+          </div>
+          <div className="dashed border border-dashed h-[1px] border-neutral-100 mt-5 w-[342px]"></div>
 
+          <div className="mx-auto flex max-w-[292px] flex-col justify-center items-center">
             <div className="flex flex-col items-center">
               <form onSubmit={handleSubmit} className="w-full">
                 <EmotionSelector
