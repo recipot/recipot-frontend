@@ -12,7 +12,7 @@ import EmotionSelector from './EmotionSelector';
 import type { ReviewFeeling, ReviewModalProps } from './types';
 import { RecipeProsSelector } from '../ProsSection';
 
-export function ReviewModal({
+export function ReviewBottomSheet({
   onOpenChange,
   open,
   recipeImageUrl,
@@ -126,4 +126,4 @@ export function ReviewModal({
   );
 }
 
-export default ReviewModal;
+export default ReviewBottomSheet;

@@ -1,16 +1,15 @@
 import { useState } from 'react';
 import { Button } from '@/components/common/Button/Button';
 
-import { ReviewModal } from './ReviewModal';
-
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import ReviewBottomSheet from './ReviewBottomSheet';
 
 const meta = {
-  component: ReviewModal,
+  component: ReviewBottomSheet,
   parameters: { layout: 'centered' },
   tags: ['autodocs'],
-  title: 'Common/ReviewModal',
-} satisfies Meta<typeof ReviewModal>;
+  title: 'Common/ReviewBottomSheet',
+} satisfies Meta<typeof ReviewBottomSheet>;
 export default meta;
 
 type Story = StoryObj<typeof meta>;
@@ -20,7 +19,7 @@ const Template = () => {
   return (
     <div>
       <Button onClick={() => setOpen(true)}>리뷰 모달 열기</Button>
-      <ReviewModal
+      <ReviewBottomSheet
         open={open}
         onOpenChange={setOpen}
         recipeTitle="양배추 계란 샐러드"
