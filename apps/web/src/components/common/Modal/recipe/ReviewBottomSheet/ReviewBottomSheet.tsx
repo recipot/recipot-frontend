@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 import EmotionSelector from './EmotionSelector';
 
 import type { ReviewFeeling, ReviewModalProps } from './types';
-import { RecipeProsSelector } from '../ProsSection';
+import { RecipeProsSelector } from '../RecipeProsSelector';
 
 export function ReviewBottomSheet({
   onOpenChange,
