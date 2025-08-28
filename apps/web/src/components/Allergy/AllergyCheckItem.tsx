@@ -47,8 +47,6 @@ function AllergyCheckItem({
                 ? 'border-secondary-soft-green bg-secondary-light-green text-primary'
                 : ''
             )}
-
-            
           >
             {item.label}
           </Button>
