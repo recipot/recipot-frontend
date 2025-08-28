@@ -24,8 +24,8 @@ export function ReviewBottomSheet({
 
   const cookedBadge = (timesCooked: number) => {
     if (!timesCooked) return null;
-    if (timesCooked <= 1) return `첫 해먹기 레시피예요!`;
-    return `${timesCooked}번째 해먹기 완료한 레시피네요!`;
+
+    return `${timesCooked}번째 해먹기 완료`;
   };
 
   const togglePro = (text: string) => {
@@ -67,7 +67,7 @@ export function ReviewBottomSheet({
     >
       <DrawerContent
         className={cn(
-          `w-[390px] mx-auto rounded-t-3xl bg-white ${goodFeeling ? 'h-[844px]' : 'h-[659px]'} shadow-lg min-h-[400px] flex flex-col overflow-hidden`
+          `w-full mx-auto rounded-t-3xl bg-white ${goodFeeling ? 'h-[844px]' : 'h-[659px]'} shadow-lg min-h-[400px] flex flex-col overflow-hidden`
         )}
       >
         <DrawerClose className="absolute right-3 top-3">
@@ -77,7 +77,7 @@ export function ReviewBottomSheet({
         <div className="w-full flex flex-col items-center justify-center">
           {/* 해먹은 횟수 */}
           {cookedBadge(timesCooked) && (
-            <div className="w-[212px] h-[31px] flex justify-center items-center rounded-full bg-neutral-100 px-4 py-[5px] mb-5 text-xs text-neutral-600">
+            <div className="w-[11.25rem] mt-4 h-[31px] flex text-14sb justify-center items-center rounded-2xl bg-neutral-100 px-4 py-[5px] mb-5 text-xs text-neutral-600">
               {cookedBadge(timesCooked)}
             </div>
           )}
@@ -114,7 +114,7 @@ export function ReviewBottomSheet({
                   <Button
                     type="submit"
                     disabled={!canSubmit}
-                    className="w-full"
+                    className="w-full rounded-[6.25rem] py-[0.938rem] px-[2rem]"
                   >
                     후기 등록하기
                   </Button>
