@@ -16,8 +16,8 @@ const PROS_OPTIONS = [
 
 export function RecipeProsSelector({ onTogglePro, pros }: ProsSectionProps) {
   return (
-    <div className="w-full">
-      <div className="flex justify-center items-center mb-4 rounded-2xl bg-[#FFE2E2] py-3 text-center text-[#D25D5D] font-semibold">
+    <div className="w-[21.375rem] p-6">
+      <div className="flex justify-center items-center mb-4 rounded-2xl bg-[#FFE2E2] py-5 text-center text-[#D25D5D] font-semibold">
         <EmotionGoodIcon className="mr-1" />
         <span>또 해먹을래요</span>
       </div>
