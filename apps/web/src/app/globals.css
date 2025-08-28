@@ -4,6 +4,8 @@
 
 @layer base {
   :root {
+    --font-pretendard: 'Pretendard', sans-serif;
+
     --background: 0 0% 100%;
     --foreground: 0 0% 3.9%;
 
@@ -16,8 +18,9 @@
     --primary: var(--brand-primary);
     --primary-foreground: 0 0% 100%;
 
-    --secondary: var(--secondary-soft-green);
+    --secondary: 210 7% 56%;
     --secondary-foreground: 0 0% 9%;
+    --secondary-pressed: 208 6% 45%;
 
     --muted: 0 0% 96.1%;
     --muted-foreground: 0 0% 45.1%;
@@ -28,7 +31,7 @@
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 89.8%;
+    --border: 210, 14%, 83%;
     --input: 0 0% 89.8%;
     --ring: 0 0% 3.9%;
 
@@ -42,36 +45,36 @@
 
     /* Primary */
     --brand-primary: 87 54% 39%; /* #68982D */
-    --brand-primary-pressed: 0 0% 20%;
+    --brand-primary-pressed: 87 54% 30%; /* #537A24 */
 
     /* Secondary */
-    --secondary-soft-green: 93 48% 86%; /* #D7E8C2 */
-    --secondary-light-green: 96 100% 95%; /* #F6FFEC */
-    --secondary-soft-orange: 30 100% 91%; /* #FFE9D4 */
-    --secondary-light-orange: 20 100% 96%; /* #FFF4ED */
-    --secondary-soft-red: 0 100% 92%; /* #FFD7D4 */
-    --secondary-light-red: 0 0% 97%; /* #FFEEEE */
+    --secondary-soft-green: 87, 45%, 84%; /* #D7E8C2 */
+    --secondary-light-green: 88, 100%, 96%; /* #F6FFEC */
+    --secondary-soft-orange: 29, 100%, 92%; /* #FFE9D4 */
+    --secondary-light-orange: 23, 100%, 96%; /* #FFF4ED */
+    --secondary-soft-red: 4, 100%, 92%; /* #FFD7D4 */
+    --secondary-light-red: 0, 100%, 97%; /* #FFEEEE */
 
     /* Feel */
     --feel-tired-text: 221 46% 47%; /* #4164AE */
-    --feel-soso-text: 49 76% 45%; /* #AD7E06 */
-    --feel-free-text: 357 70% 66%; /* #DF6567 */
+    --feel-soso-text: 43, 93%, 35%; /* #AD7E06 */
+    --feel-free-text: 359, 66%, 64%; /* #DF6567 */
     --feel-back-default: 80 100% 91%; /* #E8FFD0 */
     --feel-back-tired: 223 100% 92%; /* #D4E0FF */
     --feel-back-soso: 53 100% 88%; /* #FFF7C4 */
     --feel-back-free: 358 100% 93%; /* #FFDBDC */
 
     /* Gray scale */
-    --gray-900: 210 10% 15%; /* #212529 */
-    --gray-800: 210 7% 25%; /* #343A40 */
-    --gray-700: 210 10% 30%; /* #495057 */
-    --gray-600: 210 6% 45%; /* #868E96 */
-    --gray-500: 210 8% 56%; /* #ADB5BD */
-    --gray-400: 210 16% 80%; /* #CED4DA */
-    --gray-300: 210 17% 90%; /* #DEE2E6 */
-    --gray-200: 210 20% 94%; /* #E9ECEF */
-    --gray-100: 210 33% 96%; /* #F1F3F5 */
-    --gray-50: 210 50% 97%; /* #F8F9FA */
+    --gray-900: 210, 11%, 15%; /* #212529 */
+    --gray-800: 210, 10%, 23%; /* #343A40 */
+    --gray-700: 210, 9%, 31%; /* #495057 */
+    --gray-600: 210, 7%, 56%; /* #868E96 */
+    --gray-500: 210, 11%, 71%; /* #ADB5BD */
+    --gray-400: 210, 14%, 83%; /* #CED4DA */
+    --gray-300: 210, 14%, 89%; /* #DEE2E6 */
+    --gray-200: 210, 16%, 93%; /* #E9ECEF */
+    --gray-100: 210, 17%, 95%; /* #F1F3F5 */
+    --gray-50: 210, 17%, 98%; /* #F8F9FA */
   }
   .dark {
     --background: 0 0% 3.9%;
@@ -101,74 +104,10 @@
   }
 }
 
-@layer utilities {
-  .text-24 {
-    line-height: 140%;
-    font-size: 1.5rem; /* 24px */
-    font-weight: 600;
-  }
-  .text-22 {
-    line-height: 140%;
-    font-size: 1.375rem; /* 22px */
-    font-weight: 600;
-  }
-  .text-20 {
-    line-height: 140%;
-    font-size: 1.25rem; /* 20px */
-    font-weight: 700;
-  }
-  .text-18 {
-    line-height: 150%;
-    font-size: 1.125rem; /* 18px */
-  }
-  .text-18sb {
-    line-height: 150%;
-    font-size: 1.125rem; /* 18px */
-    font-weight: 600;
-  }
-  .text-17 {
-    line-height: 140%;
-    font-size: 1.0625rem; /* 17px */
-  }
-  .text-17sb {
-    line-height: 140%;
-    font-size: 1.0625rem; /* 17px */
-    font-weight: 600;
-  }
-  .text-16sb {
-    line-height: 150%;
-    font-size: 1rem; /* 16px */
-    font-weight: 600;
-  }
-	.text-16{
-		line-height: 150%;
-		font-size: 1rem; /* 16px */
-		font-weight: 400;
-	}
-  .text-15 {
-    line-height: 150%;
-    font-size: 0.9375rem; /* 15px */
-  }
-  .text-15sb {
-    line-height: 150%;
-    font-size: 0.9375rem; /* 15px */
-    font-weight: 600;
-  }
-  .text-14 {
-    line-height: 150%;
-    font-size: 0.875rem; /* 14px */
-    font-weight: 600;
-  }
-  .text-14b {
-    line-height: 150%;
-    font-size: 0.875rem; /* 14px */
-    font-weight: 700;
-  }
-}
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border font-pretendard;
   }
   body {
     @apply bg-background text-foreground;
