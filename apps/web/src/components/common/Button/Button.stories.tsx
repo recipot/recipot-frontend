@@ -241,7 +241,7 @@ export const Pressed: Story = {
 export const Sizes: Story = {
   name: 'Size Variants',
   render: () => (
-    <div className="flex items-center gap-4 flex-wrap">
+    <div className="flex flex-wrap items-center gap-4">
       <Button variant="default" size="sm" shape="round">
         Small
       </Button>

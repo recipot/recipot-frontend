@@ -4,6 +4,8 @@ import { memo } from 'react';
 
 import { cn } from '@/lib/utils';
 
+import { Button } from '../common/Button';
+
 import type { AllergyCheckItem } from './Allergy.constants';
 
 /**
@@ -32,22 +34,24 @@ function AllergyCheckItem({
       </label>
       <div className="text-15sb grid grid-cols-3 gap-3">
         {items.map(item => (
-          // TODO : 추후 공통 컴포넌트로 변경 필요
-          <button
+          <Button
             key={item.id}
+            size="full"
+            shape="square"
             type="button"
             onClick={() => onItemToggle(item.id)}
+            variant="outline"
             className={cn(
-              // 공통 스타일
-              'h-10 w-full rounded-[10px] border-[1.2px] p-3 leading-none transition-all duration-200',
-              // 상태별 스타일
+              'h-10',
               selectedItems.includes(item.id)
                 ? 'border-secondary-soft-green bg-secondary-light-green text-primary'
-                : 'border-gray-300 bg-white hover:border-gray-300'
+                : ''
             )}
+
+            
           >
             {item.label}
-          </button>
+          </Button>
         ))}
       </div>
     </div>

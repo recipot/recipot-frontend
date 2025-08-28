@@ -22,7 +22,7 @@ export default function AllergyCheckPresenter({
   onSubmit: (e: React.FormEvent) => void;
 }) {
   return (
-    <form onSubmit={onSubmit} className="space-y-8">
+    <form onSubmit={onSubmit} className="w-full space-y-8">
       {categories.map(category => (
         <AllergyCheckItem
           key={category.title}

@@ -5,13 +5,6 @@
     "allowJs": true,
     "skipLibCheck": true
   },
-  "include": [
-    "app",
-    "**/*.ts",
-    "**/*.tsx"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["app", "**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"]
 }
-

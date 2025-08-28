@@ -38,8 +38,8 @@ type Story = StoryObj<typeof meta>;
 export const AllTextStyles: Story = {
   name: 'Text Styles',
   render: () => (
-    <div className="p-4 font-pretendard space-y-6">
-      <h1 className="text-3xl font-bold mb-8">Typography</h1>
+    <div className="space-y-6 p-4 font-pretendard">
+      <h1 className="mb-8 text-3xl font-bold">Typography</h1>
       {typographyStyles.map(style => (
         <div key={style} className="border-b pb-4">
           <p className={style}>

@@ -106,8 +106,6 @@
   }
 }
 
-
-
 @layer base {
   * {
     @apply border-border font-pretendard text-gray-900;

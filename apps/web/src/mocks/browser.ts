@@ -15,15 +15,17 @@ export const startMswWorker = async () => {
           url: '/mockServiceWorker.js', // public 폴더에 있는 service worker
         },
       });
-      
+
       console.log('MSW가 시작되었습니다.');
       console.log('등록된 핸들러:', handlers.length, '개');
       console.log('Mock API 엔드포인트:');
-      
+
       // 등록된 핸들러들의 엔드포인트 출력 (개발용)
       handlers.forEach((handler: any) => {
         if (handler.info) {
-          console.log(`   ${handler.info.method?.toUpperCase()} ${handler.info.path}`);
+          console.log(
+            `   ${handler.info.method?.toUpperCase()} ${handler.info.path}`
+          );
         }
       });
     } catch (error) {

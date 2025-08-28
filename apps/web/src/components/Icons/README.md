@@ -97,7 +97,11 @@ function MyComponent() {
 ### 스타일 추가
 
 ```tsx
-<CheckIcon className="my-custom-class" style={{ marginRight: '8px' }} onClick={() => console.log('clicked')} />
+<CheckIcon
+  className="my-custom-class"
+  style={{ marginRight: '8px' }}
+  onClick={() => console.log('clicked')}
+/>
 ```
 
 ## 주의사항

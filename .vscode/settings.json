@@ -6,15 +6,17 @@
     "source.organizeImports": "never"
   },
   "eslint.format.enable": true,
-  "eslint.validate": ["typescript", "typescriptreact", "javascript", "javascriptreact"],
-  "eslint.useFlatConfig": true,
-  "eslint.workingDirectories": [
-    "apps/web",
-    "apps/mobile"
+  "eslint.validate": [
+    "typescript",
+    "typescriptreact",
+    "javascript",
+    "javascriptreact"
   ],
-  "prettier.requireConfig": false,
-  "prettier.prettierPath": "node_modules/prettier",
-  
+  "eslint.useFlatConfig": true,
+  "eslint.workingDirectories": ["apps/web", "apps/mobile"],
+  "prettier.requireConfig": true,
+  "prettier.configPath": ".config/.prettierrc",
+
   // 파일별 포매터 설정
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
@@ -23,7 +25,7 @@
     }
   },
   "[typescriptreact]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode", 
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.codeActionsOnSave": {
       "source.fixAll.eslint": "explicit"
     }
