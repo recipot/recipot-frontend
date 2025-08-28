@@ -13,46 +13,17 @@ import { cn } from '@/lib/utils';
 import type { ComponentPropsWithoutRef } from 'react';
 
 export interface ModalProps extends ComponentPropsWithoutRef<typeof Dialog> {
-  title?: string;
-  description?: string;
-  size?: 'sm' | 'default' | 'lg' | 'xl' | 'full';
-  showCloseButton?: boolean;
-  contentClassName?: string;
-  footer?: React.ReactNode;
+  title?: string | React.ReactNode;
   disableOverlayClick?: boolean;
 }
 
-const sizeClasses = {
-  default: 'max-w-md',
-  full: 'max-w-[95vw] w-full',
-  lg: 'max-w-2xl',
-  sm: 'max-w-sm',
-  xl: 'max-w-4xl',
-} as const;
-
 export function Modal({
   children,
-  contentClassName,
-  description,
   disableOverlayClick = false,
-  footer,
   onOpenChange,
-  size = 'default',
   title,
   ...props
 }: ModalProps) {
-  const ALLOWED_SIZES = new Set<keyof typeof sizeClasses>([
-    'default',
-    'full',
-    'lg',
-    'sm',
-    'xl',
-  ]);
-
-  const safeSize: keyof typeof sizeClasses = ALLOWED_SIZES.has(size)
-    ? size
-    : 'default';
-
   const lockBodyScroll = (lock: boolean) => {
     const html = document.documentElement;
     const { body } = document;
@@ -85,24 +56,6 @@ export function Modal({
     }
   };
 
-  let sizeClass: (typeof sizeClasses)[keyof typeof sizeClasses];
-  switch (safeSize) {
-    case 'sm':
-      sizeClass = sizeClasses.sm;
-      break;
-    case 'lg':
-      sizeClass = sizeClasses.lg;
-      break;
-    case 'xl':
-      sizeClass = sizeClasses.xl;
-      break;
-    case 'full':
-      sizeClass = sizeClasses.full;
-      break;
-    default:
-      sizeClass = sizeClasses.default;
-  }
-
   return (
     <Dialog onOpenChange={handleOpenChange} {...props}>
       <DialogPortal>
@@ -112,32 +65,14 @@ export function Modal({
         />
         <DialogContent
           className={cn(
-            'fixed left-[50%] top-[50%] z-50 grid w-[320px] translate-x-[-50%] translate-y-[-50%] gap-[30px] border bg-background px-5 pb-5 pt-[30px] shadow-lg duration-200 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 rounded-3xl',
-            sizeClass,
-            contentClassName
+            'w-[320px] gap-[30px] border bg-background px-5 pb-5 pt-[30px] w-[320px] rounded-3xl'
           )}
         >
-          <div className="flex flex-col space-y-2 text-center">
-            <h2
-              className={cn(
-                'font-normal leading-none tracking-tight',
-                'text-body17'
-              )}
-            >
-              {title}
-            </h2>
-            {description && (
-              <p className="text-sm text-muted-foreground">{description}</p>
-            )}
+          <div className="text-center w-[280px]">
+            <h2 className="text-17">{title}</h2>
           </div>
 
-          <div className="py-1 text-body17 font-pretendard">{children}</div>
-
-          {footer && (
-            <div className="flex justify-end space-x-2 pt-4 border-t">
-              {footer}
-            </div>
-          )}
+          <div className="py-1 text-17 font-pretendard">{children}</div>
         </DialogContent>
       </DialogPortal>
     </Dialog>
