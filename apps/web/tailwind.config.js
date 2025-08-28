@@ -26,10 +26,12 @@ module.exports = {
         primary: {
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))',
+          pressed: 'hsl(var(--brand-primary-pressed))',
         },
         secondary: {
           DEFAULT: 'hsl(var(--secondary))',
           foreground: 'hsl(var(--secondary-foreground))',
+          pressed: 'hsl(var(--secondary-pressed))',
         },
         muted: {
           DEFAULT: 'hsl(var(--muted))',
