@@ -41,7 +41,7 @@ const LoginRequiredModal = ({ onOpenChange, open }: ModalProps) => (
         <Button className="w-full" variant="outline">
           취소
         </Button>
-        <Button className="w-full" variant="outline">
+        <Button className="w-full" variant="default">
           로그인하기
         </Button>
       </div>
