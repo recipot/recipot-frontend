@@ -2,18 +2,18 @@ import React, { useEffect } from 'react';
 
 import {
   Dialog,
-  DialogClose,
   DialogContent,
+  DialogDescription,
+  DialogHeader,
   DialogOverlay,
   DialogPortal,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 
 import type { ComponentPropsWithoutRef } from 'react';
 
 export interface ModalProps extends ComponentPropsWithoutRef<typeof Dialog> {
-  title?: string | React.ReactNode;
+  description?: string | React.ReactNode;
   disableOverlayClick?: boolean;
 }
 
@@ -21,7 +21,7 @@ export function Modal({
   children,
   disableOverlayClick = false,
   onOpenChange,
-  title,
+  description,
   ...props
 }: ModalProps) {
   const lockBodyScroll = (lock: boolean) => {
@@ -65,12 +65,16 @@ export function Modal({
         />
         <DialogContent
           className={cn(
-            'flex flex-col justify-center items-center gap-[30px] border bg-background px-5 pb-5 pt-[1.875rem] w-xs rounded-3xl'
+            'flex flex-col w-[20rem] justify-center items-center gap-[30px] border bg-background px-5 py-5 rounded-3xl'
           )}
         >
-          <div className="text-center w-[17.5rem]">
-            <h2 className="text-17">{title}</h2>
-          </div>
+          <DialogHeader className="text-center">
+            {description ? (
+              <DialogDescription className="text-17">
+                {description}
+              </DialogDescription>
+            ) : null}
+          </DialogHeader>
 
           <div className="py-1 text-17 font-pretendard">{children}</div>
         </DialogContent>
@@ -78,7 +82,3 @@ export function Modal({
     </Dialog>
   );
 }
-
-// export { Dialog as ModalRoot };
-// export { DialogTrigger as ModalTrigger };
-// export { DialogClose as ModalClose };
