@@ -38,11 +38,11 @@ const LoginRequiredModal = ({ onOpenChange, open }: ModalProps) => (
   >
     <div className="space-y-4">
       <div className="pt-2 flex justify-center space-x-2">
-        <Button className="w-full" variant="default">
-          확인
-        </Button>
         <Button className="w-full" variant="outline">
           취소
+        </Button>
+        <Button className="w-full" variant="outline">
+          로그인하기
         </Button>
       </div>
     </div>
