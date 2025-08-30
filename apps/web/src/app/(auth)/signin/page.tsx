@@ -48,16 +48,20 @@ export default function SignInPage() {
   const [activeIndex, setActiveIndex] = useState(0);
   const current = INTRO.at(activeIndex) ?? INTRO[0];
   return (
-    <div className="mx-auto w-full min-h-screen">
+    <div className="mx-auto min-h-screen w-full">
       <div className="pb-[calc(128px+env(safe-area-inset-bottom))]">
         <Swiper
           pagination={SWIPER_PAGINATION}
           modules={SWIPER_MODULES}
           className="intro-swiper"
           autoplay={SWIPER_AUTOPLAY}
-          onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}>
+          onSlideChange={swiper => setActiveIndex(swiper.realIndex)}
+        >
           {INTRO.map((item, index) => (
-            <SwiperSlide key={index} className="flex items-center justify-center">
+            <SwiperSlide
+              key={index}
+              className="flex items-center justify-center"
+            >
               <Image
                 src={item.src}
                 alt={item.alt}
@@ -70,20 +74,34 @@ export default function SignInPage() {
           ))}
         </Swiper>
         <div className="intro-pagination mt-5 flex justify-center" />
-        <p className="mt-6 whitespace-pre-line text-center text-lg text-neutral-950 font-semibold">{current.text}</p>
+        <p className="mt-6 text-center text-lg font-semibold whitespace-pre-line text-neutral-950">
+          {current.text}
+        </p>
       </div>
-      <div className="fixed bottom-0 left-1/2 z-50 w-full -translate-x-1/2 bg-white/60 backdrop-blur flex flex-col items-center gap-3 pt-[10px] pb-[calc(10px+env(safe-area-inset-bottom))] px-6">
+      <div className="fixed bottom-0 left-1/2 z-50 flex w-full -translate-x-1/2 flex-col items-center gap-3 bg-white/60 px-6 pt-[10px] pb-[calc(10px+env(safe-area-inset-bottom))] backdrop-blur">
         {/* TODO 추후 컴포넌트 교체 */}
         <button
           type="button"
-          className="py-3 bg-[#FCE40B] rounded-full w-full text-[17px] font-semibold text-neutral-900 flex justify-center items-center gap-2">
-          <Image src={icon.kakao.src} alt={icon.kakao.alt} width={20} height={20} />
+          className="flex w-full items-center justify-center gap-2 rounded-full bg-[#FCE40B] py-3 text-[17px] font-semibold text-neutral-900"
+        >
+          <Image
+            src={icon.kakao.src}
+            alt={icon.kakao.alt}
+            width={20}
+            height={20}
+          />
           <span>카카오로 시작하기</span>
         </button>
         <button
           type="button"
-          className="py-3 bg-white rounded-full w-full text-[17px] font-semibold border border-neutral-400 text-neutral-900 flex justify-center items-center gap-2">
-          <Image src={icon.google.src} alt={icon.google.alt} width={20} height={20} />
+          className="flex w-full items-center justify-center gap-2 rounded-full border border-neutral-400 bg-white py-3 text-[17px] font-semibold text-neutral-900"
+        >
+          <Image
+            src={icon.google.src}
+            alt={icon.google.alt}
+            width={20}
+            height={20}
+          />
           <span>Google로 시작하기</span>
         </button>
       </div>
