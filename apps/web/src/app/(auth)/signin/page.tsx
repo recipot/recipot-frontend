@@ -9,6 +9,9 @@ import Image from 'next/image';
 import { Autoplay, Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
+import { Button } from '@/components/common/Button/Button';
+import { GoogleIcon, KakaoIcon } from '@/components/Icons';
+
 const SWIPER_MODULES = [Pagination, Autoplay];
 const SWIPER_AUTOPLAY = { delay: 3500, disableOnInteraction: false };
 const SWIPER_PAGINATION = {
@@ -34,16 +37,6 @@ const INTRO = [
   },
 ];
 
-const icon = {
-  google: {
-    alt: 'Google Icon',
-    src: '/auth/icon-google.svg',
-  },
-  kakao: {
-    alt: 'Kakao Icon',
-    src: '/auth/icon-kakao.svg',
-  },
-};
 export default function SignInPage() {
   const [activeIndex, setActiveIndex] = useState(0);
   const current = INTRO.at(activeIndex) ?? INTRO[0];
@@ -79,31 +72,23 @@ export default function SignInPage() {
         </p>
       </div>
       <div className="fixed bottom-0 left-1/2 z-50 flex w-full -translate-x-1/2 flex-col items-center gap-3 bg-white/60 px-6 pt-[10px] pb-[calc(10px+env(safe-area-inset-bottom))] backdrop-blur">
-        {/* TODO 추후 컴포넌트 교체 */}
-        <button
-          type="button"
-          className="flex w-full items-center justify-center gap-2 rounded-full bg-[#FCE40B] py-3 text-[17px] font-semibold text-neutral-900"
+        <Button
+          size="full"
+          shape="round"
+          className="bg-[#FEE500] text-gray-900"
         >
-          <Image
-            src={icon.kakao.src}
-            alt={icon.kakao.alt}
-            width={20}
-            height={20}
-          />
-          <span>카카오로 시작하기</span>
-        </button>
-        <button
-          type="button"
-          className="flex w-full items-center justify-center gap-2 rounded-full border border-neutral-400 bg-white py-3 text-[17px] font-semibold text-neutral-900"
+          <KakaoIcon size={28} />
+          카카오로 시작하기
+        </Button>
+        <Button
+          size="full"
+          shape="round"
+          variant="outline"
+          className="bg-white"
         >
-          <Image
-            src={icon.google.src}
-            alt={icon.google.alt}
-            width={20}
-            height={20}
-          />
-          <span>Google로 시작하기</span>
-        </button>
+          <GoogleIcon />
+          Google로 시작하기
+        </Button>
       </div>
     </div>
   );
