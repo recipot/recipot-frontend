@@ -7,7 +7,7 @@
   --swiper-pagination-color: #111827; /* neutral-900 */
 }
 .intro-swiper .swiper-pagination-bullet-active {
-  background: #111827 !important; /* 안전망 */
+  @apply bg-neutral-900;
 }
 
 /* 외부 페이지네이션 컨테이너 스타일 */
