@@ -108,9 +108,9 @@
 
 @layer base {
   * {
-    @apply border-border font-pretendard text-gray-900;
+    @apply border-border font-pretendard;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-gray-900;
   }
 }
