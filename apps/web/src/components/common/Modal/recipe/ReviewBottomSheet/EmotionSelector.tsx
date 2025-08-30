@@ -12,9 +12,9 @@ export function EmotionSelector({
   selectedFeeling,
 }: EmotionSelectorProps) {
   return (
-    <div className="w-[342px] mb-6 gap-10 pt-5 px-6">
+    <div className="mb-6 w-[342px] gap-10 px-6 pt-5">
       {selectedFeeling === null ? (
-        <p className="my-3 text-center text-heading22 font-semibold">
+        <p className="text-heading22 my-3 text-center font-semibold">
           식사는 어떠셨나요?
         </p>
       ) : (

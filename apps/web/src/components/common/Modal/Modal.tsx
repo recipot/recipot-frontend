@@ -16,7 +16,7 @@ import { DialogTitle } from '@radix-ui/react-dialog';
 
 export interface ModalProps extends ComponentPropsWithoutRef<typeof Dialog> {
   title?: string;
-  description?: string;
+  description?: string | React.ReactNode;
   disableOverlayClick?: boolean;
 }
 
@@ -69,7 +69,7 @@ export function Modal({
         />
         <DialogContent
           className={cn(
-            'flex flex-col w-[20rem] justify-center items-center gap-[30px] border bg-background px-5 py-5 rounded-3xl'
+            'bg-background flex w-[20rem] flex-col items-center justify-center gap-[30px] rounded-3xl border px-5 py-5'
           )}
         >
           <DialogHeader className="text-center">
@@ -85,7 +85,7 @@ export function Modal({
             ) : null}
           </DialogHeader>
 
-          <div className="py-1 text-17 font-pretendard">{children}</div>
+          <div className="text-17 font-pretendard py-1">{children}</div>
         </DialogContent>
       </DialogPortal>
     </Dialog>

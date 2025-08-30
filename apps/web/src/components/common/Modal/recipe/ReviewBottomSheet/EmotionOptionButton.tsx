@@ -40,8 +40,8 @@ export function EmotionOptionButton({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        'flex h-[94px] w-[106px] flex-col items-center justify-center rounded-2xl text-sm font-semibold gap-[6px]',
-        disabled && 'opacity-60 cursor-not-allowed',
+        'flex h-[94px] w-[106px] flex-col items-center justify-center gap-[6px] rounded-2xl text-sm font-semibold',
+        disabled && 'cursor-not-allowed opacity-60',
         selected ? selectedByColor[color] : baseByColor[color]
       )}
       aria-pressed={!!selected}

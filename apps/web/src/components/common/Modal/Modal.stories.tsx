@@ -22,7 +22,7 @@ const ShareRecipeModal = ({ onOpenChange, open }: ModalProps) => {
       title="레시피 공유"
       description="해당 레시피를 공유해보세요!"
     >
-      <div className="space-y-4 flex justify-center">
+      <div className="flex justify-center space-y-4">
         <Button onClick={handleCopyClick} size="lg" variant="default">
           복사하기
         </Button>
@@ -39,7 +39,7 @@ const LoginRequiredModal = ({ onOpenChange, open }: ModalProps) => (
     description="로그인이 필요한 서비스입니다."
   >
     <div className="space-y-2">
-      <div className="pt-2 flex justify-center space-x-2">
+      <div className="flex justify-center space-x-2 pt-2">
         <Button className="w-full px-8 py-[0.938rem]" variant="outline">
           취소
         </Button>

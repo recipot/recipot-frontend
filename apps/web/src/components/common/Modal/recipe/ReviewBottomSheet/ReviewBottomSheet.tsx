@@ -75,7 +75,7 @@ export function ReviewBottomSheet({
       <DrawerContent
         aria-describedby={undefined}
         className={cn(
-          `w-full mx-auto rounded-t-3xl bg-white ${goodFeeling ? 'h-[844px]' : 'h-[659px]'} shadow-lg min-h-[400px] flex flex-col overflow-hidden`
+          `mx-auto w-full rounded-t-3xl bg-white ${goodFeeling ? 'h-[844px]' : 'h-[659px]'} flex min-h-[400px] flex-col overflow-hidden shadow-lg`
         )}
       >
         <DrawerHeader className="sr-only">
@@ -83,20 +83,20 @@ export function ReviewBottomSheet({
             <DrawerTitle>{recipeTitle} 리뷰 작성</DrawerTitle>
           </VisuallyHidden>
         </DrawerHeader>
-        <DrawerClose className="absolute right-3 top-3">
+        <DrawerClose className="absolute top-3 right-3">
           <CloseIcon />
         </DrawerClose>
 
-        <div className="w-full flex flex-col items-center justify-center">
+        <div className="flex w-full flex-col items-center justify-center">
           {/* 해먹은 횟수 */}
           {cookedBadge(timesCooked) && (
-            <div className="w-[11.25rem] mt-4 h-[31px] flex text-14sb justify-center items-center rounded-2xl bg-neutral-100 px-4 py-[5px] mb-5 text-xs text-neutral-600">
+            <div className="text-14sb mt-4 mb-5 flex h-[31px] w-[11.25rem] items-center justify-center rounded-2xl bg-neutral-100 px-4 py-[5px] text-xs text-neutral-600">
               {cookedBadge(timesCooked)}
             </div>
           )}
           {/* 레시피 타이틀 + 이미지 */}
-          <div className="flex flex-col justify-center items-center overflow-y-auto">
-            <div className="text-lg font-semibold mb-2">{recipeTitle}</div>
+          <div className="flex flex-col items-center justify-center overflow-y-auto">
+            <div className="mb-2 text-lg font-semibold">{recipeTitle}</div>
             {recipeImageUrl && (
               <Image
                 src={recipeImageUrl}
@@ -107,9 +107,9 @@ export function ReviewBottomSheet({
               />
             )}
           </div>
-          <div className="border border-dashed h-[1px] border-neutral-100 mt-5 w-[342px]"></div>
+          <div className="mt-5 h-[1px] w-[342px] border border-dashed border-neutral-100"></div>
 
-          <div className="mx-auto flex max-w-[292px] flex-col justify-center items-center">
+          <div className="mx-auto flex max-w-[292px] flex-col items-center justify-center">
             <div className="flex flex-col items-center">
               <form onSubmit={handleSubmit} className="w-full">
                 <div className="mb-[155px]">
@@ -127,7 +127,7 @@ export function ReviewBottomSheet({
                   <Button
                     type="submit"
                     disabled={!canSubmit}
-                    className="w-full rounded-[6.25rem] py-[0.938rem] px-[2rem]"
+                    className="w-full rounded-[6.25rem] px-[2rem] py-[0.938rem]"
                   >
                     후기 등록하기
                   </Button>
