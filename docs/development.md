@@ -122,7 +122,7 @@ function useRecipeCard(recipeId: string) {
   const { data: recipe } = useRecipeQuery(recipeId);
 
   const handleLike = () => {
-    setIsLiked((prev) => !prev);
+    setIsLiked(prev => !prev);
     // API 호출
   };
 
@@ -164,7 +164,7 @@ export const useAuthStore = create(set => ({
 // 서버 상태 예시
 function useRecipeQuery(id: string) {
   return useQuery({
-    queryKey: ["recipe", id],
+    queryKey: ['recipe', id],
     queryFn: () => recipeApi.getRecipe(id),
   });
 }
@@ -188,7 +188,7 @@ function useRecipeQuery(id: string) {
 
 ```typescript
 // C가 D의 즐겨찾기 상태 사용
-import { useProfileStore } from "@/stores/profileStore"; // D 담당
+import { useProfileStore } from '@/stores/profileStore'; // D 담당
 
 function RecipeDetail() {
   const { favorites, addFavorite } = useProfileStore(); // D의 상태 사용

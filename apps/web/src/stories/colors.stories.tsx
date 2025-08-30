@@ -83,7 +83,7 @@ interface ColorItemProps {
 const ColorItem: React.FC<ColorItemProps> = ({ colorName }) => (
   <div className="mb-4 flex items-center space-x-4">
     <div
-      className={`h-16 w-16 rounded-md border border-border bg-${colorName}`}
+      className={`border-border h-16 w-16 rounded-md border bg-${colorName}`}
     />
     <div className="flex flex-col">
       <span className="text-sm font-bold">.{colorName}</span>
@@ -120,7 +120,7 @@ type Story = StoryObj;
 
 export const AllColors: Story = {
   render: () => (
-    <div className="p-4 font-pretendard">
+    <div className="font-pretendard p-4">
       <TailwindSafelist />
       <h1 className="mb-8 text-3xl font-bold">Color Palette</h1>
       {Object.entries(colors).map(([title, colorList]) => (

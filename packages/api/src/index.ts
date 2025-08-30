@@ -1,1 +1,1 @@
-export * from "./allergyAPI";
+export * from './allergyAPI';

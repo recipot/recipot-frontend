@@ -1,9 +1,9 @@
 ---
 name: 기능 개발
 about: 새로운 기능 개발을 위한 이슈
-title: "[DOMAIN] 기능명"
-labels: ["feature"]
-assignees: ""
+title: '[DOMAIN] 기능명'
+labels: ['feature']
+assignees: ''
 ---
 
 ## 📋 기본 정보
