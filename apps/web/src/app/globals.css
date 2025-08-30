@@ -75,6 +75,8 @@
     --gray-200: 210, 16%, 93%; /* #E9ECEF */
     --gray-100: 210, 17%, 95%; /* #F1F3F5 */
     --gray-50: 210, 17%, 98%; /* #F8F9FA */
+    /* Anchor offset for sticky header (used by scroll-margin) */
+    --anchor-offset: 80px;
   }
   .dark {
     --background: 0 0% 3.9%;
@@ -105,10 +107,29 @@
 }
 
 @layer base {
+  html {
+    /* Native smooth scrolling for in-page anchors */
+    scroll-behavior: smooth;
+  }
   * {
     @apply border-border font-pretendard;
   }
   body {
     @apply bg-background text-foreground;
+  }
+
+  /* Offset anchor targets by sticky header height */
+  :where(h1, h2, h3, h4, h5, h6, [data-anchor-target])[id] {
+    scroll-margin-top: var(--anchor-offset);
+  }
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }
