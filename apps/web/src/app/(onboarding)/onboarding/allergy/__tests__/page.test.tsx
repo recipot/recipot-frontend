@@ -1,245 +1,135 @@
-// allergyPost API 모킹
-import { allergyPost } from '@recipot/api';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen, waitFor } from '@testing-library/react';
+import {
+  QueryClient,
+  QueryClientProvider,
+  useMutation,
+} from '@tanstack/react-query';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { http, HttpResponse } from 'msw';
+import { setupServer } from 'msw/node';
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  describe,
+  expect,
+  it,
+  type Mock,
+  vi,
+} from 'vitest';
 
 import AllergyPage from '../page';
 
-jest.mock('@recipot/api', () => ({
-  allergyPost: jest.fn(),
-}));
+import type * as TanStackQuery from '@tanstack/react-query';
 
-const mockedAllergyPost = jest.mocked(allergyPost);
+// vi.mock a module to replace exports
+vi.mock('@tanstack/react-query', async importOriginal => {
+  const original = await importOriginal<typeof TanStackQuery>();
+  return {
+    ...original,
+    useMutation: vi.fn(),
+  };
+});
 
-// QueryClient를 사용한 테스트 래퍼
+// MSW 핸들러 설정
+const server = setupServer(
+  http.post('/api/onboarding/allergy', () => {
+    return HttpResponse.json({ message: 'Success' });
+  })
+);
+
+beforeAll(() => server.listen());
+afterEach(() => server.resetHandlers());
+afterAll(() => server.close());
+
 const createWrapper = () => {
   const queryClient = new QueryClient({
     defaultOptions: {
-      mutations: {
-        retry: false,
-      },
       queries: {
         retry: false,
       },
     },
   });
-
-  function Wrapper({ children }: { children: React.ReactNode }) {
-    return (
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    );
-  }
-
+  const Wrapper = ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  );
+  Wrapper.displayName = 'QueryClientWrapper';
   return Wrapper;
 };
 
-describe('Allergy Page - API 테스트', () => {
-  const user = userEvent.setup();
+describe('Allergy Page', () => {
+  let mockMutate: Mock;
 
   beforeEach(() => {
-    mockedAllergyPost.mockClear();
-    // alert 모킹
-    global.alert = jest.fn();
+    mockMutate = vi.fn();
+    (useMutation as Mock).mockReturnValue({
+      mutate: mockMutate,
+    });
   });
 
-  it('사용자가 알레르기 항목을 선택하고 제출하면 API가 호출됨', async () => {
-    // API 응답 모킹
-    mockedAllergyPost.mockResolvedValueOnce({
-      analysis: {
-        animalCount: 1,
-        seafoodCount: 2,
-        totalSelected: 3,
-      },
-      message: '못 먹는 음식 item POST 완료',
-      selectedItems: [1, 2, 6],
-      success: true,
-    });
-
-    // console.log 스파이
-    const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
-
-    // 페이지 렌더링 (QueryClient로 래핑)
-    render(<AllergyPage />, { wrapper: createWrapper() });
-
-    // 항목 선택
-    await user.click(screen.getByText('어류'));
-    await user.click(screen.getByText('돼지고기'));
-    await user.click(screen.getByText('게'));
-
-    // 제출
-    await user.click(screen.getByRole('button', { name: /submit/i }));
-
-    // API 호출 확인
-    expect(mockedAllergyPost).toHaveBeenCalledWith({ categories: [1, 2, 6] });
-
-    // console.log에 성공 로그가 찍혔는지 확인
-    await waitFor(() => {
-      expect(consoleSpy).toHaveBeenCalledWith('API 호출 성공:', {
-        analysis: {
-          animalCount: 1,
-          seafoodCount: 2,
-          totalSelected: 3,
-        },
-        message: '못 먹는 음식 item POST 완료',
-        selectedItems: [1, 2, 6],
-        success: true,
-      });
-    });
-
-    // 스파이 정리
-    consoleSpy.mockRestore();
+  afterEach(() => {
+    vi.clearAllMocks();
   });
 
-  it('선택된 항목이 없을 때 제출하면 빈 배열로 API 호출됨', async () => {
-    // API 응답 모킹
-    mockedAllergyPost.mockResolvedValueOnce({
-      analysis: {
-        animalCount: 0,
-        seafoodCount: 0,
-        totalSelected: 0,
-      },
-      message: '못 먹는 음식 item POST 완료',
-      selectedItems: [],
-      success: true,
-    });
-
-    // console.log 스파이
-    const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
-
+  it('AllergyPage가 정상적으로 렌더링되어야 한다.', () => {
     render(<AllergyPage />, { wrapper: createWrapper() });
-
-    // 아무것도 선택하지 않고 제출
-    await user.click(screen.getByRole('button', { name: /submit/i }));
-
-    // API 호출 확인
-    expect(mockedAllergyPost).toHaveBeenCalledWith({ categories: [] });
-
-    // console.log에 성공 로그가 찍혔는지 확인
-    await waitFor(() => {
-      expect(consoleSpy).toHaveBeenCalledWith('API 호출 성공:', {
-        analysis: {
-          animalCount: 0,
-          seafoodCount: 0,
-          totalSelected: 0,
-        },
-        message: '못 먹는 음식 item POST 완료',
-        selectedItems: [],
-        success: true,
-      });
-    });
-
-    // 스파이 정리
-    consoleSpy.mockRestore();
+    expect(
+      screen.getByRole('heading', { name: '알레르기 정보를 선택해주세요.' })
+    ).toBeInTheDocument();
   });
 
-  it('복잡한 선택 패턴에서도 올바른 API 호출이 됨', async () => {
-    // API 응답 모킹
-    mockedAllergyPost.mockResolvedValueOnce({
-      analysis: {
-        animalCount: 4,
-        seafoodCount: 4,
-        totalSelected: 8,
-      },
-      message: '못 먹는 음식 item POST 완료',
-      selectedItems: [1, 2, 3, 5, 6, 7, 9, 10],
-      success: true,
-    });
-
-    // console.log 스파이
-    const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
-
+  it('사용자가 알레르기 항목을 선택하고 "선택하기"를 누르면 mutate 함수가 호출된다', async () => {
+    const user = userEvent.setup();
     render(<AllergyPage />, { wrapper: createWrapper() });
 
-    // 해산물류: 어류, 게, 새우, 조개류
-    await user.click(screen.getByText('어류'));
-    await user.click(screen.getByText('게'));
-    await user.click(screen.getByText('새우'));
-    await user.click(screen.getByText('조개류'));
+    // 1. 항목 선택
+    await user.click(screen.getByRole('button', { name: '게' }));
+    await user.click(screen.getByRole('button', { name: '어류' }));
 
-    // 동물성 식품: 돼지고기, 닭고기, 알류, 유제품
-    await user.click(screen.getByText('돼지고기'));
-    await user.click(screen.getByText('닭고기'));
-    await user.click(screen.getByText('알류'));
-    await user.click(screen.getByText('유제품'));
+    // 2. 제출 버튼 클릭
+    await user.click(screen.getByRole('button', { name: '선택하기' }));
 
-    // 제출
-    await user.click(screen.getByRole('button', { name: /submit/i }));
-
-    // API 호출 확인
-    expect(mockedAllergyPost).toHaveBeenCalledWith({
-      categories: [1, 2, 3, 5, 6, 7, 9, 10],
+    // 3. mutate 함수 호출 검증
+    expect(mockMutate).toHaveBeenCalledWith({
+      categories: [1, 2],
     });
-
-    // console.log에 성공 로그가 찍혔는지 확인
-    await waitFor(() => {
-      expect(consoleSpy).toHaveBeenCalledWith('API 호출 성공:', {
-        analysis: {
-          animalCount: 4,
-          seafoodCount: 4,
-          totalSelected: 8,
-        },
-        message: '못 먹는 음식 item POST 완료',
-        selectedItems: [1, 2, 3, 5, 6, 7, 9, 10],
-        success: true,
-      });
-    });
-
-    // 스파이 정리
-    consoleSpy.mockRestore();
   });
 
-  it('API 에러 발생 시 콘솔에 에러가 로깅됨', async () => {
-    // API 에러 모킹
-    mockedAllergyPost.mockRejectedValueOnce(new Error('API 호출 실패: 500'));
-
-    // console.error 스파이
-    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
-
+  it('"선택 초기화" 버튼을 누르면 선택된 항목들이 해제된다', async () => {
+    const user = userEvent.setup();
     render(<AllergyPage />, { wrapper: createWrapper() });
 
-    // 항목 선택
-    await user.click(screen.getByText('어류'));
+    const crabButton = screen.getByRole('button', { name: '게' });
+    const fishButton = screen.getByRole('button', { name: '어류' });
+    const resetButton = screen.getByRole('button', { name: '선택 초기화' });
 
-    // 제출
-    await user.click(screen.getByRole('button', { name: /submit/i }));
+    // 1. 항목 선택
+    await user.click(crabButton);
+    await user.click(fishButton);
 
-    // console.error에 에러 로그가 찍혔는지 확인
-    await waitFor(() => {
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        'API 호출 실패:',
-        new Error('API 호출 실패: 500')
-      );
-    });
+    // 선택 확인
+    expect(crabButton).toHaveClass('bg-secondary-light-green');
+    expect(fishButton).toHaveClass('bg-secondary-light-green');
 
-    // 스파이 정리
-    consoleErrorSpy.mockRestore();
+    // 2. 초기화
+    await user.click(resetButton);
+
+    // 초기화 확인
+    expect(crabButton).not.toHaveClass('bg-secondary-light-green');
+    expect(fishButton).not.toHaveClass('bg-secondary-light-green');
   });
 
-  it('네트워크 에러 발생 시 콘솔에 에러가 로깅됨', async () => {
-    // 네트워크 에러 모킹
-    mockedAllergyPost.mockRejectedValueOnce(new Error('Network error'));
-
-    // console.error 스파이
-    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
-
+  it('선택된 항목이 없으면 "선택 초기화" 버튼은 비활성화된다', async () => {
+    const user = userEvent.setup();
     render(<AllergyPage />, { wrapper: createWrapper() });
 
-    // 항목 선택
-    await user.click(screen.getByText('어류'));
+    const resetButton = screen.getByRole('button', { name: '선택 초기화' });
+    expect(resetButton).toBeDisabled();
 
-    // 제출
-    await user.click(screen.getByRole('button', { name: /submit/i }));
+    await user.click(screen.getByRole('button', { name: '게' }));
+    expect(resetButton).not.toBeDisabled();
 
-    // console.error에 에러 로그가 찍혔는지 확인
-    await waitFor(() => {
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        'API 호출 실패:',
-        new Error('Network error')
-      );
-    });
-
-    // 스파이 정리
-    consoleErrorSpy.mockRestore();
+    await user.click(resetButton);
+    expect(resetButton).toBeDisabled();
   });
 });

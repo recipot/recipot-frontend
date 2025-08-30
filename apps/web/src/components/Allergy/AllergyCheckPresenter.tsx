@@ -23,7 +23,12 @@ export default function AllergyCheckPresenter({
   formId?: string;
 }) {
   return (
-    <form id={formId} onSubmit={onSubmit} className="w-full space-y-8">
+    <form
+      id={formId}
+      onSubmit={onSubmit}
+      className="w-full space-y-8"
+      aria-label="알레르기 선택 양식"
+    >
       {categories.map(category => (
         <AllergyCheckItem
           key={category.title}

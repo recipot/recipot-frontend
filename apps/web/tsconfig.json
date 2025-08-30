@@ -5,8 +5,14 @@
     "allowJs": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ]
     },
+    "types": [
+      "jest",
+      "vitest/globals"
+    ],
     "plugins": [
       {
         "name": "next"
@@ -14,11 +20,13 @@
     ]
   },
   "include": [
+    "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".storybook/**/*.ts",
-    "next-env.d.ts",
     ".next/types/**/*.ts"
   ],
-  "exclude": ["node_modules", ".next"]
+  "exclude": [
+    "node_modules",
+    ".next"
+  ]
 }

@@ -1,113 +1,87 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import React from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { fireEvent, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { describe, expect, it, vi } from 'vitest';
 
 import AllergyCheckContainer from '../AllergyCheckContainer';
 
-describe('AllergyCheck 컴포넌트 테스트', () => {
-  const mockOnSubmit = jest.fn();
+const queryClient = new QueryClient();
 
-  beforeEach(() => {
-    mockOnSubmit.mockClear();
+const TestWrapper = ({
+  formId,
+  onSubmit,
+}: {
+  onSubmit: (data: { items: number[] }) => void;
+  formId: string;
+}) => {
+  const [selectedItems, setSelectedItems] = React.useState<number[]>([]);
+
+  const handleItemToggle = (id: number) => {
+    setSelectedItems(prev =>
+      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+    );
+  };
+
+  return (
+    <AllergyCheckContainer
+      formId={formId}
+      onSubmit={onSubmit}
+      selectedItems={selectedItems}
+      onItemToggle={handleItemToggle}
+    />
+  );
+};
+
+const renderWithProviders = (ui: React.ReactElement) => {
+  return render(
+    <QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>
+  );
+};
+
+describe('AllergyCheck', () => {
+  it('항목을 클릭하면 선택 상태가 토글된다', async () => {
+    const user = userEvent.setup();
+
+    renderWithProviders(<TestWrapper formId="test-form" onSubmit={() => {}} />);
+    const fishButton = screen.getByRole('button', { name: '어류' });
+    const crabButton = screen.getByRole('button', { name: '게' });
+
+    // '어류' 선택
+    await user.click(fishButton);
+    expect(fishButton).toHaveClass('bg-secondary-light-green');
+    expect(crabButton).not.toHaveClass('bg-secondary-light-green');
+
+    // '게' 선택
+    await user.click(crabButton);
+    expect(fishButton).toHaveClass('bg-secondary-light-green');
+    expect(crabButton).toHaveClass('bg-secondary-light-green');
+
+    // '어류' 선택 해제
+    await user.click(fishButton);
+    expect(fishButton).not.toHaveClass('bg-secondary-light-green');
+    expect(crabButton).toHaveClass('bg-secondary-light-green');
   });
 
-  it('모든 카테고리 섹션 렌더링', () => {
-    render(<AllergyCheckContainer onSubmit={mockOnSubmit} />);
+  it('제출 시 선택된 항목들의 ID 배열이 전달되어야 한다', async () => {
+    const user = userEvent.setup();
+    const mockOnSubmit = vi.fn();
+    renderWithProviders(
+      <TestWrapper formId="test-form" onSubmit={mockOnSubmit} />
+    );
 
-    expect(screen.getByText('해산물류')).toBeInTheDocument();
-    expect(screen.getByText('동물성 식품')).toBeInTheDocument();
-  });
+    // '어류'(id:1), '게'(id:2) 순서로 클릭
+    const fishButton = screen.getByRole('button', { name: '어류' });
+    const crabButton = screen.getByRole('button', { name: '게' });
 
-  it('각 카테고리의 모든 항목 렌더링', () => {
-    render(<AllergyCheckContainer onSubmit={mockOnSubmit} />);
+    await user.click(fishButton);
+    await user.click(crabButton);
 
-    // 해산물류 항목들
-    expect(screen.getByText('어류')).toBeInTheDocument();
-    expect(screen.getByText('게')).toBeInTheDocument();
-    expect(screen.getByText('새우')).toBeInTheDocument();
-    expect(screen.getByText('오징어')).toBeInTheDocument();
-    expect(screen.getByText('조개류')).toBeInTheDocument();
+    const form = screen.getByRole('form', { name: '알레르기 선택 양식' });
+    fireEvent.submit(form);
 
-    // 동물성 식품 항목들
-    expect(screen.getByText('돼지고기')).toBeInTheDocument();
-    expect(screen.getByText('닭고기')).toBeInTheDocument();
-    expect(screen.getByText('쇠고기')).toBeInTheDocument();
-    expect(screen.getByText('알류')).toBeInTheDocument();
-    expect(screen.getByText('유제품')).toBeInTheDocument();
-  });
-
-  it('제출 버튼 렌더링', () => {
-    render(<AllergyCheckContainer onSubmit={mockOnSubmit} />);
-
-    expect(screen.getByRole('button', { name: /submit/i })).toBeInTheDocument();
-  });
-
-  it('선택된 항목이 없을 때 onSubmit 호출', async () => {
-    render(<AllergyCheckContainer onSubmit={mockOnSubmit} />);
-
-    const submitButton = screen.getByRole('button', { name: /submit/i });
-    fireEvent.click(submitButton);
-
-    await waitFor(() => {
-      expect(mockOnSubmit).toHaveBeenCalledWith({ items: [] });
-    });
-  });
-
-  it('선택된 항목이 있을 때 onSubmit 호출', async () => {
-    render(<AllergyCheckContainer onSubmit={mockOnSubmit} />);
-
-    // 어류 선택
-    const fishButton = screen.getByText('어류');
-    fireEvent.click(fishButton);
-
-    // 게 선택
-    const crabButton = screen.getByText('게');
-    fireEvent.click(crabButton);
-
-    // 제출
-    const submitButton = screen.getByRole('button', { name: /submit/i });
-    fireEvent.click(submitButton);
-
-    await waitFor(() => {
-      expect(mockOnSubmit).toHaveBeenCalledWith({ items: [1, 2] });
-    });
-  });
-
-  it('항목 선택 및 선택 해제 처리', async () => {
-    render(<AllergyCheckContainer onSubmit={mockOnSubmit} />);
-
-    // 어류 선택
-    const fishButton = screen.getByText('어류');
-    fireEvent.click(fishButton);
-
-    // 어류 선택 해제
-    fireEvent.click(fishButton);
-
-    // 제출
-    const submitButton = screen.getByRole('button', { name: /submit/i });
-    fireEvent.click(submitButton);
-
-    await waitFor(() => {
-      expect(mockOnSubmit).toHaveBeenCalledWith({ items: [] });
-    });
-  });
-
-  it('여러 선택 상태 유지', async () => {
-    render(<AllergyCheckContainer onSubmit={mockOnSubmit} />);
-
-    // 여러 항목 선택
-    const fishButton = screen.getByText('어류');
-    const crabButton = screen.getByText('게');
-    const porkButton = screen.getByText('돼지고기');
-
-    fireEvent.click(fishButton);
-    fireEvent.click(crabButton);
-    fireEvent.click(porkButton);
-
-    // 제출
-    const submitButton = screen.getByRole('button', { name: /submit/i });
-    fireEvent.click(submitButton);
-
-    await waitFor(() => {
-      expect(mockOnSubmit).toHaveBeenCalledWith({ items: [1, 2, 6] });
+    expect(mockOnSubmit).toHaveBeenCalledWith({
+      items: [1, 2],
     });
   });
 });

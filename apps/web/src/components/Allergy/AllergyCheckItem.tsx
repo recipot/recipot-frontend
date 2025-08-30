@@ -27,6 +27,9 @@ function AllergyCheckItem({
   selectedItems: number[];
   onItemToggle: (itemId: number) => void;
 }) {
+  const StyleActive =
+    'border-secondary-soft-green bg-secondary-light-green text-primary';
+
   return (
     <div className="space-y-4">
       <label className="text-18sb" htmlFor={label} id={label}>
@@ -43,9 +46,7 @@ function AllergyCheckItem({
             variant="outline"
             className={cn(
               'h-10',
-              selectedItems.includes(item.id)
-                ? 'border-secondary-soft-green bg-secondary-light-green text-primary'
-                : ''
+              selectedItems.includes(item.id) ? StyleActive : ''
             )}
           >
             {item.label}
