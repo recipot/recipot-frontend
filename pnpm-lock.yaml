@@ -213,7 +213,7 @@ importers:
         specifier: ^26.1.0
         version: 26.1.0
       msw:
-        specifier: 2.10.4
+        specifier: ^2.10.4
         version: 2.10.4(@types/node@20.17.30)(typescript@5.8.3)
       playwright:
         specifier: ^1.54.2
