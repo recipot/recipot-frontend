@@ -10,7 +10,7 @@
     // 모노레포 경로 매핑
     "paths": {
       "@core/*": ["packages/core/*"],
-      "@types/*": ["packages/types/*"], 
+      "@types/*": ["packages/types/*"],
       "@ui/*": ["packages/ui/*"],
       "@lib/*": ["packages/lib/*"],
       "@api/*": ["packages/api/*"],
@@ -19,15 +19,6 @@
       "@validators/*": ["packages/validators/*"]
     }
   },
-  "include": [
-    "next-env.d.ts", 
-    "**/*.ts", 
-    "**/*.tsx", 
-    ".next/types/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "**/dist/**",
-    "**/build/**"
-  ]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules", "**/dist/**", "**/build/**"]
 }

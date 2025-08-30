@@ -4,7 +4,14 @@ import type { IconProps } from '@/types/Icon.types';
 
 const GoogleIcon: React.FC<IconProps> = ({ size = 24, ...props }) => {
   return (
-    <svg width={size} height={size} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 20 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
       <g clipPath="url(#clip0_1248_12099)">
         <g clipPath="url(#clip1_1248_12099)">
           <path
@@ -38,7 +45,12 @@ const GoogleIcon: React.FC<IconProps> = ({ size = 24, ...props }) => {
           <rect width="20" height="20" fill="white" />
         </clipPath>
         <clipPath id="clip1_1248_12099">
-          <rect width="19.5996" height="20" fill="white" transform="translate(0.0400391)" />
+          <rect
+            width="19.5996"
+            height="20"
+            fill="white"
+            transform="translate(0.0400391)"
+          />
         </clipPath>
       </defs>
     </svg>
