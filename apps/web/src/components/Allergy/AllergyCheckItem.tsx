@@ -17,7 +17,6 @@ import type { AllergyCheckItem } from './Allergy.constants';
  * @returns AllergyCheckItem component
  */
 function AllergyCheckItem({
-  htmlFor,
   items,
   label,
   onItemToggle,
@@ -25,7 +24,6 @@ function AllergyCheckItem({
 }: {
   items: AllergyCheckItem[];
   label: string;
-  htmlFor: string;
   selectedItems: number[];
   onItemToggle: (itemId: number) => void;
 }) {
@@ -33,10 +31,8 @@ function AllergyCheckItem({
     'border-secondary-soft-green bg-secondary-light-green text-primary';
 
   return (
-    <div className="space-y-4">
-      <label className="text-18sb" htmlFor={htmlFor} id={label}>
-        {label}
-      </label>
+    <fieldset className="space-y-4">
+      <legend className="text-18sb">{label}</legend>
       <div className="text-15sb grid grid-cols-3 gap-3">
         {items.map(item => (
           <Button
@@ -55,7 +51,7 @@ function AllergyCheckItem({
           </Button>
         ))}
       </div>
-    </div>
+    </fieldset>
   );
 }
 

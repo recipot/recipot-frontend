@@ -54,15 +54,12 @@ export const itemsAnimal: AllergyCheckItem[] = [
 export const categories: {
   items: AllergyCheckItem[];
   title: string;
-  htmlFor: string;
 }[] = [
   {
-    htmlFor: 'seafood',
     items: itemsSeafood,
     title: '해산물류',
   },
   {
-    htmlFor: 'animal',
     items: itemsAnimal,
     title: '동물성 식품',
   },
