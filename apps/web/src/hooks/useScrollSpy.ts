@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface ScrollSpyOptions {
   /** GNB의 높이 등 화면 상단에서부터의 오프셋(px) */
@@ -56,8 +56,8 @@ export const useScrollSpy = (
     if (activeElement) {
       activeElement.scrollIntoView({
         behavior: 'smooth',
-        inline: 'center',
         block: 'nearest',
+        inline: 'center',
       });
     }
   }, [activeSection]);
