@@ -4,13 +4,20 @@ import Image from 'next/image';
 import { Button } from '@/components/common/Button/Button';
 
 import { CloseIcon } from '@/components/Icons';
-import { Drawer, DrawerClose, DrawerContent } from '@/components/ui/drawer';
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+} from '@/components/ui/drawer';
 import { cn } from '@/lib/utils';
 
 import EmotionSelector from './EmotionSelector';
 
-import type { ReviewFeeling, ReviewModalProps } from './types';
+import type { ReviewFeeling, ReviewBottomSheetProps } from './types';
 import { RecipeProsSelector } from '../RecipeProsSelector';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 
 export function ReviewBottomSheet({
   onOpenChange,
@@ -18,7 +25,7 @@ export function ReviewBottomSheet({
   recipeImageUrl,
   recipeTitle,
   timesCooked = 1,
-}: ReviewModalProps) {
+}: ReviewBottomSheetProps) {
   const [feeling, setFeeling] = useState<ReviewFeeling | null>(null);
   const [pros, setPros] = useState<string[]>([]);
 
@@ -66,10 +73,16 @@ export function ReviewBottomSheet({
       aria-labelledby="review-bottomsheet"
     >
       <DrawerContent
+        aria-describedby={undefined}
         className={cn(
           `w-full mx-auto rounded-t-3xl bg-white ${goodFeeling ? 'h-[844px]' : 'h-[659px]'} shadow-lg min-h-[400px] flex flex-col overflow-hidden`
         )}
       >
+        <DrawerHeader className="sr-only">
+          <VisuallyHidden asChild>
+            <DrawerTitle>{recipeTitle} 리뷰 작성</DrawerTitle>
+          </VisuallyHidden>
+        </DrawerHeader>
         <DrawerClose className="absolute right-3 top-3">
           <CloseIcon />
         </DrawerClose>
