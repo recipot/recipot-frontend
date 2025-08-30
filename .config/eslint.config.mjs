@@ -118,7 +118,7 @@ export default [
       'security/detect-unsafe-regex': 'error',
 
       // Import management - Clean and organized imports
-      'import/no-relative-parent-imports': 'warn',
+      'import/no-relative-parent-imports': 'off',
       'import/no-duplicates': 'error',
       'import/no-unresolved': 'error',
       'import/order': [
