@@ -7,7 +7,7 @@ import { authHandlers } from './auth.handlers';
 export const handlers = [
   ...authHandlers,
   // ...ingredientHandlers,    // B 담당자가 완성 후 추가
-  // ...recipeHandlers,        // C 담당자가 완성 후 추가  
+  // ...recipeHandlers,        // C 담당자가 완성 후 추가
   // ...profileHandlers,       // D 담당자가 완성 후 추가
 ];
 
