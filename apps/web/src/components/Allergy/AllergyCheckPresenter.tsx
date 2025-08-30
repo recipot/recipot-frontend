@@ -20,7 +20,7 @@ export default function AllergyCheckPresenter({
   selectedItems: number[];
   onItemToggle: (itemId: number) => void;
   onSubmit: (e: React.FormEvent) => void;
-  formId?: string;
+  formId: string;
 }) {
   return (
     <form
