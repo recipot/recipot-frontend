@@ -251,9 +251,11 @@ export const AllIcons: Story = {
     size: 20,
   },
   render: (args: { size?: number; color?: string }) => (
-    <div className="p-6 space-y-8">
+    <div className="space-y-8 p-6">
       <div>
-        <h3 className="text-lg font-semibold mb-4 text-gray-800">기본 아이콘들</h3>
+        <h3 className="mb-4 text-lg font-semibold text-gray-800">
+          기본 아이콘들
+        </h3>
         <div className="grid grid-cols-6 gap-4">
           <div className="flex flex-col items-center space-y-2">
             <AddIcon {...args} />
@@ -283,7 +285,9 @@ export const AllIcons: Story = {
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold mb-4 text-gray-800">감정 아이콘들</h3>
+        <h3 className="mb-4 text-lg font-semibold text-gray-800">
+          감정 아이콘들
+        </h3>
         <div className="grid grid-cols-3 gap-6">
           <div className="flex flex-col items-center space-y-2">
             <EmotionGoodIcon {...args} />
@@ -301,7 +305,9 @@ export const AllIcons: Story = {
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold mb-4 text-gray-800">기능 아이콘들</h3>
+        <h3 className="mb-4 text-lg font-semibold text-gray-800">
+          기능 아이콘들
+        </h3>
         <div className="grid grid-cols-5 gap-4">
           <div className="flex flex-col items-center space-y-2">
             <CookIcon {...args} />
@@ -327,7 +333,9 @@ export const AllIcons: Story = {
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold mb-4 text-gray-800">단계 아이콘들</h3>
+        <h3 className="mb-4 text-lg font-semibold text-gray-800">
+          단계 아이콘들
+        </h3>
         <div className="grid grid-cols-4 gap-4">
           <div className="flex flex-col items-center space-y-2">
             <IngredientIcon {...args} />
@@ -349,7 +357,9 @@ export const AllIcons: Story = {
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold mb-4 text-gray-800">카드 아이콘들</h3>
+        <h3 className="mb-4 text-lg font-semibold text-gray-800">
+          카드 아이콘들
+        </h3>
         <div className="grid grid-cols-1 gap-4">
           <div className="flex flex-col items-center space-y-2">
             <CardTimeIcon {...args} />
@@ -359,7 +369,9 @@ export const AllIcons: Story = {
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold mb-4 text-gray-800">네비게이션 아이콘들</h3>
+        <h3 className="mb-4 text-lg font-semibold text-gray-800">
+          네비게이션 아이콘들
+        </h3>
         <div className="grid grid-cols-3 gap-6">
           <div className="flex flex-col items-center space-y-2">
             <UserIcon {...args} />
@@ -377,7 +389,9 @@ export const AllIcons: Story = {
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold mb-4 text-gray-800">소셜 로그인 아이콘들</h3>
+        <h3 className="mb-4 text-lg font-semibold text-gray-800">
+          소셜 로그인 아이콘들
+        </h3>
         <div className="grid grid-cols-2 gap-6">
           <div className="flex flex-col items-center space-y-2">
             <GoogleIcon {...args} />
@@ -391,7 +405,7 @@ export const AllIcons: Story = {
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold mb-4 text-gray-800">찜 아이콘</h3>
+        <h3 className="mb-4 text-lg font-semibold text-gray-800">찜 아이콘</h3>
         <div className="grid grid-cols-1 gap-4">
           <div className="flex flex-col items-center space-y-2">
             <HeartIcon {...args} active />

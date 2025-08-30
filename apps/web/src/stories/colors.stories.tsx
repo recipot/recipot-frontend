@@ -81,12 +81,12 @@ interface ColorItemProps {
 }
 
 const ColorItem: React.FC<ColorItemProps> = ({ colorName }) => (
-  <div className="flex items-center space-x-4 mb-4">
+  <div className="mb-4 flex items-center space-x-4">
     <div
-      className={`w-16 h-16 rounded-md border border-border bg-${colorName}`}
+      className={`border-border h-16 w-16 rounded-md border bg-${colorName}`}
     />
     <div className="flex flex-col">
-      <span className="font-bold text-sm">.{colorName}</span>
+      <span className="text-sm font-bold">.{colorName}</span>
       <span className="text-xs text-gray-500">
         hsl(var(--{colorName.replace('gray-', 'gray-')}))
       </span>
@@ -101,8 +101,8 @@ interface ColorPaletteProps {
 
 const ColorPalette: React.FC<ColorPaletteProps> = ({ colorList, title }) => (
   <div className="mb-8">
-    <h2 className="text-xl font-bold mb-4 border-b pb-2">{title}</h2>
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    <h2 className="mb-4 border-b pb-2 text-xl font-bold">{title}</h2>
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
       {colorList.map(color => (
         <ColorItem key={color} colorName={color} />
       ))}
@@ -120,9 +120,9 @@ type Story = StoryObj;
 
 export const AllColors: Story = {
   render: () => (
-    <div className="p-4 font-pretendard">
+    <div className="font-pretendard p-4">
       <TailwindSafelist />
-      <h1 className="text-3xl font-bold mb-8">Color Palette</h1>
+      <h1 className="mb-8 text-3xl font-bold">Color Palette</h1>
       {Object.entries(colors).map(([title, colorList]) => (
         <ColorPalette key={title} title={title} colorList={colorList} />
       ))}

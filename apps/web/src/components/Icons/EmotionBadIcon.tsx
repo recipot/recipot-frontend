@@ -2,9 +2,20 @@ import React from 'react';
 
 import type { IconProps } from '@/types/Icon.types';
 
-const EmotionBadIcon: React.FC<IconProps> = ({ color = '#4164AE', size = 24, ...props }) => {
+const EmotionBadIcon: React.FC<IconProps> = ({
+  color = '#4164AE',
+  size = 24,
+  ...props
+}) => {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
       <mask
         id="mask0_1248_12125"
         style={{ maskType: 'luminance' }}
@@ -12,7 +23,8 @@ const EmotionBadIcon: React.FC<IconProps> = ({ color = '#4164AE', size = 24, ...
         x="0"
         y="0"
         width="24"
-        height="24">
+        height="24"
+      >
         <rect width="24" height="24" fill="white" />
       </mask>
       <g mask="url(#mask0_1248_12125)">

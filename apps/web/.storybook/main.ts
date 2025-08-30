@@ -26,7 +26,7 @@ const config: StorybookConfig = {
     '../src/components/common/**/*.stories.@(js|jsx|mjs|ts|tsx)',
     '../src/stories/**/*.stories.@(js|jsx|mjs|ts|tsx)',
   ],
-  viteFinal: async (config) => {
+  viteFinal: async config => {
     config.resolve = config.resolve ?? {};
     config.resolve.alias = {
       ...config.resolve.alias,

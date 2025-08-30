@@ -37,13 +37,17 @@ export const mswTestHelpers = {
   // 특정 API 호출 에러 시뮬레이션
   simulateError: (endpoint: string, status: number = 500) => {
     const { http, HttpResponse } = require('msw');
-    return http.all(endpoint, () => HttpResponse.json({ error: 'Test error' }, { status }));
+    return http.all(endpoint, () =>
+      HttpResponse.json({ error: 'Test error' }, { status })
+    );
   },
 
   // 네트워크 에러 시뮬레이션
   simulateNetworkError: (endpoint: string) => {
     const { http, HttpResponse } = require('msw');
-    return http.all(endpoint, () => HttpResponse.json({ error: 'Network error' }, { status: 503 }));
+    return http.all(endpoint, () =>
+      HttpResponse.json({ error: 'Network error' }, { status: 503 })
+    );
   },
 
   // 지연 시뮬레이션

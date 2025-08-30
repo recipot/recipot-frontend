@@ -1,0 +1,49 @@
+# 이 파일은 워크스페이스 전체에 적용됩니다.
+# 경로는 항상 프로젝트 루트(.prettierignore 파일이 위치한 곳) 기준입니다.
+
+# Dependencies
+**/node_modules
+
+# Build output
+**/.next
+**/out
+**/build
+**/dist
+**/storybook-static
+
+# Cache directories
+**/.turbo
+**/.cache
+
+# Static assets (often not code)
+# web/public, mobile/public 등 모든 public 폴더를 제외합니다.
+**/public
+
+# Reports
+**/coverage
+
+# Generated code (e.g., shadcn/ui)
+# web 앱의 shadcn/ui 컴포넌트는 포맷팅에서 제외합니다.
+apps/web/src/components/ui
+
+# Lockfiles
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# Environment variables
+.env*
+
+# Log files
+*.log
+
+# IDE/Editor settings
+.vscode/
+.idea/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# GitHub workflows (optional - uncomment if you don't want to format these)
+# .github/

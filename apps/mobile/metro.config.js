@@ -12,5 +12,3 @@ config.resolver.nodeModulesPaths = [
 ];
 
 module.exports = config;
-
-
