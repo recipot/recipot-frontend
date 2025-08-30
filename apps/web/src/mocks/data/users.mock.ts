@@ -10,7 +10,7 @@ export const mockUsers = [
     providerUserId: 'kakao_123456',
   },
   {
-    avatar: 'https://picsum.photos/100/100?random=2', 
+    avatar: 'https://picsum.photos/100/100?random=2',
     cookingLevel: 'beginner' as const,
     email: 'test@google.com',
     id: '2',
@@ -21,14 +21,14 @@ export const mockUsers = [
   },
   {
     avatar: 'https://picsum.photos/100/100?random=3',
-    cookingLevel: 'advanced' as const, 
+    cookingLevel: 'advanced' as const,
     email: 'chef@example.com',
     id: '3',
     joinDate: new Date('2024-01-01'),
     name: '박요리사',
     provider: 'kakao' as const,
     providerUserId: 'kakao_345678',
-  }
+  },
 ];
 
 export const mockDietaryRestrictions = [
