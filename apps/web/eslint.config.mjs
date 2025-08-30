@@ -8,7 +8,7 @@ export default [
     },
   },
   {
-    files: ['jest.config.cjs', 'tailwind.config.cjs', 'postcss.config.cjs'],
+    files: ['tailwind.config.cjs', 'postcss.config.cjs'],
     languageOptions: {
       parserOptions: { project: null },
     },
