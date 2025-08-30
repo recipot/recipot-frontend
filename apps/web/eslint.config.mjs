@@ -7,4 +7,10 @@ export default [
       'import/no-relative-parent-imports': 'off',
     },
   },
+  {
+    files: ['tailwind.config.cjs', 'postcss.config.cjs'],
+    languageOptions: {
+      parserOptions: { project: null },
+    },
+  },
 ];

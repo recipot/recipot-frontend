@@ -2,6 +2,7 @@ import '@testing-library/jest-dom';
 
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
+import { describe, expect, test, vi } from 'vitest';
 
 import { Button } from './Button';
 
@@ -14,22 +15,22 @@ describe('Button 컴포넌트', () => {
     });
 
     test('클릭 이벤트 핸들러가 정상적으로 호출된다', () => {
-      const handleClick = jest.fn();
+      const handleClick = vi.fn();
       render(<Button onClick={handleClick}>클릭 테스트</Button>);
 
-      fireEvent.click(screen.getByRole('button'));
+      const button = screen.getByRole('button', { name: '클릭 테스트' });
+      fireEvent.click(button);
       expect(handleClick).toHaveBeenCalledTimes(1);
     });
 
     test('여러 번 클릭 시 핸들러가 매번 호출된다', () => {
-      const handleClick = jest.fn();
+      const handleClick = vi.fn();
       render(<Button onClick={handleClick}>클릭 테스트</Button>);
 
-      const button = screen.getByRole('button');
+      const button = screen.getByRole('button', { name: '클릭 테스트' });
       fireEvent.click(button);
       fireEvent.click(button);
       fireEvent.click(button);
-
       expect(handleClick).toHaveBeenCalledTimes(3);
     });
   });
@@ -41,14 +42,15 @@ describe('Button 컴포넌트', () => {
     });
 
     test('disabled 상태일 때 클릭 이벤트가 발생하지 않는다', () => {
-      const handleClick = jest.fn();
+      const handleClick = vi.fn();
       render(
         <Button disabled onClick={handleClick}>
           비활성화 버튼
         </Button>
       );
 
-      fireEvent.click(screen.getByRole('button'));
+      const button = screen.getByRole('button', { name: '비활성화 버튼' });
+      fireEvent.click(button);
       expect(handleClick).not.toHaveBeenCalled();
     });
 
@@ -106,35 +108,37 @@ describe('Button 컴포넌트', () => {
 
   describe('이벤트 핸들링', () => {
     test('onMouseEnter 이벤트가 정상적으로 동작한다', () => {
-      const handleMouseEnter = jest.fn();
+      const handleMouseEnter = vi.fn();
       render(<Button onMouseEnter={handleMouseEnter}>Hover 테스트</Button>);
 
-      fireEvent.mouseEnter(screen.getByRole('button'));
+      const button = screen.getByRole('button', { name: 'Hover 테스트' });
+      fireEvent.mouseEnter(button);
       expect(handleMouseEnter).toHaveBeenCalledTimes(1);
     });
 
     test('onMouseLeave 이벤트가 정상적으로 동작한다', () => {
-      const handleMouseLeave = jest.fn();
+      const handleMouseLeave = vi.fn();
       render(<Button onMouseLeave={handleMouseLeave}>Hover 테스트</Button>);
 
-      fireEvent.mouseLeave(screen.getByRole('button'));
+      const button = screen.getByRole('button', { name: 'Hover 테스트' });
+      fireEvent.mouseLeave(button);
       expect(handleMouseLeave).toHaveBeenCalledTimes(1);
     });
 
     test('onFocus 이벤트가 정상적으로 동작한다', () => {
-      const handleFocus = jest.fn();
+      const handleFocus = vi.fn();
       render(<Button onFocus={handleFocus}>Focus 테스트</Button>);
 
-      fireEvent.focus(screen.getByRole('button'));
+      const button = screen.getByRole('button', { name: 'Focus 테스트' });
+      fireEvent.focus(button);
       expect(handleFocus).toHaveBeenCalledTimes(1);
     });
 
     test('onBlur 이벤트가 정상적으로 동작한다', () => {
-      const handleBlur = jest.fn();
+      const handleBlur = vi.fn();
       render(<Button onBlur={handleBlur}>Blur 테스트</Button>);
 
-      const button = screen.getByRole('button');
-      fireEvent.focus(button);
+      const button = screen.getByRole('button', { name: 'Blur 테스트' });
       fireEvent.blur(button);
       expect(handleBlur).toHaveBeenCalledTimes(1);
     });
