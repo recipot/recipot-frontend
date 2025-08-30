@@ -34,6 +34,7 @@ export default function AllergyCheckPresenter({
           key={category.title}
           items={category.items}
           label={category.title}
+          htmlFor={category.htmlFor}
           selectedItems={selectedItems}
           onItemToggle={onItemToggle}
         />
