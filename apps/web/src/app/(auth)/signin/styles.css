@@ -12,10 +12,10 @@
 
 /* 외부 페이지네이션 컨테이너 스타일 */
 .intro-pagination {
-  @apply flex items-center justify-center mt-4;
+  @apply mt-4 flex items-center justify-center;
 }
 .intro-pagination .swiper-pagination-bullet {
-  @apply w-2 h-2 bg-neutral-200 opacity-100;
+  @apply h-2 w-2 bg-neutral-200 opacity-100;
 }
 .intro-pagination .swiper-pagination-bullet-active {
   @apply bg-neutral-900;
