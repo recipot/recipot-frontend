@@ -9,11 +9,14 @@ import {
   DialogPortal,
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 
 import type { ComponentPropsWithoutRef } from 'react';
+import { DialogTitle } from '@radix-ui/react-dialog';
 
 export interface ModalProps extends ComponentPropsWithoutRef<typeof Dialog> {
-  description?: string | React.ReactNode;
+  title?: string;
+  description?: string;
   disableOverlayClick?: boolean;
 }
 
@@ -22,6 +25,7 @@ export function Modal({
   disableOverlayClick = false,
   onOpenChange,
   description,
+  title,
   ...props
 }: ModalProps) {
   const lockBodyScroll = (lock: boolean) => {
@@ -69,6 +73,11 @@ export function Modal({
           )}
         >
           <DialogHeader className="text-center">
+            {title && (
+              <VisuallyHidden asChild>
+                <DialogTitle className="text-17">{title}</DialogTitle>
+              </VisuallyHidden>
+            )}
             {description ? (
               <DialogDescription className="text-17">
                 {description}
