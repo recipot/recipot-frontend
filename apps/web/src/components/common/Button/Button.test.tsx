@@ -139,6 +139,7 @@ describe('Button 컴포넌트', () => {
       render(<Button onBlur={handleBlur}>Blur 테스트</Button>);
 
       const button = screen.getByRole('button', { name: 'Blur 테스트' });
+      fireEvent.focus(button);
       fireEvent.blur(button);
       expect(handleBlur).toHaveBeenCalledTimes(1);
     });
