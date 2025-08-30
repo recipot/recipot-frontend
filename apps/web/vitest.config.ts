@@ -11,6 +11,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      '@recipot/api': path.resolve(__dirname, '../../packages/api/src'),
     },
   },
   esbuild: {

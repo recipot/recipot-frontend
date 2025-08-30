@@ -14,6 +14,7 @@
       "@ui/*": ["packages/ui/*"],
       "@lib/*": ["packages/lib/*"],
       "@api/*": ["packages/api/*"],
+      "@recipot/api": ["packages/api/src"],
       "@constants/*": ["packages/constants/*"],
       "@hooks/*": ["packages/hooks/*"],
       "@validators/*": ["packages/validators/*"]

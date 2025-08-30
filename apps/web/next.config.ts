@@ -2,6 +2,7 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  transpilePackages: ['@recipot/api'],
   webpack(config) {
     config.module.rules.push({
       test: /\.svg$/i,
