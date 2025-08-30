@@ -1,9 +1,9 @@
 ---
 name: UI 컴포넌트 요청
 about: 공통 UI 컴포넌트 개발 요청
-title: "[UI] 컴포넌트명"
-labels: ["ui-component"]
-assignees: "@twtwkim" # D 담당자 GitHub ID
+title: '[UI] 컴포넌트명'
+labels: ['ui-component']
+assignees: '@twtwkim' # D 담당자 GitHub ID
 ---
 
 ## 📋 컴포넌트 정보
@@ -49,7 +49,7 @@ interface ComponentProps {
   title: string;
   onClick: () => void;
   isLoading?: boolean;
-  variant?: "primary" | "secondary";
+  variant?: 'primary' | 'secondary';
 }
 ```
 

@@ -27,7 +27,9 @@ export default [
       // MSW 관련 파일 제외
       'src/mocks/**',
       // 기타 제외할 파일들
-      '**/*.config.{js,ts,mjs}',
+      '**/*.config.{js,ts,mjs,cjs}',
+      // .config 폴더 전체 제외
+      '.config/**',
       'public/**',
     ],
   },
@@ -49,7 +51,7 @@ export default [
         ecmaFeatures: { jsx: true },
         ecmaVersion: 2022,
         sourceType: 'module',
-        project: true,
+        project: '../tsconfig.json',
       },
       globals: {
         ...globals.browser,

@@ -176,7 +176,7 @@ export const Floating: Story = {
         variant="default"
         shape="round"
         size="icon-xl"
-        className="fixed bottom-4 right-4"
+        className="fixed right-4 bottom-4"
       >
         <Plus />
       </Button>

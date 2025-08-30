@@ -155,9 +155,9 @@ function useRecipeCard(recipeId: string) {
 
 ```typescript
 // 전역 상태 예시
-export const useAuthStore = create((set) => ({
+export const useAuthStore = create(set => ({
   user: null,
-  login: (user) => set({ user }),
+  login: user => set({ user }),
   logout: () => set({ user: null }),
 }));
 
