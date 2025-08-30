@@ -19,6 +19,7 @@ const ShareRecipeModal = ({ onOpenChange, open }: ModalProps) => {
     <Modal
       open={open}
       onOpenChange={onOpenChange}
+      title="레시피 공유"
       description="해당 레시피를 공유해보세요!"
     >
       <div className="space-y-4 flex justify-center">
@@ -34,6 +35,7 @@ const LoginRequiredModal = ({ onOpenChange, open }: ModalProps) => (
   <Modal
     open={open}
     onOpenChange={onOpenChange}
+    title="로그인이 필요한 서비스입니다."
     description="로그인이 필요한 서비스입니다."
   >
     <div className="space-y-2">
@@ -53,6 +55,7 @@ const LeavePageWarningModal = ({ onOpenChange, open }: ModalProps) => (
   <Modal
     open={open}
     onOpenChange={onOpenChange}
+    title="페이지 나가기"
     description={
       <>
         해당 페이지를 벗어나면
