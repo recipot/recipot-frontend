@@ -1,15 +1,28 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { authService } from '../../api/src';
 import { AuthResponse, UserInfo } from '../../types/src/auth.types';
+// 개발 환경에서 MSW 초기화 대기
+const waitForMsw = async (): Promise<void> => {
+  if (process.env.NODE_ENV !== 'development') {
+    return;
+  }
+
+  // MSW 초기화를 위해 잠시 대기 (500ms)
+  await new Promise(resolve => setTimeout(resolve, 500));
+};
 
 // AuthContext 타입 정의
 interface AuthContextType {
   user: UserInfo | null;
   token: string | null;
+  refreshToken: string | null;
   loading: boolean;
-  login: () => void;
+  login: () => Promise<void>;
   logout: () => void;
   refreshAuth: () => Promise<void>;
+  setUser: (user: UserInfo | null) => void;
+  setToken: (token: string | null) => void;
+  setRefreshToken: (token: string | null) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -18,44 +31,69 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UserInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState<string | null>(null);
+  const [refreshToken, setRefreshToken] = useState<string | null>(null);
 
   useEffect(() => {
-    // 페이지 로드 시 저장된 토큰 확인
-    const savedToken = localStorage.getItem('authToken');
-    if (savedToken) {
-      authService
-        .verifyToken(savedToken)
-        .then((userData: AuthResponse) => {
+    const initializeAuth = async () => {
+      // 개발 환경에서는 MSW가 준비될 때까지 대기
+      if (process.env.NODE_ENV === 'development') {
+        await waitForMsw();
+      }
+
+      // 페이지 로드 시 저장된 토큰 확인
+      const savedToken = localStorage.getItem('authToken');
+      const savedRefreshToken = localStorage.getItem('refreshToken');
+
+      if (savedToken) {
+        try {
+          const userData = await authService.verifyToken(savedToken);
           setUser(userData.data as UserInfo);
           setToken(savedToken);
-        })
-        .catch(() => {
+          if (savedRefreshToken) {
+            setRefreshToken(savedRefreshToken);
+          }
+        } catch (error) {
+          console.error('토큰 검증 실패:', error);
           localStorage.removeItem('authToken');
-        })
-        .finally(() => setLoading(false));
-    } else {
+          localStorage.removeItem('refreshToken');
+        }
+      }
+
       setLoading(false);
-    }
+    };
+
+    initializeAuth();
   }, []);
 
-  const login = () => {
-    // 백엔드 카카오 로그인 URL로 리디렉션
-    window.location.href = authService.getKakaoLoginUrl();
+  const login = async () => {
+    try {
+      // 카카오 로그인 URL 생성
+      const kakaoUrl = await authService.getKakaoLoginUrl();
+
+      // 카카오 인증 페이지로 리디렉션
+      window.location.href = kakaoUrl;
+    } catch (error) {
+      console.error('카카오 로그인 URL 생성 실패:', error);
+    }
   };
 
   const logout = () => {
     localStorage.removeItem('authToken');
+    localStorage.removeItem('refreshToken');
     setUser(null);
     setToken(null);
+    setRefreshToken(null);
   };
 
   // 토큰 자동 갱신
   const refreshAuth = async () => {
-    if (token) {
+    if (refreshToken) {
       try {
-        const newTokenData = await authService.refreshToken(token);
+        const newTokenData = await authService.refreshToken(refreshToken);
         setToken(newTokenData.accessToken);
+        setRefreshToken(newTokenData.refreshToken);
         localStorage.setItem('authToken', newTokenData.accessToken);
+        localStorage.setItem('refreshToken', newTokenData.refreshToken);
       } catch (error) {
         logout();
       }
@@ -67,10 +105,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       value={{
         user,
         token,
+        refreshToken,
         loading,
         login,
         logout,
         refreshAuth,
+        setUser,
+        setToken,
+        setRefreshToken,
       }}
     >
       {children}
