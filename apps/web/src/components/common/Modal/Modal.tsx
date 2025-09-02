@@ -64,7 +64,7 @@ export function Modal({
             ) : null}
           </DialogHeader>
 
-          <div className="text-17 font-pretendard py-1">{children}</div>
+          <div className="text-17 py-1">{children}</div>
         </DialogContent>
       </DialogPortal>
     </Dialog>
