@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { EmotionGoodIcon } from '@/components/Icons';
 import { Checkbox } from '@/components/ui/checkbox';
 

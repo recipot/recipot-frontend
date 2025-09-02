@@ -1,6 +1,6 @@
-import '@testing-library/jest-dom';
-
+import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
+import { describe, vi } from 'vitest';
 
 import { EmotionOptionButton } from './EmotionOptionButton';
 
@@ -26,14 +26,14 @@ describe('EmotionOptionButton', () => {
       />
     );
 
-    const button = screen.getByRole('button', { name: /보통/ });
+    const button = screen.getByRole('button', { name: /그저 그래요/ });
     expect(button).toHaveClass('bg-gray-100');
     expect(button).toHaveClass('text-gray-500');
     expect(button).toHaveAttribute('aria-pressed', 'true');
   });
 
   test('onClick 핸들러가 클릭 시 호출된다', () => {
-    const handleClick = jest.fn();
+    const handleClick = vi.fn();
 
     render(
       <EmotionOptionButton
