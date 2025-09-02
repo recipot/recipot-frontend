@@ -6,6 +6,6 @@ export interface ReviewBottomSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   recipeTitle: string;
-  recipeImageUrl: StaticImageData | string;
+  recipeImageUrl?: StaticImageData | string;
   timesCooked?: number;
 }
