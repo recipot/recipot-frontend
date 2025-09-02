@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { DialogTitle } from '@radix-ui/react-dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 
@@ -28,30 +28,9 @@ export function Modal({
   title,
   ...props
 }: ModalProps) {
-  const lockBodyScroll = (lock: boolean) => {
-    const html = document.documentElement;
-    const { body } = document;
-    if (lock) {
-      html.style.overflow = 'hidden';
-      body.style.overflow = 'hidden';
-      body.style.overscrollBehavior = 'contain';
-    } else {
-      html.style.overflow = '';
-      body.style.overflow = '';
-      body.style.overscrollBehavior = '';
-    }
-  };
-
   const handleOpenChange = (open: boolean) => {
-    lockBodyScroll(open);
     if (onOpenChange) onOpenChange(open);
   };
-
-  useEffect(() => {
-    const initiallyOpen = props.open;
-    if (initiallyOpen) lockBodyScroll(true);
-    return () => lockBodyScroll(false);
-  }, [props.open]);
 
   const handleOverlayClick: React.MouseEventHandler<HTMLDivElement> = event => {
     if (disableOverlayClick) {
