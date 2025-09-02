@@ -9,6 +9,7 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from '@/components/ui/drawer';
+import { useReviewForm } from '@/hooks/useReviewForm';
 import { cn } from '@/lib/utils';
 
 import { ReviewForm } from './ReviewForm';
@@ -27,6 +28,8 @@ export function ReviewBottomSheet({
     onOpenChange(false);
   };
 
+  const form = useReviewForm(timesCooked, handleReviewSubmit);
+
   return (
     <Drawer
       open={open}
@@ -36,7 +39,8 @@ export function ReviewBottomSheet({
       <DrawerContent
         aria-describedby={undefined}
         className={cn(
-          `mx-auto flex h-[844px] min-h-[400px] w-full flex-col overflow-hidden rounded-t-3xl bg-white shadow-lg`
+          `mx-auto flex min-h-[400px] w-full flex-col overflow-hidden rounded-t-3xl bg-white shadow-lg`,
+          form.feeling === 'good' ? 'h-[844px]' : 'h-[659px]'
         )}
       >
         <DrawerHeader className="sr-only">
@@ -54,10 +58,7 @@ export function ReviewBottomSheet({
           timesCooked={timesCooked}
         />
 
-        <ReviewForm
-          timesCooked={timesCooked}
-          onReviewSubmit={handleReviewSubmit}
-        />
+        <ReviewForm form={form} />
       </DrawerContent>
     </Drawer>
   );

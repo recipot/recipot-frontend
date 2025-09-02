@@ -1,51 +1,25 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import { Button } from '@/components/common/Button/Button';
+import type { useReviewForm } from '@/hooks/useReviewForm';
 
 import { RecipeProsSelector } from '../RecipeProsSelector';
 
 import EmotionSelector from './EmotionSelector';
 
-import type { ReviewFeeling } from './types';
-
 interface ReviewFormProps {
-  timesCooked: number;
-  onReviewSubmit: () => void;
+  form: ReturnType<typeof useReviewForm>;
 }
 
-export function ReviewForm({ onReviewSubmit, timesCooked }: ReviewFormProps) {
-  const [feeling, setFeeling] = useState<ReviewFeeling | null>(null);
-  const [pros, setPros] = useState<string[]>([]);
-
-  const togglePro = (text: string) => {
-    setPros(prev =>
-      prev.includes(text) ? prev.filter(t => t !== text) : [...prev, text]
-    );
-  };
-
-  const handleFeelingClick = (selectedFeeling: ReviewFeeling) => {
-    setFeeling(prevFeeling =>
-      prevFeeling === selectedFeeling ? null : selectedFeeling
-    );
-  };
-
-  const canSubmit = !!feeling && (feeling !== 'good' || pros.length > 0);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // TODO: 서버에 제출할 데이터 구조
-    const reviewData = {
-      feeling,
-      pros,
-      timesCooked,
-      // 기타 필요한 데이터 추가
-    };
-
-    console.log(reviewData, 'reviewData');
-
-    onReviewSubmit(); // 부모 컴포넌트에 제출 완료 알림
-  };
+export function ReviewForm({ form }: ReviewFormProps) {
+  const {
+    canSubmit,
+    feeling,
+    handleFeelingClick,
+    handleSubmit,
+    pros,
+    togglePro,
+  } = form;
 
   return (
     <div className="mx-auto flex max-w-[292px] flex-col items-center justify-center">
