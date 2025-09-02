@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { AuthProvider } from '@recipot/contexts';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
@@ -12,7 +13,6 @@ export default function Providers({ children }: PropsWithChildren) {
   // 개발 환경에서만 MSW 워커 시작
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
-      // eslint-disable-next-line import/no-relative-parent-imports
       import('@/mocks/browser').then(({ startMswWorker }) => {
         startMswWorker();
       });
@@ -21,7 +21,7 @@ export default function Providers({ children }: PropsWithChildren) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {children}
+      <AuthProvider>{children}</AuthProvider>
       {process.env.NODE_ENV === 'development' ? (
         <ReactQueryDevtools initialIsOpen={false} />
       ) : null}
