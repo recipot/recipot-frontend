@@ -42,8 +42,11 @@ export function IntroSlider({
         autoplay={SWIPER_AUTOPLAY}
         onSlideChange={onSlideChange}
       >
-        {intro.map((item, index) => (
-          <SwiperSlide key={index} className="flex items-center justify-center">
+        {intro.map(item => (
+          <SwiperSlide
+            key={item.alt}
+            className="flex items-center justify-center"
+          >
             <Image
               src={item.src}
               alt={item.alt}
