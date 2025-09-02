@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      axios:
+        specifier: ^1.7.7
+        version: 1.11.0
       next:
         specifier: 15.3.1
         version: 15.3.1(@babel/core@7.28.3)(react-dom@18.3.1)(react@18.3.1)
@@ -133,6 +136,9 @@ importers:
       '@radix-ui/react-slot':
         specifier: ^1.2.3
         version: 1.2.3(@types/react@18.3.23)(react@18.3.1)
+      '@recipot/contexts':
+        specifier: workspace:*
+        version: link:../../packages/contexts
       '@tanstack/react-query':
         specifier: ^5.59.16
         version: 5.84.2(react@18.3.1)
@@ -242,6 +248,66 @@ importers:
       vitest:
         specifier: ^3.2.4
         version: 3.2.4(@types/node@20.17.30)(@vitest/browser@3.2.4)(jsdom@26.1.0)(msw@2.10.4)
+
+  packages/api:
+    dependencies:
+      axios:
+        specifier: ^1.11.0
+        version: 1.11.0
+    devDependencies:
+      typescript:
+        specifier: ^5
+        version: 5.8.3
+
+  packages/constants:
+    devDependencies:
+      typescript:
+        specifier: ^5
+        version: 5.8.3
+
+  packages/contexts:
+    dependencies:
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^18
+        version: 18.3.23
+      typescript:
+        specifier: ^5
+        version: 5.8.3
+
+  packages/hooks:
+    dependencies:
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^18
+        version: 18.3.23
+      typescript:
+        specifier: ^5
+        version: 5.8.3
+
+  packages/types:
+    devDependencies:
+      typescript:
+        specifier: ^5
+        version: 5.8.3
+
+  packages/utils:
+    devDependencies:
+      typescript:
+        specifier: ^5
+        version: 5.8.3
+
+  packages/validators:
+    devDependencies:
+      typescript:
+        specifier: ^5
+        version: 5.8.3
 
 packages:
 

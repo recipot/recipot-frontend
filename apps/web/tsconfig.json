@@ -3,9 +3,16 @@
   "compilerOptions": {
     "jsx": "preserve",
     "allowJs": true,
-    "baseUrl": ".",
+    "baseUrl": "../../",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./apps/web/src/*"],
+      "@recipot/api": ["./packages/api/src"],
+      "@recipot/constants": ["./packages/constants/src"],
+      "@recipot/contexts": ["./packages/contexts/src"],
+      "@recipot/hooks": ["./packages/hooks/src"],
+      "@recipot/types": ["./packages/types/src"],
+      "@recipot/utils": ["./packages/utils/src"],
+      "@recipot/validators": ["./packages/validators/src"]
     },
     "types": ["vitest/globals"],
     "plugins": [
