@@ -104,6 +104,40 @@ export const authService = {
     }
   },
 
+  // 구글 로그인 URL 생성
+  async getGoogleLoginUrl(): Promise<string> {
+    try {
+      const response = await authApi.get('/v1/login/google');
+
+      if (process.env.NODE_ENV === 'development') {
+        // Mock 환경에서는 authUrl을 반환
+        return response.data.authUrl;
+      } else {
+        // 실제 환경에서는 구글 인증 서버 URL을 반환
+        return response.data.authUrl;
+      }
+    } catch (error) {
+      throw new Error('구글 로그인 URL 생성에 실패했습니다.');
+    }
+  },
+
+  // 구글 콜백에서 토큰 받기 (GET 요청)
+  async getTokenFromGoogleCallback(code: string): Promise<{
+    accessToken: string;
+    refreshToken: string;
+    expiresIn: number;
+    user: UserInfo;
+  }> {
+    try {
+      const response = await authApi.get(
+        `/v1/login/google/callback?code=${code}`
+      );
+      return response.data.data;
+    } catch (error) {
+      throw new Error('구글 로그인 처리에 실패했습니다.');
+    }
+  },
+
   // 백엔드에서 JWT 토큰 검증
   async verifyToken(token: string): Promise<AuthResponse> {
     try {

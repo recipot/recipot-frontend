@@ -5,8 +5,16 @@ import { authService } from '@recipot/api';
 import { useAuth } from '@recipot/contexts';
 
 export default function TestPage() {
-  const { loading, login, logout, refreshAuth, refreshToken, token, user } =
-    useAuth();
+  const {
+    googleLogin,
+    loading,
+    login,
+    logout,
+    refreshAuth,
+    refreshToken,
+    token,
+    user,
+  } = useAuth();
   const [testResults, setTestResults] = useState<string[]>([]);
 
   const addResult = (result: string) => {
@@ -139,6 +147,60 @@ export default function TestPage() {
     window.location.href = `/v1/login/kakao/callback?code=${mockCode}`;
   };
 
+  // 구글 로그인 관련 테스트 함수들
+  const testGoogleAuthUrlGeneration = async () => {
+    addResult('🔄 구글 로그인 URL 생성 테스트...');
+    try {
+      const response = await fetch('/v1/login/google', {
+        method: 'GET',
+      });
+
+      const data = await response.json();
+      addResult(`✅ 구글 URL 생성 응답: ${JSON.stringify(data, null, 2)}`);
+    } catch (error) {
+      addResult(`❌ 구글 URL 생성 실패: ${error}`);
+    }
+  };
+
+  const testGoogleCallbackDirectly = async () => {
+    addResult('🔄 구글 콜백 API 직접 테스트 시작...');
+    try {
+      const mockCode = `mock_google_code_${Date.now()}`;
+      const response = await fetch(
+        `/v1/login/google/callback?code=${mockCode}`,
+        {
+          method: 'GET',
+        }
+      );
+
+      const data = await response.json();
+      addResult(`✅ 구글 콜백 API 응답: ${JSON.stringify(data, null, 2)}`);
+    } catch (error) {
+      addResult(`❌ 구글 콜백 API 실패: ${error}`);
+    }
+  };
+
+  const simulateGoogleCallbackWithToken = () => {
+    const mockToken = `google_mock_token_${Date.now()}`;
+    addResult(
+      `🔄 구글 토큰 콜백 시뮬레이션 시작: ${mockToken.substring(0, 25)}...`
+    );
+    window.location.href = `/v1/login/google/callback?token=${mockToken}`;
+  };
+
+  const simulateGoogleCallbackWithCode = () => {
+    const mockCode = `mock_google_code_${Date.now()}`;
+    addResult(`🔄 구글 코드 콜백 시뮬레이션 시작: ${mockCode}`);
+    window.location.href = `/v1/login/google/callback?code=${mockCode}`;
+  };
+
+  const testGoogleLoginFlow = () => {
+    addResult('🔄 구글 로그인 플로우 테스트...');
+    addResult('📍 /v1/login/google/callback 경로로 이동합니다...');
+    const mockCode = `mock_google_code_${Date.now()}`;
+    window.location.href = `/v1/login/google/callback?code=${mockCode}`;
+  };
+
   const testUserProfileDirect = async () => {
     if (!token) {
       addResult('❌ 토큰이 없습니다.');
@@ -209,12 +271,20 @@ export default function TestPage() {
         <h2 className="mb-4 text-xl font-semibold">기본 인증</h2>
         <div className="space-x-4">
           {!user ? (
-            <button
-              onClick={login}
-              className="rounded bg-yellow-400 px-4 py-2 text-black hover:bg-yellow-500"
-            >
-              카카오 로그인 (Mock)
-            </button>
+            <>
+              <button
+                onClick={login}
+                className="rounded bg-yellow-400 px-4 py-2 text-black hover:bg-yellow-500"
+              >
+                카카오 로그인 (Mock)
+              </button>
+              <button
+                onClick={googleLogin}
+                className="rounded bg-red-500 px-4 py-2 text-white hover:bg-red-600"
+              >
+                구글 로그인 (Mock)
+              </button>
+            </>
           ) : (
             <button
               onClick={logout}
@@ -306,6 +376,46 @@ export default function TestPage() {
         </div>
         <p className="text-sm text-gray-600">
           실제 카카오 인증 플로우를 시뮬레이션합니다. 새 페이지로 이동됩니다.
+        </p>
+      </div>
+
+      {/* 구글 로그인 테스트 */}
+      <div className="mb-8 rounded-lg border bg-white p-6">
+        <h2 className="mb-4 text-xl font-semibold">구글 로그인 테스트</h2>
+        <div className="mb-4 space-x-4">
+          <button
+            onClick={testGoogleAuthUrlGeneration}
+            className="rounded bg-red-400 px-4 py-2 text-white hover:bg-red-500"
+          >
+            구글 URL 생성 테스트
+          </button>
+          <button
+            onClick={testGoogleCallbackDirectly}
+            className="rounded bg-red-500 px-4 py-2 text-white hover:bg-red-600"
+          >
+            구글 콜백 API 직접 테스트
+          </button>
+          <button
+            onClick={simulateGoogleCallbackWithToken}
+            className="rounded bg-red-600 px-4 py-2 text-white hover:bg-red-700"
+          >
+            구글 토큰 콜백 시뮬레이션
+          </button>
+          <button
+            onClick={simulateGoogleCallbackWithCode}
+            className="rounded bg-red-700 px-4 py-2 text-white hover:bg-red-800"
+          >
+            구글 코드 콜백 시뮬레이션
+          </button>
+          <button
+            onClick={testGoogleLoginFlow}
+            className="rounded bg-red-800 px-4 py-2 text-white hover:bg-red-900"
+          >
+            구글 로그인 플로우 테스트
+          </button>
+        </div>
+        <p className="text-sm text-gray-600">
+          실제 구글 인증 플로우를 시뮬레이션합니다. 새 페이지로 이동됩니다.
         </p>
       </div>
 

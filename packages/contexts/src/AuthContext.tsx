@@ -18,6 +18,7 @@ interface AuthContextType {
   refreshToken: string | null;
   loading: boolean;
   login: () => Promise<void>;
+  googleLogin: () => Promise<void>;
   logout: () => void;
   refreshAuth: () => Promise<void>;
   setUser: (user: UserInfo | null) => void;
@@ -77,6 +78,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const googleLogin = async () => {
+    try {
+      // 구글 로그인 URL 생성
+      const googleUrl = await authService.getGoogleLoginUrl();
+
+      // 구글 인증 페이지로 리디렉션
+      window.location.href = googleUrl;
+    } catch (error) {
+      console.error('구글 로그인 URL 생성 실패:', error);
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem('authToken');
     localStorage.removeItem('refreshToken');
@@ -108,6 +121,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         refreshToken,
         loading,
         login,
+        googleLogin,
         logout,
         refreshAuth,
         setUser,

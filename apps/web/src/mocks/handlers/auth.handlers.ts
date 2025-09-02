@@ -8,8 +8,10 @@ const isValidMockToken = (token: string): boolean => {
   return (
     token.includes('mock_token') ||
     token.includes('kakao_mock_token') ||
-    token.includes('refreshed_mock_token') ||
-    token.includes('google_mock_token')
+    token.includes('google_mock_token') ||
+    token.includes('refreshed_kakao_mock_token') ||
+    token.includes('refreshed_google_mock_token') ||
+    token.includes('refreshed_mock_token') // 기존 호환성
   );
 };
 
@@ -17,10 +19,31 @@ const isValidMockRefreshToken = (token: string): boolean => {
   return (
     token.includes('mock_refresh') ||
     token.includes('kakao_mock_refresh') ||
-    token.includes('refreshed_mock_refresh') ||
     token.includes('google_mock_refresh') ||
+    token.includes('refreshed_kakao_mock_refresh') ||
+    token.includes('refreshed_google_mock_refresh') ||
+    token.includes('refreshed_mock_refresh') || // 기존 호환성
     token.includes('temp_refresh')
   );
+};
+
+// 토큰에서 사용자 제공자 식별
+const getUserFromToken = (token: string): UserInfo => {
+  if (token.includes('google')) {
+    return mockUsers.find(u => u.provider === 'google') || mockUsers[1];
+  } else if (token.includes('kakao')) {
+    return mockUsers.find(u => u.provider === 'kakao') || mockUsers[0];
+  }
+  // 기본값은 카카오 사용자
+  return mockUsers[0];
+};
+
+// 토큰에서 제공자 추출
+const getProviderFromToken = (token: string): 'google' | 'kakao' => {
+  if (token.includes('google')) {
+    return 'google';
+  }
+  return 'kakao';
 };
 
 export const authHandlers = [
@@ -76,6 +99,61 @@ export const authHandlers = [
     return HttpResponse.json(response, { status: 200 });
   }),
 
+  // 구글 로그인 URL 생성 (실제 백엔드 플로우에 맞게)
+  http.get('/v1/login/google', async () => {
+    await delay(100);
+    // 실제로는 구글 인증 서버 URL을 반환
+    // Mock에서는 백엔드 REDIRECT_URI와 일치하는 경로로 리디렉션
+    const mockAuthUrl = `/v1/login/google/callback?code=mock_google_code_${Date.now()}`;
+
+    return HttpResponse.json(
+      {
+        authUrl: mockAuthUrl,
+        message: '구글 인증 URL이 생성되었습니다.',
+      },
+      { status: 200 }
+    );
+  }),
+
+  // 구글 로그인 콜백 (GET 요청)
+  http.get('/v1/login/google/callback', async ({ request }) => {
+    const url = new URL(request.url);
+    const code = url.searchParams.get('code');
+
+    if (!code) {
+      const errorResponse: AuthResponse = {
+        success: false,
+        error: '구글 인증 코드가 필요합니다.',
+      };
+      return HttpResponse.json(errorResponse, { status: 400 });
+    }
+
+    await delay(1000);
+
+    const user =
+      mockUsers.find(u => u.provider === 'google') ||
+      mockUsers[1] ||
+      mockUsers[0];
+    const tokenData: TokenResponse = {
+      accessToken: `google_mock_token_${Date.now()}`,
+      refreshToken: `google_mock_refresh_${Date.now()}`,
+      expiresIn: 3600,
+    };
+
+    const response = {
+      success: true,
+      data: {
+        accessToken: tokenData.accessToken,
+        refreshToken: tokenData.refreshToken,
+        expiresIn: tokenData.expiresIn,
+        user,
+      },
+      message: '구글 로그인에 성공했습니다.',
+    };
+
+    return HttpResponse.json(response, { status: 200 });
+  }),
+
   // JWT 토큰 검증
   http.post('/v1/auth/verify', async ({ request }) => {
     const authHeader = request.headers.get('Authorization');
@@ -99,7 +177,7 @@ export const authHandlers = [
     }
 
     await delay(300);
-    const user = mockUsers.find(u => u.provider === 'kakao') || mockUsers[0];
+    const user = getUserFromToken(token);
     const successResponse: AuthResponse = {
       success: true,
       data: user,
@@ -122,9 +200,10 @@ export const authHandlers = [
     }
 
     await delay(500);
+    const provider = getProviderFromToken(refreshToken);
     const tokenResponse: TokenResponse = {
-      accessToken: `refreshed_mock_token_${Date.now()}`,
-      refreshToken: `refreshed_mock_refresh_${Date.now()}`,
+      accessToken: `refreshed_${provider}_mock_token_${Date.now()}`,
+      refreshToken: `refreshed_${provider}_mock_refresh_${Date.now()}`,
       expiresIn: 3600,
     };
     return HttpResponse.json(tokenResponse, { status: 200 });
@@ -150,8 +229,8 @@ export const authHandlers = [
       );
     }
 
-    // 토큰에서 사용자를 식별 (mock에서는 첫 번째 사용자 반환)
-    const user = mockUsers[0];
+    // 토큰에서 사용자를 식별
+    const user = getUserFromToken(token);
 
     await delay(300);
     return HttpResponse.json(user, { status: 200 });
