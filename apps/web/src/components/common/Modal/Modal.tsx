@@ -1,4 +1,6 @@
 import React, { useEffect } from 'react';
+import { DialogTitle } from '@radix-ui/react-dialog';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 
 import {
   Dialog,
@@ -9,10 +11,8 @@ import {
   DialogPortal,
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
-import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 
 import type { ComponentPropsWithoutRef } from 'react';
-import { DialogTitle } from '@radix-ui/react-dialog';
 
 export interface ModalProps extends ComponentPropsWithoutRef<typeof Dialog> {
   title?: string;
@@ -22,9 +22,9 @@ export interface ModalProps extends ComponentPropsWithoutRef<typeof Dialog> {
 
 export function Modal({
   children,
+  description,
   disableOverlayClick = false,
   onOpenChange,
-  description,
   title,
   ...props
 }: ModalProps) {

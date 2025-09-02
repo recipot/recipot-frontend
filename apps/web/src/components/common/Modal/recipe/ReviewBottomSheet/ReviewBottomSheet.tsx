@@ -1,8 +1,8 @@
 import { useState } from 'react';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import Image from 'next/image';
 
 import { Button } from '@/components/common/Button/Button';
-
 import { CloseIcon } from '@/components/Icons';
 import {
   Drawer,
@@ -13,11 +13,11 @@ import {
 } from '@/components/ui/drawer';
 import { cn } from '@/lib/utils';
 
+import { RecipeProsSelector } from '../RecipeProsSelector';
+
 import EmotionSelector from './EmotionSelector';
 
-import type { ReviewFeeling, ReviewBottomSheetProps } from './types';
-import { RecipeProsSelector } from '../RecipeProsSelector';
-import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+import type { ReviewBottomSheetProps, ReviewFeeling } from './types';
 
 export function ReviewBottomSheet({
   onOpenChange,
@@ -107,7 +107,7 @@ export function ReviewBottomSheet({
               />
             )}
           </div>
-          <div className="mt-5 h-[1px] w-[342px] border border-dashed border-neutral-100"></div>
+          <div className="mt-5 h-[1px] w-[342px] border border-dashed border-neutral-100" />
 
           <div className="mx-auto flex max-w-[292px] flex-col items-center justify-center">
             <div className="flex flex-col items-center">
