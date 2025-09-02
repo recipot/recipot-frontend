@@ -1,5 +1,7 @@
-import { render, screen, fireEvent } from '@testing-library/react';
-import '@testing-library/jest-dom';
+import React from 'react';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { describe, vi } from 'vitest';
+
 import { Modal } from './Modal';
 
 describe('Modal 컴포넌트', () => {
@@ -8,7 +10,7 @@ describe('Modal 컴포넌트', () => {
       <Modal
         title="테스트 제목"
         description="테스트 설명"
-        open={true}
+        open
         onOpenChange={() => {}}
       >
         <div>모달 컨텐츠</div>
@@ -22,19 +24,18 @@ describe('Modal 컴포넌트', () => {
   });
 
   test('닫기 버튼 클릭 시 onOpenChange가 호출된다', () => {
-    const handleOpenChange = jest.fn();
+    const handleOpenChange = vi.fn();
     render(
       <Modal
         title="테스트 제목"
         description="테스트 제목"
-        open={true}
+        open
         onOpenChange={handleOpenChange}
       >
         <div>모달 컨텐츠</div>
       </Modal>
     );
 
-    // Find and click the close button (assuming it has an aria-label)
     const closeButton = screen.getByRole('button', { name: /close/i });
     fireEvent.click(closeButton);
 
@@ -43,4 +44,4 @@ describe('Modal 컴포넌트', () => {
 });
 
 // 추후 작업
-describe('Share Recipe 모달', () => {});
+// describe('Share Recipe 모달', () => {});

@@ -1,13 +1,15 @@
-import { render, screen, fireEvent } from '@testing-library/react';
-import { EmotionSelector } from './EmotionSelector';
+import * as React from 'react';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { describe, vi } from 'vitest';
+
+import EmotionSelector from './EmotionSelector';
+
 import type { ReviewFeeling } from './types';
-import '@testing-library/jest-dom';
 
 describe('EmotionSelector', () => {
-  const mockOnFeelingSelect = jest.fn();
+  const mockOnFeelingSelect = vi.fn();
   const feelings: ReviewFeeling[] = ['bad', 'soso', 'good'];
   const labels = ['별로예요', '그저 그래요', '또 해먹을래요'];
-  const colors = ['blue', 'yellow', 'red'];
 
   test('초기 렌더링 시 "식사는 어떠셨나요?" 문구가 보여야 함', () => {
     render(

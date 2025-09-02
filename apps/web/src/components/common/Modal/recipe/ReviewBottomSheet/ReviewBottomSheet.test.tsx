@@ -1,17 +1,19 @@
-import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
+import { describe } from 'vitest';
+
 import { ReviewBottomSheet } from './ReviewBottomSheet';
-import recipeImage from '../../../../../../public/recipeImage.png';
+
+import recipeImage from '/public/recipeImage.png';
 
 describe('ReviewBottomSheet', () => {
   const mockOnOpenChange = jest.fn();
   const mockOnFeelingSelect = jest.fn();
   const defaultProps = {
-    open: true,
-    onOpenChange: mockOnOpenChange,
     onFeelingSelect: mockOnFeelingSelect,
-    recipeTitle: '테스트 레시피',
+    onOpenChange: mockOnOpenChange,
+    open: true,
     recipeImageUrl: recipeImage,
+    recipeTitle: '테스트 레시피',
     timesCooked: 1,
   };
 
@@ -45,6 +47,6 @@ describe('ReviewBottomSheet', () => {
 
   test('후기 선택 여부에 따라 후기 등록 버튼이 활성화/비활성화된다.', () => {
     render(<ReviewBottomSheet {...defaultProps} />);
-    const buttons = screen.getAllByRole('button');
+    // const buttons = screen.getAllByRole('button');
   });
 });
