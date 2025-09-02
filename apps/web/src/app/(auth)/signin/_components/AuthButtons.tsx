@@ -17,7 +17,7 @@ export function AuthButtons() {
       <Button
         size="full"
         shape="round"
-        className="bg-[#FEE500] text-gray-900 active:bg-[#e5cf00]"
+        className="bg-kakao active:bg-kakao-pressed text-gray-900"
         onClick={handleKakaoLogin}
       >
         <KakaoIcon size={28} />
