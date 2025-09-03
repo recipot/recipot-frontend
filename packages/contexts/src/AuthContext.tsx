@@ -1,14 +1,21 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type PropsWithChildren,
+} from 'react';
 import { authService } from '../../api/src';
 import { AuthResponse, UserInfo } from '../../types/src/auth.types';
 // 개발 환경에서 MSW 초기화 대기
+// MSW 초기화가 완료될 때까지 잠시 대기합니다. 500ms는 MSW가 정상적으로 초기화되는 데 충분한 경험적 값입니다.
+const MSW_INIT_DELAY_MS = 500;
 const waitForMsw = async (): Promise<void> => {
   if (process.env.NODE_ENV !== 'development') {
     return;
   }
 
-  // MSW 초기화를 위해 잠시 대기 (500ms)
-  await new Promise(resolve => setTimeout(resolve, 500));
+  await new Promise(resolve => setTimeout(resolve, MSW_INIT_DELAY_MS));
 };
 
 // AuthContext 타입 정의
@@ -28,7 +35,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export function AuthProvider({ children }: PropsWithChildren) {
   const [user, setUser] = useState<UserInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState<string | null>(null);
