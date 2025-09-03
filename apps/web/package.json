@@ -26,7 +26,8 @@
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "tailwind-merge": "^2.6.0",
-    "@recipot/contexts": "workspace:*"
+    "@recipot/contexts": "workspace:*",
+    "swiper": "^11.2.10"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^4.1.1",
