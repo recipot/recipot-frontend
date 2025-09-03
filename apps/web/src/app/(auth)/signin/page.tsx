@@ -39,7 +39,6 @@ export default function SignInPage() {
       ) : (
         <AuthButtons kakaoLogin={login} googleLogin={googleLogin} />
       )}
-      <AuthButtons kakaoLogin={login} googleLogin={googleLogin} />
     </div>
   );
 }
