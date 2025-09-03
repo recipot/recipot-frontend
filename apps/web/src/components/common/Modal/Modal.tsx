@@ -43,7 +43,7 @@ export function Modal({
     <Dialog onOpenChange={handleOpenChange} {...props}>
       <DialogPortal>
         <DialogOverlay
-          onPointerDownOutside={handleOverlayClick}
+          onPointerDown={handleOverlayClick}
           className="fixed inset-0 z-50 bg-gray-300 backdrop-blur-sm"
         />
         <DialogContent
