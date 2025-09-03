@@ -55,6 +55,10 @@ module.exports = {
           4: 'hsl(var(--chart-4))',
           5: 'hsl(var(--chart-5))',
         },
+        kakao: {
+          DEFAULT: '#FEE500',
+          pressed: '#e5cf00',
+        },
 
         /* Secondary */
         'secondary-soft-green': 'hsl(var(--secondary-soft-green))',
