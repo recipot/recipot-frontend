@@ -150,9 +150,9 @@ export const authService = {
   },
 
   // 백엔드에서 JWT 토큰 검증
-  async verifyToken(token: string): Promise<AuthResponse> {
+  async verifyToken(token: string): Promise<AuthResponse<UserInfo>> {
     try {
-      const response = await authApi.post<AuthResponse>(
+      const response = await authApi.post<AuthResponse<UserInfo>>(
         '/v1/auth/verify',
         {},
         {
