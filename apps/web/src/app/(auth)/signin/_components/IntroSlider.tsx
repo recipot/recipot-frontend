@@ -17,11 +17,13 @@ const SWIPER_PAGINATION = {
 interface IntroSliderProps {
   intro: Array<{
     alt: string;
+    id: number;
     src: string;
     text: string;
   }>;
   current: {
     alt: string;
+    id: number;
     src: string;
     text: string;
   };
@@ -44,7 +46,7 @@ export function IntroSlider({
       >
         {intro.map(item => (
           <SwiperSlide
-            key={item.alt}
+            key={item.id}
             className="flex items-center justify-center"
           >
             <Image
