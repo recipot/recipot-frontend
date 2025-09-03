@@ -23,7 +23,7 @@ const ShareRecipeModal = ({ onOpenChange, open }: ModalProps) => {
       description="해당 레시피를 공유해보세요!"
     >
       <div className="flex justify-center space-y-4">
-        <Button onClick={handleCopyClick} size="lg" variant="default">
+        <Button onClick={handleCopyClick} size="full" variant="default">
           복사하기
         </Button>
       </div>
@@ -38,15 +38,21 @@ const LoginRequiredModal = ({ onOpenChange, open }: ModalProps) => (
     title="로그인이 필요한 서비스입니다."
     description="로그인이 필요한 서비스입니다."
   >
-    <div className="space-y-2">
-      <div className="flex justify-center space-x-2 pt-2">
-        <Button className="w-full px-8 py-[0.938rem]" variant="outline">
-          취소
-        </Button>
-        <Button className="w-full px-8 py-[0.938rem]" variant="default">
-          로그인
-        </Button>
-      </div>
+    <div className="flex justify-center space-x-2">
+      <Button
+        className="w-full px-8 py-[0.938rem]"
+        size="full"
+        variant="outline"
+      >
+        취소
+      </Button>
+      <Button
+        className="w-full px-8 py-[0.938rem]"
+        size="full"
+        variant="default"
+      >
+        로그인
+      </Button>
     </div>
   </Modal>
 );
@@ -66,10 +72,16 @@ const LeavePageWarningModal = ({ onOpenChange, open }: ModalProps) => (
   >
     <div className="space-y-4">
       <div className="flex justify-center space-x-2 pt-2">
-        <Button variant="outline" onClick={() => onOpenChange(false)}>
+        <Button
+          variant="outline"
+          size="full"
+          onClick={() => onOpenChange(false)}
+        >
           확인
         </Button>
-        <Button variant="default">취소</Button>
+        <Button variant="default" size="full">
+          취소
+        </Button>
       </div>
     </div>
   </Modal>

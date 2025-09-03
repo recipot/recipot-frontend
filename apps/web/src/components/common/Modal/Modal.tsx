@@ -48,15 +48,16 @@ export function Modal({
         />
         <DialogContent
           className={cn(
-            'bg-background flex w-[20rem] flex-col items-center justify-center gap-[30px] rounded-3xl border px-5 py-5'
+            'bg-background flex w-[20rem] flex-col items-center justify-center gap-[30px] rounded-3xl border px-5 pt-[30px]'
           )}
         >
-          <DialogHeader className="text-center">
-            {title && (
-              <VisuallyHidden asChild>
-                <DialogTitle className="text-17">{title}</DialogTitle>
-              </VisuallyHidden>
-            )}
+          <DialogHeader
+            className={cn('text-center', title ? 'space-y-1.2' : 'space-y-0')}
+          >
+            <VisuallyHidden asChild>
+              <DialogTitle className="text-17">{title}</DialogTitle>
+            </VisuallyHidden>
+
             {description ? (
               <DialogDescription className="text-17">
                 {description}
@@ -64,7 +65,7 @@ export function Modal({
             ) : null}
           </DialogHeader>
 
-          <div className="text-17 py-1">{children}</div>
+          <div className="text-17 w-full">{children}</div>
         </DialogContent>
       </DialogPortal>
     </Dialog>
