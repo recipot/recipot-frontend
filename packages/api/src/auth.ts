@@ -13,6 +13,15 @@ const createAuthApiInstance = (): AxiosInstance => {
       ? '' // MSW가 현재 도메인에서 요청을 가로챔
       : process.env.NEXT_PUBLIC_BACKEND_URL;
 
+  if (
+    process.env.NODE_ENV !== 'development' &&
+    (!baseURL || baseURL.trim() === '')
+  ) {
+    throw new Error(
+      'Environment variable NEXT_PUBLIC_BACKEND_URL is not set. Please configure it before running in production.'
+    );
+  }
+
   const instance = axios.create({
     baseURL,
     timeout: 10000,
@@ -83,7 +92,9 @@ export const authService = {
         return response.data.authUrl;
       }
     } catch (error) {
-      throw new Error('카카오 로그인 URL 생성에 실패했습니다.');
+      throw new Error('카카오 로그인 URL 생성에 실패했습니다.', {
+        cause: error,
+      });
     }
   },
 

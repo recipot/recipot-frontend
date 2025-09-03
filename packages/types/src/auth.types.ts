@@ -1,6 +1,6 @@
-export interface AuthResponse {
+export interface AuthResponse<T = unknown> {
   success: boolean;
-  data?: any;
+  data?: T;
   message?: string;
   error?: string;
 }

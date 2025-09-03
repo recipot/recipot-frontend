@@ -7,7 +7,7 @@
 ### 1. 개발 서버 시작
 
 ```bash
-cd /Users/yangjeonghwa/Desktop/project/recipot/recipot-frontend
+cd /path/to/your/project/recipot-frontend
 pnpm dev:web
 ```
 

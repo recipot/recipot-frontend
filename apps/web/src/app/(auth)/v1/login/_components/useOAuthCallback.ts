@@ -98,7 +98,7 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
       return;
     }
 
-    if (token) {
+    if (process.env.NODE_ENV === 'development' && token) {
       // 백엔드에서 JWT 토큰을 쿼리 파라미터로 전달받는 경우 (테스트용)
       handleTokenReceived(token);
     } else if (code) {

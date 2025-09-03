@@ -33,9 +33,8 @@ const tokens = await authService.refreshToken('kakao_mock_refresh_xxxxx');
 #### 4. 사용자 정보 조회
 
 ```typescript
-// GET /v1/auth/info/{userId}
-const user = await authService.getUserInfo('1', 'kakao_mock_token_xxxxx');
-// 응답: UserInfo
+// GET /v1/user/profile/me
+const user = await authService.getUserInfo('kakao_mock_token_xxxxx');
 ```
 
 #### 5. 로그아웃
