@@ -42,9 +42,11 @@ export function Modal({
   return (
     <Dialog onOpenChange={handleOpenChange} {...props}>
       <DialogPortal>
-        <DialogOverlay className="fixed inset-0 z-50 bg-gray-300 backdrop-blur-sm" />
-        <DialogContent
+        <DialogOverlay
           onPointerDownOutside={handleOverlayClick}
+          className="fixed inset-0 z-50 bg-gray-300 backdrop-blur-sm"
+        />
+        <DialogContent
           className={cn(
             'bg-background flex w-[20rem] flex-col items-center justify-center gap-[30px] rounded-3xl border px-5 py-5'
           )}
