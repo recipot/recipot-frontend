@@ -5,10 +5,9 @@ import { AuthProvider } from '@recipot/contexts';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
-// MSW 관련 import 제거
-import type { PropsWithChildren } from 'react';
+import type { ReactNode } from 'react';
 
-export default function Providers({ children }: PropsWithChildren) {
+export default function Providers({ children }: { children: ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
   const [mswReady, setMswReady] = useState(
     process.env.NODE_ENV !== 'development'
@@ -22,7 +21,7 @@ export default function Providers({ children }: PropsWithChildren) {
           return startMswWorker();
         })
         .then(() => {
-          console.log('🚀 MSW가 준비되었습니다');
+          console.info('🚀 MSW가 준비되었습니다');
           setMswReady(true);
         })
         .catch(error => {

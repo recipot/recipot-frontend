@@ -3,7 +3,7 @@ import {
   useContext,
   useEffect,
   useState,
-  type PropsWithChildren,
+  type ReactNode,
 } from 'react';
 import { authService } from '../../api/src';
 import { AuthResponse, UserInfo } from '../../types/src/auth.types';
@@ -35,7 +35,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: PropsWithChildren) {
+export function AuthProvider({ children }: { children: any }) {
   const [user, setUser] = useState<UserInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState<string | null>(null);
