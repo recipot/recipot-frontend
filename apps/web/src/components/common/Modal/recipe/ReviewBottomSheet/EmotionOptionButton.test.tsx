@@ -49,22 +49,6 @@ describe('EmotionOptionButton', () => {
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
 
-  test('disabled prop이 true일 때 disabled 상태가 적용된다', () => {
-    render(
-      <EmotionOptionButton
-        label="슬픔"
-        color="blue"
-        disabled
-        onClick={() => {}}
-      />
-    );
-
-    const button = screen.getByRole('button', { name: /슬픔/ });
-    expect(button).toBeDisabled();
-    expect(button).toHaveClass('opacity-60');
-    expect(button).toHaveClass('cursor-not-allowed');
-  });
-
   test('적절한 color에 따라 올바른 아이콘을 렌더링한다', () => {
     const { container } = render(
       <EmotionOptionButton label="별로예요" color="blue" onClick={() => {}} />

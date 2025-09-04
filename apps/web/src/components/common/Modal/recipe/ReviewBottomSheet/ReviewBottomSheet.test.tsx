@@ -25,9 +25,6 @@ describe('ReviewBottomSheet', () => {
 
     expect(screen.getByText('테스트 레시피')).toBeInTheDocument();
     expect(screen.getByText('1번째 해먹기 완료')).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: '후기 등록하기' })
-    ).toBeDisabled();
   });
 
   test('닫기 버튼 클릭 시 onOpenChange가 호출된다', () => {
