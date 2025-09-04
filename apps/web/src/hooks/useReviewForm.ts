@@ -18,8 +18,6 @@ export function useReviewForm(timesCooked: number, onReviewSubmit: () => void) {
     );
   };
 
-  const canSubmit = !!feeling && (feeling !== 'good' || pros.length > 0);
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -37,7 +35,6 @@ export function useReviewForm(timesCooked: number, onReviewSubmit: () => void) {
   };
 
   return {
-    canSubmit,
     feeling,
     handleFeelingClick,
     handleSubmit,
