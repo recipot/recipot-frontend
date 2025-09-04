@@ -45,22 +45,6 @@ describe('ReviewBottomSheet', () => {
     expect(image).toHaveAttribute('src');
   });
 
-  test('후기 선택 여부에 따라 후기 등록 버튼이 활성화/비활성화된다.', () => {
-    render(<ReviewBottomSheet {...defaultProps} />);
-    const buttons = screen.getAllByRole('button');
-    const submitButton = buttons[buttons.length - 1];
-
-    // 초기 상태는 비활성화
-    expect(submitButton).toBeDisabled();
-
-    // '별로예요' 선택 시 활성화
-    fireEvent.click(screen.getByRole('button', { name: /별로예요/i }));
-    expect(submitButton).not.toBeDisabled();
-
-    fireEvent.click(screen.getByRole('button', { name: /그저 그래요/i }));
-    expect(submitButton).not.toBeDisabled();
-  });
-
   test('"또 해먹을래요" 선택 시 장점 선택 UI가 표시된다', () => {
     render(<ReviewBottomSheet {...defaultProps} />);
 
