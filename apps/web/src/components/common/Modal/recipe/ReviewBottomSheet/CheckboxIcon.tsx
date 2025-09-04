@@ -1,3 +1,5 @@
+import React from 'react';
+
 import CheckIcon from '@/components/Icons/CheckIcon';
 import { cn } from '@/lib/utils';
 
