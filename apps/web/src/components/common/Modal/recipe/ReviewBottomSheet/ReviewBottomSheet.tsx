@@ -39,8 +39,17 @@ export function ReviewBottomSheet({
       <DrawerContent
         aria-describedby={undefined}
         className={cn(
-          `mx-auto w-full max-w-[390px]`,
-          form.feeling === 'good' ? 'h-[844px]' : 'h-[659px]'
+          `mx-auto w-full`,
+          // 모바일: 기본 바텀시트
+          'max-w-sm sm:max-w-lg',
+          // 태블릿: 더 큰 크기
+          'md:max-w-2xl',
+          // 데스크톱: 바텀시트 유지, 더 큰 크기
+          'lg:max-w-4xl xl:max-w-5xl',
+          // 높이 조정 - 모든 사이즈에서 바텀시트로 동작
+          form.feeling === 'good'
+            ? 'h-[52rem] sm:h-[44rem] md:h-[38rem] lg:h-[41rem] xl:h-[44rem]'
+            : 'h-[41rem] sm:h-[34rem] md:h-[31rem] lg:h-[34rem] xl:h-[38rem]'
         )}
       >
         <DrawerHeader className="sr-only">

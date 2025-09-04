@@ -48,7 +48,7 @@ export function Modal({
         />
         <DialogContent
           className={cn(
-            'bg-background flex w-[20rem] flex-col items-center justify-center gap-[30px] rounded-3xl border px-5 pt-[30px]'
+            'bg-background flex w-[20rem] flex-col items-center justify-center gap-[30px] rounded-3xl border px-5 pt-[30px] sm:w-[24rem] md:w-[28rem] lg:w-[32rem]'
           )}
         >
           <DialogHeader
