@@ -117,14 +117,14 @@ export default function RecipeRecommend() {
           <Button
             variant="ghost"
             size="icon"
-            className="absolute top-1/2 left-2 z-20 h-8 w-8 -translate-y-1/2 rounded-full bg-white/80 shadow-lg transition-all duration-300 hover:scale-110 hover:bg-white/90 hover:shadow-xl disabled:opacity-50 disabled:hover:scale-100 sm:left-4 sm:h-10 sm:w-10"
+            className="absolute top-1/2 left-2 z-20 h-8 w-8 -translate-y-1/2 rounded-full bg-white/80 shadow-lg transition-all duration-300 disabled:opacity-50 sm:left-4 sm:h-10 sm:w-10"
             disabled={current === 1}
           />
 
           <Button
             variant="ghost"
             size="icon"
-            className="absolute top-1/2 right-2 z-20 h-8 w-8 -translate-y-1/2 rounded-full bg-white/80 shadow-lg transition-all duration-300 hover:scale-110 hover:bg-white/90 hover:shadow-xl disabled:opacity-50 disabled:hover:scale-100 sm:right-4 sm:h-10 sm:w-10"
+            className="absolute top-1/2 right-2 z-20 h-8 w-8 -translate-y-1/2 rounded-full bg-white/80 shadow-lg transition-all duration-300 disabled:opacity-50 sm:right-4 sm:h-10 sm:w-10"
             disabled={current === count}
           />
 
@@ -136,7 +136,7 @@ export default function RecipeRecommend() {
             <CarouselContent className="-ml-2 sm:-ml-4">
               {recipeData.map((recipe, index) => (
                 <CarouselItem key={recipe.id} className="pl-2 sm:pl-4">
-                  <div className="hover:shadow-3xl relative overflow-hidden rounded-2xl shadow-2xl transition-all duration-500 ease-out hover:-translate-y-2 hover:scale-[1.02] sm:rounded-3xl">
+                  <div className="relative overflow-hidden rounded-2xl shadow-2xl transition-all duration-500 ease-out sm:rounded-3xl">
                     <div className="absolute inset-0">
                       <Image
                         src={recipe.image}
@@ -151,13 +151,13 @@ export default function RecipeRecommend() {
 
                     <div className="text-primary-foreground relative z-10 flex h-[320px] flex-col justify-between p-4 sm:h-[350px] sm:p-6 md:h-[386px]">
                       <div className="mb-4 flex flex-wrap gap-2 sm:gap-4">
-                        <div className="flex items-center gap-1 rounded-full bg-black/30 px-2 py-1 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:bg-black/40 sm:px-3">
+                        <div className="flex items-center gap-1 rounded-full bg-black/30 px-2 py-1 backdrop-blur-sm transition-all duration-300 sm:px-3">
                           <Clock className="h-3 w-3 sm:h-4 sm:w-4" />
                           <span className="text-14b sm:text-17sb">
                             {recipe.time}
                           </span>
                         </div>
-                        <div className="flex items-center gap-1 rounded-full bg-black/30 px-2 py-1 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:bg-black/40 sm:px-3">
+                        <div className="flex items-center gap-1 rounded-full bg-black/30 px-2 py-1 backdrop-blur-sm transition-all duration-300 sm:px-3">
                           <ChefHat className="h-3 w-3 sm:h-4 sm:w-4" />
                           <span className="text-14b sm:text-17sb">
                             {recipe.cookware}
@@ -184,7 +184,7 @@ export default function RecipeRecommend() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="text-primary-foreground h-10 w-10 rounded-full bg-white/20 backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:bg-white/30 hover:shadow-lg sm:h-12 sm:w-12"
+                            className="text-primary-foreground h-10 w-10 rounded-full bg-white/20 backdrop-blur-sm transition-all duration-300 sm:h-12 sm:w-12"
                             onClick={() => toggleLike(index)}
                           >
                             <HeartIcon
@@ -193,9 +193,9 @@ export default function RecipeRecommend() {
                               active={likedRecipes[index]}
                             />
                           </Button>
-                          <Button className="text-14 sm:text-17 h-10 flex-1 rounded-full bg-white text-gray-900 shadow-lg transition-all duration-300 hover:scale-105 hover:bg-gray-50 hover:shadow-xl sm:h-12">
+                          <Button className="text-14 sm:text-17 h-10 flex-1 rounded-full bg-white text-gray-900 shadow-lg transition-all duration-300 sm:h-12">
                             <CookIcon
-                              className="mr-1 h-3 w-3 transition-transform duration-300 group-hover:scale-110 sm:mr-2 sm:h-4 sm:w-4"
+                              className="mr-1 h-3 w-3 transition-transform duration-300 sm:mr-2 sm:h-4 sm:w-4"
                               color="#212529"
                             />
                             <span className="text-17sb">요리하러 가기</span>
@@ -215,10 +215,10 @@ export default function RecipeRecommend() {
           {Array.from({ length: count }, (_, i) => (
             <button
               key={i}
-              className={`h-1.5 w-1.5 rounded-full transition-all duration-300 hover:scale-125 sm:h-2 sm:w-2 ${
+              className={`h-1.5 w-1.5 rounded-full transition-all duration-300 sm:h-2 sm:w-2 ${
                 i === current - 1
                   ? 'scale-125 bg-gray-900 shadow-lg'
-                  : 'bg-gray-200 hover:bg-gray-400'
+                  : 'bg-gray-200'
               }`}
               onClick={() => api?.scrollTo(i)}
               aria-label={`${i + 1}번 슬라이드로 이동`}
