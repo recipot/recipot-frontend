@@ -20,7 +20,7 @@ export function ReviewHeader({
     <div className="flex w-full flex-col items-center justify-center">
       {/* 해먹은 횟수 */}
       {cookedBadge(timesCooked) && (
-        <div className="text-14sb mt-4 mb-5 flex h-[31px] w-[11.25rem] items-center justify-center rounded-2xl bg-neutral-100 px-4 py-[5px] text-xs text-neutral-600">
+        <div className="text-14 mt-4 mb-5 flex h-[31px] w-[11.25rem] items-center justify-center rounded-2xl bg-gray-100 px-4 py-[5px] text-xs text-gray-700">
           {cookedBadge(timesCooked)}
         </div>
       )}

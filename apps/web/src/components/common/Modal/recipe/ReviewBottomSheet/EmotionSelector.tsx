@@ -13,15 +13,15 @@ export function EmotionSelector({
   onFeelingSelect,
   selectedFeeling,
 }: EmotionSelectorProps) {
+  if (selectedFeeling) {
+    return null;
+  }
+
   return (
-    <div className="mb-6 w-[342px] gap-10 px-6 pt-5">
-      {selectedFeeling === null ? (
-        <p className="text-heading22 my-3 text-center font-semibold">
-          식사는 어떠셨나요?
-        </p>
-      ) : (
-        <div className="h-5" />
-      )}
+    <div className="flex w-full flex-col items-center space-y-6">
+      <h2 className="text-22 mt-5 text-center text-gray-900">
+        식사는 어떠셨나요?
+      </h2>
       <div className="flex w-full items-center justify-between gap-3">
         <EmotionOptionButton
           label="별로예요"

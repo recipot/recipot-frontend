@@ -1,7 +1,9 @@
 import React from 'react';
 
 import { EmotionGoodIcon } from '@/components/Icons';
-import { Checkbox } from '@/components/ui/checkbox';
+import { cn } from '@/lib/utils';
+
+import CheckboxIcon from './CheckboxIcon';
 
 interface ProsSectionProps {
   pros: string[];
@@ -17,33 +19,42 @@ const PROS_OPTIONS = [
 ] as const;
 
 export function RecipeProsSelector({ onTogglePro, pros }: ProsSectionProps) {
+  const handleKeyDown = (e: React.KeyboardEvent, text: string) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onTogglePro(text);
+    }
+  };
+
   return (
-    <div className="w-[21.375rem] p-6">
-      <div className="mb-4 flex items-center justify-center rounded-2xl bg-[#FFE2E2] py-5 text-center font-semibold text-[#D25D5D]">
+    <div className="w-full">
+      <div className="bg-feel-back-free text-feel-free-text text-15sb mt-5 mb-6 flex items-center justify-center rounded-2xl py-5 text-center">
         <EmotionGoodIcon className="mr-1" />
         <span>또 해먹을래요</span>
       </div>
 
-      <p className="text-body17 mb-3 text-center font-semibold">
-        어떤점이 좋았나요?
-      </p>
+      <p className="text-22 mb-3 text-center">어떤점이 좋았나요?</p>
 
       <ul className="flex flex-col gap-2">
         {PROS_OPTIONS.map(text => {
           const isSelected = pros.includes(text);
+          const id = `pros-${text.replace(/\s+/g, '-').toLowerCase()}`;
+
           return (
-            <li key={text}>
-              <label
-                htmlFor={text}
-                className="flex w-full cursor-pointer items-center gap-3 rounded-md px-3 py-2"
+            <li key={id}>
+              <div
+                role="checkbox"
+                aria-checked={isSelected}
+                tabIndex={0}
+                onKeyDown={e => handleKeyDown(e, text)}
+                onClick={() => onTogglePro(text)}
+                className={cn(
+                  'group flex w-full cursor-pointer items-center gap-3 rounded-md px-3 py-2'
+                )}
               >
-                <Checkbox
-                  id={text}
-                  checked={isSelected}
-                  onCheckedChange={() => onTogglePro(text)}
-                />
+                <CheckboxIcon isSelected={isSelected} />
                 <span className="text-16 text-left">{text}</span>
-              </label>
+              </div>
             </li>
           );
         })}
