@@ -1,7 +1,8 @@
 import '@testing-library/jest-dom';
 
 import React from 'react';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, expect, test, vi } from 'vitest';
 
 import { SearchInput } from './SearchInput';
@@ -53,28 +54,20 @@ describe('SearchInput 컴포넌트', () => {
       expect(input).toHaveAttribute('maxLength', '6');
     });
 
-    test('6글자 초과 입력 시 제한된다', () => {
-      const handleChange = vi.fn();
-      render(<SearchInput value="" onChange={handleChange} />);
+    test('6글자 초과 입력은 무시된다', async () => {
+      const user = userEvent.setup();
+      const TestComponent = () => {
+        const [value, setValue] = React.useState('');
+        return (
+          <SearchInput value={value} onChange={e => setValue(e.target.value)} />
+        );
+      };
+      render(<TestComponent />);
 
       const input = screen.getByRole('textbox');
-      fireEvent.change(input, { target: { value: '토마토양파당근' } }); // 7글자
+      await user.type(input, '1234567');
 
-      // maxLength에 의해 실제로는 6글자까지만 입력될 것임
-      expect(input).toHaveAttribute('maxLength', '6');
-    });
-  });
-
-  describe('키보드 이벤트', () => {
-    test('Enter 키 입력이 가능하다', () => {
-      const handleChange = vi.fn();
-      render(<SearchInput value="" onChange={handleChange} />);
-
-      const input = screen.getByRole('textbox');
-      fireEvent.keyDown(input, { code: 'Enter', key: 'Enter' });
-
-      // Enter 키 이벤트가 정상적으로 처리되는지 확인
-      expect(input).toBeInTheDocument();
+      expect(input).toHaveValue('123456');
     });
   });
 

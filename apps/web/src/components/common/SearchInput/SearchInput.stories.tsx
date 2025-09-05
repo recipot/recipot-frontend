@@ -54,14 +54,6 @@ export const WithValue: Story = {
   render: () => <ControlledSearchInput initialValue="토마토" />,
 };
 
-export const Empty: Story = {
-  args: {
-    onChange: () => {},
-    value: '',
-  },
-  render: () => <ControlledSearchInput initialValue="" />,
-};
-
 function InteractiveExample() {
   const [value, setValue] = useState('');
 
