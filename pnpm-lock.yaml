@@ -169,6 +169,9 @@ importers:
       react:
         specifier: 18.3.1
         version: 18.3.1
+      react-confetti:
+        specifier: ^6.4.0
+        version: 6.4.0(react@18.3.1)
       react-dom:
         specifier: 18.3.1
         version: 18.3.1(react@18.3.1)
@@ -11249,6 +11252,16 @@ packages:
       strip-json-comments: 2.0.1
     dev: false
 
+  /react-confetti@6.4.0(react@18.3.1):
+    resolution: {integrity: sha512-5MdGUcqxrTU26I2EU7ltkWPwxvucQTuqMm8dUz72z2YMqTD6s9vMcDUysk7n9jnC+lXuCPeJJ7Knf98VEYE9Rg==}
+    engines: {node: '>=16'}
+    peerDependencies:
+      react: ^16.3.0 || ^17.0.1 || ^18.0.0 || ^19.0.0
+    dependencies:
+      react: 18.3.1
+      tween-functions: 1.2.0
+    dev: false
+
   /react-devtools-core@5.3.2:
     resolution: {integrity: sha512-crr9HkVrDiJ0A4zot89oS0Cgv0Oa4OG1Em4jit3P3ZxZSKPMYyMjfwMqgcJna9o625g8oN87rBm8SWWrSTBZxg==}
     dependencies:
@@ -12919,6 +12932,10 @@ packages:
       turbo-windows-64: 2.5.6
       turbo-windows-arm64: 2.5.6
     dev: true
+
+  /tween-functions@1.2.0:
+    resolution: {integrity: sha512-PZBtLYcCLtEcjL14Fzb1gSxPBeL7nWvGhO5ZFPGqziCcr8uvHp0NDmdjBchp6KHL+tExcg0m3NISmKxhU394dA==}
+    dev: false
 
   /type-check@0.4.0:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}
