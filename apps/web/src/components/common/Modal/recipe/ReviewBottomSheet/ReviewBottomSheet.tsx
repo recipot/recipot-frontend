@@ -18,6 +18,48 @@ import { ReviewHeader } from './ReviewHeader';
 
 import type { ReviewBottomSheetProps } from './types';
 
+// Canvas API 모킹 (react-confetti를 위한)
+const mockCanvasContext = {
+  arc: vi.fn(),
+  beginPath: vi.fn(),
+  clearRect: vi.fn(),
+  clip: vi.fn(),
+  closePath: vi.fn(),
+  createImageData: vi.fn(() => ({ data: new Array(4) })),
+  drawImage: vi.fn(),
+  fill: vi.fn(),
+  fillRect: vi.fn(),
+  fillText: vi.fn(),
+  getImageData: vi.fn(() => ({ data: new Array(4) })),
+  lineTo: vi.fn(),
+  measureText: vi.fn(() => ({ width: 0 })),
+  moveTo: vi.fn(),
+  putImageData: vi.fn(),
+  rect: vi.fn(),
+  restore: vi.fn(),
+  rotate: vi.fn(),
+  save: vi.fn(),
+  scale: vi.fn(),
+  setTransform: vi.fn(),
+  stroke: vi.fn(),
+  transform: vi.fn(),
+  translate: vi.fn(),
+};
+
+// HTMLCanvasElement 모킹
+Object.defineProperty(HTMLCanvasElement.prototype, 'getContext', {
+  value: vi.fn(() => mockCanvasContext),
+});
+
+Object.defineProperty(HTMLCanvasElement.prototype, 'toDataURL', {
+  value: vi.fn(() => 'data:image/png;base64,test'),
+});
+
+// react-confetti 컴포넌트 모킹
+vi.mock('react-confetti', () => ({
+  default: vi.fn(() => null),
+}));
+
 const CONFETTI_COLORS = [
   '#FF6B6B',
   '#4ECDC4',
