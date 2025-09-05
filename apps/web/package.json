@@ -31,16 +31,10 @@
     "react": "18.3.1",
     "react-confetti": "^6.4.0",
     "react-dom": "18.3.1",
-<<<<<<< HEAD
-    "swiper": "^11.2.10",
-    "tailwind-merge": "^2.6.0",
-    "vaul": "^1.1.2"
-=======
     "react-hook-form": "^7.62.0",
     "tailwind-merge": "^2.6.0",
     "zod": "^4.0.17",
     "swiper": "^11.2.10"
->>>>>>> 60625fe43fb5e466fd35c539daf2d5ffaee0b2a1
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^4.1.1",
@@ -67,11 +61,7 @@
     "tailwindcss": "^3.4.14",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "^5",
-<<<<<<< HEAD
-    "vite": "6.0.11",
-=======
     "vite": "^5.4.19",
->>>>>>> 60625fe43fb5e466fd35c539daf2d5ffaee0b2a1
     "vitest": "^3.2.4"
   },
   "msw": {
