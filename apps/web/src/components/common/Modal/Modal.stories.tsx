@@ -71,7 +71,7 @@ const LeavePageWarningModal = ({ onOpenChange, open }: ModalProps) => (
     }
   >
     <div className="space-y-4">
-      <div className="flex justify-center space-x-2 pt-2">
+      <div className="flex justify-center space-x-2">
         <Button
           variant="outline"
           size="full"
