@@ -1,3 +1,4 @@
+import { createRequire } from 'module';
 import { dirname, join } from 'path';
 
 import type { StorybookConfig } from '@storybook/nextjs-vite';
@@ -7,6 +8,7 @@ import type { StorybookConfig } from '@storybook/nextjs-vite';
  * It is needed in projects that use Yarn PnP or are set up within a monorepo.
  */
 function getAbsolutePath(value: string): any {
+  const require = createRequire(import.meta.url);
   return dirname(require.resolve(join(value, 'package.json')));
 }
 const config: StorybookConfig = {
@@ -24,6 +26,7 @@ const config: StorybookConfig = {
     '../src/stories/**/*.mdx',
     '../src/components/ui/**/*.stories.@(js|jsx|mjs|ts|tsx)',
     '../src/components/common/**/*.stories.@(js|jsx|mjs|ts|tsx)',
+    '../src/components/**/**/*.stories.@(js|jsx|mjs|ts|tsx)',
     '../src/stories/**/*.stories.@(js|jsx|mjs|ts|tsx)',
   ],
   viteFinal: async config => {
@@ -32,6 +35,10 @@ const config: StorybookConfig = {
       ...config.resolve.alias,
       '@': join(__dirname, '../src'),
     };
+
+    // Vite CJS 경고 억제
+    config.logLevel = 'error';
+
     return config;
   },
 };
