@@ -11,16 +11,9 @@ const createAuthApiInstance = (): AxiosInstance => {
   const baseURL =
     process.env.NODE_ENV === 'development'
       ? '' // MSW가 현재 도메인에서 요청을 가로챔
-      : process.env.NEXT_PUBLIC_BACKEND_URL;
+      : process.env.NEXT_PUBLIC_BACKEND_URL || 'https://api.recipot.com'; // 기본값 제공
 
-  if (
-    process.env.NODE_ENV !== 'development' &&
-    (!baseURL || baseURL.trim() === '')
-  ) {
-    throw new Error(
-      'Environment variable NEXT_PUBLIC_BACKEND_URL is not set. Please configure it before running in production.'
-    );
-  }
+  // 이제 기본값을 제공하므로 에러 체크가 필요하지 않습니다
 
   const instance = axios.create({
     baseURL,

@@ -4,6 +4,9 @@ import { useState } from 'react';
 import { authService } from '@recipot/api';
 import { useAuth } from '@recipot/contexts';
 
+// 이 페이지가 정적 생성되지 않도록 설정
+export const dynamic = 'force-dynamic';
+
 export default function TestPage() {
   const {
     googleLogin,
