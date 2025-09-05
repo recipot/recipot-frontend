@@ -1,5 +1,3 @@
-import { useState } from 'react';
-
 import { SearchIcon } from '@/components/Icons';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
@@ -10,19 +8,12 @@ interface SearchInputProps {
 }
 
 /**
- * 재료 검색 입력 컴포넌트
+ * 재료 검색 입력 컴포넌트 (Controlled Component)
  * @param onChange - 입력 값 변경 핸들러
- * @param value - 입력 값
+ * @param value - 입력 값 (외부에서 관리)
  * @returns 검색 입력 컴포넌트
  */
 export function SearchInput({ onChange, value }: SearchInputProps) {
-  const [inputValue, setInputValue] = useState(value);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
-    onChange(e);
-  };
-
   const stylesInitial = 'border-none shadow-none focus-visible:ring-0';
 
   return (
@@ -30,9 +21,10 @@ export function SearchInput({ onChange, value }: SearchInputProps) {
       <Input
         type="text"
         placeholder="재료 검색하기"
-        value={inputValue}
-        onChange={handleChange}
+        value={value}
+        onChange={onChange}
         maxLength={6}
+        name="searchInput"
         className={cn(
           'text-17 flex h-[56px] w-full items-center rounded-xl bg-gray-50 pr-12 pl-4 placeholder:text-gray-600',
           stylesInitial
