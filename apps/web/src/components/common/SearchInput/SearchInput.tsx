@@ -14,7 +14,7 @@ interface SearchInputProps {
  * @returns 검색 입력 컴포넌트
  */
 export function SearchInput({ onChange, value }: SearchInputProps) {
-  const stylesInitial = 'border-none shadow-none focus-visible:ring-0';
+  const stylesInitial = 'border-none shadow-none focus-visible:ring-0 py-0';
 
   return (
     <div className="relative w-full">
@@ -26,7 +26,7 @@ export function SearchInput({ onChange, value }: SearchInputProps) {
         maxLength={6}
         name="searchInput"
         className={cn(
-          'text-17 flex h-[56px] w-full items-center rounded-xl bg-gray-50 pr-12 pl-4 placeholder:text-gray-600',
+          'text-17 flex h-[52px] w-full items-center rounded-xl bg-gray-50 pr-12 pl-4 placeholder:text-gray-600',
           stylesInitial
         )}
       />
