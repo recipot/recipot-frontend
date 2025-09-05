@@ -5,8 +5,10 @@
     "allowJs": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@recipot/api": ["../../packages/api/src"]
     },
+    "types": ["vitest/globals"],
     "plugins": [
       {
         "name": "next"
