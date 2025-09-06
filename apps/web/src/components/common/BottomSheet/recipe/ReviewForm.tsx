@@ -14,10 +14,10 @@ export function ReviewForm({ form }: ReviewFormProps) {
   const { feeling, handleFeelingClick, handleSubmit, pros, togglePro } = form;
 
   return (
-    <div className="mx-auto flex w-full max-w-[342px] flex-col items-center justify-center px-4 pb-6">
+    <div className="mx-auto flex w-full max-w-[342px] flex-col items-center justify-center px-2 pb-4 sm:px-4 sm:pb-6">
       <div className="flex w-full flex-col items-center">
         <form onSubmit={handleSubmit} className="w-full">
-          <div className="space-y-5">
+          <div className="xs:space-y-5 space-y-3">
             <EmotionSelector
               selectedFeeling={feeling}
               onFeelingSelect={handleFeelingClick}
@@ -26,10 +26,11 @@ export function ReviewForm({ form }: ReviewFormProps) {
               <RecipeProsSelector pros={pros} onTogglePro={togglePro} />
             )}
           </div>
-          <div className="sticky bottom-0 left-0 z-10 mt-8 w-full bg-white pt-4">
+          <div className="xs:mt-8 xs:pt-4 sticky bottom-0 left-0 z-10 mt-4 w-full bg-white pt-3">
             <Button
               type="submit"
-              className="w-full rounded-[6.25rem] px-[2rem] py-[0.938rem] text-base font-semibold"
+              disabled={feeling === null}
+              className="xs:py-[0.938rem] xs:text-base w-full rounded-[6.25rem] px-[2rem] py-[0.75rem] text-sm font-semibold"
             >
               후기 등록하기
             </Button>
