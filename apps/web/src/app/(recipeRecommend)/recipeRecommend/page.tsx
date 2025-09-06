@@ -13,7 +13,22 @@ import {
   CarouselItem,
 } from '@/components/ui/carousel';
 
-import berryPopsicle from '/public/backgroundImage.jpg';
+// API 응답 타입
+interface Recipe {
+  id: number;
+  title: string;
+  subtitle: string;
+  time: string;
+  cookware: string;
+  image: string;
+  description: string;
+}
+
+interface RecipeRecommendResponse {
+  recipes: Recipe[];
+  selectedIngredients: string[];
+  message: string;
+}
 
 // Carousel 설정
 const carouselOpts = {
@@ -21,41 +36,50 @@ const carouselOpts = {
   loop: false,
 };
 
-// 레시피 데이터
-const recipeData = [
-  {
-    cookware: '프라이팬 +2',
-    id: 1,
-    image: berryPopsicle,
-    subtitle: '레시피 타이틀 최대 1줄까지',
-    time: '99분',
-    title: '빵 한장에 땅콩버터 바르고\n사과만 없으면 똑딱',
-  },
-  {
-    cookware: '프라이팬',
-    id: 2,
-    image: berryPopsicle,
-    subtitle: '간단한 한끼',
-    time: '5분',
-    title: '김치볶음밥\n5분이면 완성!',
-  },
-  {
-    cookware: '냄비',
-    id: 3,
-    image: berryPopsicle,
-    subtitle: '전통 한식',
-    time: '15분',
-    title: '고사리나물\n밥도둑 레시피',
-  },
-];
-
 export default function RecipeRecommend() {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
-  const [count, setCount] = useState(recipeData.length);
-  const [likedRecipes, setLikedRecipes] = useState<boolean[]>(
-    new Array(recipeData.length).fill(false)
-  );
+  const [count, setCount] = useState(0);
+  const [likedRecipes, setLikedRecipes] = useState<boolean[]>([]);
+
+  // API 상태
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
+  const [snackbarMessage, setSnackbarMessage] = useState<string>('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // API 호출 함수
+  const fetchRecipeRecommend = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await fetch('/api/recipe-recommend');
+
+      if (!response.ok) {
+        throw new Error('레시피 추천을 불러오는데 실패했습니다.');
+      }
+
+      const data: RecipeRecommendResponse = await response.json();
+
+      setRecipes(data.recipes);
+      setSelectedIngredients(data.selectedIngredients);
+      setSnackbarMessage(data.message);
+      setLikedRecipes(new Array(data.recipes.length).fill(false));
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.'
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 컴포넌트 마운트 시 API 호출
+  useEffect(() => {
+    fetchRecipeRecommend();
+  }, []);
 
   useEffect(() => {
     if (!api) return;
@@ -66,16 +90,57 @@ export default function RecipeRecommend() {
     api.on('select', () => {
       setCurrent(api.selectedScrollSnap() + 1);
     });
-  }, [api]);
+  }, [api, recipes]);
 
-  const toggleLike = (index: number) => {
-    setLikedRecipes(prev => {
-      const newLikes = [...prev];
-      // TODO : 추후 API 연결하면서 로직 수정
-      newLikes[index] = !newLikes[index];
-      return newLikes;
-    });
+  const toggleLike = async (index: number) => {
+    if (index >= 0 && index < recipes.length) {
+      const recipe = recipes[index];
+      const isCurrentlyLiked = likedRecipes[index];
+
+      try {
+        const response = await fetch(
+          `/api/recipe-recommend/${recipe.id}/like`,
+          {
+            method: isCurrentlyLiked ? 'DELETE' : 'POST',
+          }
+        );
+
+        if (response.ok) {
+          setLikedRecipes(prev => {
+            const newLikes = [...prev];
+            newLikes[index] = !newLikes[index];
+            return newLikes;
+          });
+        }
+      } catch (err) {
+        console.error('좋아요 토글 실패:', err);
+      }
+    }
   };
+
+  // 로딩 상태
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-center">
+          <div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600" />
+          <p className="text-gray-600">레시피를 불러오는 중...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 에러 상태
+  if (error) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-center">
+          <p className="mb-4 text-red-600">{error}</p>
+          <Button onClick={fetchRecipeRecommend}>다시 시도</Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -83,32 +148,32 @@ export default function RecipeRecommend() {
       <div className="container mx-auto mt-8 px-4 sm:mt-12 sm:px-6 md:mt-[62px] lg:px-8">
         <div className="mx-auto flex max-w-sm items-center justify-between sm:max-w-md md:max-w-lg">
           <BackIcon />
-          <RefreshIcon />
+          <h1 className="text-18b text-center">타이틀</h1>
+          <RefreshIcon onClick={fetchRecipeRecommend} />
         </div>
       </div>
 
       {/* Tags */}
       <div className="mt-4 px-4 sm:px-6 lg:px-8">
         <div className="flex flex-wrap justify-center gap-1 sm:gap-2">
-          <div className="bg-secondary-light-green text-12b sm:text-14b text-secondary-pressed rounded-full px-2 py-[2px] sm:px-3 sm:py-[3px]">
-            고사리
-          </div>
-          <div className="bg-secondary-light-green text-12b sm:text-14b text-secondary-pressed rounded-full px-2 py-[2px] sm:px-3 sm:py-[3px]">
-            김치
-          </div>
-          <div className="bg-secondary-light-green text-12b sm:text-14b text-secondary-pressed rounded-full px-2 py-[2px] sm:px-3 sm:py-[3px]">
-            땅콩버터
-          </div>
-          <div className="bg-secondary-light-green text-12b sm:text-14b text-secondary-pressed rounded-full px-2 py-[2px] sm:px-3 sm:py-[3px]">
-            +5
-          </div>
+          {selectedIngredients.map((ingredient, index) => (
+            <div
+              key={index}
+              className="bg-secondary-light-green text-12b sm:text-14b text-secondary-pressed rounded-full px-2 py-[2px] sm:px-3 sm:py-[3px]"
+            >
+              {ingredient}
+            </div>
+          ))}
         </div>
       </div>
 
       {/* Title */}
-      <p className="text-18 sm:text-20 md:text-22 mt-4 px-4 text-center sm:px-6 lg:px-8">
-        요리할 여유가 거의...없어요
-      </p>
+      <div className="mt-4 px-4 text-center sm:px-6 lg:px-8">
+        <span className="text-18 sm:text-20 md:text-22">
+          요리할 여유가 그저 그래요
+        </span>
+        <span className="text-24 ml-2">😑</span>
+      </div>
 
       {/* 슬라이드 카드 */}
       <div className="px-4 sm:px-6 lg:px-8">
@@ -134,74 +199,105 @@ export default function RecipeRecommend() {
             opts={carouselOpts}
           >
             <CarouselContent className="-ml-2 sm:-ml-4">
-              {recipeData.map((recipe, index) => (
+              {recipes.map((recipe, index) => (
                 <CarouselItem key={recipe.id} className="pl-2 sm:pl-4">
-                  <div className="relative overflow-hidden rounded-2xl shadow-2xl transition-all duration-500 ease-out sm:rounded-3xl">
-                    <div className="absolute inset-0">
-                      <Image
-                        src={recipe.image}
-                        alt={recipe.title}
-                        width={310}
-                        height={386}
-                        className="h-full w-full object-cover"
-                      />
-                      {/* 그라데이션 오버레이 */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                    </div>
+                  <div className="relative h-[530px] w-[310px]">
+                    {/* 배경 카드들 - Figma 디자인 정확한 위치 */}
+                    {/* back-card2: 가장 뒤쪽 카드 */}
+                    <div className="absolute top-[5px] left-[13.999px] h-[449.74px] w-[315.36px] rounded-[30px] bg-[#e6e1cc] shadow-[0_8px_32px_rgba(0,0,0,0.1)]" />
+                    {/* back-card3: 중간 카드 */}
+                    <div className="absolute top-[25px] left-[73.001px] h-[372.75px] w-[271.29px] rounded-[30px] bg-[#f5f2e5] shadow-[0_4px_16px_rgba(0,0,0,0.08)]" />
 
-                    <div className="text-primary-foreground relative z-10 flex h-[320px] flex-col justify-between p-4 sm:h-[350px] sm:p-6 md:h-[386px]">
-                      <div className="mb-4 flex flex-wrap gap-2 sm:gap-4">
-                        <div className="flex items-center gap-1 rounded-full bg-black/30 px-2 py-1 backdrop-blur-sm transition-all duration-300 sm:px-3">
-                          <Clock className="h-3 w-3 sm:h-4 sm:w-4" />
-                          <span className="text-14b sm:text-17sb">
-                            {recipe.time}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-1 rounded-full bg-black/30 px-2 py-1 backdrop-blur-sm transition-all duration-300 sm:px-3">
-                          <ChefHat className="h-3 w-3 sm:h-4 sm:w-4" />
-                          <span className="text-14b sm:text-17sb">
-                            {recipe.cookware}
-                          </span>
-                        </div>
+                    {/* 메인 카드 - card-front */}
+                    <div className="relative z-10 h-[460px] w-[310px] overflow-hidden rounded-[32px] bg-[#f9fbff] shadow-[0_16px_48px_rgba(0,0,0,0.15)]">
+                      {/* 이미지 영역 */}
+                      <div className="absolute top-0 left-0 h-[386px] w-[310px]">
+                        <Image
+                          src={recipe.image}
+                          alt={recipe.title}
+                          width={310}
+                          height={386}
+                          className="h-full w-full object-cover"
+                        />
                       </div>
 
-                      <div className="mt-auto">
-                        <p className="mb-2 text-xs opacity-90 sm:text-sm">
-                          {recipe.subtitle}
-                        </p>
-                        <h2 className="mb-4 text-lg leading-tight font-bold sm:mb-6 sm:text-xl">
-                          {recipe.title.split('\n').map((line, i) => (
-                            <span key={i}>
-                              {line}
-                              {i < recipe.title.split('\n').length - 1 && (
-                                <br />
-                              )}
+                      {/* 상단 배지들 - 정확한 위치 */}
+                      <div className="absolute top-[20px] left-[20px] h-[32px] w-[210px]">
+                        <div className="flex gap-2">
+                          <div className="flex h-[32px] items-center gap-1 rounded-[15px] bg-black/30 px-3">
+                            <Clock className="h-[18px] w-[18px] text-white" />
+                            <span className="text-17 text-white">
+                              {recipe.time}
                             </span>
-                          ))}
-                        </h2>
-
-                        <div className="flex gap-2 sm:gap-3">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="text-primary-foreground h-10 w-10 rounded-full bg-white/20 backdrop-blur-sm transition-all duration-300 sm:h-12 sm:w-12"
-                            onClick={() => toggleLike(index)}
-                          >
-                            <HeartIcon
-                              className="h-4 w-4 transition-all duration-300 sm:h-5 sm:w-5"
-                              color="#ffffff"
-                              active={likedRecipes[index]}
-                            />
-                          </Button>
-                          <Button className="text-14 sm:text-17 h-10 flex-1 rounded-full bg-white text-gray-900 shadow-lg transition-all duration-300 sm:h-12">
-                            <CookIcon
-                              className="mr-1 h-3 w-3 transition-transform duration-300 sm:mr-2 sm:h-4 sm:w-4"
-                              color="#212529"
-                            />
-                            <span className="text-17sb">요리하러 가기</span>
-                          </Button>
+                          </div>
+                          <div className="flex h-[32px] items-center gap-1 rounded-[15px] bg-black/30 px-3">
+                            <ChefHat className="h-[18px] w-[18px] text-white" />
+                            <span className="text-17 text-white">
+                              {recipe.cookware}
+                            </span>
+                          </div>
                         </div>
                       </div>
+
+                      {/* 하단 텍스트와 버튼 영역 - 그라데이션 배경 */}
+                      <div className="absolute bottom-0 left-0 h-[242px] w-[310px] bg-gradient-to-t from-[#b9aa6d] via-[#b9aa6d] to-[#b9aa6d00]">
+                        {/* 텍스트 영역 */}
+                        <div className="absolute top-[40px] left-[20px] h-[104px] w-[270px]">
+                          <p className="text-17 mb-2 text-white opacity-90">
+                            {recipe.subtitle}
+                          </p>
+                          <h2 className="text-24 leading-tight font-semibold text-white">
+                            {recipe.title.split('\n').map((line, i) => (
+                              <span key={i}>
+                                {line}
+                                {i < recipe.title.split('\n').length - 1 && (
+                                  <br />
+                                )}
+                              </span>
+                            ))}
+                          </h2>
+                        </div>
+
+                        {/* 버튼 영역 */}
+                        <div className="absolute bottom-[11px] left-[20px] h-[50px] w-[270px]">
+                          <div className="flex gap-2">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-[50px] w-[50px] rounded-full border border-white bg-transparent hover:bg-transparent focus:bg-transparent focus:outline-none"
+                              onClick={() => toggleLike(index)}
+                            >
+                              <HeartIcon
+                                className="h-5 w-5"
+                                color="#ffffff"
+                                active={
+                                  index >= 0 && index < likedRecipes.length
+                                    ? likedRecipes[index]
+                                    : false
+                                }
+                              />
+                            </Button>
+                            <Button className="h-[50px] flex-1 rounded-full bg-white text-gray-900">
+                              <CookIcon
+                                className="mr-2 h-[18px] w-[18px]"
+                                color="#212529"
+                              />
+                              <span className="text-17sb">
+                                이 레시피 해먹기
+                              </span>
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 스낵바 메시지 */}
+                  <div className="absolute top-[480px] left-0 h-[50px] w-[310px] rounded-[14px] bg-[#5a616d]/80 shadow-lg">
+                    <div className="flex h-full items-center justify-center">
+                      <span className="text-15 text-white">
+                        {snackbarMessage}
+                      </span>
                     </div>
                   </div>
                 </CarouselItem>
