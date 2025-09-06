@@ -53,7 +53,7 @@ export function RecipeProsSelector({ onTogglePro, pros }: ProsSectionProps) {
                 )}
               >
                 <CheckboxIcon isSelected={isSelected} />
-                <span className="text-16 text-left">{text}</span>
+                <span className="text-16 xs:text-15 text-left">{text}</span>
               </div>
             </li>
           );
