@@ -28,7 +28,7 @@ export function EmotionOptionButton({
     yellow: 'bg-[#FDFAB0] text-feel-soso-text',
   };
 
-  const selectedByColor: Record<FeelingPillProps['color'], string> = {
+  const unselectedByColor: Record<FeelingPillProps['color'], string> = {
     blue: 'bg-gray-100 text-gray-500',
     red: 'bg-gray-100 text-gray-500',
     yellow: 'bg-gray-100 text-gray-500',
@@ -40,18 +40,30 @@ export function EmotionOptionButton({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        'flex h-[94px] w-[106px] flex-col items-center justify-center gap-[6px] rounded-2xl text-sm font-semibold',
+        'flex h-[80px] w-[85px] flex-shrink-0 flex-col items-center justify-center gap-[4px] rounded-2xl text-xs font-semibold sm:h-[94px] sm:w-[106px] sm:gap-[6px] sm:text-sm',
         disabled && 'cursor-not-allowed opacity-60',
-        selected ? selectedByColor[color] : baseByColor[color]
+        selected ? baseByColor[color] : unselectedByColor[color]
       )}
       aria-pressed={!!selected}
     >
-      <span className="text-2xl leading-none">
-        {color === 'blue' && <EmotionBadIcon />}
-        {color === 'yellow' && <EmotionNeutralIcon />}
-        {color === 'red' && <EmotionGoodIcon />}
+      <span className="text-xl leading-none sm:text-2xl">
+        {color === 'blue' && (
+          <EmotionBadIcon
+            color={selected ? 'hsl(var(--feel-tired-text))' : '#9CA3AF'}
+          />
+        )}
+        {color === 'yellow' && (
+          <EmotionNeutralIcon
+            color={selected ? 'hsl(var(--feel-soso-text))' : '#9CA3AF'}
+          />
+        )}
+        {color === 'red' && (
+          <EmotionGoodIcon
+            color={selected ? 'hsl(var(--feel-free-text))' : '#9CA3AF'}
+          />
+        )}
       </span>
-      <span className="text-body15">{label}</span>
+      <span className="xs:text-12sb text-15sb">{label}</span>
     </button>
   );
 }

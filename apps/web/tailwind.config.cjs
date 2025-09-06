@@ -4,6 +4,9 @@ module.exports = {
   content: ['./src/**/*.{ts,tsx}'],
   theme: {
     extend: {
+      screens: {
+        xs: '320px',
+      },
       fontFamily: {
         pretendard: ['var(--font-pretendard)'],
       },
@@ -92,6 +95,10 @@ module.exports = {
         },
       },
       fontSize: {
+        12: ['0.75rem', { lineHeight: '150%', fontWeight: '400' }], // text-12
+        '12sb': ['0.75rem', { lineHeight: '150%', fontWeight: '600' }], // text-12sb
+        13: ['0.8125rem', { lineHeight: '150%', fontWeight: '400' }], // text-13
+        '13sb': ['0.8125rem', { lineHeight: '150%', fontWeight: '600' }], // text-13sb
         14: ['0.875rem', { lineHeight: '150%', fontWeight: '400' }], // text-14
         '14sb': ['0.875rem', { lineHeight: '150%', fontWeight: '600' }], // text-14sb
         '14b': ['0.875rem', { lineHeight: '150%', fontWeight: '700' }], // text-14b
