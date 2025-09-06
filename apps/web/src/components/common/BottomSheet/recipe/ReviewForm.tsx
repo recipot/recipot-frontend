@@ -14,10 +14,10 @@ export function ReviewForm({ form }: ReviewFormProps) {
   const { feeling, handleFeelingClick, handleSubmit, pros, togglePro } = form;
 
   return (
-    <div className="mx-auto flex w-full max-w-[342px] flex-col items-center justify-center px-2 pb-4 sm:px-4 sm:pb-6">
+    <div className="xs:px-4 xs:pb-6 mx-auto flex w-full max-w-[342px] flex-col items-center justify-center px-2 pb-2">
       <div className="flex w-full flex-col items-center">
         <form onSubmit={handleSubmit} className="w-full">
-          <div className="xs:space-y-5 space-y-3">
+          <div className="xs:space-y-5 space-y-2">
             <EmotionSelector
               selectedFeeling={feeling}
               onFeelingSelect={handleFeelingClick}
@@ -26,7 +26,7 @@ export function ReviewForm({ form }: ReviewFormProps) {
               <RecipeProsSelector pros={pros} onTogglePro={togglePro} />
             )}
           </div>
-          <div className="xs:mt-8 xs:pt-4 sticky bottom-0 left-0 z-10 mt-4 w-full bg-white pt-3">
+          <div className="xs:mt-8 xs:pt-4 sticky bottom-0 left-0 z-10 mt-2 w-full bg-white pt-2">
             <Button
               type="submit"
               disabled={feeling === null}

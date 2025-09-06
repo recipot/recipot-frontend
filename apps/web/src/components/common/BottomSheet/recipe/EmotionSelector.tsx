@@ -17,14 +17,14 @@ function EmotionSelector({
   const showTitle = selectedFeeling !== 'good';
 
   return (
-    <div className="flex w-full flex-col items-center space-y-6">
+    <div className="xs:space-y-6 flex w-full flex-col items-center space-y-4">
       {showTitle && (
-        <h2 className="text-22 mt-5 text-center text-gray-900">
+        <h2 className="text-22 xs:mt-5 mt-3 text-center text-gray-900">
           식사는 어떠셨나요?
         </h2>
       )}
       {showButtons && (
-        <div className="flex w-full items-center justify-center gap-3">
+        <div className="xs:gap-3 flex w-full items-center justify-center gap-2">
           <EmotionOptionButton
             label="별로예요"
             color="blue"

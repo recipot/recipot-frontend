@@ -89,17 +89,17 @@ export default function EmotionSelectionBottomSheet({
       )}
 
       <BottomSheet open={open} onOpenChange={onOpenChange}>
-        <div className="flex w-full flex-col items-center justify-center px-2 sm:px-4">
+        <div className="xs:px-4 flex w-full flex-col items-center justify-center px-2">
           {/* ReviewHeader 스타일 */}
           <div className="flex w-full flex-col items-center justify-center">
             {/* 해먹은 횟수 */}
-            <div className="text-14 mt-12 mb-3 flex h-[28px] w-[10rem] items-center justify-center rounded-2xl bg-gray-100 px-3 py-[4px] text-xs text-gray-700 sm:mt-4 sm:mb-5 sm:h-[31px] sm:w-[11.25rem] sm:px-4 sm:py-[5px]">
+            <div className="text-14 xs:mt-4 xs:mb-5 xs:h-[31px] xs:w-[11.25rem] xs:px-4 xs:py-[5px] mt-6 mb-2 flex h-[28px] w-[10rem] items-center justify-center rounded-2xl bg-gray-100 px-3 py-[4px] text-xs text-gray-700">
               {timesCooked}번째 해먹기 완료
             </div>
 
             {/* 레시피 타이틀 + 이미지 */}
-            <div className="flex flex-col items-center justify-center overflow-y-auto">
-              <div className="mb-1 text-base font-semibold sm:mb-2 sm:text-lg">
+            <div className="flex flex-col items-center justify-center">
+              <div className="xs:mb-2 xs:text-lg mb-1 text-base font-semibold">
                 양배추 계란 샐러드
               </div>
               <Image
@@ -110,7 +110,7 @@ export default function EmotionSelectionBottomSheet({
                 className="rounded-[10.67px]"
               />
             </div>
-            <div className="mt-3 h-[1px] w-full max-w-[280px] border border-dashed border-neutral-100 sm:mt-5 sm:max-w-[342px]" />
+            <div className="xs:mt-5 xs:max-w-[342px] mt-2 h-[1px] w-full max-w-[280px] border border-dashed border-neutral-100" />
           </div>
 
           {/* ReviewForm 컴포넌트 사용 */}

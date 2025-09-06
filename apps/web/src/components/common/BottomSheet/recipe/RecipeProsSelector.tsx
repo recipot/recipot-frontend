@@ -28,14 +28,14 @@ export function RecipeProsSelector({ onTogglePro, pros }: ProsSectionProps) {
 
   return (
     <div className="w-full">
-      <div className="bg-feel-back-free text-feel-free-text text-15sb mt-5 mb-6 flex items-center justify-center rounded-2xl py-5 text-center">
+      <div className="bg-feel-back-free text-feel-free-text text-15sb xs:mt-5 xs:mb-6 xs:py-5 mt-3 mb-4 flex items-center justify-center rounded-2xl py-4 text-center">
         <EmotionGoodIcon className="mr-1" />
         <span>또 해먹을래요</span>
       </div>
 
-      <p className="text-22 mb-3 text-center">어떤점이 좋았나요?</p>
+      <p className="text-22 xs:mb-3 mb-2 text-center">어떤점이 좋았나요?</p>
 
-      <ul className="flex flex-col gap-2">
+      <ul className="xs:gap-2 flex flex-col gap-1.5">
         {PROS_OPTIONS.map(text => {
           const isSelected = pros.includes(text);
           const id = `pros-${text.replace(/\s+/g, '-').toLowerCase()}`;
@@ -49,7 +49,7 @@ export function RecipeProsSelector({ onTogglePro, pros }: ProsSectionProps) {
                 onKeyDown={e => handleKeyDown(e, text)}
                 onClick={() => onTogglePro(text)}
                 className={cn(
-                  'group flex w-full cursor-pointer items-center gap-3 rounded-md px-3 py-2'
+                  'group xs:py-2 flex w-full cursor-pointer items-center gap-3 rounded-md px-3 py-1.5'
                 )}
               >
                 <CheckboxIcon isSelected={isSelected} />
