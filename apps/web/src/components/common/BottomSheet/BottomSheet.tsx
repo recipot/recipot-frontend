@@ -1,4 +1,5 @@
 import React from 'react';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 
 import { CloseIcon } from '@/components/Icons';
 import {
@@ -6,6 +7,7 @@ import {
   DrawerClose,
   DrawerContent,
   DrawerHeader,
+  DrawerTitle,
 } from '@/components/ui/drawer';
 import { cn } from '@/lib/utils';
 
@@ -31,11 +33,11 @@ export function BottomSheet({
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent
         aria-describedby={undefined}
-        className={cn(
-          `mx-auto w-full`
-          // 사이즈별 최대 너비 설정
-        )}
+        className={cn(`mx-auto w-full`)}
       >
+        <VisuallyHidden>
+          <DrawerTitle>바텀시트</DrawerTitle>
+        </VisuallyHidden>
         <DrawerHeader />
         <DrawerClose className="absolute top-4 right-5" aria-label="닫기">
           <CloseIcon />
