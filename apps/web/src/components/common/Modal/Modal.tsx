@@ -18,6 +18,8 @@ export interface ModalProps extends ComponentPropsWithoutRef<typeof Dialog> {
   title?: string;
   description?: string | React.ReactNode;
   disableOverlayClick?: boolean;
+  children: React.ReactNode;
+  onOpenChange: (open: boolean) => void;
 }
 
 export function Modal({
@@ -48,7 +50,7 @@ export function Modal({
         />
         <DialogContent
           className={cn(
-            'bg-background flex w-[calc(100vw-70px)] max-w-[20rem] flex-col items-center justify-center gap-[30px] rounded-3xl border px-5 pt-[30px] sm:max-w-[24rem] md:max-w-[28rem] lg:max-w-[32rem]'
+            'bg-background flex w-[20rem] flex-col items-center justify-center gap-[30px] rounded-3xl border px-5 pt-[30px] max-[320px]:w-[18rem]'
           )}
         >
           <DialogHeader

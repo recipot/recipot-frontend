@@ -110,6 +110,13 @@ const ShareRecipeStory = () => {
 };
 
 export const ShareRecipe: Story = {
+  args: {
+    children: <div>Example children</div>,
+    description: '해당 레시피를 공유해보세요!',
+    onOpenChange: () => {},
+    open: false,
+    title: '레시피 공유',
+  },
   render: () => <ShareRecipeStory />,
 };
 
@@ -126,6 +133,13 @@ const LoginRequiredStory = () => {
 };
 
 export const LoginRequired: Story = {
+  args: {
+    children: <div>Example children</div>,
+    description: '로그인이 필요한 서비스입니다.',
+    onOpenChange: () => {},
+    open: false,
+    title: '로그인이 필요한 서비스입니다.',
+  },
   render: () => <LoginRequiredStory />,
 };
 
@@ -142,5 +156,18 @@ const LeavePageWarningStory = () => {
 };
 
 export const LeavePageWarning: Story = {
+  args: {
+    children: <div>Example children</div>,
+    description: (
+      <>
+        해당 페이지를 벗어나면
+        <br />
+        요리 진행이 중단 됩니다.
+      </>
+    ),
+    onOpenChange: () => {},
+    open: false,
+    title: '페이지 나가기',
+  },
   render: () => <LeavePageWarningStory />,
 };
