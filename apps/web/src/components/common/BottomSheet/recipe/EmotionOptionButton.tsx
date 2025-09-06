@@ -47,24 +47,30 @@ function EmotionOptionButton({
       className={cn(
         'flex h-[80px] w-[85px] flex-shrink-0 flex-col items-center justify-center gap-[4px] rounded-2xl text-xs font-semibold sm:h-[94px] sm:w-[106px] sm:gap-[6px] sm:text-sm',
         disabled && 'cursor-not-allowed opacity-60',
-        selected ? getBaseColor(color) : getUnselectedColor()
+        selected === false ? getUnselectedColor() : getBaseColor(color)
       )}
       aria-pressed={!!selected}
     >
       <span className="text-xl leading-none sm:text-2xl">
         {color === 'blue' && (
           <EmotionBadIcon
-            color={selected ? 'hsl(var(--feel-tired-text))' : '#9CA3AF'}
+            color={
+              selected === false ? '#9CA3AF' : 'hsl(var(--feel-tired-text))'
+            }
           />
         )}
         {color === 'yellow' && (
           <EmotionNeutralIcon
-            color={selected ? 'hsl(var(--feel-soso-text))' : '#9CA3AF'}
+            color={
+              selected === false ? '#9CA3AF' : 'hsl(var(--feel-soso-text))'
+            }
           />
         )}
         {color === 'red' && (
           <EmotionGoodIcon
-            color={selected ? 'hsl(var(--feel-free-text))' : '#9CA3AF'}
+            color={
+              selected === false ? '#9CA3AF' : 'hsl(var(--feel-free-text))'
+            }
           />
         )}
       </span>

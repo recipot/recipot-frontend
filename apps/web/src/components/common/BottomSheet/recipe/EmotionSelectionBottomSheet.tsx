@@ -4,8 +4,9 @@ import Image from 'next/image';
 
 import { useReviewForm } from '@/hooks/useReviewForm';
 
-import { ReviewForm } from '../../Modal/recipe/ReviewBottomSheet/ReviewForm';
 import { BottomSheet } from '../BottomSheet';
+
+import { ReviewForm } from './ReviewForm';
 
 const CONFETTI_COLORS = [
   '#FF6B6B',
