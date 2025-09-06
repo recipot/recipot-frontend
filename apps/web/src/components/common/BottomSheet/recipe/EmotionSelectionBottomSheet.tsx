@@ -93,7 +93,7 @@ export default function EmotionSelectionBottomSheet({
           {/* ReviewHeader 스타일 */}
           <div className="flex w-full flex-col items-center justify-center">
             {/* 해먹은 횟수 */}
-            <div className="text-14 mt-2 mb-3 flex h-[28px] w-[10rem] items-center justify-center rounded-2xl bg-gray-100 px-3 py-[4px] text-xs text-gray-700 sm:mt-4 sm:mb-5 sm:h-[31px] sm:w-[11.25rem] sm:px-4 sm:py-[5px]">
+            <div className="text-14 mt-12 mb-3 flex h-[28px] w-[10rem] items-center justify-center rounded-2xl bg-gray-100 px-3 py-[4px] text-xs text-gray-700 sm:mt-4 sm:mb-5 sm:h-[31px] sm:w-[11.25rem] sm:px-4 sm:py-[5px]">
               {timesCooked}번째 해먹기 완료
             </div>
 
