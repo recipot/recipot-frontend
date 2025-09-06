@@ -1,6 +1,6 @@
 'use client';
 
-import FoodAdd from '@/components/FoodAdd/FoodAdd';
+import IngredientsSearch from '@/components/IngredientsSearch/IngredientsSearch';
 
 export default function RefrigeratorPage() {
   const handleSubmissionSuccess = () => {
@@ -16,5 +16,5 @@ export default function RefrigeratorPage() {
     // setShowRecommendations(true);
   };
 
-  return <FoodAdd onSubmissionSuccess={handleSubmissionSuccess} />;
+  return <IngredientsSearch onSubmissionSuccess={handleSubmissionSuccess} />;
 }

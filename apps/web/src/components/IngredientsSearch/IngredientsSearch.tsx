@@ -12,7 +12,7 @@ import { filterByKoreanSearch } from '@/utils/koreanSearch';
 
 import { Button } from '../common/Button';
 
-export default function FoodAdd({
+export default function IngredientsSearch({
   onSubmissionSuccess,
 }: {
   onSubmissionSuccess: () => void;

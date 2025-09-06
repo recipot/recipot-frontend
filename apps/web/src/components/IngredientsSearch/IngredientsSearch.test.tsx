@@ -7,7 +7,7 @@ import { useSubmitSelectedFoods } from '@/hooks/useSubmitSelectedFoods';
 import { useSelectedFoodsStore } from '@/stores/selectedFoodsStore';
 import type { Food } from '@/types/food.types';
 
-import FoodAdd from './FoodAdd';
+import FoodAdd from './IngredientsSearch';
 
 // Mock hooks
 vi.mock('@/hooks/useFoodList');
