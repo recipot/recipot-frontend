@@ -4,7 +4,7 @@ import { mockFoods } from '@/mocks/data/foods.mock';
 
 import type { NextRequest } from 'next/server';
 
-export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     const body = await request.json();
     const { selectedFoodIds } = body;
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
       message: '선택된 재료가 성공적으로 전송되었습니다.',
       success: true,
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       {
         message: '서버 오류가 발생했습니다.',

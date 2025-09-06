@@ -126,9 +126,9 @@ export function separateKorean(char: string): {
   const jongsungIndex = code % KOREAN_UNICODE.JONGSUNG_COUNT;
 
   return {
-    chosung: CHOSUNG_LIST[chosungIndex],
-    jongsung: JONGSUNG_LIST[jongsungIndex],
-    jungsung: JUNGSUNG_LIST[jungsungIndex],
+    chosung: CHOSUNG_LIST[chosungIndex] || '',
+    jongsung: JONGSUNG_LIST[jongsungIndex] || '',
+    jungsung: JUNGSUNG_LIST[jungsungIndex] || '',
   };
 }
 

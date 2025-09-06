@@ -4,12 +4,12 @@ import { GoogleIcon, KakaoIcon } from '@/components/Icons';
 export function AuthButtons() {
   const handleKakaoLogin = () => {
     // TODO: 카카오 로그인 로직
-    console.log('카카오 로그인');
+    console.info('카카오 로그인');
   };
 
   const handleGoogleLogin = () => {
     // TODO: 구글 로그인 로직
-    console.log('구글 로그인');
+    console.info('구글 로그인');
   };
 
   return (

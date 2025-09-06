@@ -217,7 +217,9 @@ describe('FoodAdd', () => {
       });
 
       const foodButton = screen.getByText('당근').closest('button');
-      fireEvent.click(foodButton!);
+      if (foodButton) {
+        fireEvent.click(foodButton);
+      }
 
       expect(mockToggleFood).toHaveBeenCalledWith(3); // 당근의 id
     });
