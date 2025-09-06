@@ -173,14 +173,20 @@ export function matchKoreanSearch(target: string, query: string): boolean {
 
   // 완성된 한글이면 부분 매칭 수행
   if (isCompleteKorean) {
-    // 검색어가 한 글자인 경우, 검색어로 시작하는 글자가 있는지 확인
+    // 검색어가 한 글자인 경우, 초성과 중성이 같은 글자가 있는지 확인
     if (query.length === 1) {
       const queryParts = separateKorean(query);
 
       return target.split('').some(targetChar => {
         const targetParts = separateKorean(targetChar);
 
-        // 초성과 중성이 같으면 매칭 (종성은 무시)
+        // 검색어에 종성이 있는 경우: 정확히 일치하거나 검색어로 시작하는 경우만 매칭
+        // 예: '당' 입력시 '당근'은 매칭되지만 '닭고기'는 매칭되지 않음
+        if (queryParts.jongsung !== '') {
+          return targetChar === query || targetChar.startsWith(query);
+        }
+
+        // 검색어에 종성이 없는 경우: 초성과 중성이 같으면 매칭 (종성은 무시)
         // 예: '가' 입력시 '감', '간', '갈' 등이 매칭됨
         return (
           queryParts.chosung === targetParts.chosung &&
