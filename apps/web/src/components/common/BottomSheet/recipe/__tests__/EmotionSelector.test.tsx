@@ -2,13 +2,10 @@ import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, vi } from 'vitest';
 
-import EmotionSelector from '../../../BottomSheet/recipe/EmotionSelector';
-
-import type { ReviewFeeling } from './types';
+import EmotionSelector from '../EmotionSelector';
 
 describe('EmotionSelector', () => {
   const mockOnFeelingSelect = vi.fn();
-  const feelings: ReviewFeeling[] = ['bad', 'soso', 'good'];
   const labels = ['별로예요', '그저 그래요', '또 해먹을래요'];
 
   test('초기 렌더링 시 "식사는 어떠셨나요?" 문구가 보여야 함', () => {
@@ -43,11 +40,17 @@ describe('EmotionSelector', () => {
       />
     );
 
-    feelings.forEach((feeling, index) => {
-      const button = screen.getByText(labels[index]);
-      fireEvent.click(button);
-      expect(mockOnFeelingSelect).toHaveBeenCalledWith(feeling);
-    });
+    // bad 버튼 클릭
+    fireEvent.click(screen.getByText('별로예요'));
+    expect(mockOnFeelingSelect).toHaveBeenCalledWith('bad');
+
+    // soso 버튼 클릭
+    fireEvent.click(screen.getByText('그저 그래요'));
+    expect(mockOnFeelingSelect).toHaveBeenCalledWith('soso');
+
+    // good 버튼 클릭
+    fireEvent.click(screen.getByText('또 해먹을래요'));
+    expect(mockOnFeelingSelect).toHaveBeenCalledWith('good');
   });
 
   test('선택된 감정이 있으면 제목이 보이지 않아야 함', () => {

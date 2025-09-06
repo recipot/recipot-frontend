@@ -2,7 +2,7 @@ import React from 'react';
 
 import EmotionOptionButton from './EmotionOptionButton';
 
-import type { ReviewFeeling } from '../Modal/recipe/ReviewBottomSheet/types';
+import type { ReviewFeeling } from '../../Modal/recipe/ReviewBottomSheet/types';
 
 interface EmotionSelectorProps {
   selectedFeeling: ReviewFeeling | null;
@@ -20,7 +20,7 @@ function EmotionSelector({
           식사는 어떠셨나요?
         </h2>
       )}
-      <div className="flex w-full items-center justify-between gap-3">
+      <div className="flex w-full items-center justify-center gap-3">
         <EmotionOptionButton
           label="별로예요"
           color="blue"

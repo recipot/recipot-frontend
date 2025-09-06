@@ -3,8 +3,8 @@ import React from 'react';
 import { Button } from '@/components/common/Button/Button';
 import type { useReviewForm } from '@/hooks/useReviewForm';
 
-import EmotionSelector from './EmotionSelector';
-import { RecipeProsSelector } from './RecipeProsSelector';
+import EmotionSelector from '../../../BottomSheet/recipe/EmotionSelector';
+import { RecipeProsSelector } from '../../../BottomSheet/recipe/RecipeProsSelector';
 
 interface ReviewFormProps {
   form: ReturnType<typeof useReviewForm>;
