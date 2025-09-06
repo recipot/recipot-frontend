@@ -1,9 +1,5 @@
-import RecipeRecommend from './(recipeRecommend)/recipeRecommend/page';
+'use client';
 
 export default function Home() {
-  return (
-    <div>
-      <RecipeRecommend />
-    </div>
-  );
+  return <div>Home</div>;
 }
