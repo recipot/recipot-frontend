@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
 import type { Recipe, RecipeRecommendResponse } from '@/types/recipe.types';
 
@@ -6,88 +7,98 @@ interface UseRecipeRecommendReturn {
   recipes: Recipe[];
   selectedIngredients: string[];
   snackbarMessage: string;
-  loading: boolean;
-  error: string | null;
+  isLoading: boolean;
+  isError: boolean;
+  error: Error | null;
   likedRecipes: boolean[];
-  fetchRecipeRecommend: () => Promise<void>;
+  refetch: () => void;
   toggleLike: (index: number) => Promise<void>;
 }
 
+// API 함수들
+const fetchRecipeRecommend = async (): Promise<RecipeRecommendResponse> => {
+  const response = await fetch('/api/recipe-recommend');
+  if (!response.ok) {
+    throw new Error('레시피 추천을 불러오는데 실패했습니다.');
+  }
+  return response.json();
+};
+
+const toggleRecipeLike = async (
+  recipeId: number,
+  isLiked: boolean
+): Promise<void> => {
+  const response = await fetch(`/api/recipe-recommend/${recipeId}/like`, {
+    method: isLiked ? 'DELETE' : 'POST',
+  });
+  if (!response.ok) {
+    throw new Error('좋아요 상태 변경에 실패했습니다.');
+  }
+};
+
 export const useRecipeRecommend = (): UseRecipeRecommendReturn => {
-  const [recipes, setRecipes] = useState<Recipe[]>([]);
-  const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
-  const [snackbarMessage, setSnackbarMessage] = useState<string>('');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [likedRecipes, setLikedRecipes] = useState<boolean[]>([]);
 
-  const fetchRecipeRecommend = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
+  // 레시피 추천 데이터 조회
+  const { data, error, isError, isLoading, refetch } = useQuery({
+    queryFn: fetchRecipeRecommend,
+    queryKey: ['recipeRecommend'],
+    staleTime: 5 * 60 * 1000, // 5분
+  });
 
-      const response = await fetch('/api/recipe-recommend');
+  // 좋아요 토글 뮤테이션
+  const likeMutation = useMutation({
+    mutationFn: ({
+      isLiked,
+      recipeId,
+    }: {
+      recipeId: number;
+      isLiked: boolean;
+    }) => toggleRecipeLike(recipeId, isLiked),
+    onSuccess: (_, { isLiked, recipeId }) => {
+      setLikedRecipes(prev => {
+        const recipeIndex = data?.recipes.findIndex(
+          recipe => recipe.id === recipeId
+        );
+        if (recipeIndex !== undefined && recipeIndex >= 0) {
+          const newLikes = [...prev];
+          newLikes[recipeIndex] = !isLiked;
+          return newLikes;
+        }
+        return prev;
+      });
+    },
+  });
 
-      if (!response.ok) {
-        throw new Error('레시피 추천을 불러오는데 실패했습니다.');
-      }
-
-      const data: RecipeRecommendResponse = await response.json();
-
-      setRecipes(data.recipes);
-      setSelectedIngredients(data.selectedIngredients);
-      setSnackbarMessage(data.message);
-      setLikedRecipes(new Array(data.recipes.length).fill(false));
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.'
-      );
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  // 데이터 로드 시 좋아요 상태 초기화
+  if (data?.recipes && likedRecipes.length === 0) {
+    setLikedRecipes(new Array(data.recipes.length).fill(false));
+  }
 
   const toggleLike = useCallback(
     async (index: number) => {
-      if (index < 0 || index >= recipes.length) return;
+      if (!data?.recipes || index < 0 || index >= data.recipes.length) return;
 
-      const recipe = recipes[index];
-      const isCurrentlyLiked = likedRecipes[index];
+      const recipe = data.recipes[index];
+      const isCurrentlyLiked = likedRecipes[index] ?? false;
 
-      try {
-        const response = await fetch(
-          `/api/recipe-recommend/${recipe.id}/like`,
-          {
-            method: isCurrentlyLiked ? 'DELETE' : 'POST',
-          }
-        );
-
-        if (response.ok) {
-          setLikedRecipes(prev => {
-            const newLikes = [...prev];
-            newLikes[index] = !newLikes[index];
-            return newLikes;
-          });
-        }
-      } catch (err) {
-        console.error('좋아요 토글 실패:', err);
-      }
+      likeMutation.mutate({
+        isLiked: isCurrentlyLiked,
+        recipeId: recipe.id,
+      });
     },
-    [recipes, likedRecipes]
+    [data?.recipes, likedRecipes, likeMutation]
   );
-
-  useEffect(() => {
-    fetchRecipeRecommend();
-  }, [fetchRecipeRecommend]);
 
   return {
     error,
-    fetchRecipeRecommend,
+    isError,
+    isLoading,
     likedRecipes,
-    loading,
-    recipes,
-    selectedIngredients,
-    snackbarMessage,
+    recipes: data?.recipes ?? [],
+    refetch,
+    selectedIngredients: data?.selectedIngredients ?? [],
+    snackbarMessage: data?.message ?? '',
     toggleLike,
   };
 };
