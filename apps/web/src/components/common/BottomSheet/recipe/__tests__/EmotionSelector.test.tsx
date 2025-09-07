@@ -2,7 +2,7 @@ import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, vi } from 'vitest';
 
-import EmotionSelector from '../EmotionSelector';
+import EmotionSelector from '../../../../EmotionState/EmotionSelector';
 
 describe('EmotionSelector', () => {
   const mockOnFeelingSelect = vi.fn();

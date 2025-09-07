@@ -1,6 +1,10 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
+import { AnimatePresence, motion, type Variants } from 'framer-motion';
 
-import MoodButton, { type MoodState, type MoodType } from '../MoodButton';
+import { MOOD_LABELS } from '../../types/emotion.types';
+import EmotionOptionButton from './EmotionOptionButton';
+
+import type { MoodState, MoodType } from '../../types/emotion.types';
 
 interface EmotionStateProps {
   onMoodChange?: (mood: MoodType | null) => void;
@@ -33,48 +37,218 @@ const EmotionState: React.FC<EmotionStateProps> = ({
     return 'default';
   };
 
+  // 애니메이션 variants
+  const containerVariants: Variants = useMemo(
+    () => ({
+      hidden: { opacity: 0 },
+      visible: { opacity: 1 },
+    }),
+    []
+  );
+
+  const rowVariants: Variants = useMemo(
+    () => ({
+      hidden: { opacity: 0, y: 20 },
+      visible: { opacity: 1, y: 0 },
+    }),
+    []
+  );
+
+  const titleVariants: Variants = useMemo(
+    () => ({
+      hidden: { opacity: 0, y: -20 },
+      visible: { opacity: 1, y: 0 },
+    }),
+    []
+  );
+
+  const transitionConfig = useMemo(
+    () => ({
+      delayChildren: 0.2,
+      staggerChildren: 0.1,
+    }),
+    []
+  );
+
+  const titleTransition = useMemo(
+    () => ({
+      duration: 0.6,
+    }),
+    []
+  );
+
+  const rowTransition = useMemo(
+    () => ({
+      duration: 0.5,
+    }),
+    []
+  );
+
+  const exitTransition = useMemo(
+    () => ({
+      duration: 0.3,
+      ease: 'easeOut' as const,
+    }),
+    []
+  );
+
+  const initialAnimation = useMemo(
+    () => ({
+      opacity: 0,
+      scale: 0.8,
+      y: 20,
+    }),
+    []
+  );
+
+  const animateAnimation = useMemo(
+    () => ({
+      opacity: 1,
+      scale: 1,
+      y: 0,
+    }),
+    []
+  );
+
+  const exitAnimation = useMemo(
+    () => ({
+      opacity: 0,
+      scale: 0.8,
+      y: -20,
+    }),
+    []
+  );
+
   return (
-    <div className={`flex flex-col items-center space-y-8 ${className}`}>
-      <h2 className="mb-4 text-2xl font-bold text-gray-800">
+    <motion.div
+      className={`flex flex-col items-center space-y-8 ${className}`}
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      transition={transitionConfig}
+    >
+      <motion.h2
+        className="mb-4 text-2xl font-bold text-gray-800"
+        variants={titleVariants}
+        transition={titleTransition}
+      >
         감정 상태 컴포넌트
-      </h2>
+      </motion.h2>
 
       {/* Default States Row */}
-      <div className="flex space-x-8">
-        <MoodButton
-          type="bad"
-          state={getMoodState('bad')}
+      <motion.div
+        className="flex space-x-8"
+        variants={rowVariants}
+        transition={rowTransition}
+      >
+        <EmotionOptionButton
+          label="힘들어"
+          color="blue"
+          selected={getMoodState('bad') === 'selected'}
+          disabled={disabled}
           onClick={() => handleMoodClick('bad')}
-          disabled={disabled}
+          variant="mood"
+          enableAnimation
         />
-        <MoodButton
-          type="neutral"
-          state={getMoodState('neutral')}
+        <EmotionOptionButton
+          label="그럭저럭"
+          color="yellow"
+          selected={getMoodState('neutral') === 'selected'}
+          disabled={disabled}
           onClick={() => handleMoodClick('neutral')}
-          disabled={disabled}
+          variant="mood"
+          enableAnimation
         />
-        <MoodButton
-          type="good"
-          state={getMoodState('good')}
+        <EmotionOptionButton
+          label="충분해"
+          color="red"
+          selected={getMoodState('good') === 'selected'}
+          disabled={disabled}
           onClick={() => handleMoodClick('good')}
-          disabled={disabled}
+          variant="mood"
+          enableAnimation
         />
-      </div>
+      </motion.div>
 
       {/* Selected States Row */}
-      <div className="flex space-x-8">
-        <MoodButton type="bad" state="selected" disabled />
-        <MoodButton type="neutral" state="disabled" disabled />
-        <MoodButton type="good" state="disabled" disabled />
-      </div>
+      <motion.div
+        className="flex space-x-8"
+        variants={rowVariants}
+        transition={rowTransition}
+      >
+        <EmotionOptionButton
+          label="힘들어"
+          color="blue"
+          selected
+          disabled
+          variant="mood"
+          enableAnimation
+        />
+        <EmotionOptionButton
+          label="그럭저럭"
+          color="yellow"
+          disabled
+          variant="mood"
+          enableAnimation
+        />
+        <EmotionOptionButton
+          label="충분해"
+          color="red"
+          disabled
+          variant="mood"
+          enableAnimation
+        />
+      </motion.div>
 
       {/* Disabled States Row */}
-      <div className="flex space-x-8">
-        <MoodButton type="bad" state="disabled" disabled />
-        <MoodButton type="neutral" state="selected" disabled />
-        <MoodButton type="good" state="selected" disabled />
-      </div>
-    </div>
+      <motion.div
+        className="flex space-x-8"
+        variants={rowVariants}
+        transition={rowTransition}
+      >
+        <EmotionOptionButton
+          label="힘들어"
+          color="blue"
+          disabled
+          variant="mood"
+          enableAnimation
+        />
+        <EmotionOptionButton
+          label="그럭저럭"
+          color="yellow"
+          selected
+          disabled
+          variant="mood"
+          enableAnimation
+        />
+        <EmotionOptionButton
+          label="충분해"
+          color="red"
+          selected
+          disabled
+          variant="mood"
+          enableAnimation
+        />
+      </motion.div>
+
+      {/* Current Selection Display with Animation */}
+      <AnimatePresence>
+        {selectedMood && (
+          <motion.div
+            className="mt-6 rounded-lg bg-gray-100 p-4"
+            initial={initialAnimation}
+            animate={animateAnimation}
+            exit={exitAnimation}
+            transition={exitTransition}
+          >
+            <p className="text-sm text-gray-600">
+              선택된 감정:{' '}
+              <span className="font-semibold">{MOOD_LABELS[selectedMood]}</span>
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 };
 

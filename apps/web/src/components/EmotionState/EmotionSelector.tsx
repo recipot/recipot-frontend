@@ -2,7 +2,7 @@ import React from 'react';
 
 import EmotionOptionButton from './EmotionOptionButton';
 
-import type { ReviewFeeling } from '../types';
+import type { ReviewFeeling } from '../common/BottomSheet/types';
 
 interface EmotionSelectorProps {
   selectedFeeling: ReviewFeeling | null;

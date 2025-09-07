@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/common/Button/Button';
 import type { useReviewForm } from '@/hooks/useReviewForm';
 
-import EmotionSelector from './EmotionSelector';
+import EmotionSelector from '../../../EmotionState/EmotionSelector';
 import { RecipeProsSelector } from './RecipeProsSelector';
 
 interface ReviewFormProps {
