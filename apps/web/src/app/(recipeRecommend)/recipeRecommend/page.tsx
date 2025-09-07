@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/common/Button';
 import { BackIcon, RefreshIcon } from '@/components/Icons';
@@ -24,12 +25,15 @@ export default function RecipeRecommend() {
   const [current, setCurrent] = useState(0);
   const [count, setCount] = useState(0);
 
+  const router = useRouter();
+
   const {
     error,
-    fetchRecipeRecommend,
+    isError,
+    isLoading,
     likedRecipes,
-    loading,
     recipes,
+    refetch,
     selectedIngredients,
     snackbarMessage,
     toggleLike,
@@ -47,7 +51,7 @@ export default function RecipeRecommend() {
   }, [api, recipes]);
 
   // 로딩 상태
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="text-center">
@@ -59,12 +63,14 @@ export default function RecipeRecommend() {
   }
 
   // 에러 상태
-  if (error) {
+  if (isError) {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="text-center">
-          <p className="mb-4 text-red-600">{error}</p>
-          <Button onClick={fetchRecipeRecommend}>다시 시도</Button>
+          <p className="mb-4 text-red-600">
+            {error?.message ?? '레시피를 불러오는데 실패했습니다.'}
+          </p>
+          <Button onClick={() => refetch()}>다시 시도</Button>
         </div>
       </div>
     );
@@ -75,9 +81,16 @@ export default function RecipeRecommend() {
       {/* Header */}
       <div className="container mx-auto mt-8 px-4 sm:mt-12 sm:px-6 md:mt-[62px] lg:px-8">
         <div className="mx-auto flex max-w-sm items-center justify-between sm:max-w-md md:max-w-lg">
-          <BackIcon />
+          <BackIcon
+            onClick={() => router.push('/')}
+            className="cursor-pointer transition-opacity hover:opacity-70"
+          />
+
           <h1 className="text-18b text-center">타이틀</h1>
-          <RefreshIcon onClick={fetchRecipeRecommend} />
+          <RefreshIcon
+            onClick={() => refetch()}
+            className="cursor-pointer transition-opacity hover:opacity-70"
+          />
         </div>
       </div>
 
