@@ -27,13 +27,13 @@ export function RecipeProsSelector({ onTogglePro, pros }: ProsSectionProps) {
   };
 
   return (
-    <div className="w-full">
-      <div className="bg-feel-back-free text-feel-free-text text-15sb xs:mt-5 xs:mb-6 xs:py-5 mt-3 mb-4 flex items-center justify-center rounded-2xl py-4 text-center">
-        <EmotionGoodIcon className="mr-1" />
+    <div className="w-full max-w-[342px] md:max-w-[400px] lg:max-w-[450px]">
+      <div className="bg-feel-back-free text-feel-free-text text-15sb xs:mt-5 xs:mb-6 xs:py-5 mt-3 mb-5 flex items-center justify-center rounded-2xl py-5 text-center">
+        <EmotionGoodIcon className="mr-2" />
         <span>또 해먹을래요</span>
       </div>
 
-      <p className="text-22 xs:mb-3 mb-2 text-center">어떤점이 좋았나요?</p>
+      <p className="text-22 xs:mb-4 mb-3 text-center">어떤점이 좋았나요?</p>
 
       <ul className="xs:gap-2 flex flex-col gap-1.5">
         {PROS_OPTIONS.map(text => {

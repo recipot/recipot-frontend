@@ -110,7 +110,10 @@ export default function EmotionSelectionBottomSheet({
                 className="rounded-[10.67px]"
               />
             </div>
-            <div className="xs:mt-5 xs:max-w-[342px] mt-2 h-[1px] w-full max-w-[280px] border border-dashed border-neutral-100" />
+            <div className="xs:mt-5 mt-2 w-full max-w-[342px] divide-y divide-dashed divide-neutral-100 px-6 md:max-w-[400px] lg:max-w-[450px]">
+              <div />
+              <div />
+            </div>
           </div>
 
           {/* ReviewForm 컴포넌트 사용 */}

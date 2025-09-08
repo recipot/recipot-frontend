@@ -22,15 +22,15 @@ function EmotionOptionButton({
   onClick,
   selected,
 }: FeelingPillProps) {
-  // 선택된 버튼의 색상 (원래 색상)
+  // 선택된 버튼의 색상 (원래 색상) - 실제 디자인에 맞게 수정
   const getBaseColor = (color: FeelingPillProps['color']): string => {
     switch (color) {
       case 'blue':
-        return 'bg-[#D4E2FF] text-feel-tired-text';
+        return 'bg-[#D4E2FF] text-[#4164ae]';
       case 'red':
-        return 'bg-[#FFE2E2] text-feel-free-text';
+        return 'bg-[#FFE0E1] text-[#df6567]';
       case 'yellow':
-        return 'bg-[#FDFAB0] text-feel-soso-text';
+        return 'bg-[#FDFAB0] text-[#ad7e06]';
       default:
         return 'bg-gray-100 text-gray-500';
     }
@@ -45,36 +45,26 @@ function EmotionOptionButton({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        'flex h-[80px] w-[85px] flex-shrink-0 flex-col items-center justify-center gap-[4px] rounded-2xl text-xs font-semibold sm:h-[94px] sm:w-[106px] sm:gap-[6px] sm:text-sm',
+        'xs:h-[80px] xs:w-[85px] flex h-[93px] w-[106px] flex-shrink-0 flex-col items-center justify-center gap-[6px] rounded-2xl text-sm font-semibold',
         disabled && 'cursor-not-allowed opacity-60',
         selected === false ? getUnselectedColor() : getBaseColor(color)
       )}
       aria-pressed={!!selected}
     >
-      <span className="text-xl leading-none sm:text-2xl">
+      <span className="xs:text-xl text-2xl leading-none">
         {color === 'blue' && (
-          <EmotionBadIcon
-            color={
-              selected === false ? '#9CA3AF' : 'hsl(var(--feel-tired-text))'
-            }
-          />
+          <EmotionBadIcon color={selected === false ? '#9CA3AF' : '#4164ae'} />
         )}
         {color === 'yellow' && (
           <EmotionNeutralIcon
-            color={
-              selected === false ? '#9CA3AF' : 'hsl(var(--feel-soso-text))'
-            }
+            color={selected === false ? '#9CA3AF' : '#ad7e06'}
           />
         )}
         {color === 'red' && (
-          <EmotionGoodIcon
-            color={
-              selected === false ? '#9CA3AF' : 'hsl(var(--feel-free-text))'
-            }
-          />
+          <EmotionGoodIcon color={selected === false ? '#9CA3AF' : '#df6567'} />
         )}
       </span>
-      <span className="xs:text-12sb text-15sb">{label}</span>
+      <span className="text-15sb xs:text-13sb">{label}</span>
     </button>
   );
 }
