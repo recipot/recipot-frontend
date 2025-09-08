@@ -3,6 +3,8 @@ import { authService } from '@recipot/api';
 import { useAuth } from '@recipot/contexts';
 import { useRouter, useSearchParams } from 'next/navigation';
 
+import type { UserInfo } from '@recipot/types';
+
 export type OAuthProvider = 'google' | 'kakao';
 
 interface UseOAuthCallbackProps {
@@ -17,36 +19,61 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
     `${provider === 'google' ? '구글' : '카카오'} 로그인 처리 중...`
   );
 
+  // 토큰 저장 로직 분리
+  const saveTokens = useCallback(
+    (accessToken: string, refreshToken: string) => {
+      localStorage.setItem('authToken', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
+      setToken(accessToken);
+      setRefreshToken(refreshToken);
+    },
+    [setToken, setRefreshToken]
+  );
+
+  // 사용자 설정 로직 분리
+  const setupUser = useCallback(
+    (user: UserInfo) => {
+      setUser(user);
+    },
+    [setUser]
+  );
+
+  // 성공 처리 로직 분리
+  const handleSuccess = useCallback(() => {
+    setStatus('로그인 성공! 메인 페이지로 이동합니다...');
+    setTimeout(() => router.push('/'), 1000);
+  }, [router]);
+
+  // 에러 처리 로직 분리
+  const handleError = useCallback(
+    (error: unknown, context: string) => {
+      console.error(`${context}:`, error);
+      setStatus(
+        `${provider === 'google' ? '구글' : '카카오'} 로그인 처리 중 오류가 발생했습니다.`
+      );
+      setTimeout(() => router.push('/'), 2000);
+    },
+    [provider, router]
+  );
+
   const handleTokenReceived = useCallback(
     async (token: string) => {
       try {
         setStatus('사용자 정보를 확인하는 중...');
 
-        // 토큰 검증 및 사용자 정보 조회
         const userResponse = await authService.verifyToken(token);
-
-        if (userResponse.success && userResponse.data) {
-          localStorage.setItem('authToken', token);
-          setToken(token);
-          setUser(userResponse.data);
-
-          // 토큰 콜백의 경우 임시로 리프레시 토큰을 생성
-          const tempRefreshToken = `temp_refresh_${Date.now()}`;
-          localStorage.setItem('refreshToken', tempRefreshToken);
-          setRefreshToken(tempRefreshToken);
-
-          setStatus('로그인 성공! 메인 페이지로 이동합니다...');
-          setTimeout(() => router.push('/'), 1000);
-        } else {
+        if (!userResponse.success || !userResponse.data) {
           throw new Error('사용자 정보 조회 실패');
         }
+
+        saveTokens(token, `temp_refresh_${Date.now()}`);
+        setupUser(userResponse.data);
+        handleSuccess();
       } catch (error) {
-        console.error('토큰 처리 실패:', error);
-        setStatus('로그인 처리 중 오류가 발생했습니다.');
-        setTimeout(() => router.push('/'), 2000);
+        handleError(error, '토큰 처리 실패');
       }
     },
-    [router, setRefreshToken, setToken, setUser]
+    [saveTokens, setupUser, handleSuccess, handleError]
   );
 
   const handleAuthCode = useCallback(
@@ -56,33 +83,23 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
           `${provider === 'google' ? '구글' : '카카오'} 인증을 처리하는 중...`
         );
 
-        // authService를 통해 토큰 받기 (GET 요청)
         const tokenData =
           provider === 'google'
             ? await authService.getTokenFromGoogleCallback(code)
             : await authService.getTokenFromCallback(code);
 
         const { accessToken, refreshToken, user } = tokenData;
-        localStorage.setItem('authToken', accessToken);
-        localStorage.setItem('refreshToken', refreshToken);
-        setToken(accessToken);
-        setRefreshToken(refreshToken);
-        setUser(user);
-
-        setStatus('로그인 성공! 메인 페이지로 이동합니다...');
-        setTimeout(() => router.push('/'), 1000);
+        saveTokens(accessToken, refreshToken);
+        setupUser(user);
+        handleSuccess();
       } catch (error) {
-        console.error(
-          `${provider === 'google' ? '구글' : '카카오'} 인증 코드 처리 실패:`,
-          error
+        handleError(
+          error,
+          `${provider === 'google' ? '구글' : '카카오'} 인증 코드 처리 실패`
         );
-        setStatus(
-          `${provider === 'google' ? '구글' : '카카오'} 로그인 처리 중 오류가 발생했습니다.`
-        );
-        setTimeout(() => router.push('/'), 2000);
       }
     },
-    [provider, router, setRefreshToken, setToken, setUser]
+    [provider, saveTokens, setupUser, handleSuccess, handleError]
   );
 
   useEffect(() => {
