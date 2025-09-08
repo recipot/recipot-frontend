@@ -14,7 +14,7 @@ export function ReviewForm({ form }: ReviewFormProps) {
   const { feeling, handleFeelingClick, handleSubmit, pros, togglePro } = form;
 
   return (
-    <div className="xs:px-6 xs:pb-6 mx-auto flex w-full max-w-[342px] md:max-w-[400px] lg:max-w-[450px] flex-col items-center justify-center pb-2">
+    <div className="xs:px-6 xs:pb-6 mx-auto flex w-full max-w-[342px] flex-col items-center justify-center pb-2 md:max-w-[400px] lg:max-w-[450px]">
       <div className="flex w-full flex-col items-center">
         <form onSubmit={handleSubmit} className="flex w-full flex-col">
           <div

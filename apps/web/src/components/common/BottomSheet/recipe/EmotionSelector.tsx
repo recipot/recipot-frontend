@@ -24,7 +24,7 @@ function EmotionSelector({
         </h2>
       )}
       {showButtons && (
-        <div className="xs:gap-3 flex w-full items-center justify-center gap-3">
+        <div className="xs:gap-3 flex w-full max-w-[342px] items-center justify-center gap-3 md:max-w-[400px] lg:max-w-[450px]">
           <EmotionOptionButton
             label="별로예요"
             color="blue"
