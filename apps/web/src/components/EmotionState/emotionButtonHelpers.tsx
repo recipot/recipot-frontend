@@ -5,33 +5,60 @@ import {
   EmotionGoodIcon,
   EmotionNeutralIcon,
 } from '@/components/Icons';
-import type { EmotionColor } from '@/types/emotion.types';
 
-// 색상 관련 헬퍼 함수들
-export const getBaseColor = (color: EmotionColor, variant: string): string => {
-  if (variant === 'mood') {
-    switch (color) {
-      case 'blue':
-        return 'text-[#4164ae]';
-      case 'red':
-        return 'text-[#df6567]';
-      case 'yellow':
-        return 'text-[#ad7e06]';
-      default:
-        return 'text-gray-500';
-    }
-  }
+import type { EmotionColor } from './EmotionState';
 
-  switch (color) {
-    case 'blue':
-      return 'bg-[#D4E2FF] text-feel-tired-text';
-    case 'red':
-      return 'bg-[#FFE2E2] text-feel-free-text';
-    case 'yellow':
-      return 'bg-[#FDFAB0] text-feel-soso-text';
-    default:
-      return 'bg-gray-100 text-gray-500';
+// 색상 매핑 상수
+const FEEL_COLORS = {
+  free: 'hsl(var(--feel-free-text))',
+  soso: 'hsl(var(--feel-soso-text))',
+  tired: 'hsl(var(--feel-tired-text))',
+};
+
+const COLOR_CONFIG = {
+  blue: {
+    base: 'bg-feel-back-tired text-feel-tired-text',
+    component: EmotionBadIcon,
+    icon: FEEL_COLORS.tired,
+    iconMood: FEEL_COLORS.tired,
+    mood: 'text-feel-tired-text',
+  },
+  red: {
+    base: 'bg-feel-back-free text-feel-free-text',
+    component: EmotionGoodIcon,
+    icon: FEEL_COLORS.free,
+    iconMood: FEEL_COLORS.free,
+    mood: 'text-feel-free-text',
+  },
+  yellow: {
+    base: 'bg-feel-back-soso text-feel-soso-text',
+    component: EmotionNeutralIcon,
+    icon: FEEL_COLORS.soso,
+    iconMood: FEEL_COLORS.soso,
+    mood: 'text-feel-soso-text',
+  },
+} as const;
+
+// Variant 매핑 상수
+const VARIANT_CONFIG = {
+  default: 'rounded-2xl',
+  mood: 'rounded-none',
+} as const;
+
+// 통합된 헬퍼 함수들
+export const getBaseColor = (color: EmotionColor, variant: string) => {
+  if (color === 'blue') {
+    return variant === 'mood' ? COLOR_CONFIG.blue.mood : COLOR_CONFIG.blue.base;
   }
+  if (color === 'red') {
+    return variant === 'mood' ? COLOR_CONFIG.red.mood : COLOR_CONFIG.red.base;
+  }
+  if (color === 'yellow') {
+    return variant === 'mood'
+      ? COLOR_CONFIG.yellow.mood
+      : COLOR_CONFIG.yellow.base;
+  }
+  return 'bg-gray-100 text-gray-500';
 };
 
 export const getIconColor = (
@@ -41,57 +68,83 @@ export const getIconColor = (
 ) => {
   if (selected === false) return '#adb5bd';
 
-  if (variant === 'mood') {
-    const moodColors = { blue: '#4164ae', red: '#df6567', yellow: '#ad7e06' };
-    return selected ? moodColors[color] : '#adb5bd';
+  if (color === 'blue') {
+    return variant === 'mood' && selected
+      ? COLOR_CONFIG.blue.iconMood
+      : COLOR_CONFIG.blue.icon;
   }
-
-  const defaultColors = {
-    blue: 'hsl(var(--feel-tired-text))',
-    red: 'hsl(var(--feel-free-text))',
-    yellow: 'hsl(var(--feel-soso-text))',
-  };
-  return defaultColors[color] || '#9CA3AF';
-};
-
-// 스타일 클래스 헬퍼 함수들
-export const getSizeClasses = (size: string) => {
-  const sizeMap = {
-    lg: {
-      container: 'h-[116px] w-[93px] gap-[8px] text-base',
-      icon: 'text-3xl',
-      text: 'text-base',
-    },
-    md: {
-      container: 'h-[94px] w-[106px] gap-[6px] text-sm',
-      icon: 'text-2xl',
-      text: 'text-sm',
-    },
-    sm: {
-      container: 'h-[80px] w-[85px] gap-[4px] text-xs',
-      icon: 'text-xl',
-      text: 'text-xs',
-    },
-  };
-  return sizeMap[size as keyof typeof sizeMap] || sizeMap.md;
+  if (color === 'red') {
+    return variant === 'mood' && selected
+      ? COLOR_CONFIG.red.iconMood
+      : COLOR_CONFIG.red.icon;
+  }
+  if (color === 'yellow') {
+    return variant === 'mood' && selected
+      ? COLOR_CONFIG.yellow.iconMood
+      : COLOR_CONFIG.yellow.icon;
+  }
+  return '#9CA3AF';
 };
 
 export const getVariantClasses = (variant: string) => {
-  const variantMap = {
-    compact: 'rounded-2xl',
-    default: 'rounded-2xl',
-    mood: 'rounded-none',
-    pill: 'rounded-full',
-  };
-  return variantMap[variant as keyof typeof variantMap] || 'rounded-2xl';
+  if (variant === 'mood') return VARIANT_CONFIG.mood;
+  return VARIANT_CONFIG.default;
 };
 
-// 아이콘 렌더링 헬퍼
 export const renderIcon = (color: EmotionColor, iconColor: string) => {
-  const iconMap = {
-    blue: <EmotionBadIcon color={iconColor} />,
-    red: <EmotionGoodIcon color={iconColor} />,
-    yellow: <EmotionNeutralIcon color={iconColor} />,
+  if (color === 'blue') {
+    const IconComponent = COLOR_CONFIG.blue.component;
+    return <IconComponent color={iconColor} />;
+  }
+  if (color === 'red') {
+    const IconComponent = COLOR_CONFIG.red.component;
+    return <IconComponent color={iconColor} />;
+  }
+  if (color === 'yellow') {
+    const IconComponent = COLOR_CONFIG.yellow.component;
+    return <IconComponent color={iconColor} />;
+  }
+  return null;
+};
+
+// MoodVariantButton용 통합 색상 함수
+export const getMoodColors = (color: EmotionColor, isSelected: boolean) => {
+  const selectedColors = {
+    blue: {
+      bg: 'hsl(var(--feel-back-tired))',
+      border: FEEL_COLORS.tired,
+      icon: FEEL_COLORS.tired,
+      text: FEEL_COLORS.tired,
+    },
+    red: {
+      bg: 'hsl(var(--feel-back-free))',
+      border: FEEL_COLORS.free,
+      icon: FEEL_COLORS.free,
+      text: FEEL_COLORS.free,
+    },
+    yellow: {
+      bg: 'hsl(var(--feel-back-soso))',
+      border: FEEL_COLORS.soso,
+      icon: FEEL_COLORS.soso,
+      text: FEEL_COLORS.soso,
+    },
   };
-  return iconMap[color] || null;
+
+  const unselectedColors = {
+    bg: 'hsl(var(--gray-50))',
+    border: 'hsl(var(--gray-200))',
+    icon: 'hsl(var(--gray-500))',
+    text: 'hsl(var(--gray-600))',
+  };
+
+  if (color === 'blue') {
+    return isSelected ? selectedColors.blue : unselectedColors;
+  }
+  if (color === 'red') {
+    return isSelected ? selectedColors.red : unselectedColors;
+  }
+  if (color === 'yellow') {
+    return isSelected ? selectedColors.yellow : unselectedColors;
+  }
+  return isSelected ? selectedColors.blue : unselectedColors;
 };

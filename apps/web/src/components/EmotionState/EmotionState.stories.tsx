@@ -8,10 +8,6 @@ const meta: Meta<typeof EmotionState> = {
       control: { type: 'text' },
       description: '추가 CSS 클래스를 설정합니다.',
     },
-    disabled: {
-      control: { type: 'boolean' },
-      description: '컴포넌트의 비활성화 상태를 설정합니다.',
-    },
     initialMood: {
       control: { type: 'select' },
       description: '초기 선택된 감정을 설정합니다.',

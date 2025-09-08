@@ -1,163 +1,103 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 
-import {
-  EmotionBadIcon,
-  EmotionGoodIcon,
-  EmotionNeutralIcon,
-} from '@/components/Icons';
 import { cn } from '@/lib/utils';
-import type { EmotionColor } from '@/types/emotion.types';
 
-import type { Variants } from 'framer-motion';
+import { getMoodColors, renderIcon } from './emotionButtonHelpers';
+import { EMOTION_ANIMATION_VARIANTS, getIconOffset } from './emotionConstants';
 
-const BUTTON_VARIANTS: Variants = {
-  hover: { scale: 1.05 },
-  initial: { scale: 1 },
-  tap: { scale: 0.95 },
-};
-
-const renderIcon = (color: EmotionColor, iconColor: string) => {
-  const iconMap = {
-    blue: <EmotionBadIcon color={iconColor} />,
-    red: <EmotionGoodIcon color={iconColor} />,
-    yellow: <EmotionNeutralIcon color={iconColor} />,
-  };
-  return iconMap[color] || null;
-};
+import type { EmotionColor } from './EmotionState';
 
 interface MoodVariantButtonProps {
   color: EmotionColor;
   selected: boolean | undefined;
-  disabled: boolean | undefined;
   onClick?: () => void;
   label: string;
   className?: string;
 }
 
+// 색상 및 스타일 헬퍼 함수들
+
 const MoodVariantButton: React.FC<MoodVariantButtonProps> = ({
   className,
   color,
-  disabled,
   label,
   onClick,
   selected,
 }) => {
   const isSelected = selected === true;
-  const isDisabled = disabled ?? selected === false;
 
-  const moodColors = {
-    blue: {
-      bg: isSelected ? '#d4e2ff' : '#f8f9fa',
-      border: isSelected ? '#4164ae' : '#e9ecef',
-      icon: isSelected ? '#4164ae' : '#adb5bd',
-      text: isSelected ? '#4164ae' : '#6c757d',
-    },
-    red: {
-      bg: isSelected ? '#ffe0e1' : '#f8f9fa',
-      border: isSelected ? '#df6567' : '#e9ecef',
-      icon: isSelected ? '#df6567' : '#adb5bd',
-      text: isSelected ? '#df6567' : '#6c757d',
-    },
-    yellow: {
-      bg: isSelected ? '#fdfab0' : '#f8f9fa',
-      border: isSelected ? '#ad7e06' : '#e9ecef',
-      icon: isSelected ? '#ad7e06' : '#adb5bd',
-      text: isSelected ? '#ad7e06' : '#6c757d',
-    },
-  };
+  const colors = getMoodColors(color, isSelected);
+  const offset = getIconOffset(color, isSelected);
 
-  const colors = moodColors[color] || moodColors.blue;
+  const moodIconVariants = useMemo(
+    () => ({
+      ...EMOTION_ANIMATION_VARIANTS.moodIcon,
+      initial: {
+        ...EMOTION_ANIMATION_VARIANTS.moodIcon.initial,
+        x: offset.x,
+        y: offset.y,
+      },
+      selected: {
+        ...EMOTION_ANIMATION_VARIANTS.moodIcon.selected,
+        x: offset.x,
+        y: offset.y,
+      },
+      unselected: {
+        ...EMOTION_ANIMATION_VARIANTS.moodIcon.unselected,
+        x: offset.x,
+        y: offset.y,
+      },
+    }),
+    [offset.x, offset.y]
+  );
 
-  const circleStyle = {
-    backgroundColor: colors.bg,
-    borderColor: colors.border,
-    borderWidth: 1,
-    height: isSelected ? 72 : 60,
-    marginBottom: 8,
-    opacity: 0.95,
-    width: isSelected ? 72 : 60,
-  };
+  const circleStyle = useMemo(
+    () => ({
+      backgroundColor: colors.bg,
+      borderColor: colors.border,
+      borderWidth: isSelected ? 1.26 : 1,
+      height: isSelected ? 72 : 60, // xs: 76/64, sm: 80/68, md: 88/76, lg: 96/84
+      opacity: 0.95,
+      padding: 15,
+      width: isSelected ? 72 : 60, // xs: 76/64, sm: 80/68, md: 88/76, lg: 96/84
+    }),
+    [colors.bg, colors.border, isSelected]
+  );
 
-  const textStyle = {
-    color: colors.text,
-  };
-
-  const getIconOffset = () => {
-    const offsetMap = {
-      blue: isSelected ? { x: -9, y: -9 } : { x: -3, y: -3 },
-      red: isSelected ? { x: -9, y: -9 } : { x: -3, y: -3 },
-      yellow: isSelected ? { x: 0, y: -9 } : { x: 0, y: 0 },
-    };
-    return offsetMap[color] || { x: -9, y: -9 };
-  };
-
-  const offset = getIconOffset();
-
-  const moodIconVariants: Variants = {
-    initial: { scale: 1, x: offset.x, y: offset.y },
-    selected: { scale: 1.1, x: offset.x, y: offset.y },
-    unselected: { scale: 1, x: offset.x, y: offset.y },
-  };
-
-  const moodCircleVariants: Variants = {
-    initial: { borderRadius: isSelected ? 36 : 30, scale: 1 },
-    selected: { borderRadius: 36, scale: 1.2 },
-    unselected: { borderRadius: 30, scale: 1 },
-  };
-
-  const moodTextVariants: Variants = {
-    initial: { opacity: 1 },
-    selected: { opacity: 1, scale: 1.05 },
-    unselected: { opacity: 1, scale: 1 },
-  };
+  const textStyle = useMemo(() => ({ color: colors.text }), [colors.text]);
 
   return (
     <motion.button
       type="button"
       onClick={onClick}
-      disabled={isDisabled}
-      className={cn(
-        'flex flex-col items-center space-y-2 disabled:cursor-not-allowed disabled:opacity-50',
-        className
-      )}
+      className={cn('flex flex-col items-center space-y-2', className)}
       aria-pressed={!!selected}
-      variants={BUTTON_VARIANTS}
+      variants={EMOTION_ANIMATION_VARIANTS.button}
       initial="initial"
-      whileHover={!isDisabled ? 'hover' : 'initial'}
-      whileTap={!isDisabled ? 'tap' : 'initial'}
-      transition={{ duration: 0.2 }}
     >
       <motion.div
         className="flex items-center justify-center rounded-full border"
         style={circleStyle}
-        variants={moodCircleVariants}
+        variants={EMOTION_ANIMATION_VARIANTS.moodCircle}
         initial="initial"
         animate={isSelected ? 'selected' : 'unselected'}
-        transition={{
-          damping: 20,
-          duration: 0.3,
-          stiffness: 300,
-          type: 'spring' as const,
-        }}
       >
         <motion.div
           className="relative"
           variants={moodIconVariants}
           initial="initial"
           animate={isSelected ? 'selected' : 'unselected'}
-          transition={{ delay: isSelected ? 0.1 : 0, duration: 0.2 }}
         >
           {renderIcon(color, colors.icon)}
         </motion.div>
       </motion.div>
       <motion.span
-        className="text-sm font-semibold"
+        className="xs:text-base mt-[6px] text-sm sm:text-lg md:text-xl"
         style={textStyle}
-        variants={moodTextVariants}
+        variants={EMOTION_ANIMATION_VARIANTS.moodText}
         initial="initial"
         animate={isSelected ? 'selected' : 'unselected'}
-        transition={{ delay: isSelected ? 0.1 : 0, duration: 0.2 }}
       >
         {label}
       </motion.span>
