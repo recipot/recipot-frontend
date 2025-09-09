@@ -66,8 +66,23 @@ export const getIconColor = (
   selected: boolean | undefined,
   variant: string
 ) => {
-  if (selected === false) return '#adb5bd';
+  // 초기 상태 (아무것도 선택되지 않은 상태) - 더 진한 색상
+  if (selected === undefined) {
+    if (color === 'blue') return 'rgba(59, 130, 246, 0.6)'; // blue with medium opacity
+    if (color === 'red') return 'rgba(239, 68, 68, 0.6)'; // red with medium opacity
+    if (color === 'yellow') return 'rgba(234, 179, 8, 0.6)'; // yellow with medium opacity
+    return '#9CA3AF';
+  }
 
+  // 선택되지 않은 상태 (다른 감정이 선택된 상태) - 더 연한 색상
+  if (selected === false) {
+    if (color === 'blue') return 'rgba(59, 130, 246, 0.3)'; // blue with low opacity
+    if (color === 'red') return 'rgba(239, 68, 68, 0.3)'; // red with low opacity
+    if (color === 'yellow') return 'rgba(234, 179, 8, 0.3)'; // yellow with low opacity
+    return '#adb5bd';
+  }
+
+  // 선택된 상태
   if (color === 'blue') {
     return variant === 'mood' && selected
       ? COLOR_CONFIG.blue.iconMood
@@ -107,44 +122,54 @@ export const renderIcon = (color: EmotionColor, iconColor: string) => {
   return null;
 };
 
+// 색상 설정 상수들
+const SELECTED_COLORS = {
+  blue: {
+    bg: 'hsl(var(--feel-back-tired))',
+    border: FEEL_COLORS.tired,
+    icon: FEEL_COLORS.tired,
+    text: FEEL_COLORS.tired,
+  },
+  red: {
+    bg: 'hsl(var(--feel-back-free))',
+    border: FEEL_COLORS.free,
+    icon: FEEL_COLORS.free,
+    text: FEEL_COLORS.free,
+  },
+  yellow: {
+    bg: 'hsl(var(--feel-back-soso))',
+    border: FEEL_COLORS.soso,
+    icon: FEEL_COLORS.soso,
+    text: FEEL_COLORS.soso,
+  },
+};
+
+const INITIAL_COLORS = {
+  blue: SELECTED_COLORS.blue,
+  red: SELECTED_COLORS.red,
+  yellow: SELECTED_COLORS.yellow,
+};
+
+const UNSELECTED_COLOR = {
+  bg: 'hsl(var(--gray-100))',
+  border: 'hsl(var(--gray-600))',
+  icon: 'hsl(var(--gray-600))',
+  text: 'hsl(var(--gray-500))',
+};
+
+const UNSELECTED_COLORS = {
+  blue: UNSELECTED_COLOR,
+  red: UNSELECTED_COLOR,
+  yellow: UNSELECTED_COLOR,
+};
+
 // MoodVariantButton용 통합 색상 함수
-export const getMoodColors = (color: EmotionColor, isSelected: boolean) => {
-  const selectedColors = {
-    blue: {
-      bg: 'hsl(var(--feel-back-tired))',
-      border: FEEL_COLORS.tired,
-      icon: FEEL_COLORS.tired,
-      text: FEEL_COLORS.tired,
-    },
-    red: {
-      bg: 'hsl(var(--feel-back-free))',
-      border: FEEL_COLORS.free,
-      icon: FEEL_COLORS.free,
-      text: FEEL_COLORS.free,
-    },
-    yellow: {
-      bg: 'hsl(var(--feel-back-soso))',
-      border: FEEL_COLORS.soso,
-      icon: FEEL_COLORS.soso,
-      text: FEEL_COLORS.soso,
-    },
-  };
-
-  const unselectedColors = {
-    bg: 'hsl(var(--gray-50))',
-    border: 'hsl(var(--gray-200))',
-    icon: 'hsl(var(--gray-500))',
-    text: 'hsl(var(--gray-600))',
-  };
-
-  if (color === 'blue') {
-    return isSelected ? selectedColors.blue : unselectedColors;
-  }
-  if (color === 'red') {
-    return isSelected ? selectedColors.red : unselectedColors;
-  }
-  if (color === 'yellow') {
-    return isSelected ? selectedColors.yellow : unselectedColors;
-  }
-  return isSelected ? selectedColors.blue : unselectedColors;
+export const getMoodColors = (
+  color: EmotionColor,
+  selected: boolean | undefined
+) => {
+  if (selected === true) return SELECTED_COLORS[color] || SELECTED_COLORS.blue;
+  if (selected === false)
+    return UNSELECTED_COLORS[color] || UNSELECTED_COLORS.blue;
+  return INITIAL_COLORS[color] || INITIAL_COLORS.blue;
 };
