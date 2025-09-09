@@ -5,7 +5,7 @@ module.exports = {
   theme: {
     extend: {
       screens: {
-        xs: '320px',
+        xs: { max: '320px' },
       },
       fontFamily: {
         pretendard: ['var(--font-pretendard)'],

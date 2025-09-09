@@ -1,7 +1,5 @@
 import { useState } from 'react';
 
-import { Button } from '@/components/common/Button';
-
 import { BottomSheet } from '../BottomSheet';
 import EmotionSelectionBottomSheet from '../recipe/EmotionSelectionBottomSheet';
 
@@ -49,11 +47,11 @@ type Story = StoryObj<typeof BottomSheet>;
 // 감정 선택 바텀시트
 export const EmotionSelection: Story = {
   render: function EmotionSelectionStory() {
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(true);
 
     return (
       <>
-        <Button onClick={() => setOpen(true)}>감정 선택 바텀시트</Button>
+        {/* <Button onClick={() => setOpen(true)}>감정 선택 바텀시트</Button> */}
         <EmotionSelectionBottomSheet open={open} onOpenChange={setOpen} />
       </>
     );
@@ -75,11 +73,11 @@ export const BasicStyle: Story = {
     },
   },
   render: function BasicStyleStory() {
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(true);
 
     return (
       <>
-        <Button onClick={() => setOpen(true)}>기본 스타일 바텀시트</Button>
+        {/* <Button onClick={() => setOpen(true)}>기본 스타일 바텀시트</Button> */}
         <SimpleBottomSheet open={open} onOpenChange={setOpen} />
       </>
     );
