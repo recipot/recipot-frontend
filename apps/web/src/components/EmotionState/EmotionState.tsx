@@ -30,7 +30,10 @@ const EmotionState: React.FC<EmotionStateProps> = ({
   };
 
   const getMoodState = (mood: MoodType): MoodState => {
-    return selectedMood === mood ? 'selected' : 'default';
+    if (selectedMood === null) {
+      return 'default'; // 아무것도 선택되지 않은 상태
+    }
+    return selectedMood === mood ? 'selected' : 'disabled'; // 선택된 상태와 비활성화된 상태
   };
 
   return (
@@ -43,17 +46,26 @@ const EmotionState: React.FC<EmotionStateProps> = ({
 
       {/* Default States Row */}
       <div className="xs:space-x-6 flex space-x-4 sm:space-x-8 md:space-x-10">
-        {EMOTION_OPTIONS.mood.map(({ color, label, mood }) => (
-          <EmotionOptionButton
-            key={mood}
-            label={label}
-            color={color}
-            selected={getMoodState(mood) === 'selected'}
-            onClick={() => handleMoodClick(mood)}
-            variant="mood"
-            enableAnimation
-          />
-        ))}
+        {EMOTION_OPTIONS.mood.map(({ color, label, mood }) => {
+          const moodState = getMoodState(mood);
+          return (
+            <EmotionOptionButton
+              key={mood}
+              label={label}
+              color={color}
+              selected={
+                moodState === 'selected'
+                  ? true
+                  : moodState === 'disabled'
+                    ? false
+                    : undefined
+              }
+              onClick={() => handleMoodClick(mood)}
+              variant="mood"
+              enableAnimation
+            />
+          );
+        })}
       </div>
     </div>
   );

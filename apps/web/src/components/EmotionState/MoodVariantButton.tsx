@@ -26,8 +26,7 @@ const MoodVariantButton: React.FC<MoodVariantButtonProps> = ({
   selected,
 }) => {
   const isSelected = selected === true;
-
-  const colors = getMoodColors(color, isSelected);
+  const colors = getMoodColors(color, selected);
   const offset = getIconOffset(color, isSelected);
 
   const moodIconVariants = useMemo(
@@ -95,7 +94,6 @@ const MoodVariantButton: React.FC<MoodVariantButtonProps> = ({
       <motion.span
         className="xs:text-base mt-[6px] text-sm sm:text-lg md:text-xl"
         style={textStyle}
-        variants={EMOTION_ANIMATION_VARIANTS.moodText}
         initial="initial"
         animate={isSelected ? 'selected' : 'unselected'}
       >

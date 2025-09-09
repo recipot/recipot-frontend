@@ -122,54 +122,83 @@ export const renderIcon = (color: EmotionColor, iconColor: string) => {
   return null;
 };
 
-// 색상 설정 상수들
-const SELECTED_COLORS = {
-  blue: {
-    bg: 'hsl(var(--feel-back-tired))',
-    border: FEEL_COLORS.tired,
-    icon: FEEL_COLORS.tired,
-    text: FEEL_COLORS.tired,
-  },
-  red: {
-    bg: 'hsl(var(--feel-back-free))',
-    border: FEEL_COLORS.free,
-    icon: FEEL_COLORS.free,
-    text: FEEL_COLORS.free,
-  },
-  yellow: {
-    bg: 'hsl(var(--feel-back-soso))',
-    border: FEEL_COLORS.soso,
-    icon: FEEL_COLORS.soso,
-    text: FEEL_COLORS.soso,
-  },
-};
-
-const INITIAL_COLORS = {
-  blue: SELECTED_COLORS.blue,
-  red: SELECTED_COLORS.red,
-  yellow: SELECTED_COLORS.yellow,
-};
-
-const UNSELECTED_COLOR = {
-  bg: 'hsl(var(--gray-100))',
-  border: 'hsl(var(--gray-600))',
-  icon: 'hsl(var(--gray-600))',
-  text: 'hsl(var(--gray-500))',
-};
-
-const UNSELECTED_COLORS = {
-  blue: UNSELECTED_COLOR,
-  red: UNSELECTED_COLOR,
-  yellow: UNSELECTED_COLOR,
-};
-
 // MoodVariantButton용 통합 색상 함수
 export const getMoodColors = (
   color: EmotionColor,
   selected: boolean | undefined
 ) => {
-  if (selected === true) return SELECTED_COLORS[color] || SELECTED_COLORS.blue;
-  if (selected === false)
-    return UNSELECTED_COLORS[color] || UNSELECTED_COLORS.blue;
-  return INITIAL_COLORS[color] || INITIAL_COLORS.blue;
+  const selectedColors = {
+    blue: {
+      bg: 'hsl(var(--feel-back-tired))',
+      border: FEEL_COLORS.tired,
+      icon: FEEL_COLORS.tired,
+      text: FEEL_COLORS.tired,
+    },
+    red: {
+      bg: 'hsl(var(--feel-back-free))',
+      border: FEEL_COLORS.free,
+      icon: FEEL_COLORS.free,
+      text: FEEL_COLORS.free,
+    },
+    yellow: {
+      bg: 'hsl(var(--feel-back-soso))',
+      border: FEEL_COLORS.soso,
+      icon: FEEL_COLORS.soso,
+      text: FEEL_COLORS.soso,
+    },
+  };
+
+  // 초기 상태 (아무것도 선택되지 않은 상태) - 더 진한 색상
+  const initialColors = {
+    blue: {
+      bg: 'hsl(var(--feel-back-tired))',
+      border: FEEL_COLORS.tired,
+      icon: FEEL_COLORS.tired,
+      text: FEEL_COLORS.tired,
+    },
+    red: {
+      bg: 'hsl(var(--feel-back-free))',
+      border: FEEL_COLORS.free,
+      icon: FEEL_COLORS.free,
+      text: FEEL_COLORS.free,
+    },
+    yellow: {
+      bg: 'hsl(var(--feel-back-soso))',
+      border: FEEL_COLORS.soso,
+      icon: FEEL_COLORS.soso,
+      text: FEEL_COLORS.soso,
+    },
+  };
+
+  const UNSELECTED_COLOR = {
+    bg: 'hsl(var(--gray-100))',
+    border: 'hsl(var(--gray-600))',
+    icon: 'hsl(var(--gray-600))',
+    text: 'hsl(var(--gray-700))',
+  };
+
+  const unselectedColors = {
+    blue: UNSELECTED_COLOR,
+    red: UNSELECTED_COLOR,
+    yellow: UNSELECTED_COLOR,
+  };
+
+  if (color === 'blue') {
+    if (selected === true) return selectedColors.blue;
+    if (selected === false) return unselectedColors.blue;
+    return initialColors.blue;
+  }
+  if (color === 'red') {
+    if (selected === true) return selectedColors.red;
+    if (selected === false) return unselectedColors.red;
+    return initialColors.red;
+  }
+  if (color === 'yellow') {
+    if (selected === true) return selectedColors.yellow;
+    if (selected === false) return unselectedColors.yellow;
+    return initialColors.yellow;
+  }
+  if (selected === true) return selectedColors.blue;
+  if (selected === false) return unselectedColors.blue;
+  return initialColors.blue;
 };
