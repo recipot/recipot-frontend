@@ -107,10 +107,10 @@ export default function EmotionSelectionBottomSheet({
                 alt="양배추 계란 샐러드"
                 width={72}
                 height={72}
-                className="rounded-[10.67px]"
+                className="mb-5 rounded-[10.67px]"
               />
             </div>
-            <div className="xs:mt-5 mt-2 w-full max-w-[342px] divide-y divide-dashed divide-neutral-100 px-6 md:max-w-[400px] lg:max-w-[450px]">
+            <div className="xs:mt-5 mt-2 w-full max-w-[342px] divide-y divide-dashed divide-neutral-300 px-3 md:max-w-[400px] lg:max-w-[450px]">
               <div />
               <div />
             </div>

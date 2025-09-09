@@ -27,7 +27,7 @@ export function RecipeProsSelector({ onTogglePro, pros }: ProsSectionProps) {
   };
 
   return (
-    <div className="w-full max-w-[342px] md:max-w-[400px] lg:max-w-[450px]">
+    <div className="mx-auto w-full max-w-[342px] md:max-w-[400px] lg:max-w-[450px]">
       <div className="bg-feel-back-free text-feel-free-text text-15sb xs:mt-5 xs:mb-6 xs:py-5 mt-3 mb-5 flex items-center justify-center rounded-2xl py-5 text-center">
         <EmotionGoodIcon className="mr-2" />
         <span>또 해먹을래요</span>

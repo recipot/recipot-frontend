@@ -26,11 +26,11 @@ function EmotionOptionButton({
   const getBaseColor = (color: FeelingPillProps['color']): string => {
     switch (color) {
       case 'blue':
-        return 'bg-[#D4E2FF] text-[#4164ae]';
+        return 'bg-[#D4E2FF] text-feel-tired-text';
       case 'red':
-        return 'bg-[#FFE0E1] text-[#df6567]';
+        return 'bg-[#FFE0E1] text-feel-free-text';
       case 'yellow':
-        return 'bg-[#FDFAB0] text-[#ad7e06]';
+        return 'bg-[#FDFAB0] text-feel-soso-text';
       default:
         return 'bg-gray-100 text-gray-500';
     }
