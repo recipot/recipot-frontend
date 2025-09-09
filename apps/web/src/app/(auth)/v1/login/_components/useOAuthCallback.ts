@@ -19,6 +19,14 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
     `${provider === 'google' ? '구글' : '카카오'} 로그인 처리 중...`
   );
 
+  // 페이지 이동 로직 분리
+  const navigateWithDelay = useCallback(
+    (delay: number = 1000) => {
+      setTimeout(() => router.push('/'), delay);
+    },
+    [router]
+  );
+
   // 토큰 저장 로직 분리
   const saveTokens = useCallback(
     (accessToken: string, refreshToken: string) => {
@@ -41,8 +49,8 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
   // 성공 처리 로직 분리
   const handleSuccess = useCallback(() => {
     setStatus('로그인 성공! 메인 페이지로 이동합니다...');
-    setTimeout(() => router.push('/'), 1000);
-  }, [router]);
+    navigateWithDelay(1000);
+  }, [navigateWithDelay]);
 
   // 에러 처리 로직 분리
   const handleError = useCallback(
@@ -51,9 +59,9 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
       setStatus(
         `${provider === 'google' ? '구글' : '카카오'} 로그인 처리 중 오류가 발생했습니다.`
       );
-      setTimeout(() => router.push('/'), 2000);
+      navigateWithDelay(2000);
     },
-    [provider, router]
+    [provider, navigateWithDelay]
   );
 
   const handleTokenReceived = useCallback(
@@ -111,7 +119,7 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
       setStatus(
         `${provider === 'google' ? '구글' : '카카오'} 로그인에 실패했습니다.`
       );
-      setTimeout(() => router.push('/'), 2000);
+      navigateWithDelay(2000);
       return;
     }
 
@@ -125,9 +133,15 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
       setStatus(
         `${provider === 'google' ? '구글' : '카카오'} 인증 정보를 찾을 수 없습니다.`
       );
-      setTimeout(() => router.push('/'), 2000);
+      navigateWithDelay(2000);
     }
-  }, [searchParams, router, handleAuthCode, handleTokenReceived, provider]);
+  }, [
+    searchParams,
+    handleAuthCode,
+    handleTokenReceived,
+    provider,
+    navigateWithDelay,
+  ]);
 
   return { status };
 }
