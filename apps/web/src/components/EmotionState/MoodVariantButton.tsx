@@ -16,8 +16,6 @@ interface MoodVariantButtonProps {
   className?: string;
 }
 
-// 색상 및 스타일 헬퍼 함수들
-
 const MoodVariantButton: React.FC<MoodVariantButtonProps> = ({
   className,
   color,
@@ -56,10 +54,10 @@ const MoodVariantButton: React.FC<MoodVariantButtonProps> = ({
       backgroundColor: colors.bg,
       borderColor: colors.border,
       borderWidth: isSelected ? 1.26 : 1,
-      height: isSelected ? 72 : 60, // xs: 76/64, sm: 80/68, md: 88/76, lg: 96/84
+      height: isSelected ? 72 : 60,
       opacity: 0.95,
       padding: 15,
-      width: isSelected ? 72 : 60, // xs: 76/64, sm: 80/68, md: 88/76, lg: 96/84
+      width: isSelected ? 72 : 60,
     }),
     [colors.bg, colors.border, isSelected]
   );
