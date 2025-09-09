@@ -28,7 +28,7 @@ export const EMOTION_ANIMATION_VARIANTS = {
   } as Variants,
   icon: {
     initial: { scale: 1 },
-    selected: { scale: 1.1, transition: { duration: 0.2, ease: 'easeOut' } },
+    selected: { scale: 1.2, transition: { duration: 0.2, ease: 'easeOut' } },
     unselected: { scale: 1, transition: { duration: 0.2, ease: 'easeOut' } },
   } as Variants,
   moodCircle: {
@@ -46,36 +46,10 @@ export const EMOTION_ANIMATION_VARIANTS = {
   moodIcon: {
     initial: { scale: 1 },
     selected: {
-      scale: 1.1,
+      scale: 1.2,
       transition: { duration: 0.2, ease: 'easeOut' },
     },
     unselected: {
-      scale: 1,
-      transition: { duration: 0.2, ease: 'easeOut' },
-    },
-  } as Variants,
-  moodText: {
-    initial: { opacity: 1 },
-    selected: {
-      opacity: 1,
-      scale: 1.05,
-      transition: { duration: 0.2, ease: 'easeOut' },
-    },
-    unselected: {
-      opacity: 1,
-      scale: 1,
-      transition: { duration: 0.2, ease: 'easeOut' },
-    },
-  } as Variants,
-  text: {
-    initial: { opacity: 1, scale: 1 },
-    selected: {
-      opacity: 1,
-      scale: 1.05,
-      transition: { duration: 0.2, ease: 'easeOut' },
-    },
-    unselected: {
-      opacity: 1,
       scale: 1,
       transition: { duration: 0.2, ease: 'easeOut' },
     },
