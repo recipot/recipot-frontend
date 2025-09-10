@@ -17,11 +17,6 @@ function EmotionSelector({
   const isGoodSelected = selectedFeeling === 'good';
   const showContent = !isGoodSelected;
 
-  const getButtonSelected = (feeling: string) => {
-    if (selectedFeeling === null) return undefined;
-    return selectedFeeling === feeling;
-  };
-
   return (
     <div className="xs:space-y-6 flex w-full flex-col items-center space-y-4 sm:space-y-8 md:space-y-10">
       {showContent && (
@@ -37,7 +32,7 @@ function EmotionSelector({
               label={label}
               color={color}
               onClick={() => onFeelingSelect(feeling)}
-              selected={getButtonSelected(feeling)}
+              selected={selectedFeeling === feeling}
             />
           ))}
         </div>
