@@ -114,7 +114,7 @@ export const useRecipeRecommend = (): RecipeRecommendReturn => {
       // 배열이 비어있으면 false로 처리
       const isCurrentlyLiked = likedRecipes[index] ?? false;
 
-      likeMutation.mutate({
+      await likeMutation.mutateAsync({
         index,
         isLiked: isCurrentlyLiked,
         recipeId,
