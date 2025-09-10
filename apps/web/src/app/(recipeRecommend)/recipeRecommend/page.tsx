@@ -1,30 +1,54 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import 'swiper/css';
+import 'swiper/css/effect-cards';
+import './styles.css';
+
+import React from 'react';
 import { useRouter } from 'next/navigation';
+import { EffectCards, Pagination } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
 
 import { Button } from '@/components/common/Button';
 import { BackIcon, RefreshIcon } from '@/components/Icons';
 import { RecipeCard } from '@/components/RecipeCard';
-import type { CarouselApi } from '@/components/ui/carousel';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from '@/components/ui/carousel';
 import { useRecipeRecommend } from '@/hooks/useRecipeRecommend';
 
-// Carousel 설정
-const carouselOpts = {
-  align: 'center' as const,
-  loop: false,
-};
+const SWIPER_MODULES = [EffectCards, Pagination];
+
+// Swiper 스타일 상수
+const swiperStyles = {
+  '--swiper-navigation-color': '#212529',
+  '--swiper-pagination-color': '#212529',
+} as React.CSSProperties;
+
+// 로딩 컴포넌트
+const LoadingState = () => (
+  <div className="flex h-screen flex-col items-center justify-center">
+    <div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600" />
+    <p className="text-gray-600">레시피를 불러오는 중...</p>
+  </div>
+);
+
+// 에러 컴포넌트
+const ErrorState = ({
+  error,
+  onRetry,
+}: {
+  error?: Error | null;
+  onRetry: () => void;
+}) => (
+  <div className="flex h-screen items-center justify-center">
+    <div className="text-center">
+      <p className="mb-4 text-red-600">
+        {error?.message ?? '레시피를 불러오는데 실패했습니다.'}
+      </p>
+      <Button onClick={onRetry}>다시 시도</Button>
+    </div>
+  </div>
+);
 
 export default function RecipeRecommend() {
-  const [api, setApi] = useState<CarouselApi>();
-  const [current, setCurrent] = useState(0);
-  const [count, setCount] = useState(0);
-
   const router = useRouter();
 
   const {
@@ -39,41 +63,36 @@ export default function RecipeRecommend() {
     toggleLike,
   } = useRecipeRecommend();
 
-  useEffect(() => {
-    if (!api) return;
-
-    setCount(api.scrollSnapList().length);
-    setCurrent(api.selectedScrollSnap() + 1);
-
-    api.on('select', () => {
-      setCurrent(api.selectedScrollSnap() + 1);
-    });
-  }, [api, recipes]);
+  // Swiper 설정 상수
+  const SWIPER_CONFIG = {
+    allowTouchMove: true,
+    cardsEffect: {
+      perSlideOffset: 12,
+      perSlideRotate: 3,
+      rotate: true,
+      slideShadows: false,
+    },
+    effect: 'cards' as const,
+    grabCursor: true,
+    pagination: {
+      clickable: true,
+      el: '.recipe-pagination',
+    },
+    resistanceRatio: 0.85,
+    slidesPerView: 1,
+    spaceBetween: 0,
+    threshold: 5,
+    touchRatio: 1,
+  };
 
   // 로딩 상태
   if (isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="text-center">
-          <div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600" />
-          <p className="text-gray-600">레시피를 불러오는 중...</p>
-        </div>
-      </div>
-    );
+    return <LoadingState />;
   }
 
   // 에러 상태
   if (isError) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="text-center">
-          <p className="mb-4 text-red-600">
-            {error?.message ?? '레시피를 불러오는데 실패했습니다.'}
-          </p>
-          <Button onClick={() => refetch()}>다시 시도</Button>
-        </div>
-      </div>
-    );
+    return <ErrorState error={error} onRetry={refetch} />;
   }
 
   return (
@@ -116,32 +135,21 @@ export default function RecipeRecommend() {
         <span className="text-24 ml-2">😑</span>
       </div>
 
-      {/* 슬라이드 카드 */}
+      {/* Swiper Cards Effect */}
       <div className="px-4 sm:px-6 lg:px-8">
-        <div className="relative">
-          {/* 네비게이션 화살표 */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute top-1/2 left-2 z-20 h-8 w-8 -translate-y-1/2 rounded-full bg-white/80 shadow-lg transition-all duration-300 disabled:opacity-50 sm:left-4 sm:h-10 sm:w-10"
-            disabled={current === 1}
-          />
-
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute top-1/2 right-2 z-20 h-8 w-8 -translate-y-1/2 rounded-full bg-white/80 shadow-lg transition-all duration-300 disabled:opacity-50 sm:right-4 sm:h-10 sm:w-10"
-            disabled={current === count}
-          />
-
-          <Carousel
-            setApi={setApi}
-            className="mx-auto w-full max-w-sm sm:max-w-md md:max-w-lg"
-            opts={carouselOpts}
-          >
-            <CarouselContent className="-ml-2 sm:-ml-4">
+        <div className="flex justify-center">
+          <div className="relative h-[530px] w-[350px]">
+            <Swiper
+              modules={SWIPER_MODULES}
+              {...SWIPER_CONFIG}
+              className="recipe-swiper h-full w-full"
+              style={swiperStyles}
+            >
               {recipes.map((recipe, index) => (
-                <CarouselItem key={recipe.id} className="pl-2 sm:pl-4">
+                <SwiperSlide
+                  key={recipe.id}
+                  className="flex items-center justify-center"
+                >
                   <RecipeCard
                     recipe={recipe}
                     index={index}
@@ -153,27 +161,14 @@ export default function RecipeRecommend() {
                     snackbarMessage={snackbarMessage}
                     onToggleLike={toggleLike}
                   />
-                </CarouselItem>
+                </SwiperSlide>
               ))}
-            </CarouselContent>
-          </Carousel>
+            </Swiper>
+          </div>
         </div>
 
         {/* Page Indicator */}
-        <div className="mt-4 flex justify-center gap-1.5 sm:mt-6 sm:gap-2">
-          {Array.from({ length: count }, (_, i) => (
-            <button
-              key={i}
-              className={`h-1.5 w-1.5 rounded-full transition-all duration-300 sm:h-2 sm:w-2 ${
-                i === current - 1
-                  ? 'scale-125 bg-gray-900 shadow-lg'
-                  : 'bg-gray-200'
-              }`}
-              onClick={() => api?.scrollTo(i)}
-              aria-label={`${i + 1}번 슬라이드로 이동`}
-            />
-          ))}
-        </div>
+        <div className="recipe-pagination mt-4 flex justify-center gap-1.5 sm:mt-6 sm:gap-2" />
       </div>
     </>
   );
