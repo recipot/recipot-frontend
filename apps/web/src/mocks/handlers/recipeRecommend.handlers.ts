@@ -1,20 +1,5 @@
+import { Recipe, RecipeRecommendResponse } from '@/types/recipe.types';
 import { http, HttpResponse } from 'msw';
-
-// 레시피 추천 API 응답 타입
-export interface RecipeRecommendResponse {
-  recipes: Recipe[];
-  message: string;
-}
-
-export interface Recipe {
-  id: number;
-  title: string;
-  subtitle: string;
-  time: string;
-  cookware: string;
-  image: string;
-  description: string;
-}
 
 // 목 데이터
 const mockRecipes: Recipe[] = [
