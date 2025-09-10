@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Loader2, XIcon } from 'lucide-react';
 
 import { HighlightText } from '@/components/common/HighlightText';
@@ -36,12 +36,21 @@ export default function IngredientsSearch({
     useSubmitSelectedFoods();
 
   // 검색어에 따른 필터링된 재료 목록 계산
-  const filteredFoodList: Food[] = (() => {
+  const filteredFoodList: Food[] = useMemo(() => {
     if (value === '' || foodList.length === 0) {
       return [];
     }
     return filterByKoreanSearch(foodList, value, food => food.name);
-  })();
+  }, [foodList, value]);
+
+  // 선택된 재료 객체 목록을 미리 계산 (성능 최적화)
+  const selectedFoods: Food[] = useMemo(() => {
+    return selectedFoodIds
+      .map((foodId: number) =>
+        foodList.find((food: Food) => food.id === foodId)
+      )
+      .filter((food: Food | undefined): food is Food => food !== undefined);
+  }, [selectedFoodIds, foodList]);
 
   const StyleActive =
     'border-secondary-soft-green bg-secondary-light-green text-primary';
@@ -142,20 +151,23 @@ export default function IngredientsSearch({
                 </p>
               </div>
             )}
-            {selectedFoodIds.length > 0 &&
-              selectedFoodIds.map(foodId => (
+            {selectedFoods.length > 0 &&
+              selectedFoods.map((food: Food) => (
                 <span
-                  key={foodId}
+                  key={food.id}
                   className={cn(
                     'text-14b border-secondary-soft-green flex items-center justify-center gap-2 gap-x-1 rounded-[6px] border py-[3px] pr-2 pl-3',
                     StyleActive
                   )}
                 >
-                  {foodList.find(food => food.id === foodId)?.name}
-                  <XIcon
-                    size={12}
-                    onClick={() => handleSelectedFoodRemove(foodId)}
-                  />
+                  {food.name}
+                  <button
+                    type="button"
+                    aria-label={`${food.name} 삭제`}
+                    onClick={() => handleSelectedFoodRemove(food.id)}
+                  >
+                    <XIcon size={12} />
+                  </button>
                 </span>
               ))}
           </div>

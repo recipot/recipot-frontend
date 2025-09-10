@@ -58,7 +58,7 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
             onClick={onClear}
             className="absolute top-1/2 right-4 -translate-y-1/2"
           >
-            <CloseIcon size={24} className="text-white" />
+            <CloseIcon size={24}/>
           </button>
         ) : (
           <SearchIcon
