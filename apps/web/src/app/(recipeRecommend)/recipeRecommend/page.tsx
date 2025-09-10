@@ -5,6 +5,7 @@ import 'swiper/css/effect-cards';
 import './styles.css';
 
 import React from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { EffectCards, Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -12,7 +13,10 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Button } from '@/components/common/Button';
 import { BackIcon, RefreshIcon } from '@/components/Icons';
 import { RecipeCard } from '@/components/RecipeCard';
-import { useRecipeRecommend } from '@/hooks/useRecipeRecommend';
+import {
+  fetchRecipeRecommend,
+  useRecipeRecommend,
+} from '@/hooks/useRecipeRecommend';
 
 const SWIPER_MODULES = [EffectCards, Pagination];
 
@@ -51,17 +55,15 @@ const ErrorState = ({
 export default function RecipeRecommend() {
   const router = useRouter();
 
-  const {
-    error,
-    isError,
-    isLoading,
-    likedRecipes,
-    recipes,
-    refetch,
-    selectedIngredients,
-    snackbarMessage,
-    toggleLike,
-  } = useRecipeRecommend();
+  // TanStack Query로 레시피 데이터 조회
+  const { data, error, isError, isLoading, refetch } = useQuery({
+    queryFn: fetchRecipeRecommend,
+    queryKey: ['recipeRecommend'],
+    staleTime: 5 * 60 * 1000, // 5분
+  });
+
+  const { likedRecipes, selectedIngredients, toggleLike } =
+    useRecipeRecommend();
 
   // Swiper 설정 상수
   const SWIPER_CONFIG = {
@@ -84,6 +86,9 @@ export default function RecipeRecommend() {
     threshold: 5,
     touchRatio: 1,
   };
+
+  const recipes = data?.recipes ?? [];
+  const snackbarMessage = data?.message ?? '';
 
   // 로딩 상태
   if (isLoading) {

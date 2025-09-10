@@ -16,7 +16,7 @@ interface RecipeCardProps {
   index: number;
   isLiked: boolean;
   snackbarMessage: string;
-  onToggleLike: (index: number) => void;
+  onToggleLike: (index: number, recipeId: number) => void;
 }
 
 export const RecipeCard = ({
@@ -41,7 +41,6 @@ export const RecipeCard = ({
           />
         </div>
 
-        {/* 상단 배지들 - Figma 디자인에 맞게 수정 */}
         <div className="absolute top-[20px] left-[20px] h-[32px] w-[270px]">
           <div className="flex gap-2">
             <div className="flex h-[32px] items-center gap-1 rounded-[15px] bg-black/30 px-3">
@@ -82,7 +81,7 @@ export const RecipeCard = ({
                 variant="ghost"
                 size="icon"
                 className="h-[52px] w-[52px] rounded-full border border-white bg-transparent hover:bg-transparent focus:bg-transparent focus:outline-none"
-                onClick={() => onToggleLike(index)}
+                onClick={() => onToggleLike(index, recipe.id)}
               >
                 <HeartIcon
                   className="h-5 w-5"
