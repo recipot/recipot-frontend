@@ -1,5 +1,4 @@
 import type { EmotionColor } from './EmotionState';
-import type { Variants } from 'framer-motion';
 
 // 감정 옵션 상수
 export const EMOTION_OPTIONS = {
@@ -19,41 +18,27 @@ export const EMOTION_OPTIONS = {
   ],
 } as const;
 
+// 공통 transition 설정
+const TRANSITIONS = {
+  fast: { duration: 0.2, ease: 'easeOut' as const },
+  slow: { duration: 0.3, ease: 'easeOut' as const },
+  tap: { duration: 0.1, ease: 'easeIn' as const },
+} as const;
+
 // 애니메이션 variants
 export const EMOTION_ANIMATION_VARIANTS = {
-  button: {
-    hover: { scale: 1.05, transition: { duration: 0.2, ease: 'easeOut' } },
-    initial: { scale: 1 },
-    tap: { scale: 0.95, transition: { duration: 0.1, ease: 'easeIn' } },
-  } as Variants,
-  icon: {
-    initial: { scale: 1 },
-    selected: { scale: 1.2, transition: { duration: 0.2, ease: 'easeOut' } },
-    unselected: { scale: 1, transition: { duration: 0.2, ease: 'easeOut' } },
-  } as Variants,
   moodCircle: {
     initial: { borderRadius: 100, scale: 1 },
     selected: {
       borderRadius: 126,
-      transition: { duration: 0.3, ease: 'easeOut' },
+      transition: TRANSITIONS.slow,
     },
     unselected: {
       borderRadius: 30,
       scale: 1,
-      transition: { duration: 0.3, ease: 'easeOut' },
+      transition: TRANSITIONS.slow,
     },
-  } as Variants,
-  moodIcon: {
-    initial: { scale: 1 },
-    selected: {
-      scale: 1.2,
-      transition: { duration: 0.2, ease: 'easeOut' },
-    },
-    unselected: {
-      scale: 1,
-      transition: { duration: 0.2, ease: 'easeOut' },
-    },
-  } as Variants,
+  },
 } as const;
 
 // 아이콘 오프셋 설정
@@ -65,7 +50,5 @@ export const getIconOffset = (color: EmotionColor, isSelected: boolean) => {
       return isSelected ? { x: -9, y: -9 } : { x: -3, y: -3 };
     case 'yellow':
       return isSelected ? { x: 0, y: -9 } : { x: 0, y: 0 };
-    default:
-      return { x: -9, y: -9 };
   }
 };
