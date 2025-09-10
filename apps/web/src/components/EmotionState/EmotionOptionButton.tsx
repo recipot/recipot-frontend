@@ -2,8 +2,7 @@ import React from 'react';
 
 import { cn } from '@/lib/utils';
 
-import { EmotionBadIcon, EmotionGoodIcon, EmotionNeutralIcon } from '../Icons';
-import { getBaseColor, getIconColor } from './emotionButtonHelpers';
+import { getBaseColor, getIconColor, renderIcon } from './emotionButtonHelpers';
 import MoodVariantButton from './MoodVariantButton';
 
 import type { EmotionColor } from './EmotionState';
@@ -53,15 +52,7 @@ function EmotionOptionButton({
       aria-pressed={!!selected}
     >
       <span className="text-xl leading-none sm:text-2xl">
-        {color === 'blue' && (
-          <EmotionBadIcon color={getIconColor(color, selected, variant)} />
-        )}
-        {color === 'yellow' && (
-          <EmotionNeutralIcon color={getIconColor(color, selected, variant)} />
-        )}
-        {color === 'red' && (
-          <EmotionGoodIcon color={getIconColor(color, selected, variant)} />
-        )}
+        {renderIcon(color, getIconColor(color, selected, variant))}
       </span>
       <span className="xs:text-12sb text-15sb">{label}</span>
     </button>
