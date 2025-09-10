@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 import { Button } from '@/components/common/Button';
+import { cn } from '@/lib/utils';
 
 import { EMOTION_OPTIONS } from './emotionConstants';
 import EmotionOptionButton from './EmotionOptionButton';
@@ -31,13 +32,6 @@ const EmotionState: React.FC<EmotionStateProps> = ({
     onMoodChange?.(newMood);
   };
 
-  const getMoodState = (mood: MoodType): MoodState => {
-    if (selectedMood === null) {
-      return 'default'; // 아무것도 선택되지 않은 상태
-    }
-    return selectedMood === mood ? 'selected' : 'disabled'; // 선택된 상태와 비활성화된 상태
-  };
-
   // 선택된 감정에 따른 배경색 그래디언트 클래스 반환 (Figma 디자인 기반)
   const getBackgroundGradient = (mood: MoodType | null): string => {
     switch (mood) {
@@ -58,7 +52,11 @@ const EmotionState: React.FC<EmotionStateProps> = ({
 
   return (
     <div
-      className={`flex h-[95vh] flex-col items-center overflow-hidden ${className} ${getBackgroundGradient(selectedMood)}`}
+      className={cn(
+        'flex h-[95vh] flex-col items-center overflow-hidden',
+        className,
+        getBackgroundGradient(selectedMood)
+      )}
     >
       {/* 메인 제목과 서브 텍스트 그룹 */}
       <div className="xs:mb-10 mb-8 text-center sm:mb-12 md:mb-16">
@@ -73,18 +71,17 @@ const EmotionState: React.FC<EmotionStateProps> = ({
       {/* Default States Row */}
       <div className="xs:space-x-6 flex space-x-4 sm:space-x-8 md:space-x-10">
         {EMOTION_OPTIONS.mood.map(({ color, label, mood }) => {
-          const moodState = getMoodState(mood);
           return (
             <EmotionOptionButton
               key={mood}
               label={label}
               color={color}
               selected={
-                moodState === 'selected'
-                  ? true
-                  : moodState === 'disabled'
-                    ? false
-                    : undefined
+                selectedMood === null
+                  ? undefined
+                  : selectedMood === mood
+                    ? true
+                    : false
               }
               onClick={() => handleMoodClick(mood)}
               variant="mood"
