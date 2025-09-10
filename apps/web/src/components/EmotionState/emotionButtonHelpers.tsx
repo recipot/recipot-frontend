@@ -127,29 +127,8 @@ export const getMoodColors = (
   color: EmotionColor,
   selected: boolean | undefined
 ) => {
-  const selectedColors = {
-    blue: {
-      bg: 'hsl(var(--feel-back-tired))',
-      border: FEEL_COLORS.tired,
-      icon: FEEL_COLORS.tired,
-      text: FEEL_COLORS.tired,
-    },
-    red: {
-      bg: 'hsl(var(--feel-back-free))',
-      border: FEEL_COLORS.free,
-      icon: FEEL_COLORS.free,
-      text: FEEL_COLORS.free,
-    },
-    yellow: {
-      bg: 'hsl(var(--feel-back-soso))',
-      border: FEEL_COLORS.soso,
-      icon: FEEL_COLORS.soso,
-      text: FEEL_COLORS.soso,
-    },
-  };
-
-  // 초기 상태 (아무것도 선택되지 않은 상태) - 더 진한 색상
-  const initialColors = {
+  // 선택된 상태와 초기 상태가 동일한 색상 사용
+  const activeColors = {
     blue: {
       bg: 'hsl(var(--feel-back-tired))',
       border: FEEL_COLORS.tired,
@@ -184,21 +163,21 @@ export const getMoodColors = (
   };
 
   if (color === 'blue') {
-    if (selected === true) return selectedColors.blue;
+    if (selected === true) return activeColors.blue;
     if (selected === false) return unselectedColors.blue;
-    return initialColors.blue;
+    return activeColors.blue;
   }
   if (color === 'red') {
-    if (selected === true) return selectedColors.red;
+    if (selected === true) return activeColors.red;
     if (selected === false) return unselectedColors.red;
-    return initialColors.red;
+    return activeColors.red;
   }
   if (color === 'yellow') {
-    if (selected === true) return selectedColors.yellow;
+    if (selected === true) return activeColors.yellow;
     if (selected === false) return unselectedColors.yellow;
-    return initialColors.yellow;
+    return activeColors.yellow;
   }
-  if (selected === true) return selectedColors.blue;
+  if (selected === true) return activeColors.blue;
   if (selected === false) return unselectedColors.blue;
-  return initialColors.blue;
+  return activeColors.blue;
 };
