@@ -3,7 +3,6 @@ import { http, HttpResponse } from 'msw';
 // 레시피 추천 API 응답 타입
 export interface RecipeRecommendResponse {
   recipes: Recipe[];
-  selectedIngredients: string[];
   message: string;
 }
 
@@ -48,15 +47,25 @@ const mockRecipes: Recipe[] = [
   },
 ];
 
-const mockSelectedIngredients = ['땅콩버터', '감자', '김치', '+5'];
+// 선택된 재료 목록 (동적으로 관리)
+let mockSelectedIngredients = [
+  '땅콩버터',
+  '감자',
+  '김치',
+  '양파',
+  '마늘',
+  '고추장',
+  '된장',
+  '대파',
+];
 
 // 레시피 추천 핸들러
 export const recipeRecommendHandlers = [
   // 레시피 추천 목록 조회
+  // TODO : API 나오면 수정 필요
   http.get('/api/recipe-recommend', () => {
     const response: RecipeRecommendResponse = {
       recipes: mockRecipes,
-      selectedIngredients: mockSelectedIngredients,
       message: '새로운 레시피가 추천되었어요',
     };
 
@@ -69,6 +78,7 @@ export const recipeRecommendHandlers = [
   }),
 
   // 특정 레시피 상세 조회
+  // TODO : API 나오면 수정 필요
   http.get('/api/recipe-recommend/:id', ({ params }) => {
     const { id } = params;
     const recipe = mockRecipes.find(r => r.id === Number(id));
@@ -89,6 +99,7 @@ export const recipeRecommendHandlers = [
   }),
 
   // 레시피 좋아요 토글
+  // TODO : API 나오면 수정 필요
   http.post('/api/recipe-recommend/:id/like', ({ params }) => {
     const { id } = params;
     const recipe = mockRecipes.find(r => r.id === Number(id));
@@ -116,6 +127,7 @@ export const recipeRecommendHandlers = [
   }),
 
   // 레시피 좋아요 취소
+  // TODO : API 나오면 수정 필요
   http.delete('/api/recipe-recommend/:id/like', ({ params }) => {
     const { id } = params;
     const recipe = mockRecipes.find(r => r.id === Number(id));
@@ -140,5 +152,57 @@ export const recipeRecommendHandlers = [
         },
       }
     );
+  }),
+
+  // 선택된 재료 목록 조회 (3개로 제한하고 +N 형태로 표시)
+  // TODO : API 나오면 수정 필요
+  http.get('/api/selected-ingredients', () => {
+    // 3개로 제한하고, 3개보다 많을 경우 +N 형태로 표시
+    const displayIngredients = mockSelectedIngredients.slice(0, 3);
+    const remainingCount = Math.max(0, mockSelectedIngredients.length - 3);
+
+    if (remainingCount > 0) {
+      displayIngredients.push(`+${remainingCount}`);
+    }
+
+    return HttpResponse.json(
+      {
+        selectedIngredients: displayIngredients,
+        message: '선택된 재료 목록을 조회했습니다.',
+      },
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+  }),
+
+  // 선택된 재료 목록 업데이트
+  // TODO : API 나오면 수정 필요
+  http.put('/api/selected-ingredients', async ({ request }) => {
+    try {
+      const body = (await request.json()) as { selectedIngredients: string[] };
+      mockSelectedIngredients = body.selectedIngredients;
+
+      return HttpResponse.json(
+        {
+          selectedIngredients: mockSelectedIngredients,
+          message: '선택된 재료 목록이 업데이트되었습니다.',
+        },
+        {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+    } catch (error) {
+      return HttpResponse.json(
+        { error: '잘못된 요청 형식입니다.' },
+        { status: 400 }
+      );
+    }
   }),
 ];

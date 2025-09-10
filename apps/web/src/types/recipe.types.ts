@@ -10,7 +10,6 @@ export interface Recipe {
 
 export interface RecipeRecommendResponse {
   recipes: Recipe[];
-  selectedIngredients: string[];
   message: string;
 }
 
