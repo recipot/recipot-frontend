@@ -15,6 +15,22 @@ const FEEL_COLORS = {
   tired: 'hsl(var(--feel-tired-text))',
 };
 
+// 아이콘 색상 상수 (opacity별)
+const ICON_COLORS = {
+  blue: {
+    low: 'rgba(59, 130, 246, 0.3)',
+    medium: 'rgba(59, 130, 246, 0.6)',
+  },
+  red: {
+    low: 'rgba(239, 68, 68, 0.3)',
+    medium: 'rgba(239, 68, 68, 0.6)',
+  },
+  yellow: {
+    low: 'rgba(234, 179, 8, 0.3)',
+    medium: 'rgba(234, 179, 8, 0.6)',
+  },
+} as const;
+
 const COLOR_CONFIG = {
   blue: {
     base: 'bg-feel-back-tired text-feel-tired-text',
@@ -47,18 +63,10 @@ const VARIANT_CONFIG = {
 
 // 통합된 헬퍼 함수들
 export const getBaseColor = (color: EmotionColor, variant: string) => {
-  if (color === 'blue') {
-    return variant === 'mood' ? COLOR_CONFIG.blue.mood : COLOR_CONFIG.blue.base;
-  }
-  if (color === 'red') {
-    return variant === 'mood' ? COLOR_CONFIG.red.mood : COLOR_CONFIG.red.base;
-  }
-  if (color === 'yellow') {
-    return variant === 'mood'
-      ? COLOR_CONFIG.yellow.mood
-      : COLOR_CONFIG.yellow.base;
-  }
-  return 'bg-gray-100 text-gray-500';
+  const config = COLOR_CONFIG[color];
+  if (!config) return 'bg-gray-100 text-gray-500';
+
+  return variant === 'mood' ? config.mood : config.base;
 };
 
 export const getIconColor = (
@@ -68,37 +76,19 @@ export const getIconColor = (
 ) => {
   // 초기 상태 (아무것도 선택되지 않은 상태) - 더 진한 색상
   if (selected === undefined) {
-    if (color === 'blue') return 'rgba(59, 130, 246, 0.6)'; // blue with medium opacity
-    if (color === 'red') return 'rgba(239, 68, 68, 0.6)'; // red with medium opacity
-    if (color === 'yellow') return 'rgba(234, 179, 8, 0.6)'; // yellow with medium opacity
-    return '#9CA3AF';
+    return ICON_COLORS[color]?.medium || '#9CA3AF';
   }
 
   // 선택되지 않은 상태 (다른 감정이 선택된 상태) - 더 연한 색상
   if (selected === false) {
-    if (color === 'blue') return 'rgba(59, 130, 246, 0.3)'; // blue with low opacity
-    if (color === 'red') return 'rgba(239, 68, 68, 0.3)'; // red with low opacity
-    if (color === 'yellow') return 'rgba(234, 179, 8, 0.3)'; // yellow with low opacity
-    return '#adb5bd';
+    return ICON_COLORS[color]?.low || '#adb5bd';
   }
 
   // 선택된 상태
-  if (color === 'blue') {
-    return variant === 'mood' && selected
-      ? COLOR_CONFIG.blue.iconMood
-      : COLOR_CONFIG.blue.icon;
-  }
-  if (color === 'red') {
-    return variant === 'mood' && selected
-      ? COLOR_CONFIG.red.iconMood
-      : COLOR_CONFIG.red.icon;
-  }
-  if (color === 'yellow') {
-    return variant === 'mood' && selected
-      ? COLOR_CONFIG.yellow.iconMood
-      : COLOR_CONFIG.yellow.icon;
-  }
-  return '#9CA3AF';
+  const config = COLOR_CONFIG[color];
+  if (!config) return '#9CA3AF';
+
+  return variant === 'mood' ? config.iconMood : config.icon;
 };
 
 export const getVariantClasses = (variant: string) => {
@@ -107,19 +97,11 @@ export const getVariantClasses = (variant: string) => {
 };
 
 export const renderIcon = (color: EmotionColor, iconColor: string) => {
-  if (color === 'blue') {
-    const IconComponent = COLOR_CONFIG.blue.component;
-    return <IconComponent color={iconColor} />;
-  }
-  if (color === 'red') {
-    const IconComponent = COLOR_CONFIG.red.component;
-    return <IconComponent color={iconColor} />;
-  }
-  if (color === 'yellow') {
-    const IconComponent = COLOR_CONFIG.yellow.component;
-    return <IconComponent color={iconColor} />;
-  }
-  return null;
+  const config = COLOR_CONFIG[color];
+  if (!config) return null;
+
+  const IconComponent = config.component;
+  return <IconComponent color={iconColor} />;
 };
 
 // MoodVariantButton용 통합 색상 함수
@@ -156,28 +138,11 @@ export const getMoodColors = (
     text: 'hsl(var(--gray-700))',
   };
 
-  const unselectedColors = {
-    blue: UNSELECTED_COLOR,
-    red: UNSELECTED_COLOR,
-    yellow: UNSELECTED_COLOR,
-  };
+  // 선택되지 않은 상태는 모든 색상이 동일
+  if (selected === false) {
+    return UNSELECTED_COLOR;
+  }
 
-  if (color === 'blue') {
-    if (selected === true) return activeColors.blue;
-    if (selected === false) return unselectedColors.blue;
-    return activeColors.blue;
-  }
-  if (color === 'red') {
-    if (selected === true) return activeColors.red;
-    if (selected === false) return unselectedColors.red;
-    return activeColors.red;
-  }
-  if (color === 'yellow') {
-    if (selected === true) return activeColors.yellow;
-    if (selected === false) return unselectedColors.yellow;
-    return activeColors.yellow;
-  }
-  if (selected === true) return activeColors.blue;
-  if (selected === false) return unselectedColors.blue;
-  return activeColors.blue;
+  // 선택된 상태 또는 초기 상태
+  return activeColors[color] || activeColors.blue;
 };
