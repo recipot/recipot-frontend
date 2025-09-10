@@ -29,19 +29,7 @@ const MoodVariantButton: React.FC<MoodVariantButtonProps> = ({
 
   const moodIconVariants = useMemo(
     () => ({
-      ...EMOTION_ANIMATION_VARIANTS.moodIcon,
-      initial: {
-        ...EMOTION_ANIMATION_VARIANTS.moodIcon.initial,
-        x: offset.x,
-        y: offset.y,
-      },
       selected: {
-        ...EMOTION_ANIMATION_VARIANTS.moodIcon.selected,
-        x: offset.x,
-        y: offset.y,
-      },
-      unselected: {
-        ...EMOTION_ANIMATION_VARIANTS.moodIcon.unselected,
         x: offset.x,
         y: offset.y,
       },
@@ -70,7 +58,6 @@ const MoodVariantButton: React.FC<MoodVariantButtonProps> = ({
       onClick={onClick}
       className={cn('flex flex-col items-center space-y-2', className)}
       aria-pressed={!!selected}
-      variants={EMOTION_ANIMATION_VARIANTS.button}
       initial="initial"
     >
       <motion.div
