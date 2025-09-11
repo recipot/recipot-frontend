@@ -124,7 +124,7 @@ export default function RecipeRecommend() {
           {selectedIngredients.map(ingredient => (
             <div
               key={ingredient}
-              className="bg-secondary-light-green text-12b sm:text-14b text-secondary-pressed rounded-full px-2 py-[2px] sm:px-3 sm:py-[3px]"
+              className="bg-secondary-light-green text-12b sm:text-14b rounded-full px-2 py-[2px] text-[#53880A] sm:px-3 sm:py-[3px]"
             >
               {ingredient}
             </div>
