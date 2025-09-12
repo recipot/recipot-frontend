@@ -2,11 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Confetti from 'react-confetti';
 import Image from 'next/image';
 
-import { useReviewForm } from '@/hooks/useReviewForm';
-
 import { BottomSheet } from '../BottomSheet';
-
-import { ReviewForm } from './ReviewForm';
 
 const CONFETTI_COLORS = [
   '#FF6B6B',
@@ -42,9 +38,9 @@ export default function EmotionSelectionBottomSheet({
     width: 0,
   });
 
-  const reviewForm = useReviewForm(timesCooked, () => {
-    onOpenChange(false);
-  });
+  // const reviewForm = useReviewForm(timesCooked, () => {
+  //   onOpenChange(false);
+  // });
 
   useEffect(() => {
     const updateWindowDimensions = () => {
@@ -117,7 +113,7 @@ export default function EmotionSelectionBottomSheet({
           </div>
 
           {/* ReviewForm 컴포넌트 사용 */}
-          <ReviewForm form={reviewForm} />
+          {/* <ReviewForm form={reviewForm} /> */}
         </div>
       </BottomSheet>
     </>
