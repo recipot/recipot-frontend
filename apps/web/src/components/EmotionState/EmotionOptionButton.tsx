@@ -1,11 +1,22 @@
+import './styles.css';
+
 import React from 'react';
 
 import { cn } from '@/lib/utils';
 
-import { getBaseColor, getIconColor, renderIcon } from './emotionButtonHelpers';
+import {
+  getBaseColor,
+  getIconColor,
+  getShadowClass,
+  renderIcon,
+} from './emotionHelpers';
 import MoodVariantButton from './MoodVariantButton';
 
 import type { EmotionColor } from './EmotionState';
+
+// ============================================================================
+// 타입 정의
+// ============================================================================
 
 export interface FeelingPillProps {
   label: string;
@@ -15,9 +26,16 @@ export interface FeelingPillProps {
   className?: string;
   size?: 'sm' | 'md' | 'lg';
   variant?: 'default' | 'mood';
-  enableAnimation?: boolean;
 }
 
+// ============================================================================
+// 메인 컴포넌트
+// ============================================================================
+
+/**
+ * 감정을 선택할 수 있는 옵션 버튼 컴포넌트
+ * variant에 따라 다른 스타일과 동작을 제공합니다.
+ */
 function EmotionOptionButton({
   className,
   color,
@@ -45,14 +63,15 @@ function EmotionOptionButton({
       type="button"
       onClick={onClick}
       className={cn(
-        'flex h-[80px] w-[85px] flex-shrink-0 flex-col items-center justify-center gap-[4px] rounded-2xl text-xs font-semibold sm:h-[94px] sm:w-[106px] sm:gap-[6px] sm:text-sm',
-
+        'flex h-[80px] w-[85px] flex-shrink-0 flex-col items-center justify-center gap-[4px] rounded-2xl text-xs font-semibold',
+        'sm:h-[94px] sm:w-[106px] sm:gap-[6px] sm:text-sm',
+        getShadowClass(color, selected),
         getBaseColor(color, variant)
       )}
       aria-pressed={!!selected}
     >
       <span className="text-xl leading-none sm:text-2xl">
-        {renderIcon(color, getIconColor(color, selected, variant))}
+        {renderIcon(color, getIconColor(color, selected))}
       </span>
       <span className="xs:text-12sb text-15sb">{label}</span>
     </button>

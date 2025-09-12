@@ -1,0 +1,55 @@
+.emotion-gradient-default {
+  background:
+    linear-gradient(
+      360deg,
+      rgba(255, 247, 196, 0.8),
+      rgba(255, 247, 196, 0.12),
+      rgba(255, 255, 255, 0)
+    ),
+    #ffffff;
+}
+
+.emotion-gradient-bad {
+  background:
+    linear-gradient(
+      360deg,
+      rgba(212, 224, 255, 0.8),
+      rgba(212, 230, 255, 0.12),
+      rgba(255, 255, 255, 0)
+    ),
+    #ffffff;
+}
+
+.emotion-gradient-neutral {
+  background:
+    linear-gradient(
+      360deg,
+      rgba(255, 247, 196, 0.8),
+      rgba(255, 247, 196, 0.12),
+      rgba(255, 255, 255, 0)
+    ),
+    #ffffff;
+}
+
+.emotion-gradient-good {
+  background:
+    linear-gradient(
+      360deg,
+      rgba(255, 219, 220, 0.8),
+      rgba(255, 219, 220, 0.12),
+      rgba(255, 255, 255, 0)
+    ),
+    #ffffff;
+}
+
+.emotion-shadow-bad {
+  box-shadow: 0 0 40px rgba(212, 226, 255, 0.5);
+}
+
+.emotion-shadow-neutral {
+  box-shadow: 0 0 40px rgba(248, 246, 191, 0.5);
+}
+
+.emotion-shadow-good {
+  box-shadow: 0 0 40px rgba(255, 224, 225, 0.5);
+}

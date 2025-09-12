@@ -1,6 +1,11 @@
-import type { EmotionColor } from './EmotionState';
+/**
+ * 감정 상태 관련 상수 정의
+ */
 
+// ============================================================================
 // 감정 옵션 상수
+// ============================================================================
+
 export const EMOTION_OPTIONS = {
   mood: [
     { color: 'blue' as const, label: '힘들어', mood: 'bad' as const },
@@ -18,37 +23,21 @@ export const EMOTION_OPTIONS = {
   ],
 } as const;
 
-// 공통 transition 설정
-const TRANSITIONS = {
-  fast: { duration: 0.2, ease: 'easeOut' as const },
-  slow: { duration: 0.3, ease: 'easeOut' as const },
-  tap: { duration: 0.1, ease: 'easeIn' as const },
-} as const;
+// ============================================================================
+// 애니메이션 설정
+// ============================================================================
 
-// 애니메이션 variants
 export const EMOTION_ANIMATION_VARIANTS = {
   moodCircle: {
     initial: { borderRadius: 100, scale: 1 },
     selected: {
       borderRadius: 126,
-      transition: TRANSITIONS.slow,
+      transition: { duration: 0.3, ease: 'easeOut' },
     },
     unselected: {
       borderRadius: 30,
       scale: 1,
-      transition: TRANSITIONS.slow,
+      transition: { duration: 0.3, ease: 'easeOut' },
     },
   },
 } as const;
-
-// 아이콘 오프셋 설정
-export const getIconOffset = (color: EmotionColor, isSelected: boolean) => {
-  switch (color) {
-    case 'blue':
-      return isSelected ? { x: -9, y: -9 } : { x: -3, y: -3 };
-    case 'red':
-      return isSelected ? { x: -9, y: -9 } : { x: -3, y: -3 };
-    case 'yellow':
-      return isSelected ? { x: 0, y: -9 } : { x: 0, y: 0 };
-  }
-};
