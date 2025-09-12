@@ -45,11 +45,15 @@ export default function IngredientsSearch({
 
   // 선택된 재료 객체 목록을 미리 계산 (성능 최적화)
   const selectedFoods: Food[] = useMemo(() => {
-    return selectedFoodIds
-      .map((foodId: number) =>
-        foodList.find((food: Food) => food.id === foodId)
-      )
-      .filter((food: Food | undefined): food is Food => food !== undefined);
+    // 선택된 ID들을 실제 Food 객체로 변환
+    const mappedFoods = selectedFoodIds.map((foodId: number) =>
+      foodList.find((food: Food) => food.id === foodId)
+    );
+
+    // undefined인 항목들을 제거하고 Food 타입으로 필터링
+    return mappedFoods.filter(
+      (food: Food | undefined): food is Food => food !== undefined
+    );
   }, [selectedFoodIds, foodList]);
 
   const StyleActive =
