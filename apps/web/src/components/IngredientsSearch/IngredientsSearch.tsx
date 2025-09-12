@@ -106,7 +106,7 @@ export default function IngredientsSearch({
 
         {/* 검색된 재료 리스트 */}
         {value && filteredFoodList.length > 0 && (
-          <div className="absolute top-[84px] left-0 grid w-full grid-cols-3 gap-3 border-b border-gray-200 bg-white/80 px-8 py-5 backdrop-blur-xs">
+          <div className="absolute top-[84px] left-0 grid w-full grid-cols-3 gap-3 bg-white px-8 py-5">
             {filteredFoodList.map(food => (
               <Button
                 key={food.id}
@@ -130,9 +130,9 @@ export default function IngredientsSearch({
 
         {/* 선택한 재료 리스트 */}
         <div>
-          <div className="mt-5 mb-3 flex items-center justify-between">
-            <h3 className="text-15sb text-gray-600">내가 선택한 재료</h3>
-            {selectedFoodIds.length > 0 && (
+          {selectedFoodIds.length !== 0 && (
+            <div className="mt-5 mb-3 flex items-center justify-between">
+              <h3 className="text-15sb text-gray-600">내가 선택한 재료</h3>
               <Button
                 onClick={() => clearAllFoods()}
                 variant="outline"
@@ -140,17 +140,10 @@ export default function IngredientsSearch({
               >
                 전체 삭제
               </Button>
-            )}
-          </div>
+            </div>
+          )}
 
           <div className="flex flex-wrap gap-2">
-            {selectedFoodIds.length === 0 && (
-              <div className="bg-secondary-light-green border-secondary-soft-green w-full rounded-xl border py-5 text-center">
-                <p className="text-14 text-primary w-full">
-                  재료를 2가지 이상 선택 해주세요!
-                </p>
-              </div>
-            )}
             {selectedFoods.length > 0 &&
               selectedFoods.map((food: Food) => (
                 <span
