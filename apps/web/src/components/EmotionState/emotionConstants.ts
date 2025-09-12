@@ -32,12 +32,9 @@ export const EMOTION_ANIMATION_VARIANTS = {
     initial: { borderRadius: 100, scale: 1 },
     selected: {
       borderRadius: 126,
-      transition: { duration: 0.3, ease: 'easeOut' },
     },
     unselected: {
-      borderRadius: 30,
       scale: 1,
-      transition: { duration: 0.3, ease: 'easeOut' },
     },
   },
 } as const;
