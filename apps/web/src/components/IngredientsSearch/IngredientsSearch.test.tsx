@@ -98,12 +98,10 @@ describe('FoodAdd', () => {
 
     // Mock useSelectedFoodsStore
     mockUseSelectedFoodsStore.mockReturnValue({
-      addFood: vi.fn(),
       clearAllFoods: vi.fn(),
       getSelectedCount: vi.fn().mockReturnValue(0),
       getSelectedFoods: vi.fn(),
       isSelected: vi.fn().mockReturnValue(false),
-      removeFood: vi.fn(),
       selectedFoodIds: [],
       toggleFood: vi.fn(),
     });
@@ -197,12 +195,10 @@ describe('FoodAdd', () => {
     it('재료를 클릭하면 선택 상태가 토글된다', async () => {
       const mockToggleFood = vi.fn();
       mockUseSelectedFoodsStore.mockReturnValue({
-        addFood: vi.fn(),
         clearAllFoods: vi.fn(),
         getSelectedCount: vi.fn().mockReturnValue(0),
         getSelectedFoods: vi.fn(),
         isSelected: vi.fn().mockReturnValue(false),
-        removeFood: vi.fn(),
         selectedFoodIds: [],
         toggleFood: mockToggleFood,
       });
@@ -226,12 +222,10 @@ describe('FoodAdd', () => {
 
     it('선택된 재료는 활성화된 스타일이 적용된다', async () => {
       mockUseSelectedFoodsStore.mockReturnValue({
-        addFood: vi.fn(),
         clearAllFoods: vi.fn(),
         getSelectedCount: vi.fn().mockReturnValue(1),
         getSelectedFoods: vi.fn(),
         isSelected: vi.fn().mockImplementation((id: number) => id === 3),
-        removeFood: vi.fn(),
         selectedFoodIds: [3], // 당근 선택됨
         toggleFood: vi.fn(),
       });
@@ -259,12 +253,10 @@ describe('FoodAdd', () => {
   describe('제출 기능', () => {
     it('선택된 재료가 2개 미만일 때 제출 버튼이 비활성화된다', () => {
       mockUseSelectedFoodsStore.mockReturnValue({
-        addFood: vi.fn(),
         clearAllFoods: vi.fn(),
         getSelectedCount: vi.fn().mockReturnValue(1),
         getSelectedFoods: vi.fn(),
         isSelected: vi.fn().mockImplementation((id: number) => id === 1),
-        removeFood: vi.fn(),
         selectedFoodIds: [1], // 1개만 선택
         toggleFood: vi.fn(),
       });
@@ -277,14 +269,12 @@ describe('FoodAdd', () => {
 
     it('선택된 재료가 2개 이상일 때 제출 버튼이 활성화된다', () => {
       mockUseSelectedFoodsStore.mockReturnValue({
-        addFood: vi.fn(),
         clearAllFoods: vi.fn(),
         getSelectedCount: vi.fn().mockReturnValue(2),
         getSelectedFoods: vi.fn(),
         isSelected: vi
           .fn()
           .mockImplementation((id: number) => [1, 3].includes(id)),
-        removeFood: vi.fn(),
         selectedFoodIds: [1, 3], // 2개 선택
         toggleFood: vi.fn(),
       });
@@ -304,14 +294,12 @@ describe('FoodAdd', () => {
       } as any);
 
       mockUseSelectedFoodsStore.mockReturnValue({
-        addFood: vi.fn(),
         clearAllFoods: vi.fn(),
         getSelectedCount: vi.fn().mockReturnValue(2),
         getSelectedFoods: vi.fn(),
         isSelected: vi
           .fn()
           .mockImplementation((id: number) => [1, 3].includes(id)),
-        removeFood: vi.fn(),
         selectedFoodIds: [1, 3],
         toggleFood: vi.fn(),
       });
@@ -333,14 +321,12 @@ describe('FoodAdd', () => {
       } as any);
 
       mockUseSelectedFoodsStore.mockReturnValue({
-        addFood: vi.fn(),
         clearAllFoods: vi.fn(),
         getSelectedCount: vi.fn().mockReturnValue(2),
         getSelectedFoods: vi.fn(),
         isSelected: vi
           .fn()
           .mockImplementation((id: number) => [1, 3].includes(id)),
-        removeFood: vi.fn(),
         selectedFoodIds: [1, 3],
         toggleFood: vi.fn(),
       });
@@ -366,14 +352,12 @@ describe('FoodAdd', () => {
       } as any);
 
       mockUseSelectedFoodsStore.mockReturnValue({
-        addFood: vi.fn(),
         clearAllFoods: vi.fn(),
         getSelectedCount: vi.fn().mockReturnValue(2),
         getSelectedFoods: vi.fn(),
         isSelected: vi
           .fn()
           .mockImplementation((id: number) => [1, 3].includes(id)),
-        removeFood: vi.fn(),
         selectedFoodIds: [1, 3],
         toggleFood: vi.fn(),
       });

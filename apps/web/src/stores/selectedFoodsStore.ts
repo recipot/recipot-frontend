@@ -7,16 +7,6 @@ export const useSelectedFoodsStore = create<SelectedFoodsStore>()(
   devtools(
     persist(
       (set, get) => ({
-        addFood: foodId => {
-          set(
-            state => ({
-              selectedFoodIds: [...state.selectedFoodIds, foodId],
-            }),
-            false,
-            'addFood'
-          );
-        },
-
         clearAllFoods: () => {
           set({ selectedFoodIds: [] }, false, 'clearAllFoods');
         },
@@ -29,19 +19,7 @@ export const useSelectedFoodsStore = create<SelectedFoodsStore>()(
         },
 
         isSelected: foodId => get().selectedFoodIds.includes(foodId),
-
-        removeFood: foodId => {
-          set(
-            state => ({
-              selectedFoodIds: state.selectedFoodIds.filter(
-                id => id !== foodId
-              ),
-            }),
-            false,
-            'removeFood'
-          );
-        },
-        selectedFoodIds: [],
+        selectedFoodIds: [] as number[],
         toggleFood: foodId => {
           const state = get();
           const isCurrentlySelected = state.selectedFoodIds.includes(foodId);
@@ -59,12 +37,6 @@ export const useSelectedFoodsStore = create<SelectedFoodsStore>()(
       }),
       {
         name: 'selected-foods-storage',
-        onRehydrateStorage: () => state => {
-          console.info(
-            '선택된 재료 상태가 복원되었습니다:',
-            state?.selectedFoodIds
-          );
-        },
       }
     ),
     {

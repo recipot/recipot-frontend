@@ -6,8 +6,6 @@ export interface Food {
 
 export interface SelectedFoodsStore {
   selectedFoodIds: number[];
-  addFood: (foodId: number) => void;
-  removeFood: (foodId: number) => void;
   toggleFood: (foodId: number) => void;
   clearAllFoods: () => void;
   isSelected: (foodId: number) => boolean;
