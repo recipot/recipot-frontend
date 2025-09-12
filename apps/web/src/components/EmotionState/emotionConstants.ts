@@ -6,6 +6,7 @@
 // 감정 옵션 상수
 // ============================================================================
 
+// TODO : 백엔드와 논의 필요
 export const EMOTION_OPTIONS = {
   mood: [
     { color: 'blue' as const, label: '힘들어', mood: 'bad' as const },
@@ -34,6 +35,7 @@ export const EMOTION_ANIMATION_VARIANTS = {
       borderRadius: 126,
     },
     unselected: {
+      borderRadius: 100,
       scale: 1,
     },
   },

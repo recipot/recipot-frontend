@@ -5,9 +5,9 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 
 import {
+  EMOTION_CONFIG,
   getBaseColor,
   getIconColor,
-  getShadowClass,
   renderIcon,
 } from './emotionHelpers';
 import MoodVariantButton from './MoodVariantButton';
@@ -58,14 +58,15 @@ function EmotionOptionButton({
   }
 
   // 기본 variant 렌더링
+  const shadowClass = selected ? EMOTION_CONFIG[color]?.shadow : '';
+
   return (
     <button
       type="button"
       onClick={onClick}
       className={cn(
-        'flex h-[80px] w-[85px] flex-shrink-0 flex-col items-center justify-center gap-[4px] rounded-2xl text-xs font-semibold',
-        'sm:h-[94px] sm:w-[106px] sm:gap-[6px] sm:text-sm',
-        getShadowClass(color, selected),
+        'flex h-[80px] w-[85px] flex-shrink-0 flex-col items-center justify-center gap-1 rounded-2xl text-xs font-semibold',
+        shadowClass,
         getBaseColor(color, variant)
       )}
       aria-pressed={!!selected}

@@ -75,12 +75,12 @@ const EmotionState: React.FC<EmotionStateProps> = ({
   return (
     <div
       className={cn(
-        'flex h-[95vh] flex-col items-center overflow-hidden',
+        'flex h-[95vh] w-full items-center overflow-hidden',
         className,
         getBackgroundGradient(selectedMood)
       )}
     >
-      <div className="xs:space-x-6 flex space-x-4 sm:space-x-8 md:space-x-10">
+      <div className="flex justify-between gap-[15.5px] px-10">
         {EMOTION_OPTIONS.mood.map(({ color, label, mood }) => (
           <EmotionOptionButton
             key={mood}

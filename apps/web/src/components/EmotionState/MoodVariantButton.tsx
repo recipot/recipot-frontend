@@ -7,9 +7,9 @@ import { cn } from '@/lib/utils';
 
 import { EMOTION_ANIMATION_VARIANTS } from './emotionConstants';
 import {
+  EMOTION_CONFIG,
   getIconOffset,
   getMoodColors,
-  getShadowClass,
   renderIcon,
 } from './emotionHelpers';
 
@@ -36,7 +36,6 @@ interface MoodVariantButtonProps {
  * Framer Motion을 사용하여 부드러운 전환 효과를 제공합니다.
  */
 const MoodVariantButton: React.FC<MoodVariantButtonProps> = ({
-  className,
   color,
   label,
   onClick,
@@ -44,14 +43,17 @@ const MoodVariantButton: React.FC<MoodVariantButtonProps> = ({
 }) => {
   const isSelected = selected === true;
   const colors = getMoodColors(color, selected);
-  const offset = getIconOffset(color, isSelected);
+  const selectedOffset = getIconOffset(color, true);
+  const unselectedOffset = getIconOffset(color, false);
 
   // 아이콘 애니메이션 variants
   const moodIconVariants = useMemo(
     () => ({
-      selected: { x: offset.x, y: offset.y },
+      initial: { x: 0, y: 0 },
+      selected: { x: selectedOffset.x, y: selectedOffset.y },
+      unselected: { x: unselectedOffset.x, y: unselectedOffset.y },
     }),
-    [offset.x, offset.y]
+    [selectedOffset.x, selectedOffset.y, unselectedOffset.x, unselectedOffset.y]
   );
 
   // 원형 버튼 스타일
@@ -60,10 +62,7 @@ const MoodVariantButton: React.FC<MoodVariantButtonProps> = ({
       backgroundColor: colors.bg,
       borderColor: colors.border,
       borderWidth: isSelected ? 1.26 : 1,
-      height: isSelected ? 72 : 60,
-      opacity: 0.95,
       padding: 15,
-      width: isSelected ? 72 : 60,
     }),
     [colors.bg, colors.border, isSelected]
   );
@@ -71,19 +70,28 @@ const MoodVariantButton: React.FC<MoodVariantButtonProps> = ({
   // 텍스트 스타일
   const textStyle = useMemo(() => ({ color: colors.text }), [colors.text]);
 
+  // 그림자 클래스
+  const shadowClass = selected ? EMOTION_CONFIG[color]?.shadow : '';
+
+  // 컨테이너 크기 클래스
+  const containerSizeClass = isSelected
+    ? 'h-[72px] w-[72px]'
+    : 'h-[60px] w-[60px]';
+
   return (
     <motion.button
       type="button"
       onClick={onClick}
-      className={cn('flex flex-col items-center space-y-2', className)}
+      className="flex flex-col items-center"
       aria-pressed={!!selected}
       initial="initial"
     >
       {/* 원형 아이콘 컨테이너 */}
       <motion.div
         className={cn(
-          'flex items-center justify-center rounded-full border',
-          getShadowClass(color, selected)
+          'flex items-center justify-center',
+          containerSizeClass,
+          shadowClass
         )}
         style={circleStyle}
         variants={EMOTION_ANIMATION_VARIANTS.moodCircle}
@@ -103,7 +111,7 @@ const MoodVariantButton: React.FC<MoodVariantButtonProps> = ({
 
       {/* 라벨 텍스트 */}
       <motion.span
-        className="xs:text-base mt-[6px] text-sm sm:text-lg md:text-xl"
+        className="text-17sb mt-[6px]"
         style={textStyle}
         initial="initial"
         animate={isSelected ? 'selected' : 'unselected'}

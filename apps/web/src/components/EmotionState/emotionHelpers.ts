@@ -15,7 +15,7 @@ import type { EmotionColor } from './EmotionState';
 /**
  * 감정별 색상 및 아이콘 매핑
  */
-const EMOTION_CONFIG = {
+export const EMOTION_CONFIG = {
   blue: {
     bg: 'hsl(var(--feel-back-tired))',
     component: EmotionBadIcon,
@@ -43,18 +43,12 @@ const UNSELECTED_COLORS = {
   bg: 'hsl(var(--gray-100))',
   border: 'hsl(var(--gray-600))',
   icon: 'hsl(var(--gray-600))',
-  text: 'hsl(var(--gray-700))',
+  text: 'hsl(var(--gray-500))',
 } as const;
 
 // ============================================================================
 // 유틸리티 함수들
 // ============================================================================
-
-/**
- * CSS 변수에서 클래스명 추출
- */
-const extractCssVar = (cssVar: string) =>
-  cssVar.replace('hsl(var(', '').replace('))', '');
 
 /**
  * 아이콘 오프셋 계산
@@ -64,13 +58,6 @@ export const getIconOffset = (color: EmotionColor, isSelected: boolean) => {
     return isSelected ? { x: 0, y: -9 } : { x: 0, y: 0 };
   }
   return isSelected ? { x: -9, y: -9 } : { x: -3, y: -3 };
-};
-
-/**
- * 그림자 클래스 반환
- */
-export const getShadowClass = (color: EmotionColor, selected?: boolean) => {
-  return selected ? EMOTION_CONFIG[color]?.shadow || '' : '';
 };
 
 /**
@@ -111,10 +98,10 @@ export const getBaseColor = (color: EmotionColor, variant: string) => {
   if (!config) return 'bg-gray-100 text-gray-500';
 
   if (variant === 'mood') {
-    return extractCssVar(config.text);
+    return config.text; // CSS 변수를 직접 반환
   }
 
-  return `${extractCssVar(config.bg)} ${extractCssVar(config.text)}`;
+  return `${config.bg} ${config.text}`; // CSS 변수를 직접 반환
 };
 
 /**
