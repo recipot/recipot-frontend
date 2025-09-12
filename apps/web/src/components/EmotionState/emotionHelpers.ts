@@ -18,21 +18,21 @@ import type { EmotionColor } from './EmotionState';
 export const EMOTION_CONFIG = {
   blue: {
     bg: 'hsl(var(--feel-back-tired))',
-    border: 'hsl(var(--feel-back-tired))',
+    border: 'hsl(var(--feel-back-tired) / 0.05)',
     component: EmotionBadIcon,
     shadow: 'emotion-shadow-bad',
     text: 'hsl(var(--feel-tired-text))',
   },
   red: {
     bg: 'hsl(var(--feel-back-free))',
-    border: 'hsl(var(--feel-back-free))',
+    border: 'hsl(var(--feel-back-free) / 0.05)',
     component: EmotionGoodIcon,
     shadow: 'emotion-shadow-good',
     text: 'hsl(var(--feel-free-text))',
   },
   yellow: {
     bg: 'hsl(var(--feel-back-soso))',
-    border: 'hsl(var(--feel-back-soso))',
+    border: 'hsl(var(--feel-back-soso) / 0.05)',
     component: EmotionNeutralIcon,
     shadow: 'emotion-shadow-neutral',
     text: 'hsl(var(--feel-soso-text))',
@@ -44,7 +44,7 @@ export const EMOTION_CONFIG = {
  */
 const UNSELECTED_COLORS = {
   bg: 'hsl(var(--gray-100))',
-  border: 'hsl(var(--gray-600))',
+  border: 'hsl(var(--gray-600), 0.05)',
   icon: 'hsl(var(--gray-600))',
   text: 'hsl(var(--gray-500))',
 } as const;
@@ -87,7 +87,7 @@ export const getMoodColors = (
 
   return {
     bg: config.bg,
-    border: config.text.replace('hsl(', 'hsla(').replace(')', ', 0.05)'),
+    border: config.border,
     icon: config.text,
     text: config.text,
   };
