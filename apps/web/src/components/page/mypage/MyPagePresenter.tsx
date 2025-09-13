@@ -5,12 +5,13 @@ import { QuickLinks } from '@/components/page/mypage/components/QuickLinks';
 import { UserProfile } from '@/components/page/mypage/components/UserProfile';
 import { PageHeader } from '@/components/page/mypage/PageHeader';
 
-export const MyPagePresenter = ({ onGoBack }) => {
+export function MyPagePresenter() {
   return (
     <div>
-      <PageHeader />
-
-      <main>
+      <div className="px-5">
+        <PageHeader title="마이페이지" />
+      </div>
+      <main className="px-5">
         <UserProfile />
         <QuickLinks />
         <MyRecipesLink />
@@ -18,8 +19,11 @@ export const MyPagePresenter = ({ onGoBack }) => {
       </main>
 
       <footer>
-        <InfoLinks />
+        <div className="h-2 bg-gray-50" />
+        <div className="px-5">
+          <InfoLinks />
+        </div>
       </footer>
     </div>
   );
-};
+}

@@ -101,6 +101,7 @@ module.exports = {
         20: ['1.25rem', { lineHeight: '140%', fontWeight: '700' }], // text-20
         22: ['1.375rem', { lineHeight: '140%', fontWeight: '600' }], // text-22
         24: ['1.5rem', { lineHeight: '140%', fontWeight: '600' }], // text-24
+        28: ['1.75rem', { lineHeight: '100%', fontWeight: '700' }], // text-28
       },
     },
   },
