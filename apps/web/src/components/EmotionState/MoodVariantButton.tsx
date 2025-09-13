@@ -75,8 +75,8 @@ const MoodVariantButton: React.FC<MoodVariantButtonProps> = ({
 
   // 컨테이너 크기 클래스
   const containerSizeClass = isSelected
-    ? 'h-[72px] w-[72px]'
-    : 'h-[60px] w-[60px]';
+    ? 'h-[4.5rem] w-[4.5rem]'
+    : 'h-[3.75rem] w-[3.75rem]';
 
   return (
     <motion.button
