@@ -7,7 +7,15 @@ import EmotionState from './EmotionState';
 
 // Mock EmotionOptionButton 컴포넌트
 vi.mock('./EmotionOptionButton', () => ({
-  default: function MockEmotionOptionButton({ label, onClick, selected }: any) {
+  default: function MockEmotionOptionButton({
+    label,
+    onClick,
+    selected,
+  }: {
+    label: string;
+    onClick: () => void;
+    selected: boolean;
+  }) {
     return (
       <button
         data-testid={`emotion-button-${label}`}
