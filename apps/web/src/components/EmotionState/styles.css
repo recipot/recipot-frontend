@@ -43,13 +43,13 @@
 }
 
 .emotion-shadow-bad {
-  box-shadow: 0 0 40px rgba(212, 226, 255, 0.5);
+  box-shadow: 0 0 40px #d4e2ff80;
 }
 
 .emotion-shadow-neutral {
-  box-shadow: 0 0 40px rgba(248, 246, 191, 0.5);
+  box-shadow: 0 0 40px #f8f6bf80;
 }
 
 .emotion-shadow-good {
-  box-shadow: 0 0 40px rgba(255, 224, 225, 0.5);
+  box-shadow: 0 0 40px #ffe0e180;
 }
