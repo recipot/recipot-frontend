@@ -155,9 +155,7 @@ export default [
             ['^react', '^@?\\w'],
             // Internal packages
             ['^(@|components)(/.*|$)'],
-            // Parent imports
-            ['^\\.\\.(?!/?$)', '^\\.\\./?$'],
-            // Other relative imports
+            // Other relative imports (parent imports 제거됨)
             ['^\\./(?=.*/)(?!/?$)', '^\\.(?!/?$)', '^\\./?$'],
             // Type imports
             ['^.+\\u0000$'],

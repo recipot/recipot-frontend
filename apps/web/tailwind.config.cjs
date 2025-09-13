@@ -4,6 +4,9 @@ module.exports = {
   content: ['./src/**/*.{ts,tsx}'],
   theme: {
     extend: {
+      screens: {
+        xs: { max: '320px' },
+      },
       fontFamily: {
         pretendard: ['var(--font-pretendard)'],
       },
@@ -55,6 +58,10 @@ module.exports = {
           4: 'hsl(var(--chart-4))',
           5: 'hsl(var(--chart-5))',
         },
+        kakao: {
+          DEFAULT: '#FEE500',
+          pressed: '#e5cf00',
+        },
 
         /* Secondary */
         'secondary-soft-green': 'hsl(var(--secondary-soft-green))',
@@ -88,7 +95,12 @@ module.exports = {
         },
       },
       fontSize: {
-        14: ['0.875rem', { lineHeight: '150%', fontWeight: '600' }], // text-14
+        12: ['0.75rem', { lineHeight: '150%', fontWeight: '400' }], // text-12
+        '12sb': ['0.75rem', { lineHeight: '150%', fontWeight: '600' }], // text-12sb
+        13: ['0.8125rem', { lineHeight: '150%', fontWeight: '400' }], // text-13
+        '13sb': ['0.8125rem', { lineHeight: '150%', fontWeight: '600' }], // text-13sb
+        14: ['0.875rem', { lineHeight: '150%', fontWeight: '400' }], // text-14
+        '14sb': ['0.875rem', { lineHeight: '150%', fontWeight: '600' }], // text-14sb
         '14b': ['0.875rem', { lineHeight: '150%', fontWeight: '700' }], // text-14b
         15: ['0.9375rem', { lineHeight: '150%' }], // text-15
         '15sb': ['0.9375rem', { lineHeight: '150%', fontWeight: '600' }], // text-15sb
