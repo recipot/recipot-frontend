@@ -4,7 +4,7 @@ import 'swiper/css';
 import 'swiper/css/effect-cards';
 import './styles.css';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { EffectCards, Pagination } from 'swiper/modules';
@@ -54,6 +54,7 @@ const ErrorState = ({
 
 export default function RecipeRecommend() {
   const router = useRouter();
+  const [activeIndex, setActiveIndex] = useState(0);
 
   // TanStack Query로 레시피 데이터 조회
   const { data, error, isError, isLoading, refetch } = useQuery({
@@ -149,6 +150,7 @@ export default function RecipeRecommend() {
               {...SWIPER_CONFIG}
               className="recipe-swiper h-full w-full"
               style={swiperStyles}
+              onSlideChange={swiper => setActiveIndex(swiper.activeIndex)}
             >
               {recipes.map((recipe, index) => (
                 <SwiperSlide
@@ -165,6 +167,7 @@ export default function RecipeRecommend() {
                     }
                     snackbarMessage={snackbarMessage}
                     onToggleLike={toggleLike}
+                    isMainCard={index === activeIndex}
                   />
                 </SwiperSlide>
               ))}
