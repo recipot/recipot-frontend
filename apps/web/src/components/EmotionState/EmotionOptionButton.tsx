@@ -65,16 +65,14 @@ function EmotionOptionButton({
       type="button"
       onClick={onClick}
       className={cn(
-        'flex h-[80px] w-[85px] flex-shrink-0 flex-col items-center justify-center gap-1 rounded-2xl text-xs font-semibold',
+        'flex h-[93px] w-[106px] flex-shrink-0 flex-col items-center justify-center gap-1 rounded-2xl',
         shadowClass,
         getBaseColor(color, variant)
       )}
       aria-pressed={!!selected}
     >
-      <span className="text-xl leading-none sm:text-2xl">
-        {renderIcon(color, getIconColor(color, selected))}
-      </span>
-      <span className="xs:text-12sb text-15sb">{label}</span>
+      {renderIcon(color, getIconColor(color, selected))}
+      <span className="text-15sb">{label}</span>
     </button>
   );
 }
