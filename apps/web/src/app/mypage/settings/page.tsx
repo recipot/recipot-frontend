@@ -3,7 +3,7 @@ import LogoutButton from '@/components/page/mypage/settings/LogoutButton';
 import ProfileSection from '@/components/page/mypage/settings/ProfileSection';
 import SnsLinkageSection from '@/components/page/mypage/settings/SnsLinkageSection';
 
-const SettingsPage = () => {
+export default function SettingsPage() {
   // 임시 유저 데이터
   const user = {
     avatarUrl: '/chick-avatar.png',
@@ -30,6 +30,4 @@ const SettingsPage = () => {
       <LogoutButton />
     </div>
   );
-};
-
-export default SettingsPage;
+}

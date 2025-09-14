@@ -21,7 +21,7 @@ export default function UserProfile() {
           height={54}
           className="overflow-hidden rounded-full"
         />
-        <div className="flex min-w-0 flex-1 flex-col gap-[3px]">
+        <div className="flex min-w-0 flex-1 flex-col gap-[0.188rem]">
           <span className="text-20 truncate text-gray-900">
             오리무중체다치즈
           </span>

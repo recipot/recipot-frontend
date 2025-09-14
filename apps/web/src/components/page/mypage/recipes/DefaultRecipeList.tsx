@@ -44,7 +44,7 @@ export default function DefaultRecipeList({
         </ul>
       </div>
       <div
-        className="pointer-events-none absolute right-0 bottom-0 left-0 h-[85px] rounded-b-[1.25rem]"
+        className="pointer-events-none absolute right-0 bottom-0 left-0 h-[5.313rem] rounded-b-[1.25rem]"
         style={{
           background: `linear-gradient(to top, ${config.overLayColor}, transparent)`,
         }}

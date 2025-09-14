@@ -12,7 +12,7 @@ export default function ProfileSection({ user }: ProfileSectionProps) {
         height={54}
         className="overflow-hidden rounded-full"
       />
-      <div className="flex flex-col gap-0.75">
+      <div className="flex flex-col gap-[0.188rem]">
         <span className="text-20 text-gray-900">{user.nickname}</span>
         <span className="text-16 text-[#999999]">{user.email}</span>
       </div>
