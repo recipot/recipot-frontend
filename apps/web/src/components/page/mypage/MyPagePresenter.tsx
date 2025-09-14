@@ -1,9 +1,10 @@
-import { DietaryRestrictions } from '@/components/page/mypage/components/DietaryRestrictions';
-import { InfoLinks } from '@/components/page/mypage/components/InfoLinks';
-import { MyRecipesLink } from '@/components/page/mypage/components/MyRecipesLink';
-import { QuickLinks } from '@/components/page/mypage/components/QuickLinks';
-import { UserProfile } from '@/components/page/mypage/components/UserProfile';
 import { PageHeader } from '@/components/page/mypage/PageHeader';
+
+import DietaryRestrictions from './components/DietaryRestrictions';
+import InfoLinks from './components/InfoLinks';
+import MyRecipesLink from './components/MyRecipesLink';
+import QuickLinks from './components/QuickLinks';
+import UserProfile from './components/UserProfile';
 
 export function MyPagePresenter() {
   return (

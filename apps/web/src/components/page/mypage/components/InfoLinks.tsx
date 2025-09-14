@@ -9,7 +9,7 @@ const links = [
   { href: '/terms', label: '이용약관' },
 ];
 
-export function InfoLinks() {
+export default function InfoLinks() {
   return (
     <div className="mt-6">
       {links.map(({ href, label }) => (
@@ -19,7 +19,7 @@ export function InfoLinks() {
           className="flex w-fit items-center py-[11px] pl-2"
         >
           <span className="text-17sb">{label}</span>
-          <ArrowIcon size={18} color="hsl(var(--gray-900))" />
+          <ArrowIcon size={18} color="var(--gray-900)" />
         </Link>
       ))}
     </div>

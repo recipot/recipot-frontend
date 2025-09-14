@@ -4,9 +4,8 @@ import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/common/Button';
 import { SettingsIcon } from '@/components/Icons';
-import userProfileImage from '@/stories/assets/default-profile.png';
 
-export function UserProfile() {
+export default function UserProfile() {
   const router = useRouter();
 
   const hadleNavigateToSettings = () => {
@@ -16,7 +15,7 @@ export function UserProfile() {
     <div className="py-6">
       <div className="flex items-center gap-4">
         <Image
-          src={userProfileImage}
+          src="/mypage/default-profile.png"
           alt="사용자 프로필 이미지"
           width={54}
           height={54}
@@ -37,7 +36,7 @@ export function UserProfile() {
           className="bg-gray-100 px-2 py-1 active:bg-[#E9ECEF]"
           onClick={hadleNavigateToSettings}
         >
-          <SettingsIcon size={18} color="hsl(var(--gray-600))" />
+          <SettingsIcon size={18} color="var(--gray-600)" />
           <span className="text-14b text-gray-600">설정</span>
         </Button>
       </div>

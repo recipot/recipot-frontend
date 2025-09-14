@@ -1,34 +1,21 @@
 import Image from 'next/image';
 
-interface User {
-  avatarUrl: string;
-  nickname: string;
-  email: string;
-}
+import type { ProfileSectionProps } from '@/components/page/mypage/MyPage.types';
 
-interface ProfileSectionProps {
-  user: User;
-}
-
-const ProfileSection = ({ user }: ProfileSectionProps) => {
+export default function ProfileSection({ user }: ProfileSectionProps) {
   return (
-    <section className="mb-8 flex items-center gap-4">
+    <section className="flex items-center gap-4 py-6">
       <Image
-        src={user.avatarUrl}
-        alt="프로필 이미지"
-        width={64}
-        height={64}
-        className="rounded-full bg-yellow-200"
+        src="/mypage/default-profile.png"
+        alt="사용자 프로필 이미지"
+        width={54}
+        height={54}
+        className="overflow-hidden rounded-full"
       />
-      <div className="flex flex-col">
-        <span className="font-semibold text-gray-800">{user.nickname}</span>
-        <span className="text-sm text-gray-500">
-          10자 까지 입력할 수 있어요
-        </span>
-        <span className="mt-1 text-sm text-gray-500">{user.email}</span>
+      <div className="flex flex-col gap-0.75">
+        <span className="text-20 text-gray-900">{user.nickname}</span>
+        <span className="text-16 text-[#999999]">{user.email}</span>
       </div>
     </section>
   );
-};
-
-export default ProfileSection;
+}
