@@ -34,6 +34,7 @@
     "react": "18.3.1",
     "react-confetti": "^6.4.0",
     "react-dom": "18.3.1",
+    "@recipot/contexts": "workspace:*",
     "react-hook-form": "^7.62.0",
     "swiper": "^11.2.10",
     "tailwind-merge": "^2.6.0",
