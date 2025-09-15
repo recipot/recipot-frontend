@@ -36,6 +36,28 @@ export const buttonVariants = cva(
         secondary: 'bg-secondary text-white active:bg-secondary-pressed',
         toggle:
           'bg-gray-100 text-gray-600 data-[state=active]:bg-gray-900 data-[state=active]:text-white',
+        // 감정 선택 버튼들
+        emotion:
+          'bg-blue-100 text-gray-700 hover:bg-blue-200 active:bg-blue-300',
+        emotionGood:
+          'bg-pink-100 text-gray-700 hover:bg-pink-200 active:bg-pink-300',
+        emotionNeutral:
+          'bg-yellow-100 text-gray-700 hover:bg-yellow-200 active:bg-yellow-300',
+        // 카테고리 탭 버튼들
+        category:
+          'bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300',
+        categoryActive:
+          'bg-gray-800 text-white hover:bg-gray-700 active:bg-gray-900',
+        // 음식 아이템 선택 버튼들
+        foodItem:
+          'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 active:bg-gray-100',
+        foodItemSelected:
+          'bg-green-100 border border-green-300 text-green-800 hover:bg-green-200 active:bg-green-300',
+        // 리셋 버튼
+        reset: 'bg-gray-100 text-gray-600 hover:bg-gray-200 active:bg-gray-300',
+        // 주요 액션 버튼
+        primaryAction:
+          'bg-green-600 text-white hover:bg-green-700 active:bg-green-800',
       },
     },
   }
