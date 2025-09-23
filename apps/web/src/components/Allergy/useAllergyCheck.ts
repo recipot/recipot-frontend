@@ -20,9 +20,5 @@ export default function useAllergyCheck() {
     });
   }, []);
 
-  const handleItemReset = useCallback(() => {
-    setSelectedItems([]);
-  }, []);
-
-  return { handleItemReset, handleItemToggle, selectedItems };
+  return { handleItemToggle, selectedItems };
 }

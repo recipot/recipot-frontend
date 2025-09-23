@@ -9,8 +9,7 @@ import { Button } from '@/components/common/Button';
 import { useOnboarding } from '../../_context/OnboardingContext';
 
 export default function AllergyStep() {
-  const { handleItemReset, handleItemToggle, selectedItems } =
-    useAllergyCheck();
+  const { handleItemToggle, selectedItems } = useAllergyCheck();
   const { goToNextStep, markStepCompleted, setStepData } = useOnboarding();
 
   const allergyMutation = useMutation({
@@ -33,15 +32,6 @@ export default function AllergyStep() {
 
   return (
     <div className="container mx-auto max-w-4xl p-6">
-      <h1 className="sr-only">알레르기 정보를 선택해주세요.</h1>
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={handleItemReset}
-        disabled={selectedItems.length === 0}
-      >
-        선택 초기화
-      </Button>
       <AllergyCheckContainer
         formId="allergy-form"
         onSubmit={handleSubmit}
