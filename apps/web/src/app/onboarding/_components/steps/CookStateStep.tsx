@@ -26,11 +26,13 @@ export default function CookStateStep() {
 
   return (
     <>
-      <EmotionState
-        onMoodChange={handleMoodChange}
-        initialMood={selectedMood}
-        className="!h-[80vh] pb-[72px]"
-      />
+      <div className="fixed top-0 right-0 left-0 -z-10 h-screen min-h-[500px]">
+        <EmotionState
+          onMoodChange={handleMoodChange}
+          initialMood={selectedMood}
+          className="h-full"
+        />
+      </div>
 
       <div className="fixed right-0 bottom-0 left-0 flex justify-center px-6 py-[10px]">
         <Button onClick={handleNext} disabled={selectedMood === null}>
