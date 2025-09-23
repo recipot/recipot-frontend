@@ -12,6 +12,7 @@ export interface UserInfo {
   provider: string;
   createdAt: string;
   updatedAt: string;
+  isOnboardingCompleted?: boolean;
 }
 
 export interface TokenResponse {

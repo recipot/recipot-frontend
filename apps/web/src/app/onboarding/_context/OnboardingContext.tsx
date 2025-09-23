@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState } from 'react';
+import { useAuth } from '@recipot/contexts';
 
 import type { ReactNode } from 'react';
 
@@ -22,6 +23,7 @@ interface OnboardingContextType {
   isStepCompleted: (step: number) => boolean;
   canGoToNextStep: () => boolean;
   canGoToPreviousStep: () => boolean;
+  completeOnboarding: () => void;
 }
 
 const OnboardingContext = createContext<OnboardingContextType | undefined>(
@@ -31,6 +33,7 @@ const OnboardingContext = createContext<OnboardingContextType | undefined>(
 const TOTAL_STEPS = 3;
 
 export function OnboardingProvider({ children }: { children: ReactNode }) {
+  const { setUser, user } = useAuth();
   const [state, setState] = useState<OnboardingState>({
     completedSteps: [],
     currentStep: 1,
@@ -79,9 +82,20 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
     return state.currentStep > 1;
   };
 
+  const completeOnboarding = () => {
+    if (user) {
+      // 사용자의 온보딩 완료 상태 업데이트
+      setUser({
+        ...user,
+        isOnboardingCompleted: true,
+      });
+    }
+  };
+
   const value: OnboardingContextType = {
     canGoToNextStep,
     canGoToPreviousStep,
+    completeOnboarding,
     goToNextStep,
     goToPreviousStep,
     isStepCompleted,

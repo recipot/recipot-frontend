@@ -2,6 +2,7 @@
 
 import './styles.css';
 
+import { useEffect } from 'react';
 import { useAuth } from '@recipot/contexts';
 import { useRouter } from 'next/navigation';
 
@@ -12,8 +13,20 @@ import { useIntroSlider } from './_components/useIntroSlider';
 export default function SignInPage() {
   const { current, handleSlideChange, intro } = useIntroSlider();
   const { googleLogin, loading, login, logout, user } = useAuth();
-
   const router = useRouter();
+
+  // 로그인 성공 후 온보딩 상태에 따른 리다이렉트
+  useEffect(() => {
+    if (user && !loading) {
+      if (user.isOnboardingCompleted) {
+        // 온보딩 완료된 사용자는 메인 페이지로 이동
+        router.push('/');
+      } else {
+        // 온보딩 미완료 사용자는 온보딩 페이지로 이동
+        router.push('/onboarding');
+      }
+    }
+  }, [user, loading, router]);
 
   return (
     <div className="mx-auto min-h-screen w-full">

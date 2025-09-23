@@ -11,7 +11,8 @@ import {
 import { useOnboarding } from '../../_context/OnboardingContext';
 
 export default function RefrigeratorStep() {
-  const { markStepCompleted, setStepData } = useOnboarding();
+  const { completeOnboarding, markStepCompleted, setStepData } =
+    useOnboarding();
   const ingredientsSearchRef = useRef<IngredientsSearchRef>(null);
   const [selectedCount, setSelectedCount] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -42,6 +43,7 @@ export default function RefrigeratorStep() {
     };
     setStepData(3, refrigeratorData);
     markStepCompleted(3);
+    completeOnboarding(); // 온보딩 완료 상태 업데이트
     console.info('온보딩 완료!', refrigeratorData);
     // TODO: 메인 페이지로 이동하거나 완료 처리
   };
