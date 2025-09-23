@@ -48,15 +48,16 @@ export default function AllergyStep() {
         selectedItems={selectedItems}
         onItemToggle={handleItemToggle}
       />
-      <Button
-        form="allergy-form"
-        size="full"
-        type="submit"
-        className="mt-4"
-        disabled={selectedItems.length === 0 || allergyMutation.isPending}
-      >
-        {allergyMutation.isPending ? '처리 중...' : '다음 단계'}
-      </Button>
+
+      <div className="fixed right-0 bottom-0 left-0 flex justify-center px-6 py-[10px]">
+        <Button
+          form="allergy-form"
+          disabled={allergyMutation.isPending}
+          type="submit"
+        >
+          여유에 맞는 요리 추천받기
+        </Button>
+      </div>
     </div>
   );
 }

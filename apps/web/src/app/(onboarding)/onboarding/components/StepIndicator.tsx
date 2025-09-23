@@ -7,8 +7,8 @@ export default function StepIndicator() {
   const totalSteps = 3;
 
   return (
-    <div className="flex w-full justify-center px-6 py-4">
-      <div className="flex w-full max-w-md gap-1">
+    <div className="flex w-full justify-center">
+      <div className="flex w-full">
         {Array.from({ length: totalSteps }, (_, index) => {
           const stepNumber = index + 1;
           const isCurrentStep = state.currentStep === stepNumber;

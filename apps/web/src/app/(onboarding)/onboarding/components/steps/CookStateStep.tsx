@@ -19,9 +19,6 @@ export default function CookStateStep() {
 
   return (
     <div className="container mx-auto max-w-4xl p-6">
-      <h1 className="mb-4 text-2xl font-bold">요리할 여유가 얼마나 있나요?</h1>
-      <p className="mb-8 text-gray-600">상태와 재료 딱 두 가지만 알려주세요!</p>
-
       {/* TODO: 실제 요리 상태 선택 UI 구현 */}
       <div className="space-y-4">
         <div className="rounded-lg border p-4">
@@ -29,10 +26,8 @@ export default function CookStateStep() {
         </div>
       </div>
 
-      <div className="mt-8">
-        <Button size="full" onClick={handleNext}>
-          다음 단계
-        </Button>
+      <div className="fixed right-0 bottom-0 left-0 flex justify-center px-6 py-[10px]">
+        <Button onClick={handleNext}>여유에 맞는 요리 추천받기</Button>
       </div>
     </div>
   );

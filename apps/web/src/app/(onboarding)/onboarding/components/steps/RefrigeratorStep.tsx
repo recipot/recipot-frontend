@@ -22,11 +22,6 @@ export default function RefrigeratorStep() {
 
   return (
     <div className="container mx-auto max-w-4xl p-6">
-      <h1 className="mb-4 text-2xl font-bold">
-        현재 냉장고에 어떤 재료를 가지고 계신가요?
-      </h1>
-      <p className="mb-8 text-gray-600">두 가지만 골라도 요리를 찾아드려요</p>
-
       {/* TODO: 실제 냉장고 재료 선택 UI 구현 */}
       <div className="space-y-4">
         <div className="rounded-lg border p-4">
@@ -34,10 +29,8 @@ export default function RefrigeratorStep() {
         </div>
       </div>
 
-      <div className="mt-8">
-        <Button size="full" onClick={handleComplete}>
-          완료하기
-        </Button>
+      <div className="fixed right-0 bottom-0 left-0 flex justify-center px-6 py-[10px]">
+        <Button onClick={handleComplete}>여유에 맞는 요리 추천받기</Button>
       </div>
     </div>
   );

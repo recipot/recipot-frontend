@@ -49,7 +49,7 @@ function OnboardingContent() {
         <h2 className="text-24 mb-1 whitespace-pre-line">
           {currentStepData.title}
         </h2>
-        <p className="text-18">{currentStepData.description}</p>
+        <p className="text-18 text-gray-600">{currentStepData.description}</p>
       </div>
 
       <div>{renderCurrentStep()}</div>
