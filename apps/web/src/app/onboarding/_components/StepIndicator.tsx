@@ -1,6 +1,6 @@
 'use client';
 
-import { useOnboarding } from '../context/OnboardingContext';
+import { useOnboarding } from '../_context/OnboardingContext';
 
 export default function StepIndicator() {
   const { state } = useOnboarding();

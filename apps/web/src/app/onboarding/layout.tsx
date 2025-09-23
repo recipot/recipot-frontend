@@ -4,7 +4,10 @@ import { useRouter } from 'next/navigation';
 
 import { BackIcon, RefreshIcon } from '@/components/Icons';
 
-import { OnboardingProvider, useOnboarding } from './context/OnboardingContext';
+import {
+  OnboardingProvider,
+  useOnboarding,
+} from './_context/OnboardingContext';
 
 function OnboardingHeader() {
   const router = useRouter();

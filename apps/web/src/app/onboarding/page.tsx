@@ -1,10 +1,10 @@
 'use client';
 
-import StepIndicator from './components/StepIndicator';
-import AllergyStep from './components/steps/AllergyStep';
-import CookStateStep from './components/steps/CookStateStep';
-import RefrigeratorStep from './components/steps/RefrigeratorStep';
-import { useOnboarding } from './context/OnboardingContext';
+import StepIndicator from './_components/StepIndicator';
+import AllergyStep from './_components/steps/AllergyStep';
+import CookStateStep from './_components/steps/CookStateStep';
+import RefrigeratorStep from './_components/steps/RefrigeratorStep';
+import { useOnboarding } from './_context/OnboardingContext';
 
 const steps = [
   {

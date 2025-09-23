@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/common/Button';
 
-import { useOnboarding } from '../../context/OnboardingContext';
+import { useOnboarding } from '../../_context/OnboardingContext';
 
 export default function CookStateStep() {
   const { goToNextStep, markStepCompleted, setStepData } = useOnboarding();

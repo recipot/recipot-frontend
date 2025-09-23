@@ -6,7 +6,7 @@ import { useMutation } from '@tanstack/react-query';
 import { AllergyCheckContainer, useAllergyCheck } from '@/components/Allergy';
 import { Button } from '@/components/common/Button';
 
-import { useOnboarding } from '../../context/OnboardingContext';
+import { useOnboarding } from '../../_context/OnboardingContext';
 
 export default function AllergyStep() {
   const { handleItemReset, handleItemToggle, selectedItems } =
