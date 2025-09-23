@@ -1,24 +1,20 @@
 import { Button } from '@/components/common/Button/Button';
 import { GoogleIcon, KakaoIcon } from '@/components/Icons';
 
-export function AuthButtons() {
-  const handleKakaoLogin = () => {
-    // TODO: 카카오 로그인 로직
-    console.info('카카오 로그인');
-  };
-
-  const handleGoogleLogin = () => {
-    // TODO: 구글 로그인 로직
-    console.info('구글 로그인');
-  };
-
+export function AuthButtons({
+  googleLogin,
+  kakaoLogin,
+}: {
+  kakaoLogin: () => void;
+  googleLogin: () => void;
+}) {
   return (
     <div className="fixed bottom-0 left-1/2 z-50 flex w-full -translate-x-1/2 flex-col items-center gap-3 bg-white/60 px-6 pt-[10px] pb-[calc(10px+env(safe-area-inset-bottom))] backdrop-blur">
       <Button
         size="full"
         shape="round"
         className="bg-kakao active:bg-kakao-pressed text-gray-900"
-        onClick={handleKakaoLogin}
+        onClick={kakaoLogin}
       >
         <KakaoIcon size={28} />
         카카오로 시작하기
@@ -28,7 +24,7 @@ export function AuthButtons() {
         shape="round"
         variant="outline"
         className="bg-white"
-        onClick={handleGoogleLogin}
+        onClick={googleLogin}
       >
         <GoogleIcon />
         Google로 시작하기

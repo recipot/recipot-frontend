@@ -33,9 +33,9 @@ vi.mock('@tanstack/react-query', async importOriginal => {
 
 // MSW 핸들러 설정
 const server = setupServer(
-  http.post('/api/onboarding/allergy', () => {
-    return HttpResponse.json({ message: 'Success' });
-  })
+  http.post('/api/onboarding/allergy', (async () => {
+    return HttpResponse.json({ message: 'Success' }, { status: 200 });
+  }) as any)
 );
 
 beforeAll(() => server.listen());

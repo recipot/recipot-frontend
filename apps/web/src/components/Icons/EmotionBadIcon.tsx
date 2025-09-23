@@ -2,7 +2,7 @@ import React from 'react';
 
 import type { IconProps } from '@/types/Icon.types';
 
-const MASK_STYLE = { maskType: 'luminance' as const };
+const maskStyle = { maskType: 'luminance' as const };
 
 const EmotionBadIcon: React.FC<IconProps> = ({
   color = '#4164AE',
@@ -20,7 +20,7 @@ const EmotionBadIcon: React.FC<IconProps> = ({
     >
       <mask
         id="mask0_1248_12125"
-        style={MASK_STYLE}
+        style={maskStyle}
         maskUnits="userSpaceOnUse"
         x="0"
         y="0"
