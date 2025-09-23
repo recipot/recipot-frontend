@@ -82,7 +82,7 @@ const MoodVariantButton: React.FC<MoodVariantButtonProps> = ({
     <motion.button
       type="button"
       onClick={onClick}
-      className="flex flex-col items-center"
+      className="flex h-[116px] w-[93px] flex-col items-center justify-center"
       aria-pressed={!!selected}
       initial="initial"
     >
