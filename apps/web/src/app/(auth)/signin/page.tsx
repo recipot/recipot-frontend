@@ -18,11 +18,17 @@ export default function SignInPage() {
   // 로그인 성공 후 온보딩 상태에 따른 리다이렉트
   useEffect(() => {
     if (user && !loading) {
-      if (user.isOnboardingCompleted) {
+      console.log('사용자 정보:', user);
+      console.log('온보딩 완료 상태:', user.isOnboardingCompleted);
+
+      // isOnboardingCompleted가 undefined이거나 false인 경우 온보딩으로 이동
+      if (user.isOnboardingCompleted === true) {
         // 온보딩 완료된 사용자는 메인 페이지로 이동
+        console.log('온보딩 완료된 사용자 - 메인 페이지로 이동');
         router.push('/');
       } else {
         // 온보딩 미완료 사용자는 온보딩 페이지로 이동
+        console.log('온보딩 미완료 사용자 - 온보딩 페이지로 이동');
         router.push('/onboarding');
       }
     }
