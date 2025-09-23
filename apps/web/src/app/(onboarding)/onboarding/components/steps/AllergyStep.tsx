@@ -6,9 +6,12 @@ import { useMutation } from '@tanstack/react-query';
 import { AllergyCheckContainer, useAllergyCheck } from '@/components/Allergy';
 import { Button } from '@/components/common/Button';
 
-export default function AllergyPage() {
+import { useOnboarding } from '../../context/OnboardingContext';
+
+export default function AllergyStep() {
   const { handleItemReset, handleItemToggle, selectedItems } =
     useAllergyCheck();
+  const { goToNextStep, markStepCompleted, setStepData } = useOnboarding();
 
   const allergyMutation = useMutation({
     mutationFn: allergyPost,
@@ -16,7 +19,11 @@ export default function AllergyPage() {
       console.error('API 호출 실패:', error);
     },
     onSuccess: data => {
-      console.info('API 호출 성공:', data);
+      console.log('API 호출 성공:', data);
+      // 데이터 저장 및 다음 단계로 이동
+      setStepData(1, { apiResponse: data, selectedItems });
+      markStepCompleted(1);
+      goToNextStep();
     },
   });
 
@@ -41,8 +48,14 @@ export default function AllergyPage() {
         selectedItems={selectedItems}
         onItemToggle={handleItemToggle}
       />
-      <Button form="allergy-form" size="full" type="submit" className="mt-4">
-        선택하기
+      <Button
+        form="allergy-form"
+        size="full"
+        type="submit"
+        className="mt-4"
+        disabled={selectedItems.length === 0 || allergyMutation.isPending}
+      >
+        {allergyMutation.isPending ? '처리 중...' : '다음 단계'}
       </Button>
     </div>
   );
