@@ -1,1 +1,4 @@
-export { default as IngredientsSearch } from './IngredientsSearch';
+export {
+  default as IngredientsSearch,
+  type IngredientsSearchRef,
+} from './IngredientsSearch';
