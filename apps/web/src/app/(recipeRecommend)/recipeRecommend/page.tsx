@@ -102,16 +102,16 @@ export default function RecipeRecommend() {
   }
 
   return (
-    <>
+    // TODO : 추후 감정 상태에 따라 그래디언트 적용 필요
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
       {/* Header */}
-      <div className="container mx-auto mt-8 px-4 sm:mt-12 sm:px-6 md:mt-[62px] lg:px-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mx-auto flex max-w-sm items-center justify-between sm:max-w-md md:max-w-lg">
           <BackIcon
             onClick={() => router.push('/')}
             className="cursor-pointer transition-opacity hover:opacity-70"
           />
 
-          <h1 className="text-18b text-center">타이틀</h1>
           <RefreshIcon
             onClick={() => refetch()}
             className="cursor-pointer transition-opacity hover:opacity-70"
@@ -120,31 +120,30 @@ export default function RecipeRecommend() {
       </div>
 
       {/* Tags */}
-      <div className="mt-4 px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-wrap justify-center gap-1 sm:gap-2">
+      <div className="mt-4 mb-[17.5px] px-4">
+        <div className="flex flex-wrap justify-center gap-[6px]">
           {selectedIngredients.map(ingredient => (
             <div
               key={ingredient}
-              className="bg-secondary-light-green text-12b sm:text-14b rounded-full px-2 py-[2px] text-[#53880A] sm:px-3 sm:py-[3px]"
+              className="bg-secondary-light-green border-secondary-soft-green rounded-[6px] border px-2 py-[2px] text-[#53880A]"
             >
-              {ingredient}
+              <p className="text-14b">{ingredient}</p>
             </div>
           ))}
         </div>
       </div>
 
       {/* Title */}
-      <div className="mt-4 px-4 text-center sm:px-6 lg:px-8">
-        <span className="text-18 sm:text-20 md:text-22">
-          요리할 여유가 그저 그래요
-        </span>
-        <span className="text-24 ml-2">😑</span>
+      <div className="flex w-full items-center justify-center px-10">
+        {/* TODO : 감정에 따른 감정 상태 표현 변경 필요 */}
+        <h2 className="text-22 mr-[2px]">요리할 여유가 그저 그래요</h2>
+        <div className="text-24 flex h-6 w-6 items-center">😑</div>
       </div>
 
       {/* Swiper Cards Effect */}
-      <div className="px-4 sm:px-6 lg:px-8">
+      <div className="mt-10 px-4">
         <div className="flex justify-center">
-          <div className="relative h-[530px] w-[350px]">
+          <div className="relative h-[460px] w-[344px]">
             <Swiper
               modules={SWIPER_MODULES}
               {...SWIPER_CONFIG}
@@ -178,6 +177,6 @@ export default function RecipeRecommend() {
         {/* Page Indicator */}
         <div className="recipe-pagination mt-4 flex justify-center gap-1.5 sm:mt-6 sm:gap-2" />
       </div>
-    </>
+    </div>
   );
 }
