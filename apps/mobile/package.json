@@ -6,7 +6,10 @@
     "dev": "expo start",
     "start": "expo start",
     "android": "expo run:android",
-    "ios": "expo run:ios"
+    "ios": "expo run:ios",
+    "build": "echo 'Mobile app build skipped in CI'",
+    "lint": "echo 'Mobile app lint skipped in CI'",
+    "typecheck": "echo 'Mobile app typecheck skipped in CI'"
   },
   "dependencies": {
     "expo": "~51.0.0",

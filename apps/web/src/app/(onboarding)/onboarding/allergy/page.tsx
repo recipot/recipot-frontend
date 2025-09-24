@@ -16,7 +16,7 @@ export default function AllergyPage() {
       console.error('API 호출 실패:', error);
     },
     onSuccess: data => {
-      console.log('API 호출 성공:', data);
+      console.info('API 호출 성공:', data);
     },
   });
 

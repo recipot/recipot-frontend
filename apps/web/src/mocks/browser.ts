@@ -14,6 +14,7 @@ export const startMswWorker = async () => {
         serviceWorker: {
           url: '/mockServiceWorker.js', // public 폴더에 있는 service worker
         },
+        waitUntilReady: true, // 워커가 준비될 때까지 대기
       });
 
       console.log('MSW가 시작되었습니다.');

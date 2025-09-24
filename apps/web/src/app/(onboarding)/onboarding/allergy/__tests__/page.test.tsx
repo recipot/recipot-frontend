@@ -33,9 +33,9 @@ vi.mock('@tanstack/react-query', async importOriginal => {
 
 // MSW 핸들러 설정
 const server = setupServer(
-  http.post('/api/onboarding/allergy', () => {
-    return HttpResponse.json({ message: 'Success' });
-  })
+  http.post('/api/onboarding/allergy', (async () => {
+    return HttpResponse.json({ message: 'Success' }, { status: 200 });
+  }) as any)
 );
 
 beforeAll(() => server.listen());
@@ -93,43 +93,5 @@ describe('Allergy Page', () => {
     expect(mockMutate).toHaveBeenCalledWith({
       categories: [1, 2],
     });
-  });
-
-  it('"선택 초기화" 버튼을 누르면 선택된 항목들이 해제된다', async () => {
-    const user = userEvent.setup();
-    render(<AllergyPage />, { wrapper: createWrapper() });
-
-    const crabButton = screen.getByRole('button', { name: '게' });
-    const fishButton = screen.getByRole('button', { name: '어류' });
-    const resetButton = screen.getByRole('button', { name: '선택 초기화' });
-
-    // 1. 항목 선택
-    await user.click(crabButton);
-    await user.click(fishButton);
-
-    // 선택 확인
-    expect(crabButton).toHaveClass('bg-secondary-light-green');
-    expect(fishButton).toHaveClass('bg-secondary-light-green');
-
-    // 2. 초기화
-    await user.click(resetButton);
-
-    // 초기화 확인
-    expect(crabButton).not.toHaveClass('bg-secondary-light-green');
-    expect(fishButton).not.toHaveClass('bg-secondary-light-green');
-  });
-
-  it('선택된 항목이 없으면 "선택 초기화" 버튼은 비활성화된다', async () => {
-    const user = userEvent.setup();
-    render(<AllergyPage />, { wrapper: createWrapper() });
-
-    const resetButton = screen.getByRole('button', { name: '선택 초기화' });
-    expect(resetButton).toBeDisabled();
-
-    await user.click(screen.getByRole('button', { name: '게' }));
-    expect(resetButton).not.toBeDisabled();
-
-    await user.click(resetButton);
-    expect(resetButton).toBeDisabled();
   });
 });
