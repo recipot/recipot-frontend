@@ -8,13 +8,19 @@ import type { Recipe } from '@/types/recipe.types';
 
 const gradientStyle = {
   background:
-    'linear-gradient(180deg, rgba(84, 114, 178, 0) 5.38%, rgba(84, 114, 178, 0.8) 28.90%, #5472b2 40.40%, #5472b2 100%)',
+    'linear-gradient(180deg, rgba(79, 112, 181, 0) 0%, #4F70B5 40%, #4F70B5 100%)',
 };
 
 const getBackgroundColor = (index: number) => {
-  const colors = ['#d1d9f0', '#b8c4e8', '#9fb0e0', '#f0f3fc'];
-  return colors[index % 4];
+  // 인덱스에 따른 투명도 직접 계산
+  const opacity = index % 2 === 0 ? 0.15 : 0.3;
+
+  return `rgba(79, 112, 181, ${opacity})`;
 };
+
+const getBackgroundStyle = (index: number) => ({
+  backgroundColor: getBackgroundColor(index),
+});
 
 interface RecipeCardProps {
   recipe: Recipe;
@@ -31,14 +37,13 @@ export const RecipeCard = ({
   isMainCard = false,
   onToggleLike,
   recipe,
-  // snackbarMessage,
 }: RecipeCardProps) => {
   return (
     <div className="relative h-[460px] w-[310px]">
       {/* 메인 카드 - card-front */}
       <div className="relative z-10 h-[460px] w-[310px] overflow-hidden rounded-[32px] bg-white">
         {/* 이미지 영역 - 메인 카드만 이미지 표시 */}
-        <div className="absolute top-0 left-0 h-[386px] w-[310px]">
+        <div className="h-full w-full">
           {isMainCard ? (
             <Image
               src={recipe.image}
@@ -48,10 +53,7 @@ export const RecipeCard = ({
               className="h-full w-full object-cover"
             />
           ) : (
-            <div
-              className="h-full w-full"
-              style={{ backgroundColor: getBackgroundColor(index) }}
-            />
+            <div className="h-full w-full" style={getBackgroundStyle(index)} />
           )}
         </div>
 
@@ -120,21 +122,9 @@ export const RecipeCard = ({
             </div>
           </div>
         ) : (
-          <div
-            className="absolute bottom-0 left-0 h-[244px] w-[310px]"
-            style={{ backgroundColor: getBackgroundColor(index) }}
-          />
+          <div className="h-full w-full" style={getBackgroundStyle(index)} />
         )}
       </div>
-
-      {/* 스낵바 메시지 */}
-      {/* {snackbarMessage && (
-        <div className="absolute top-[480px] left-0 h-[50px] w-[310px] rounded-[14px] bg-[#5a616d]/80 shadow-lg">
-          <div className="flex h-full items-center justify-center">
-            <span className="text-15 text-white">{snackbarMessage}</span>
-          </div>
-        </div>
-      )} */}
     </div>
   );
 };
