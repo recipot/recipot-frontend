@@ -12,12 +12,12 @@ interface UseWebShareReturn {
   isSupported: boolean;
   isSharing: boolean;
   share: (data: ShareData) => Promise<void>;
-  shareError: string | null;
+  shareError: Error | null;
 }
 
 export const useWebShare = (): UseWebShareReturn => {
   const [isSharing, setIsSharing] = useState(false);
-  const [shareError, setShareError] = useState<string | null>(null);
+  const [shareError, setShareError] = useState<Error | null>(null);
   const [isSupported, setIsSupported] = useState(false);
 
   // 클라이언트에서만 지원 여부 확인
@@ -37,9 +37,8 @@ export const useWebShare = (): UseWebShareReturn => {
       try {
         await navigator.share(data);
       } catch (error) {
-        if (error instanceof Error && error.name !== 'AbortError') {
-          const errorMessage = error.message || '공유 중 오류가 발생했습니다.';
-          setShareError(errorMessage);
+        if (error instanceof Error) {
+          setShareError(error);
           throw error;
         }
       } finally {

@@ -7,7 +7,7 @@ import { useWebShare } from '@/hooks/useWebShare';
 import { ShareIcon } from '../Icons';
 
 const SimpleShareTest: React.FC = () => {
-  const { isSharing, isSupported, share } = useWebShare();
+  const { isSharing, isSupported, share, shareError } = useWebShare();
   const [isMounted, setIsMounted] = useState(false);
 
   // 클라이언트 마운트 확인
@@ -25,12 +25,7 @@ const SimpleShareTest: React.FC = () => {
 
       await share(shareData);
     } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError') {
-        console.log('공유 취소됨');
-      } else {
-        console.error('공유 실패:', error);
-        alert('공유에 실패했습니다.');
-      }
+      console.error('공유 실패:', error);
     }
   };
 
@@ -66,6 +61,12 @@ const SimpleShareTest: React.FC = () => {
       />
 
       {isSharing && <p className="text-blue-600">공유 중...</p>}
+
+      {shareError && (
+        <div className="text-center">
+          <p className="mb-2 text-red-500">공유 실패: {shareError.message}</p>
+        </div>
+      )}
 
       {!isSupported && (
         <div className="text-center">
