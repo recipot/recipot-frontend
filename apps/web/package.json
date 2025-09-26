@@ -28,16 +28,19 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "eslint-plugin-storybook": "^9.1.3",
+    "framer-motion": "^12.23.12",
     "lucide-react": "^0.460.0",
     "next": "15.3.1",
     "react": "18.3.1",
     "react-confetti": "^6.4.0",
     "react-dom": "18.3.1",
+    "@recipot/contexts": "workspace:*",
     "react-hook-form": "^7.62.0",
     "swiper": "^11.2.10",
     "tailwind-merge": "^2.6.0",
     "vaul": "^1.1.2",
-    "zod": "^4.0.17"
+    "zod": "^4.0.17",
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^4.1.1",
