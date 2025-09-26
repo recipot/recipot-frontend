@@ -31,7 +31,7 @@ export interface CookedRecipe extends Recipe {
   reviewId: number | null;
 }
 
-type configType = {
+export type configType = {
   overLayColor: string;
   themeColor: string;
   title: string;

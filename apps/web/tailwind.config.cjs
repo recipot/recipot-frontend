@@ -30,6 +30,7 @@ module.exports = {
           DEFAULT: 'var(--primary)',
           foreground: 'var(--primary-foreground)',
           pressed: 'var(--brand-primary-pressed)',
+          sub: 'var(--brand-sub-green)',
         },
         secondary: {
           DEFAULT: 'var(--secondary)',

@@ -8,7 +8,7 @@ import { SettingsIcon } from '@/components/Icons';
 export default function UserProfile() {
   const router = useRouter();
 
-  const hadleNavigateToSettings = () => {
+  const handleNavigateToSettings = () => {
     router.push('/mypage/settings');
   };
   return (
@@ -34,7 +34,7 @@ export default function UserProfile() {
           size="sm"
           shape="square"
           className="bg-gray-100 px-2 py-1 active:bg-[#E9ECEF]"
-          onClick={hadleNavigateToSettings}
+          onClick={handleNavigateToSettings}
         >
           <SettingsIcon size={18} color="var(--gray-600)" />
           <span className="text-14b text-gray-600">설정</span>

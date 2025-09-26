@@ -10,7 +10,7 @@ export default function QuickLinks() {
         <Button
           size="lg"
           shape="square"
-          className="flex flex-1 items-center justify-center gap-1.5 bg-[#e7f5ff] px-7 py-4 active:bg-[#d0ebff]"
+          className="flex flex-1 items-center justify-center gap-1.5 rounded-[0.875rem] bg-[#e7f5ff] px-7 py-4 leading-[100%] font-medium active:bg-[#d0ebff]"
         >
           <MyFileIcon size={18} color="#228be6" />
           <span className="text-16 text-[#228be6]">보관한 레시피</span>
@@ -21,7 +21,7 @@ export default function QuickLinks() {
         <Button
           size="lg"
           shape="square"
-          className="flex flex-1 items-center justify-center gap-1.5 bg-[#f3f0ff] px-7 py-4 active:bg-[#e5dbff]"
+          className="flex flex-1 items-center justify-center gap-1.5 rounded-[0.875rem] bg-[#f3f0ff] px-7 py-4 leading-[100%] font-medium active:bg-[#e5dbff]"
         >
           <MyOpenFileIcon size={18} color="#845ef7" />
           <span className="text-16 text-[#845ef7]">최근 본 레시피</span>

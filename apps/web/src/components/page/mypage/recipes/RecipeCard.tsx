@@ -28,7 +28,9 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
         </p>
       </div>
       <button className="flex-shrink-0 text-gray-400 active:text-red-500">
-        <HeartIcon color="var(--gray-900)" />
+        <HeartIcon
+          color={recipe.isSaved ? 'var(--destructive)' : 'var(--gray-900)'}
+        />
       </button>
     </div>
   );

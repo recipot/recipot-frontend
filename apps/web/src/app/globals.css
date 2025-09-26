@@ -46,6 +46,7 @@
     /* Primary */
     --brand-primary: #68982d;
     --brand-primary-pressed: #537a24;
+    --brand-sub-green: #66a80f;
 
     /* Secondary */
     --secondary-soft-green: #d7e8c2;
@@ -77,8 +78,6 @@
     --gray-50: #f8f9fa;
 
     --anchor-offset: 80px;
-
-    --font-pretendard: 'Pretendard', sans-serif;
   }
   .dark {
     --background: #09090b;

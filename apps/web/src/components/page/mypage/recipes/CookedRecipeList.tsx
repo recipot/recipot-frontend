@@ -42,7 +42,9 @@ export default function CookedRecipeList({
               <span className="text-18sb text-[#66A80F]">{date}</span>
               <div className="flex items-center gap-1">
                 <CookIcon size={18} />
-                <span className="text-16 text-[#66A80F]">내가 만든 요리</span>
+                <span className="text-16 font-medium text-[#66A80F]">
+                  내가 만든 요리
+                </span>
               </div>
             </div>
 
@@ -53,13 +55,17 @@ export default function CookedRecipeList({
                     <RecipeCard recipe={recipe} />
                     {recipe.reviewId ? (
                       <div className="w-full px-3">
-                        <Button variant="outline" size="full">
+                        <Button
+                          variant="outline"
+                          size="full"
+                          className="text-15sb py-3"
+                        >
                           남긴 후기 보기
                         </Button>
                       </div>
                     ) : (
                       <div className="w-full px-3">
-                        <Button size="full">
+                        <Button size="full" className="text-15sb py-3">
                           맛있게 드셨나요? 후기를 남겨주세요
                         </Button>
                       </div>

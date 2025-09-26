@@ -10,7 +10,7 @@ export default function SnsLinkageSection() {
           <span className="text-16 text-[#7A8394]">간편 로그인 수단 추가</span>
         </div>
         <div className="flex items-center gap-3">
-          <Button size="icon-xl" shape="round" className="bg-[#FCE40B]">
+          <Button size="icon-xl" shape="round" className="bg-kakao">
             <KakaoIcon size={28} />
           </Button>
           <Button size="icon-xl" shape="round" variant="outline">
