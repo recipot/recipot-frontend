@@ -26,7 +26,6 @@ interface RecipeCardProps {
   recipe: Recipe;
   index: number;
   isLiked: boolean;
-  snackbarMessage: string;
   onToggleLike: (index: number, recipeId: number) => void;
   isMainCard?: boolean;
 }

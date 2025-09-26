@@ -6,25 +6,19 @@ import './styles.css';
 
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
-import { EffectCards, Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
 import { Button } from '@/components/common/Button';
-import { BackIcon, RefreshIcon } from '@/components/Icons';
 import { RecipeCard } from '@/components/RecipeCard';
 import {
   fetchRecipeRecommend,
   useRecipeRecommend,
 } from '@/hooks/useRecipeRecommend';
 
-const SWIPER_MODULES = [EffectCards, Pagination];
-
-// Swiper 스타일 상수
-const swiperStyles = {
-  '--swiper-navigation-color': '#212529',
-  '--swiper-pagination-color': '#212529',
-} as React.CSSProperties;
+import RecipeHeader from './_components/RecipeHeader';
+import RecipeTags from './_components/RecipeTags';
+import RecipeTitle from './_components/RecipeTitle';
+import { SWIPER_CONFIG, SWIPER_MODULES, swiperStyles } from '../constants';
 
 // 로딩 컴포넌트
 const LoadingState = () => (
@@ -53,7 +47,6 @@ const ErrorState = ({
 );
 
 export default function RecipeRecommend() {
-  const router = useRouter();
   const [activeIndex, setActiveIndex] = useState(0);
 
   // TanStack Query로 레시피 데이터 조회
@@ -67,29 +60,8 @@ export default function RecipeRecommend() {
     useRecipeRecommend();
 
   // Swiper 설정 상수
-  const SWIPER_CONFIG = {
-    allowTouchMove: true,
-    cardsEffect: {
-      perSlideOffset: 12,
-      perSlideRotate: 3,
-      rotate: true,
-      slideShadows: false,
-    },
-    effect: 'cards' as const,
-    grabCursor: true,
-    pagination: {
-      clickable: true,
-      el: '.recipe-pagination',
-    },
-    resistanceRatio: 0.85,
-    slidesPerView: 1,
-    spaceBetween: 0,
-    threshold: 5,
-    touchRatio: 1,
-  };
 
   const recipes = data?.recipes ?? [];
-  const snackbarMessage = data?.message ?? '';
 
   // 로딩 상태
   if (isLoading) {
@@ -105,40 +77,12 @@ export default function RecipeRecommend() {
     // TODO : 추후 감정 상태에 따라 그래디언트 적용 필요
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
       {/* Header */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto flex max-w-sm items-center justify-between sm:max-w-md md:max-w-lg">
-          <BackIcon
-            onClick={() => router.push('/')}
-            className="cursor-pointer transition-opacity hover:opacity-70"
-          />
-
-          <RefreshIcon
-            onClick={() => refetch()}
-            className="cursor-pointer transition-opacity hover:opacity-70"
-          />
-        </div>
-      </div>
-
+      <RecipeHeader />
       {/* Tags */}
-      <div className="mt-4 mb-[17.5px] px-4">
-        <div className="flex flex-wrap justify-center gap-[6px]">
-          {selectedIngredients.map(ingredient => (
-            <div
-              key={ingredient}
-              className="bg-secondary-light-green border-secondary-soft-green rounded-[6px] border px-2 py-[2px] text-[#53880A]"
-            >
-              <p className="text-14b">{ingredient}</p>
-            </div>
-          ))}
-        </div>
-      </div>
+      <RecipeTags selectedIngredients={selectedIngredients} />
 
       {/* Title */}
-      <div className="flex w-full items-center justify-center px-10">
-        {/* TODO : 감정에 따른 감정 상태 표현 변경 필요 */}
-        <h2 className="text-22 mr-[2px]">요리할 여유가 그저 그래요</h2>
-        <div className="text-24 flex h-6 w-6 items-center">😑</div>
-      </div>
+      <RecipeTitle />
 
       {/* Swiper Cards Effect */}
       <div className="mt-10 px-4">
@@ -164,7 +108,6 @@ export default function RecipeRecommend() {
                         ? likedRecipes[index]
                         : false
                     }
-                    snackbarMessage={snackbarMessage}
                     onToggleLike={toggleLike}
                     isMainCard={index === activeIndex}
                   />
