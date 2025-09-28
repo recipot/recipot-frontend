@@ -1,7 +1,7 @@
 import Image from 'next/image';
 
 import { ArrowIcon, HeartIcon } from '@/components/Icons';
-import type { Recipe } from '@/components/page/mypage/MyPage.types';
+import type { Recipe } from '@/types/MyPage.types';
 
 interface RecipeCardProps {
   recipe: Recipe;
@@ -28,9 +28,7 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
         </p>
       </div>
       <button className="flex-shrink-0 text-gray-400 active:text-red-500">
-        <HeartIcon
-          color={recipe.isSaved ? 'var(--destructive)' : 'var(--gray-900)'}
-        />
+        <HeartIcon active={recipe.isSaved} color="var(--brand-primary)" />
       </button>
     </div>
   );

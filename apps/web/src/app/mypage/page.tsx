@@ -1,4 +1,4 @@
-import { MyPageContainer } from '@/components/page/mypage/MyPageContainer';
+import { MyPageContainer } from '@/app/mypage/_components/MyPageContainer';
 
 export default function MyPage() {
   return <MyPageContainer />;

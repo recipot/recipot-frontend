@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 
 import { BackIcon } from '@/components/Icons';
-import type { PageHeaderProps } from '@/components/page/mypage/MyPage.types';
+import type { PageHeaderProps } from '@/types/MyPage.types';
 
 export function PageHeader({ title }: PageHeaderProps) {
   const router = useRouter();

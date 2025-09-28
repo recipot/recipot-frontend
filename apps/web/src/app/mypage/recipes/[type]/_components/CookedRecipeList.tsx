@@ -3,7 +3,10 @@ import { CookIcon } from '@/components/Icons';
 
 import RecipeCard from './RecipeCard';
 
-import type { CookedRecipe, CookedRecipeListProps } from '../MyPage.types';
+import type {
+  CookedRecipe,
+  CookedRecipeListProps,
+} from '../../../../../types/MyPage.types';
 
 export default function CookedRecipeList({
   config,

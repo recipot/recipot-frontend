@@ -1,10 +1,10 @@
-import { PageHeader } from '@/components/page/mypage/PageHeader';
+import { PageHeader } from '@/app/mypage/_components/PageHeader';
 
-import DietaryRestrictions from './components/DietaryRestrictions';
-import InfoLinks from './components/InfoLinks';
-import MyRecipesLink from './components/MyRecipesLink';
-import QuickLinks from './components/QuickLinks';
-import UserProfile from './components/UserProfile';
+import DietaryRestrictions from './DietaryRestrictions';
+import InfoLinks from './InfoLinks';
+import MyRecipesLink from './MyRecipesLink';
+import QuickLinks from './QuickLinks';
+import UserProfile from './UserProfile';
 
 export function MyPagePresenter() {
   return (

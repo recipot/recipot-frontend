@@ -1,16 +1,17 @@
-import { PageHeader } from '@/components/page/mypage/PageHeader';
-import LogoutButton from '@/components/page/mypage/settings/LogoutButton';
-import ProfileSection from '@/components/page/mypage/settings/ProfileSection';
-import SnsLinkageSection from '@/components/page/mypage/settings/SnsLinkageSection';
+import { PageHeader } from '@/app/mypage/_components/PageHeader';
+import LogoutButton from '@/app/mypage/settings/_components/LogoutButton';
+import ProfileSection from '@/app/mypage/settings/_components/ProfileSection';
+import SnsLinkageSection from '@/app/mypage/settings/_components/SnsLinkageSection';
+
+// 임시 유저 데이터
+const MOCK_USER = {
+  avatarUrl: '/mypage/default-profile.png',
+  email: 'abc@facebook.com',
+  nickname: '오리무중체다치즈',
+};
 
 export default function SettingsPage() {
-  // 임시 유저 데이터
-  const user = {
-    avatarUrl: '/chick-avatar.png',
-    email: 'abc@facebook.com',
-    nickname: '오리무중체다치즈',
-  };
-
+  const user = MOCK_USER;
   return (
     <div className="flex min-h-screen flex-col">
       <div className="px-5">

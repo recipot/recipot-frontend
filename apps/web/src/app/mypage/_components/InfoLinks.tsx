@@ -3,10 +3,9 @@ import Link from 'next/link';
 import { ArrowIcon } from '@/components/Icons';
 
 const links = [
-  // TODO: 실제 링크로 교체 필요
-  { href: '/faq', label: '자주묻는 질문' },
-  { href: '/feedback', label: '앱 피드백 남기기' },
-  { href: '/terms', label: '이용약관' },
+  { href: '/mypage/faq', label: '자주묻는 질문' },
+  { href: '/mypage/feedback', label: '앱 피드백 남기기' },
+  { href: '/mypage/terms', label: '이용약관' },
 ];
 
 export default function InfoLinks() {

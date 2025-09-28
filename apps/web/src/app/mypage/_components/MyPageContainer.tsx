@@ -1,6 +1,6 @@
 'use client';
 
-import { MyPagePresenter } from '@/components/page/mypage/MyPagePresenter';
+import { MyPagePresenter } from '@/app/mypage/_components/MyPagePresenter';
 
 export function MyPageContainer() {
   return <MyPagePresenter />;

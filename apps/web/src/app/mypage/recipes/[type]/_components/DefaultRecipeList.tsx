@@ -2,7 +2,7 @@ import { MyFileIcon, MyOpenFileIcon } from '@/components/Icons';
 
 import RecipeCard from './RecipeCard';
 
-import type { DefaultRecipeListProps } from '../MyPage.types';
+import type { DefaultRecipeListProps } from '../../../../../types/MyPage.types';
 
 export default function DefaultRecipeList({
   config,

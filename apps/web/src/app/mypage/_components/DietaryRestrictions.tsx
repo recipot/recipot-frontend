@@ -38,9 +38,10 @@ export default function DietaryRestrictions() {
             <div className="flex flex-col items-center gap-[0.875rem]">
               <Button
                 shape="round"
-                className="bg-primary-sub flex h-12 w-12 items-center justify-center text-white"
+                className="bg-primary-sub flex h-12 w-12 items-center justify-center p-0"
+                size="md"
               >
-                <AddIcon size={12} />
+                <AddIcon size={22} color="white" />
               </Button>
               <span className="text-16 text-primary-sub leading-[100%]">
                 변경

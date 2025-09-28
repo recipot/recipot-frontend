@@ -1,12 +1,12 @@
 import Image from 'next/image';
 
-import type { ProfileSectionProps } from '@/components/page/mypage/MyPage.types';
+import type { ProfileSectionProps } from '@/types/MyPage.types';
 
 export default function ProfileSection({ user }: ProfileSectionProps) {
   return (
     <section className="flex items-center gap-4 py-6">
       <Image
-        src="/mypage/default-profile.png"
+        src={user.avatarUrl}
         alt="사용자 프로필 이미지"
         width={54}
         height={54}

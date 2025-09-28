@@ -1,13 +1,13 @@
 import { use } from 'react';
 
+import { PageHeader } from '@/app/mypage/_components/PageHeader';
+import CookedRecipeList from '@/app/mypage/recipes/[type]/_components/CookedRecipeList';
+import DefaultRecipeList from '@/app/mypage/recipes/[type]/_components/DefaultRecipeList';
 import type {
   CookedRecipe,
   Recipe,
   RecipePageProps,
-} from '@/components/page/mypage/MyPage.types';
-import { PageHeader } from '@/components/page/mypage/PageHeader';
-import CookedRecipeList from '@/components/page/mypage/recipes/CookedRecipeList';
-import DefaultRecipeList from '@/components/page/mypage/recipes/DefaultRecipeList';
+} from '@/types/MyPage.types';
 
 const PAGE_CONFIG = {
   cooked: {
