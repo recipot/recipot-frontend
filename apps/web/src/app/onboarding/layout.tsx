@@ -26,6 +26,7 @@ function OnboardingHeader() {
   const handleRefreshClick = () => {
     // 현재 step의 데이터만 초기화
     resetCurrentStep();
+    console.info('refresh');
   };
 
   return (

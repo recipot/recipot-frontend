@@ -29,14 +29,21 @@ export default function AllergyCheckPresenter({
       className="w-full space-y-8"
       aria-label="알레르기 선택 양식"
     >
-      {categories.map(category => (
-        <AllergyCheckItem
-          key={category.title}
-          items={category.items}
-          label={category.title}
-          selectedItems={selectedItems}
-          onItemToggle={onItemToggle}
-        />
+      {categories.map((category, index) => (
+        <div key={category.title} className="space-y-4">
+          <h2
+            id={`allergy-section-${index}`}
+            className="scroll-mt-20 text-xl font-semibold text-gray-900"
+          >
+            {category.title}
+          </h2>
+          <AllergyCheckItem
+            items={category.items}
+            label=""
+            selectedItems={selectedItems}
+            onItemToggle={onItemToggle}
+          />
+        </div>
       ))}
     </form>
   );

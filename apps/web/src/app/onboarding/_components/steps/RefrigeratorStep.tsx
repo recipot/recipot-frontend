@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@recipot/contexts';
 
 import { Button } from '@/components/common/Button';
@@ -9,6 +9,7 @@ import {
   type IngredientsSearchRef,
 } from '@/components/IngredientsSearch';
 import { useOnboardingStore } from '@/stores/onboardingStore';
+import { useSelectedFoodsStore } from '@/stores/selectedFoodsStore';
 
 export default function RefrigeratorStep() {
   const { setUser, user } = useAuth();
@@ -16,9 +17,25 @@ export default function RefrigeratorStep() {
     state => state.markStepCompleted
   );
   const setStepData = useOnboardingStore(state => state.setStepData);
+
+  // 저장된 데이터 불러오기
+  const stepData = useOnboardingStore(state => state.stepData[3]);
+  const isRefreshed = useOnboardingStore(state => state.isRefreshed);
+  const clearRefreshFlag = useOnboardingStore(state => state.clearRefreshFlag);
+  const clearAllFoods = useSelectedFoodsStore(state => state.clearAllFoods);
+
   const ingredientsSearchRef = useRef<IngredientsSearchRef>(null);
   const [selectedCount, setSelectedCount] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // 새로고침 버튼을 눌렀을 때만 선택된 재료들 초기화
+  useEffect(() => {
+    if (isRefreshed && stepData && Object.keys(stepData).length === 0) {
+      clearAllFoods();
+      setSelectedCount(0);
+      clearRefreshFlag(); // 플래그 리셋
+    }
+  }, [stepData, isRefreshed, clearAllFoods, clearRefreshFlag]);
 
   // 온보딩 완료 처리
   const completeOnboarding = () => {

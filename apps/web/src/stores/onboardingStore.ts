@@ -14,6 +14,8 @@ interface OnboardingState {
   stepData: {
     [key: number]: any;
   };
+  /** 새로고침 플래그 */
+  isRefreshed: boolean;
 }
 
 /**
@@ -42,6 +44,8 @@ interface OnboardingActions {
   resetCurrentStep: () => void;
   /** 전체 스토어 초기화 */
   resetStore: () => void;
+  /** 새로고침 플래그 리셋 */
+  clearRefreshFlag: () => void;
 }
 
 /** 총 온보딩 단계 수 */
@@ -51,6 +55,7 @@ const TOTAL_STEPS = 3;
 const initialState: OnboardingState = {
   completedSteps: [],
   currentStep: 1,
+  isRefreshed: false,
   stepData: {},
 };
 
@@ -77,6 +82,10 @@ export const useOnboardingStore = create<OnboardingState & OnboardingActions>(
     canGoToPreviousStep: () => {
       const { currentStep } = get();
       return currentStep > 1;
+    },
+
+    clearRefreshFlag: () => {
+      set({ isRefreshed: false });
     },
 
     completeOnboarding: () => {
@@ -113,6 +122,7 @@ export const useOnboardingStore = create<OnboardingState & OnboardingActions>(
     resetCurrentStep: () => {
       const { currentStep } = get();
       set(state => ({
+        isRefreshed: true, // 새로고침 플래그 설정
         stepData: {
           ...state.stepData,
           [currentStep]: {}, // 현재 단계의 데이터만 초기화

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/common/Button';
 import EmotionState, { type MoodType } from '@/components/EmotionState';
@@ -13,7 +13,22 @@ export default function CookStateStep() {
     state => state.markStepCompleted
   );
   const setStepData = useOnboardingStore(state => state.setStepData);
-  const [selectedMood, setSelectedMood] = useState<MoodType | null>(null);
+
+  // 저장된 데이터 불러오기
+  const stepData = useOnboardingStore(state => state.stepData[2]);
+  const isRefreshed = useOnboardingStore(state => state.isRefreshed);
+  const clearRefreshFlag = useOnboardingStore(state => state.clearRefreshFlag);
+  const savedMood = stepData?.mood ?? null;
+
+  const [selectedMood, setSelectedMood] = useState<MoodType | null>(savedMood);
+
+  // 새로고침 버튼을 눌렀을 때만 로컬 상태 초기화
+  useEffect(() => {
+    if (isRefreshed && stepData && Object.keys(stepData).length === 0) {
+      setSelectedMood(null);
+      clearRefreshFlag(); // 플래그 리셋
+    }
+  }, [stepData, isRefreshed, clearRefreshFlag]);
 
   // 기분 상태 전송 mutation
   const { isPending: isSubmitting, mutate: submitMood } = useSubmitMood();
@@ -42,6 +57,7 @@ export default function CookStateStep() {
     <>
       <div className="fixed top-0 right-0 left-0 -z-10 h-screen min-h-[500px]">
         <EmotionState
+          key={selectedMood ?? 'null'} // selectedMood가 변경되면 컴포넌트 리마운트
           onMoodChange={handleMoodChange}
           initialMood={selectedMood}
           className="h-full"
