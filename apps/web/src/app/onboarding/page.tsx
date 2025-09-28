@@ -1,10 +1,11 @@
 'use client';
 
+import { useCurrentStep } from '@/stores/onboardingStore';
+
 import StepIndicator from './_components/StepIndicator';
 import AllergyStep from './_components/steps/AllergyStep';
 import CookStateStep from './_components/steps/CookStateStep';
 import RefrigeratorStep from './_components/steps/RefrigeratorStep';
-import { useOnboarding } from './_context/OnboardingContext';
 
 const steps = [
   {
@@ -25,11 +26,11 @@ const steps = [
 ];
 
 function OnboardingContent() {
-  const { state } = useOnboarding();
-  const currentStepData = steps[state.currentStep - 1];
+  const currentStep = useCurrentStep();
+  const currentStepData = steps[currentStep - 1];
 
   const renderCurrentStep = () => {
-    switch (state.currentStep) {
+    switch (currentStep) {
       case 1:
         return <AllergyStep />;
       case 2:

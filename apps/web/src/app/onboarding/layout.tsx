@@ -3,15 +3,16 @@
 import { useRouter } from 'next/navigation';
 
 import { BackIcon, RefreshIcon } from '@/components/Icons';
-
-import {
-  OnboardingProvider,
-  useOnboarding,
-} from './_context/OnboardingContext';
+import { useOnboardingStore } from '@/stores/onboardingStore';
 
 function OnboardingHeader() {
   const router = useRouter();
-  const { canGoToPreviousStep, goToPreviousStep, state } = useOnboarding();
+  const currentStep = useOnboardingStore(state => state.currentStep);
+  const canGoToPreviousStep = useOnboardingStore(
+    state => state.canGoToPreviousStep
+  );
+  const goToPreviousStep = useOnboardingStore(state => state.goToPreviousStep);
+  const resetCurrentStep = useOnboardingStore(state => state.resetCurrentStep);
 
   const handleBackClick = () => {
     if (canGoToPreviousStep()) {
@@ -23,13 +24,13 @@ function OnboardingHeader() {
   };
 
   const handleRefreshClick = () => {
-    // 현재 step 초기화 (새로고침)
-    window.location.reload();
+    // 현재 step의 데이터만 초기화
+    resetCurrentStep();
   };
 
   return (
     <header className="flex h-14 items-center justify-between px-3 py-2">
-      {state.currentStep > 1 ? (
+      {currentStep > 1 ? (
         <button
           className="flex size-10 items-center justify-center"
           onClick={handleBackClick}
@@ -49,23 +50,15 @@ function OnboardingHeader() {
   );
 }
 
-function OnboardingLayoutContent({ children }: { children: React.ReactNode }) {
-  return (
-    <>
-      <OnboardingHeader />
-      <div>{children}</div>
-    </>
-  );
-}
-
 export default function OnboardingLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <OnboardingProvider>
-      <OnboardingLayoutContent>{children}</OnboardingLayoutContent>
-    </OnboardingProvider>
+    <>
+      <OnboardingHeader />
+      <div>{children}</div>
+    </>
   );
 }

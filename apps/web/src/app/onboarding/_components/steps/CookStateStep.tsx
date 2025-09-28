@@ -5,11 +5,14 @@ import { useState } from 'react';
 import { Button } from '@/components/common/Button';
 import EmotionState, { type MoodType } from '@/components/EmotionState';
 import { useSubmitMood } from '@/hooks';
-
-import { useOnboarding } from '../../_context/OnboardingContext';
+import { useOnboardingStore } from '@/stores/onboardingStore';
 
 export default function CookStateStep() {
-  const { goToNextStep, markStepCompleted, setStepData } = useOnboarding();
+  const goToNextStep = useOnboardingStore(state => state.goToNextStep);
+  const markStepCompleted = useOnboardingStore(
+    state => state.markStepCompleted
+  );
+  const setStepData = useOnboardingStore(state => state.setStepData);
   const [selectedMood, setSelectedMood] = useState<MoodType | null>(null);
 
   // 기분 상태 전송 mutation

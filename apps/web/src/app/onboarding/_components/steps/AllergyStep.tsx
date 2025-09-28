@@ -5,12 +5,15 @@ import { useMutation } from '@tanstack/react-query';
 
 import { AllergyCheckContainer, useAllergyCheck } from '@/components/Allergy';
 import { Button } from '@/components/common/Button';
-
-import { useOnboarding } from '../../_context/OnboardingContext';
+import { useOnboardingStore } from '@/stores/onboardingStore';
 
 export default function AllergyStep() {
   const { handleItemToggle, selectedItems } = useAllergyCheck();
-  const { goToNextStep, markStepCompleted, setStepData } = useOnboarding();
+  const goToNextStep = useOnboardingStore(state => state.goToNextStep);
+  const markStepCompleted = useOnboardingStore(
+    state => state.markStepCompleted
+  );
+  const setStepData = useOnboardingStore(state => state.setStepData);
 
   const allergyMutation = useMutation({
     mutationFn: allergyPost,

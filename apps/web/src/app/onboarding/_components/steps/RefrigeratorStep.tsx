@@ -1,21 +1,34 @@
 'use client';
 
 import { useRef, useState } from 'react';
+import { useAuth } from '@recipot/contexts';
 
 import { Button } from '@/components/common/Button';
 import {
   IngredientsSearch,
   type IngredientsSearchRef,
 } from '@/components/IngredientsSearch';
-
-import { useOnboarding } from '../../_context/OnboardingContext';
+import { useOnboardingStore } from '@/stores/onboardingStore';
 
 export default function RefrigeratorStep() {
-  const { completeOnboarding, markStepCompleted, setStepData } =
-    useOnboarding();
+  const { setUser, user } = useAuth();
+  const markStepCompleted = useOnboardingStore(
+    state => state.markStepCompleted
+  );
+  const setStepData = useOnboardingStore(state => state.setStepData);
   const ingredientsSearchRef = useRef<IngredientsSearchRef>(null);
   const [selectedCount, setSelectedCount] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // 온보딩 완료 처리
+  const completeOnboarding = () => {
+    if (user) {
+      setUser({
+        ...user,
+        isOnboardingCompleted: true,
+      });
+    }
+  };
 
   const handleComplete = () => {
     // IngredientsSearch의 제출 로직 호출

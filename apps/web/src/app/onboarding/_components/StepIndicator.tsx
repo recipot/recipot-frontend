@@ -1,9 +1,9 @@
 'use client';
 
-import { useOnboarding } from '../_context/OnboardingContext';
+import { useCurrentStep } from '@/stores/onboardingStore';
 
 export default function StepIndicator() {
-  const { state } = useOnboarding();
+  const currentStep = useCurrentStep();
   const totalSteps = 3;
 
   return (
@@ -11,7 +11,7 @@ export default function StepIndicator() {
       <div className="flex w-full">
         {Array.from({ length: totalSteps }, (_, index) => {
           const stepNumber = index + 1;
-          const isCurrentStep = state.currentStep === stepNumber;
+          const isCurrentStep = currentStep === stepNumber;
 
           return (
             <div
