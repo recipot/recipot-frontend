@@ -75,7 +75,7 @@ export default function RecipeRecommend() {
 
   return (
     // TODO : 추후 감정 상태에 따라 그래디언트 적용 필요
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+    <div className="mt-[54px] min-h-screen">
       {/* Header */}
       <RecipeHeader />
       {/* Tags */}
