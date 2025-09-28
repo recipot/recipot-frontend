@@ -75,6 +75,7 @@ const WebShareButton: React.FC<WebShareButtonProps> = ({
         .writeText(shareText)
         .then(() => {
           if (isAndroid) {
+            // 추후 토스트 메시지로 alert 대체 예정
             alert(
               'Android에서 공유: 링크가 클립보드에 복사되었습니다.\n다른 앱에서 붙여넣기하여 공유하세요.'
             );
@@ -85,7 +86,11 @@ const WebShareButton: React.FC<WebShareButtonProps> = ({
         })
         .catch(error => {
           console.error('클립보드 복사 실패:', error);
-          onShareError?.(error);
+          if (error instanceof Error) {
+            onShareError?.(error);
+          } else {
+            onShareError?.(new Error(String(error)));
+          }
         });
     } else {
       // 클립보드 API도 지원되지 않는 경우
@@ -96,7 +101,6 @@ const WebShareButton: React.FC<WebShareButtonProps> = ({
       } else {
         alert(`공유할 내용: ${shareText}`);
       }
-      onShareSuccess?.();
     }
   };
 
