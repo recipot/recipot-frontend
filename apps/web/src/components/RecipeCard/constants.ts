@@ -7,7 +7,7 @@ export const GRADIENT_STYLE = {
 export const CARD_DIMENSIONS = {
   height: 460,
   width: 310,
-} as const;
+};
 
 export const CARD_STYLES = {
   card: {
@@ -18,4 +18,4 @@ export const CARD_STYLES = {
     height: `${CARD_DIMENSIONS.height}px`,
     width: `${CARD_DIMENSIONS.width}px`,
   },
-} as const;
+};

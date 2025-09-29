@@ -21,3 +21,5 @@ export const RecipeMetaInfo = ({ recipe }: RecipeMetaInfoProps) => (
     </div>
   </div>
 );
+
+

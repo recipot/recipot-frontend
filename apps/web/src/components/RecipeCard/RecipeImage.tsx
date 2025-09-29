@@ -30,3 +30,5 @@ export const RecipeImage = ({
 
   return <div className="h-full w-full" style={getBackgroundStyle(index)} />;
 };
+
+

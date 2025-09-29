@@ -9,11 +9,13 @@ import { useQuery } from '@tanstack/react-query';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
 import { Button } from '@/components/common/Button';
+import { Toast } from '@/components/common/Toast';
 import { RecipeCard } from '@/components/RecipeCard';
 import {
   fetchRecipeRecommend,
   useRecipeRecommend,
 } from '@/hooks/useRecipeRecommend';
+import { useToast } from '@/hooks/useToast';
 
 import RecipeHeader from './_components/RecipeHeader';
 import RecipeTags from './_components/RecipeTags';
@@ -48,6 +50,7 @@ const ErrorState = ({
 
 export default function RecipeRecommend() {
   const [activeIndex, setActiveIndex] = useState(0);
+  const { isVisible, message, showToast } = useToast();
 
   // TanStack Query로 레시피 데이터 조회
   const { data, error, isError, isLoading, refetch } = useQuery({
@@ -59,7 +62,27 @@ export default function RecipeRecommend() {
   const { likedRecipes, selectedIngredients, toggleLike } =
     useRecipeRecommend();
 
-  // Swiper 설정 상수
+  // 토스트 상태 관리
+  const [toastIcon, setToastIcon] = useState<'heart' | 'recipe'>('recipe');
+
+  // 하트 아이콘 클릭 시 토스트 표시를 위한 래퍼 함수
+  const handleToggleLike = (index: number, recipeId: number) => {
+    const isCurrentlyLiked = likedRecipes[index] ?? false;
+    toggleLike(index, recipeId);
+
+    // 좋아요 상태가 변경될 때 토스트 표시
+    if (!isCurrentlyLiked) {
+      setToastIcon('heart');
+      showToast('레시피가 저장되었어요');
+    }
+  };
+
+  // 새로고침 버튼 클릭 시 토스트 표시를 위한 래퍼 함수
+  const handleRefresh = () => {
+    refetch();
+    setToastIcon('recipe');
+    showToast('새로운 레시피가 추천되었어요');
+  };
 
   const recipes = data?.recipes ?? [];
 
@@ -77,7 +100,7 @@ export default function RecipeRecommend() {
     // TODO : 추후 감정 상태에 따라 그래디언트 적용 필요
     <div className="mt-[54px] min-h-screen">
       {/* Header */}
-      <RecipeHeader />
+      <RecipeHeader onRefresh={handleRefresh} />
       {/* Tags */}
       <RecipeTags selectedIngredients={selectedIngredients} />
 
@@ -108,7 +131,7 @@ export default function RecipeRecommend() {
                         ? likedRecipes[index]
                         : false
                     }
-                    onToggleLike={toggleLike}
+                    onToggleLike={handleToggleLike}
                     isMainCard={index === activeIndex}
                   />
                 </SwiperSlide>
@@ -120,6 +143,9 @@ export default function RecipeRecommend() {
         {/* Page Indicator */}
         <div className="recipe-pagination mt-4 flex justify-center gap-1.5 sm:mt-6 sm:gap-2" />
       </div>
+
+      {/* 전역 토스트 */}
+      <Toast message={message} isVisible={isVisible} icon={toastIcon} />
     </div>
   );
 }
