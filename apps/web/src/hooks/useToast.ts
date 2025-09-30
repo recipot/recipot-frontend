@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 
 interface UseToastReturn {
   isVisible: boolean;
@@ -11,7 +11,7 @@ export const useToast = (): UseToastReturn => {
   const [isVisible, setIsVisible] = useState(false);
   const [message, setMessage] = useState('');
 
-  const showToast = useCallback((toastMessage: string, duration = 3000) => {
+  const showToast = (toastMessage: string, duration = 3000) => {
     setMessage(toastMessage);
     setIsVisible(true);
 
@@ -19,11 +19,11 @@ export const useToast = (): UseToastReturn => {
     setTimeout(() => {
       setIsVisible(false);
     }, duration);
-  }, []);
+  };
 
-  const hideToast = useCallback(() => {
+  const hideToast = () => {
     setIsVisible(false);
-  }, []);
+  };
 
   return {
     hideToast,

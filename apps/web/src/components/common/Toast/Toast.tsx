@@ -7,7 +7,6 @@ interface ToastProps {
   message: string;
   isVisible: boolean;
   icon?: 'heart' | 'recipe';
-  onClose?: () => void;
 }
 
 export const Toast: React.FC<ToastProps> = ({
