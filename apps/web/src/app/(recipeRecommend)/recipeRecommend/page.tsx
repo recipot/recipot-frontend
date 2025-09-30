@@ -126,11 +126,7 @@ export default function RecipeRecommend() {
                   <RecipeCard
                     recipe={recipe}
                     index={index}
-                    isLiked={
-                      index >= 0 && index < likedRecipes.length
-                        ? likedRecipes[index]
-                        : false
-                    }
+                    isLiked={likedRecipes[index] ?? false}
                     onToggleLike={handleToggleLike}
                     isMainCard={index === activeIndex}
                   />
