@@ -10,7 +10,7 @@ const RecipeSearchLoadingPage = ({
   userName: string;
 }) => {
   return (
-    <div className="flex h-screen w-screen flex-col items-center justify-center bg-[#00000099] opacity-90">
+    <div className="flex h-screen w-screen flex-col items-center justify-center bg-[#00000099]">
       <Image
         src={RecipeSearchCharacter}
         alt="레시피 검색 중 캐릭터"
