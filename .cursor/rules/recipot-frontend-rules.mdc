@@ -1,0 +1,248 @@
+---
+description: Recipot Frontend 프로젝트 개발 가이드라인
+globs: ['apps/web/src/**/*', 'packages/**/*']
+alwaysApply: true
+---
+
+# Recipot Frontend 개발 규칙
+
+## 🏗️ 프로젝트 구조
+
+### Monorepo 구조
+
+- `apps/web/`: Next.js 웹 애플리케이션
+- `packages/`: 공유 패키지 (api, contexts, types, utils, validators)
+- `apps/mobile/`: React Native 모바일 앱
+
+### 폴더 구조 규칙
+
+- **페이지별 컴포넌트**: `app/domain/_components/` (해당 페이지에서만 사용)
+- **전역 컴포넌트**: `components/common/` (여러 페이지에서 재사용)
+- **UI 컴포넌트**: `components/ui/` (shadcn 원본, 수정 금지)
+
+## 🎯 개발 패턴
+
+### Container-Presenter 패턴
+
+복잡한 로직과 서버 데이터가 있을 때 사용: 반드시 `-Container`, `-Presenter` 규칙을 따르지 않아도 됨
+
+```typescript
+// Container: 로직 담당
+export function RecipeCardContainer({ recipeId }: Props) {
+  const { data: recipe, isLoading } = useRecipeQuery(recipeId);
+  const handleLike = () => likeRecipe(recipeId);
+
+  return <RecipeCardPresenter recipe={recipe} onLike={handleLike} />;
+}
+
+// Presenter: UI만 담당
+export function RecipeCardPresenter({ recipe, onLike }: Props) {
+  return (
+    <Card>
+      <h3>{recipe.title}</h3>
+      <Button onClick={onLike}>좋아요</Button>
+    </Card>
+  );
+}
+```
+
+### Custom Hook 패턴
+
+여러 컴포넌트에서 같은 로직을 사용할 때:
+
+```typescript
+function useRecipeCard(recipeId: string) {
+  const [isLiked, setIsLiked] = useState(false);
+  const { data: recipe } = useRecipeQuery(recipeId);
+
+  const handleLike = () => {
+    setIsLiked(prev => !prev);
+    // API 호출
+  };
+
+  return { recipe, isLiked, handleLike };
+}
+```
+
+## 🔧 상태 관리
+
+### 상태 관리 선택 기준
+
+- **컴포넌트 내부**: `useState` (폼 입력값, 모달 상태, 로딩 상태)
+- **전역 상태**: `Zustand` (사용자 정보, 테마 설정, 장바구니)
+- **서버 상태**: `TanStack Query` (API 데이터, 캐싱이 필요한 데이터)
+- zustand, tanstack query 같은 상태 관리 도구는 반드시 필요하다고 생각할 때만 적용
+
+### 전역 상태 예시
+
+```typescript
+export const useAuthStore = create(set => ({
+  user: null,
+  login: user => set({ user }),
+  logout: () => set({ user: null }),
+}));
+```
+
+### 서버 상태 예시
+
+```typescript
+function useRecipeQuery(id: string) {
+  return useQuery({
+    queryKey: ['recipe', id],
+    queryFn: () => recipeApi.getRecipe(id),
+  });
+}
+```
+
+## 🎨 UI/UX 가이드라인
+
+### 컴포넌트 설계
+
+- **하나의 컴포넌트 = 하나의 역할**
+- **같은 코드 3번 반복 = 함수로 분리**
+- **조기 반환으로 중첩 줄이기**
+
+### 성능 최적화
+
+- `React.memo()`는 정말 필요한 경우에만 사용
+- 큰 리스트엔 가상화 적용
+- 이미지 최적화 (`next/image` 사용)
+- 코드 분할 (lazy loading)
+
+### 반응형 디자인
+
+- 모바일 우선 설계
+- Tailwind CSS 사용
+- 브레이크포인트: `sm:`, `md:`, `lg:`, `xl:`
+
+## 📝 코딩 스타일
+
+### TypeScript
+
+- 엄격한 타입 체크 사용
+- `any` 타입 사용 금지
+- 인터페이스는 `I` 접두사 없이 사용
+- Props 타입은 컴포넌트명 + `Props` 접미사
+
+### React
+
+- 함수형 컴포넌트 사용
+- `useCallback`, `useMemo` 는 정말 필요한 경우에만 사용
+- Props drilling 방지 (Context 또는 상태 관리 라이브러리 사용)
+
+### 파일명 규칙
+
+- 컴포넌트: `PascalCase.tsx`
+- 훅: `use` + `PascalCase.ts`
+- 유틸리티: `camelCase.ts`
+- 타입: `camelCase.types.ts`
+
+## 🚨 코드 품질
+
+### 즉시 리팩토링 대상
+
+- 파일 200줄 초과
+- 함수 50줄 초과
+- if-else 4단계 이상 중첩
+
+### 주의 깊게 관찰
+
+- 파일 100줄 초과
+- useState 5개 이상
+- Props 8개 이상
+
+### 조기 반환 패턴
+
+```typescript
+// ❌ 나쁜 예
+function processUser(user) {
+  if (user) {
+    if (user.isActive) {
+      if (user.hasPermission) {
+        return doSomething();
+      }
+    }
+  }
+}
+
+// ✅ 좋은 예
+function processUser(user) {
+  if (!user) return;
+  if (!user.isActive) return;
+  if (!user.hasPermission) return;
+
+  return doSomething();
+}
+```
+
+## 🧪 테스트
+
+### 테스트 작성 규칙
+
+- 컴포넌트 테스트: `@testing-library/react`
+- 훅 테스트: `@testing-library/react-hooks`
+- 유틸리티 테스트: `vitest`
+- 파일명: `ComponentName.test.tsx`
+
+### MSW 사용
+
+- API 모킹: `mocks/handlers/`
+- 개발 환경에서 MSW 활성화
+- 테스트에서 MSW 사용
+
+## 📦 패키지 관리
+
+### 의존성 관리
+
+- `pnpm` 사용
+- `workspace:*` 로컬 패키지 참조
+- 버전 고정 (^ 사용 금지)
+
+### 스크립트
+
+```bash
+pnpm web dev      # 웹 개발 서버
+pnpm mobile dev   # 모바일 개발 서버
+pnpm lint         # 코드 검사
+pnpm typecheck    # 타입 검사
+pnpm test         # 테스트 실행
+pnpm build        # 빌드
+```
+
+## 🔍 코드 리뷰 체크리스트
+
+### 필수 체크
+
+- [ ] ESLint 통과
+- [ ] TypeScript 에러 없음
+- [ ] 테스트 작성/업데이트
+- [ ] 관련 도메인 담당자 리뷰
+
+### 성능 체크
+
+- [ ] 불필요한 리렌더링 없음
+- [ ] 번들 사이즈 체크
+- [ ] 모바일 반응형 확인
+
+### 도메인 체크
+
+- [ ] 내 도메인: A(인증&설문) / B(메인&재료) / C(레시피&요리) / D(마이페이지&UI)
+- [ ] 다른 도메인 API/상태 사용 여부
+- [ ] 공통 컴포넌트 수정 여부
+
+## 🎯 실천 방법
+
+### 단계별 적용
+
+1. **1주차**: 조기 반환, 명확한 함수명
+2. **2주차**: Container-Presenter 패턴
+3. **3주차**: Custom Hook 분리
+4. **4주차**: 성능 최적화
+
+### 팀 협업
+
+- 매주 금요일: 좋은 코드 공유
+- 월 1회: 새로운 패턴 학습
+- PR 리뷰: 24시간 내 완료
+
+- 커스텀 훅 및 최적화 함수는 비용이 많이 드는 계산인지 철저하게 파악한 후 실시할 것, 만약에 그렇지 않으면 그대로 둘 것
