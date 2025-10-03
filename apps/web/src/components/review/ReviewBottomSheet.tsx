@@ -59,7 +59,8 @@ export function ReviewBottomSheet({
     });
   };
 
-  const isFormValid = emotions.taste && emotions.difficulty && emotions.experience;
+  const isFormValid =
+    emotions.taste && emotions.difficulty && emotions.experience;
 
   return (
     <Drawer open={isOpen} onOpenChange={onClose}>
@@ -95,7 +96,7 @@ export function ReviewBottomSheet({
                 <p className="text-15 text-gray-600">
                   {reviewData.completionCount}번째 레시피 해먹기 완료!
                 </p>
-                <h2 className="truncate text-20 text-gray-900">
+                <h2 className="text-20 truncate text-gray-900">
                   {reviewData.recipeName}
                 </h2>
               </div>
@@ -126,8 +127,8 @@ export function ReviewBottomSheet({
 
               {/* 코멘트 입력 */}
 
-              <div className='mb-[13px]'>
-                <p className="mb-2 text-18sb text-gray-900">
+              <div className="mb-[13px]">
+                <p className="text-18sb mb-2 text-gray-900">
                   기타 의견이 있어요!
                 </p>
                 <Textarea
@@ -145,13 +146,12 @@ export function ReviewBottomSheet({
               onClick={handleSubmit}
               disabled={!isFormValid}
               className="py-4"
-              size='full'
+              size="full"
             >
               <p className="text-17sb">후기 등록하기</p>
             </Button>
           </div>
         </div>
-
       </DrawerContent>
     </Drawer>
   );
