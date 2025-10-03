@@ -17,7 +17,7 @@ export function EmotionButton({
     <button
       onClick={onClick}
       className={cn(
-        'h-[47px] w-[108px] rounded-[10px] border p-3',
+        'w-full rounded-[10px] border p-3',
         isSelected
           ? 'bg-secondary-light-green border-secondary-soft-green text-primary border'
           : 'border border-neutral-300 bg-white text-gray-500'

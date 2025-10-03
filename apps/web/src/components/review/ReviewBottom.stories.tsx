@@ -50,8 +50,8 @@ function ReviewBottomSheetWrapper() {
   const handleSubmit = (data: {
     comment: string;
     emotions: {
-      cooking: string | null;
       difficulty: string | null;
+      experience: string | null;
       taste: string | null;
     };
   }) => {
