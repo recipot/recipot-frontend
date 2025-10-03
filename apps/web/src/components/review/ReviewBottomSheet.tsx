@@ -10,18 +10,20 @@ import type {
 } from '@/types/review.types';
 
 import { Button } from '../common/Button';
+import { Drawer, DrawerClose, DrawerContent } from '../ui/drawer';
+import { Textarea } from '../ui/textarea';
 import { EmotionSection } from './EmotionSection';
 
 const EMOTION_OPTIONS = {
-  cooking: [
-    { label: '간단해요', value: 'easy' },
-    { label: '적당해요', value: 'medium' },
-    { label: '어려워요', value: 'hard' },
-  ],
   difficulty: [
     { label: '쉬워요', value: 'easy' },
     { label: '적당해요', value: 'medium' },
     { label: '힘들어요', value: 'hard' },
+  ],
+  experience: [
+    { label: '간단해요', value: 'easy' },
+    { label: '적당해요', value: 'medium' },
+    { label: '어려워요', value: 'hard' },
   ],
   taste: [
     { label: '맛있어요', value: 'good' },
@@ -38,8 +40,8 @@ export function ReviewBottomSheet({
 }: ReviewBottomSheetProps) {
   const [comment, setComment] = useState('');
   const [emotions, setEmotions] = useState<EmotionRating>({
-    cooking: null,
     difficulty: null,
+    experience: null,
     taste: null,
   });
 
@@ -57,65 +59,50 @@ export function ReviewBottomSheet({
     });
   };
 
-  const isFormValid = emotions.taste && emotions.difficulty && emotions.cooking;
-
-  if (!isOpen) return null;
+  const isFormValid = emotions.taste && emotions.difficulty && emotions.experience;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/50"
-        onClick={onClose}
-        onKeyDown={e => {
-          if (e.key === 'Escape') onClose();
-        }}
-        role="button"
-        tabIndex={0}
-      />
+    <Drawer open={isOpen} onOpenChange={onClose}>
+      <DrawerContent className="mx-auto w-full max-w-[430px]">
+        <div className="overflow-y-auto px-4 pb-6">
+          {/* 헤더 - 상단에 고정 */}
+          <div className="sticky top-0 z-10 -mx-4 flex justify-end bg-white px-4 py-3">
+            <DrawerClose className="rounded-full p-1.5 transition-colors hover:bg-gray-100">
+              <X className="h-5 w-5 text-gray-600" />
+              <span className="sr-only">닫기</span>
+            </DrawerClose>
+          </div>
 
-      {/* Bottom Sheet */}
-      <div className="relative mx-auto flex max-h-[90vh] w-full max-w-[390px] flex-col rounded-t-2xl bg-white shadow-lg">
-        {/* Header - 고정 */}
-        <div className="flex flex-shrink-0 items-center justify-between p-6 pb-4">
-          <div className="w-6" /> {/* Spacer */}
-          <button
-            onClick={onClose}
-            className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-200 transition-colors hover:bg-gray-300"
-            aria-label="닫기"
-          >
-            <X className="h-4 w-4 text-gray-600" />
-          </button>
-        </div>
-
-        <div className="flex-1 overflow-y-auto">
-          <div className="px-6 pb-6">
-            <div className="mb-6 flex items-center gap-4">
-              <div className="flex h-[72px] w-[72px] items-center justify-center rounded-[18px] bg-gray-100">
+          {/* 컨텐츠 영역 */}
+          <div className="space-y-6">
+            {/* 레시피 정보 */}
+            <div className="flex items-center gap-4">
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gray-100">
                 {reviewData.recipeImage ? (
                   <Image
                     src={reviewData.recipeImage}
                     alt={reviewData.recipeName}
                     width={72}
                     height={72}
-                    className="h-full w-full rounded-[18px] object-cover"
+                    className="h-full w-full object-cover"
+                    priority
                   />
                 ) : (
-                  <div className="h-8 w-8 rounded bg-gray-300" />
+                  <div className="h-7 w-7 rounded bg-gray-300" />
                 )}
               </div>
-              <div className="flex-1">
-                <p className="mb-1 text-[15px] text-gray-500">
+              <div className="min-w-0">
+                <p className="text-15 text-gray-600">
                   {reviewData.completionCount}번째 레시피 해먹기 완료!
                 </p>
-                <h2 className="text-[20px] font-bold text-gray-900">
+                <h2 className="truncate text-20 text-gray-900">
                   {reviewData.recipeName}
                 </h2>
               </div>
             </div>
 
-            {/* Emotion Sections */}
-            <div className="space-y-8">
+            {/* 감정 선택 섹션 */}
+            <div className="">
               <EmotionSection
                 title="요리의 맛은 어땠나요?"
                 options={EMOTION_OPTIONS.taste}
@@ -132,40 +119,40 @@ export function ReviewBottomSheet({
 
               <EmotionSection
                 title="직접 요리해보니 어땠나요?"
-                options={EMOTION_OPTIONS.cooking}
-                selectedValue={emotions.cooking}
-                onSelect={value => handleEmotionSelect('cooking', value)}
+                options={EMOTION_OPTIONS.experience}
+                selectedValue={emotions.experience}
+                onSelect={value => handleEmotionSelect('experience', value)}
               />
 
-              {/* Comment Section */}
-              <div>
-                <p className="text-18sb mb-2">기타 의견이 있어요!</p>
-                <div className="relative">
-                  <textarea
-                    value={comment}
-                    onChange={e => setComment(e.target.value)}
-                    placeholder="내용을 입력해 주세요"
-                    className="h-[100px] w-full rounded-xl border border-gray-300 p-4 placeholder:text-gray-600"
-                    maxLength={500}
-                  />
-                </div>
+              {/* 코멘트 입력 */}
+
+              <div className='mb-[13px]'>
+                <p className="mb-2 text-18sb text-gray-900">
+                  기타 의견이 있어요!
+                </p>
+                <Textarea
+                  value={comment}
+                  onChange={e => setComment(e.target.value)}
+                  placeholder="내용을 입력해 주세요"
+                  className="min-h-[100px] w-full"
+                  maxLength={500}
+                />
               </div>
             </div>
 
-            {/* Submit Button */}
-            <div className="mt-8">
-              <Button
-                onClick={handleSubmit}
-                disabled={!isFormValid}
-                className="w-full"
-                variant={isFormValid ? 'default' : 'secondary'}
-              >
-                후기 제출하기
-              </Button>
-            </div>
+            {/* 제출 버튼 */}
+            <Button
+              onClick={handleSubmit}
+              disabled={!isFormValid}
+              className="py-4"
+              size='full'
+            >
+              <p className="text-17sb">후기 등록하기</p>
+            </Button>
           </div>
         </div>
-      </div>
-    </div>
+
+      </DrawerContent>
+    </Drawer>
   );
 }

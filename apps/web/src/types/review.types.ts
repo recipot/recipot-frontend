@@ -8,7 +8,7 @@ export interface ReviewData {
 export interface EmotionRating {
   taste: 'bad' | 'neutral' | 'good' | null;
   difficulty: 'hard' | 'medium' | 'easy' | null;
-  cooking: 'hard' | 'medium' | 'easy' | null;
+  experience: 'hard' | 'medium' | 'easy' | null;
 }
 
 export interface ReviewFormData {
