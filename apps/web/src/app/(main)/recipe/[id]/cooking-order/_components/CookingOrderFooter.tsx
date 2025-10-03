@@ -19,17 +19,23 @@ export default function CookingOrderFooter({
   onStepComplete,
 }: CookingOrderFooterProps) {
   const buttonTextClassName = 'text-17sb';
-  const buttonLayoutClassName =
-    'flex-1 rounded-[100px] bg-gray-600 px-8 py-[15px]';
+  const buttonLayoutClassName = 'flex-1 rounded-[100px] px-8 py-[15px]';
   return (
     <div className="fixed bottom-0 left-1/2 w-full max-w-sm -translate-x-1/2 transform bg-[#FFFFFF]/50">
       <div className="bg-white/50 px-4 py-4 backdrop-blur-sm">
         {isFirstStep ? (
           <Button
-            onClick={onStepComplete}
+            onClick={onNextStep}
             className="bg-primary w-full rounded-full py-3 text-white"
           >
             <p className={buttonTextClassName}>다음으로</p>
+          </Button>
+        ) : isLastStep ? (
+          <Button
+            onClick={onStepComplete}
+            className="bg-primary w-full rounded-full py-3 text-white"
+          >
+            <p className={buttonTextClassName}>요리 완성</p>
           </Button>
         ) : (
           <div className="flex space-x-3">
@@ -40,12 +46,10 @@ export default function CookingOrderFooter({
               <p className={buttonTextClassName}>이전으로</p>
             </Button>
             <Button
-              onClick={isLastStep ? onStepComplete : onNextStep}
+              onClick={onNextStep}
               className={cn('bg-primary', buttonLayoutClassName)}
             >
-              <p className={buttonTextClassName}>
-                {isLastStep ? '완료' : '다음으로'}
-              </p>
+              <p className={buttonTextClassName}>다음으로</p>
             </Button>
           </div>
         )}
