@@ -1,15 +1,16 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 import { useCookingOrder } from '@/hooks/useCookingOrder';
 
+import { useCookingOrderNavigation } from '../../../../../../hooks/useCookingOrderNavigation';
 import CompletionSidebar from './CompletionSidebar';
 import CookingOrderContent from './CookingOrderContent';
 import CookingOrderFooter from './CookingOrderFooter';
 import CookingOrderHeader from './CookingOrderHeader';
 import IngredientsSidebar from './IngredientsSidebar';
-import { useCookingOrderNavigation } from './useCookingOrderNavigation';
 import WarningModal from './WarningModal';
 
 interface CookingOrderPresenterProps {
@@ -25,6 +26,8 @@ export default function CookingOrderPresenter({
   const [showIngredientsModal, setShowIngredientsModal] = useState(false);
   const [showCompletionSidebar, setShowCompletionSidebar] = useState(false);
   const [showWarningModal, setShowWarningModal] = useState(false);
+
+  const router = useRouter();
 
   const {
     currentStep,
@@ -42,7 +45,7 @@ export default function CookingOrderPresenter({
   const handleStepComplete = () => {
     completeStepHandler(currentStep);
     if (isLastStep) {
-      setShowCompletionSidebar(true);
+      // 바텀시트 띄우기
     } else {
       handleNextStep();
     }
@@ -57,9 +60,10 @@ export default function CookingOrderPresenter({
     setShowWarningModal(true);
   };
 
-  const handleConfirmExit = () => {
-    // 실제로는 이전 페이지로 이동하는 로직이 들어가야 함
-    // router.back() 또는 router.push('/recipes')
+  const handleConfirmExit = ({ recipeId }: { recipeId: string }) => {
+    // 레시피 상세 페이지로 되돌아가는 로직 필요
+    // recipeId는 params로?
+    router.push(`/recipe/${recipeId}`);
   };
 
   if (isLoading) {
@@ -129,7 +133,7 @@ export default function CookingOrderPresenter({
       <WarningModal
         isOpen={showWarningModal}
         onClose={() => setShowWarningModal(false)}
-        onConfirm={handleConfirmExit}
+        onConfirm={() => handleConfirmExit({ recipeId })}
       />
     </div>
   );

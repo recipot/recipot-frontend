@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from '@/components/common/Button';
+import { cn } from '@/lib/utils';
 
 interface CookingOrderFooterProps {
   isFirstStep: boolean;
@@ -13,37 +14,38 @@ interface CookingOrderFooterProps {
 export default function CookingOrderFooter({
   isFirstStep,
   isLastStep,
-  onPrevStep,
   onNextStep,
+  onPrevStep,
   onStepComplete,
 }: CookingOrderFooterProps) {
+  const buttonTextClassName = 'text-17sb';
+  const buttonLayoutClassName =
+    'flex-1 rounded-[100px] bg-gray-600 px-8 py-[15px]';
   return (
-    <div className="fixed bottom-0 left-1/2 w-full max-w-sm -translate-x-1/2 transform">
-      {/* 그라데이션 오버레이 */}
-      <div className="h-4 bg-gradient-to-t from-white/50 to-transparent" />
-
-      {/* 버튼 */}
+    <div className="fixed bottom-0 left-1/2 w-full max-w-sm -translate-x-1/2 transform bg-[#FFFFFF]/50">
       <div className="bg-white/50 px-4 py-4 backdrop-blur-sm">
         {isFirstStep ? (
           <Button
             onClick={onStepComplete}
-            className="bg-primary w-full rounded-full py-3 font-semibold text-white"
+            className="bg-primary w-full rounded-full py-3 text-white"
           >
-            다음으로
+            <p className={buttonTextClassName}>다음으로</p>
           </Button>
         ) : (
           <div className="flex space-x-3">
             <Button
               onClick={onPrevStep}
-              className="flex-1 rounded-full bg-gray-500 py-3 font-semibold text-white"
+              className={cn('bg-gray-600', buttonLayoutClassName)}
             >
-              이전으로
+              <p className={buttonTextClassName}>이전으로</p>
             </Button>
             <Button
               onClick={isLastStep ? onStepComplete : onNextStep}
-              className="bg-primary flex-1 rounded-full py-3 font-semibold text-white"
+              className={cn('bg-primary', buttonLayoutClassName)}
             >
-              {isLastStep ? '완료' : '다음으로'}
+              <p className={buttonTextClassName}>
+                {isLastStep ? '완료' : '다음으로'}
+              </p>
             </Button>
           </div>
         )}

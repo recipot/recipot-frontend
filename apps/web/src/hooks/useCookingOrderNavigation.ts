@@ -22,14 +22,16 @@ export function useCookingOrderNavigation(recipe: Recipe | null) {
   };
 
   const isFirstStep = currentStep === 1;
-  const isLastStep = recipe ? currentStep === recipe.cookingSteps.length : false;
+  const isLastStep = recipe
+    ? currentStep === recipe.cookingSteps.length
+    : false;
 
   return {
     currentStep,
-    isFirstStep,
-    isLastStep,
     handleNextStep,
     handlePrevStep,
     handleReset,
+    isFirstStep,
+    isLastStep,
   };
 }
