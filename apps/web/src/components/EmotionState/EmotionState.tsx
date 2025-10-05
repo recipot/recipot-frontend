@@ -1,15 +1,16 @@
 import './styles.css';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 
 import { cn } from '@/lib/utils';
 
+import HappyBird from '../../../public/emotion/enough.png';
+import VisualMain from '../../../public/emotion/initial.png';
+import NormalBird from '../../../public/emotion/soso.png';
+import TiredBird from '../../../public/emotion/tired.png';
 import { EMOTION_OPTIONS } from './emotionConstants';
 import EmotionOptionButton from './EmotionOptionButton';
-
-// ============================================================================
-// 타입 정의
-// ============================================================================
 
 export type MoodType = 'bad' | 'neutral' | 'good';
 export type MoodState = 'default' | 'selected' | 'disabled';
@@ -21,10 +22,6 @@ interface EmotionStateProps {
   className?: string;
 }
 
-// ============================================================================
-// 메인 컴포넌트
-// ============================================================================
-
 /**
  * 사용자의 현재 기분을 선택할 수 있는 컴포넌트
  */
@@ -33,6 +30,18 @@ const EmotionState: React.FC<EmotionStateProps> = ({
   initialMood = null,
   onMoodChange,
 }) => {
+  const getEmotionImage = (mood: MoodType | null) => {
+    switch (mood) {
+      case 'bad':
+        return TiredBird;
+      case 'good':
+        return HappyBird;
+      case 'neutral':
+        return NormalBird;
+      default:
+        return VisualMain;
+    }
+  };
   const [selectedMood, setSelectedMood] = useState<MoodType | null>(
     initialMood
   );
@@ -75,12 +84,12 @@ const EmotionState: React.FC<EmotionStateProps> = ({
   return (
     <div
       className={cn(
-        'flex h-[95vh] w-full items-center justify-center overflow-hidden',
+        'flex h-[95vh] w-full flex-col items-center justify-center overflow-hidden',
         className,
         getBackgroundGradient(selectedMood)
       )}
     >
-      <div className="flex w-fit justify-between gap-[15.5px] px-10">
+      <div className="mb-[30px] flex w-fit justify-between gap-[15.5px] px-10">
         {EMOTION_OPTIONS.mood.map(({ color, label, mood }) => (
           <EmotionOptionButton
             key={mood}
@@ -92,6 +101,8 @@ const EmotionState: React.FC<EmotionStateProps> = ({
           />
         ))}
       </div>
+
+      <Image src={getEmotionImage(selectedMood)} alt="emotion" />
     </div>
   );
 };
