@@ -1,8 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
-
-import { Button } from '@/components/ui/button';
+import React, { useEffect, useState } from 'react';
 
 interface ShareData {
   title?: string;
@@ -21,7 +19,6 @@ interface WebShareButtonProps {
 
 const WebShareButton: React.FC<WebShareButtonProps> = ({
   children,
-  className,
   fallbackText = '공유하기',
   onShareError,
   onShareSuccess,
@@ -32,7 +29,7 @@ const WebShareButton: React.FC<WebShareButtonProps> = ({
   const [isAndroid, setIsAndroid] = useState(false);
 
   // 클라이언트에서만 브라우저 정보 확인
-  React.useEffect(() => {
+  useEffect(() => {
     if (typeof navigator !== 'undefined') {
       setIsSupported('share' in navigator);
       setIsAndroid(/Android/i.test(navigator.userAgent));
@@ -105,14 +102,13 @@ const WebShareButton: React.FC<WebShareButtonProps> = ({
   };
 
   return (
-    <Button
+    <button
       onClick={handleWebShare}
       disabled={isSharing}
-      className={className}
-      variant="default"
+      className="hover:cursor-pointer disabled:cursor-not-allowed"
     >
-      {isSharing ? '공유 중...' : (children ?? fallbackText)}
-    </Button>
+      {children ?? fallbackText}
+    </button>
   );
 };
 

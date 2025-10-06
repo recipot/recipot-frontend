@@ -11,12 +11,12 @@ import CookwareSection from './CookwareSection';
 import IngredientsSection from './IngredientsSection';
 import RecipeHeader from './RecipeHeader';
 import RelatedRecipes from './RelatedRecipes';
-import StepsSection from './StepsSection';
+import StepSection from './StepSection';
 import TabNavigation from './TabNavigation';
 
 import type { RecipeDetailProps, TabId } from '../types/recipe.types';
 
-const RecipeDetail: React.FC<RecipeDetailProps> = ({ recipe }) => {
+const RecipeDetail = ({ recipe }: RecipeDetailProps) => {
   const [activeTab, setActiveTab] = useState<TabId>('ingredients');
 
   const ingredientsRef = useRef<HTMLDivElement>(null);
@@ -97,9 +97,7 @@ const RecipeDetail: React.FC<RecipeDetailProps> = ({ recipe }) => {
         tabContainerRef={tabContainerRef}
       />
 
-      {/* Content */}
       <div className="px-4 pb-24">
-        {/* Description */}
         <div className="bg-secondary-light-green border-secondary-soft-green my-4 rounded-2xl border-[1px] p-5">
           <p className="recipe-description text-15sb leading-relaxed">
             {recipe.description}
@@ -114,21 +112,22 @@ const RecipeDetail: React.FC<RecipeDetailProps> = ({ recipe }) => {
 
         <CookwareSection cookware={recipe.cookware} cookwareRef={cookwareRef} />
 
-        <StepsSection steps={recipe.steps} stepsRef={stepsRef} />
+        <StepSection steps={recipe.steps} stepsRef={stepsRef} />
 
         <RelatedRecipes relatedRecipes={recipe.relatedRecipes} />
       </div>
 
-      {/* Fixed Bottom Button */}
       <div className="fixed right-0 bottom-0 left-0">
-        <div className="h-4 bg-gradient-to-t from-white/50 to-transparent" />
-        <div className="bg-white/50 px-4 py-4 backdrop-blur-sm">
-          <Button variant="default" size="full" className="bg-primary">
-            <CookIcon className="h-6 w-6" color="#ffffff" />
+        <div className="flex bg-white/50 px-[50px] py-[10px]">
+          <Button
+            variant="default"
+            size="full"
+            className="bg-primary px-8 py-[15px]"
+          >
+            <CookIcon className="mr-[6px] h-6 w-6" color="#ffffff" />
             <p className="text-17sb text-white">요리하러 가기</p>
           </Button>
         </div>
-        <div className="h-2 bg-white/50" />
       </div>
     </div>
   );

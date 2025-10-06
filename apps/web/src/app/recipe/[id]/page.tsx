@@ -78,5 +78,6 @@ interface RecipePageProps {
 }
 
 export default function RecipePage({ params }: RecipePageProps) {
+  console.log(params.id);
   return <RecipeDetail recipe={sampleRecipe} />;
 }
