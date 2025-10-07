@@ -54,9 +54,10 @@ const RecipeHeader = ({ recipe }: RecipeHeaderProps) => {
             >
               <ShareIcon className="h-6 w-6" color="#212529" />
             </WebShareButton>
-            <button className="p-2">
-              <HeartIcon className="h-6 w-6" color="#212529" />
-            </button>
+            <HeartIcon
+              className="h-6 w-6 cursor-pointer stroke-2"
+              color="#212529"
+            />
           </div>
         </div>
       </div>
