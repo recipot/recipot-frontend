@@ -2,10 +2,11 @@
 
 import './RecipeDetail.css';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useMemo, useRef } from 'react';
 
 import { Button } from '@/components/common/Button';
 import { CookIcon } from '@/components/Icons';
+import { useIntersectionScrollSpy } from '@/hooks/useIntersectionScrollSpy';
 
 import CookwareSection from './CookwareSection';
 import IngredientsSection from './IngredientsSection';
@@ -17,15 +18,25 @@ import TabNavigation from './TabNavigation';
 import type { RecipeDetailProps, TabId } from '../types/recipe.types';
 
 const RecipeDetail = ({ recipe }: RecipeDetailProps) => {
-  const [activeTab, setActiveTab] = useState<TabId>('ingredients');
-
   const ingredientsRef = useRef<HTMLDivElement>(null);
   const cookwareRef = useRef<HTMLDivElement>(null);
   const stepsRef = useRef<HTMLDivElement>(null);
   const tabContainerRef = useRef<HTMLDivElement>(null);
 
+  const sectionRefs = useMemo(
+    () => [ingredientsRef, cookwareRef, stepsRef],
+    []
+  );
+
+  const { activeSection: activeTab, setActiveSection } =
+    useIntersectionScrollSpy({
+      initialState: 'ingredients', 
+      rootRef: tabContainerRef,
+      sectionRefs,
+    });
+
   const handleTabClick = (tabId: TabId) => {
-    setActiveTab(tabId);
+    setActiveSection(tabId);
 
     let targetRef: React.RefObject<HTMLDivElement> | null = null;
 
@@ -52,47 +63,12 @@ const RecipeDetail = ({ recipe }: RecipeDetailProps) => {
       });
     }
   };
-
-  // Intersection Observer로 현재 보이는 섹션 감지
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      entries => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            const sectionId = entry.target.getAttribute('data-section');
-            if (sectionId) {
-              setActiveTab(sectionId as TabId);
-            }
-          }
-        });
-      },
-      {
-        rootMargin: '-100px 0px -50% 0px', // sticky 탭 높이 고려
-        threshold: 0.1,
-      }
-    );
-
-    const sections = [ingredientsRef, cookwareRef, stepsRef];
-    sections.forEach(ref => {
-      if (ref.current) {
-        observer.observe(ref.current);
-      }
-    });
-
-    return () => {
-      sections.forEach(ref => {
-        if (ref.current) {
-          observer.unobserve(ref.current);
-        }
-      });
-    };
-  }, []);
   return (
     <div className="min-h-screen bg-gray-50">
       <RecipeHeader recipe={recipe} />
 
       <TabNavigation
-        activeTab={activeTab}
+        activeTab={activeTab as TabId}
         onTabClick={handleTabClick}
         tabContainerRef={tabContainerRef}
       />
