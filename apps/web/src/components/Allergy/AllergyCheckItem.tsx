@@ -31,7 +31,7 @@ function AllergyCheckItem({
     'border-secondary-soft-green bg-secondary-light-green text-primary';
 
   return (
-    <fieldset className="space-y-4">
+    <fieldset>
       <legend className="text-18sb">{label}</legend>
       <div className="text-15sb grid grid-cols-3 gap-3">
         {items.map(item => (
