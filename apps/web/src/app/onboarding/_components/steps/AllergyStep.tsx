@@ -1,14 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { allergyPost } from '@recipot/api';
-import { useMutation } from '@tanstack/react-query';
 
 import { AllergyCheckContainer, useAllergyCheck } from '@/components/Allergy';
 import { categories } from '@/components/Allergy/Allergy.constants';
 import { Button } from '@/components/common/Button';
 import { useScrollSpy } from '@/hooks';
 import { useOnboardingStore } from '@/stores/onboardingStore';
+import { onboardingStorage } from '@/utils/onboardingStorage';
 
 // categories 배열에서 섹션 정보 동적 생성 (실제 렌더링과 일치)
 const ALLERGY_SECTIONS = categories.map((category, index) => ({
@@ -65,22 +64,35 @@ export default function AllergyStep() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const allergyMutation = useMutation({
-    mutationFn: allergyPost,
-    onError: error => {
-      console.error('API 호출 실패:', error);
-    },
-    onSuccess: data => {
-      console.info('API 호출 성공:', data);
-      // 데이터 저장 및 다음 단계로 이동
-      setStepData(1, { apiResponse: data, selectedItems });
-      markStepCompleted(1);
-      goToNextStep();
-    },
-  });
+  // 로딩 상태 관리 (기존 mutation 대신)
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (data: { items: number[] }) => {
-    allergyMutation.mutate({ categories: data.items });
+  const handleSubmit = async (data: { items: number[] }) => {
+    try {
+      setIsSubmitting(true);
+
+      // localStorage에 알레르기 데이터 저장
+      onboardingStorage.saveStepData(1, {
+        allergies: data.items,
+      });
+
+      // 스토어 업데이트 (UI 상태 관리용)
+      setStepData(1, { allergies: data.items, selectedItems });
+      markStepCompleted(1);
+
+      console.info('✅ Step 1 완료: 알레르기 정보 저장됨', {
+        allergies: data.items,
+        selectedItems,
+      });
+
+      // 다음 단계로 이동
+      goToNextStep();
+    } catch (error) {
+      console.error('❌ 알레르기 데이터 저장 실패:', error);
+      // TODO: 에러 토스트 메시지 표시
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // 섹션으로 스크롤하는 함수 (URL 해시 변경 없이)
@@ -140,12 +152,8 @@ export default function AllergyStep() {
 
       {/* 하단 버튼 */}
       <div className="fixed right-0 bottom-0 left-0 flex justify-center bg-gradient-to-t from-white via-white to-transparent px-6 py-[10px] pt-8">
-        <Button
-          form="allergy-form"
-          disabled={allergyMutation.isPending}
-          type="submit"
-        >
-          여유에 맞는 요리 추천받기
+        <Button form="allergy-form" disabled={isSubmitting} type="submit">
+          {isSubmitting ? '저장 중...' : '여유에 맞는 요리 추천받기'}
         </Button>
       </div>
     </div>

@@ -1,15 +1,14 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '@recipot/contexts';
 
+import { onboardingAPI } from '@/api/onboardingAPI';
 import { Button } from '@/components/common/Button';
-import {
-  IngredientsSearch,
-  type IngredientsSearchRef,
-} from '@/components/IngredientsSearch';
+import { IngredientsSearch } from '@/components/IngredientsSearch';
 import { useOnboardingStore } from '@/stores/onboardingStore';
 import { useSelectedFoodsStore } from '@/stores/selectedFoodsStore';
+import { onboardingStorage } from '@/utils/onboardingStorage';
 
 export default function RefrigeratorStep() {
   const { setUser, user } = useAuth();
@@ -24,7 +23,6 @@ export default function RefrigeratorStep() {
   const clearRefreshFlag = useOnboardingStore(state => state.clearRefreshFlag);
   const clearAllFoods = useSelectedFoodsStore(state => state.clearAllFoods);
 
-  const ingredientsSearchRef = useRef<IngredientsSearchRef>(null);
   const [selectedCount, setSelectedCount] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -47,10 +45,71 @@ export default function RefrigeratorStep() {
     }
   };
 
-  const handleComplete = () => {
-    // IngredientsSearch의 제출 로직 호출
-    if (ingredientsSearchRef.current) {
-      ingredientsSearchRef.current.submitSelectedFoods();
+  const handleComplete = async () => {
+    try {
+      setIsSubmitting(true);
+
+      // 1. 현재 스텝 데이터 저장
+      const { selectedFoodIds } = useSelectedFoodsStore.getState();
+      onboardingStorage.saveStepData(3, {
+        selectedFoods: selectedFoodIds,
+      });
+
+      // 2. 모든 온보딩 데이터 수집
+      const completeData = onboardingStorage.getCompleteOnboardingData();
+
+      if (!completeData) {
+        throw new Error(
+          '온보딩 데이터가 불완전합니다. 처음부터 다시 진행해주세요.'
+        );
+      }
+
+      // 3. 데이터 유효성 검증
+      const validation = onboardingAPI.validateOnboardingData(completeData);
+      if (!validation.isValid) {
+        throw new Error(`입력 데이터 오류: ${validation.errors.join(', ')}`);
+      }
+
+      console.info('🚀 통합 온보딩 데이터 전송 시작:', completeData);
+
+      // 4. 통합 API 호출
+      const result = await onboardingAPI.submitComplete(completeData);
+
+      if (result.success) {
+        // 5. 성공 시 데이터 정리
+        onboardingStorage.clearData();
+
+        // 6. 온보딩 완료 처리
+        const refrigeratorData = {
+          selectedFoods: selectedFoodIds,
+        };
+        setStepData(3, refrigeratorData);
+        markStepCompleted(3);
+        completeOnboarding();
+
+        console.info('✅ 온보딩 완료!', {
+          allergies: completeData.allergies,
+          mood: completeData.mood,
+          selectedFoods: completeData.selectedFoods,
+        });
+
+        // TODO: 메인 페이지로 이동하거나 완료 처리
+      } else {
+        throw new Error(result.message || '온보딩 완료 처리에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('❌ 온보딩 완료 실패:', error);
+
+      // 사용자에게 에러 메시지 표시
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : '알 수 없는 오류가 발생했습니다.';
+      alert(
+        `온보딩 완료 중 오류가 발생했습니다.\n\n${errorMessage}\n\n다시 시도해주세요.`
+      );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -58,33 +117,12 @@ export default function RefrigeratorStep() {
     setSelectedCount(count);
   };
 
-  const handleSubmissionStateChange = (submitting: boolean) => {
-    setIsSubmitting(submitting);
-  };
-
-  const handleSubmissionSuccess = () => {
-    console.info(
-      '재료 선택이 완료되었습니다. 레시피 추천 페이지로 이동합니다.'
-    );
-
-    // 온보딩 완료 처리
-    const refrigeratorData = {
-      /* 냉장고 재료 데이터 */
-    };
-    setStepData(3, refrigeratorData);
-    markStepCompleted(3);
-    completeOnboarding(); // 온보딩 완료 상태 업데이트
-    console.info('온보딩 완료!', refrigeratorData);
-    // TODO: 메인 페이지로 이동하거나 완료 처리
-  };
-
   return (
     <>
       <IngredientsSearch
-        ref={ingredientsSearchRef}
-        onSubmissionSuccess={handleSubmissionSuccess}
+        onSubmissionSuccess={() => {}} // 더 이상 사용하지 않음
         onSelectionChange={handleSelectionChange}
-        onSubmissionStateChange={handleSubmissionStateChange}
+        onSubmissionStateChange={() => {}} // 더 이상 사용하지 않음
       />
 
       <div className="fixed right-0 bottom-0 left-0 flex justify-center px-6 py-[10px]">
@@ -92,7 +130,7 @@ export default function RefrigeratorStep() {
           onClick={handleComplete}
           disabled={selectedCount < 2 || isSubmitting}
         >
-          여유에 맞는 요리 추천받기
+          {isSubmitting ? '온보딩 완료 중...' : '여유에 맞는 요리 추천받기'}
         </Button>
       </div>
     </>

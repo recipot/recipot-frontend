@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/common/Button';
 import EmotionState, { type MoodType } from '@/components/EmotionState';
-import { useSubmitMood } from '@/hooks';
 import { useOnboardingStore } from '@/stores/onboardingStore';
+import { onboardingStorage } from '@/utils/onboardingStorage';
 
 export default function CookStateStep() {
   const goToNextStep = useOnboardingStore(state => state.goToNextStep);
@@ -30,27 +30,41 @@ export default function CookStateStep() {
     }
   }, [stepData, isRefreshed, clearRefreshFlag]);
 
-  // 기분 상태 전송 mutation
-  const { isPending: isSubmitting, mutate: submitMood } = useSubmitMood();
+  // 로딩 상태 관리 (기존 mutation 대신)
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleMoodChange = (mood: MoodType | null) => {
     setSelectedMood(mood);
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (!selectedMood) return;
 
-    // 기분 상태를 서버에 전송
-    submitMood(selectedMood, {
-      onSuccess: () => {
-        const cookStateData = {
-          mood: selectedMood,
-        };
-        setStepData(2, cookStateData);
-        markStepCompleted(2);
-        goToNextStep();
-      },
-    });
+    try {
+      setIsSubmitting(true);
+
+      // localStorage에 기분 상태 저장
+      onboardingStorage.saveStepData(2, {
+        mood: selectedMood,
+      });
+
+      // 스토어 업데이트 (UI 상태 관리용)
+      const cookStateData = {
+        mood: selectedMood,
+      };
+      setStepData(2, cookStateData);
+      markStepCompleted(2);
+
+      console.info('✅ Step 2 완료: 기분 상태 저장됨', { mood: selectedMood });
+
+      // 다음 단계로 이동
+      goToNextStep();
+    } catch (error) {
+      console.error('❌ 기분 상태 저장 실패:', error);
+      // TODO: 에러 토스트 메시지 표시
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -69,7 +83,7 @@ export default function CookStateStep() {
           onClick={handleNext}
           disabled={selectedMood === null || isSubmitting}
         >
-          {isSubmitting ? '전송 중...' : '여유에 맞는 요리 추천받기'}
+          {isSubmitting ? '저장 중...' : '여유에 맞는 요리 추천받기'}
         </Button>
       </div>
     </>
