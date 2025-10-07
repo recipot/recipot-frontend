@@ -82,6 +82,17 @@ export default function AllergyStep() {
     allergyMutation.mutate({ categories: data.items });
   };
 
+  // 섹션으로 스크롤하는 함수 (URL 해시 변경 없이)
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }
+  };
+
   return (
     <div className="container mx-auto max-w-4xl">
       {/* 네비게이션 바 */}
@@ -97,16 +108,18 @@ export default function AllergyStep() {
               data-section-id={section.id}
               className="flex-shrink-0"
             >
-              <a
-                href={`#${section.id}`}
-                className={`text-15sb inline-block rounded-full px-4 py-2 transition-all duration-200 ${
+              <button
+                type="button"
+                onClick={() => scrollToSection(section.id)}
+                className={`text-15sb inline-block cursor-pointer rounded-full px-4 py-2 transition-all duration-200 ${
                   hasScrolled && activeSection === section.id
                     ? 'bg-black text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 } `}
+                aria-label={`${section.label} 섹션으로 이동`}
               >
                 {section.label}
-              </a>
+              </button>
             </li>
           ))}
         </ul>
