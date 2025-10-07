@@ -5,15 +5,16 @@ import { allergyPost } from '@recipot/api';
 import { useMutation } from '@tanstack/react-query';
 
 import { AllergyCheckContainer, useAllergyCheck } from '@/components/Allergy';
+import { categories } from '@/components/Allergy/Allergy.constants';
 import { Button } from '@/components/common/Button';
 import { useScrollSpy } from '@/hooks';
 import { useOnboardingStore } from '@/stores/onboardingStore';
 
-// 섹션 정보 정의
-const ALLERGY_SECTIONS = [
-  { id: 'allergy-section-0', label: '해산물류' },
-  { id: 'allergy-section-1', label: '동물성 식품' },
-];
+// categories 배열에서 섹션 정보 동적 생성 (실제 렌더링과 일치)
+const ALLERGY_SECTIONS = categories.map((category, index) => ({
+  id: `allergy-section-${index}`,
+  label: category.title,
+}));
 
 // 스크롤바 숨김 스타일
 const scrollbarHideStyle = {
@@ -96,17 +97,19 @@ export default function AllergyStep() {
   return (
     <div className="container mx-auto max-w-4xl">
       {/* 네비게이션 바 */}
-      <div className="sticky top-0 z-10 bg-white px-6 py-4">
+      <div className="sticky top-0 z-10 bg-white py-4">
         <ul
           ref={gnbRef}
           className="flex gap-2 overflow-x-auto [&::-webkit-scrollbar]:hidden"
           style={scrollbarHideStyle}
         >
-          {ALLERGY_SECTIONS.map(section => (
+          {ALLERGY_SECTIONS.map((section, index) => (
             <li
               key={section.id}
               data-section-id={section.id}
-              className="flex-shrink-0"
+              className={`flex-shrink-0 ${index === 0 ? 'pl-4' : ''} ${
+                index === ALLERGY_SECTIONS.length - 1 ? 'pr-4' : ''
+              }`}
             >
               <button
                 type="button"
