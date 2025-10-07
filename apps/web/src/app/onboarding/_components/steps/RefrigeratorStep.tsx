@@ -8,19 +8,20 @@ import { Button } from '@/components/common/Button';
 import { IngredientsSearch } from '@/components/IngredientsSearch';
 import { useOnboardingStore } from '@/stores/onboardingStore';
 import { useSelectedFoodsStore } from '@/stores/selectedFoodsStore';
-import { onboardingStorage } from '@/utils/onboardingStorage';
+
+import { ONBOARDING_CONSTANTS } from '../../_constants';
+import { useOnboardingActions } from '../../_hooks';
+import { getSubmitButtonText, onboardingStorage } from '../../_utils';
 
 export default function RefrigeratorStep() {
   const { setUser, user } = useAuth();
-  const markStepCompleted = useOnboardingStore(
-    state => state.markStepCompleted
-  );
-  const setStepData = useOnboardingStore(state => state.setStepData);
+
+  // 온보딩 액션들
+  const { clearRefreshFlag, isRefreshed, markStepCompleted, setStepData } =
+    useOnboardingActions();
 
   // 저장된 데이터 불러오기
   const stepData = useOnboardingStore(state => state.stepData[3]);
-  const isRefreshed = useOnboardingStore(state => state.isRefreshed);
-  const clearRefreshFlag = useOnboardingStore(state => state.clearRefreshFlag);
   const clearAllFoods = useSelectedFoodsStore(state => state.clearAllFoods);
 
   const [selectedCount, setSelectedCount] = useState(0);
@@ -128,9 +129,12 @@ export default function RefrigeratorStep() {
       <div className="fixed right-0 bottom-0 left-0 flex justify-center px-6 py-[10px]">
         <Button
           onClick={handleComplete}
-          disabled={selectedCount < 2 || isSubmitting}
+          disabled={
+            selectedCount < ONBOARDING_CONSTANTS.MIN_SELECTED_FOODS ||
+            isSubmitting
+          }
         >
-          {isSubmitting ? '온보딩 완료 중...' : '여유에 맞는 요리 추천받기'}
+          {getSubmitButtonText(isSubmitting, 3)}
         </Button>
       </div>
     </>

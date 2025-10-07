@@ -7,7 +7,17 @@ import { categories } from '@/components/Allergy/Allergy.constants';
 import { Button } from '@/components/common/Button';
 import { useScrollSpy } from '@/hooks';
 import { useOnboardingStore } from '@/stores/onboardingStore';
-import { onboardingStorage } from '@/utils/onboardingStorage';
+
+import { ONBOARDING_CONSTANTS, SCROLLBAR_HIDE_STYLE } from '../../_constants';
+import { useOnboardingActions, useOnboardingStep } from '../../_hooks';
+import {
+  getNavigationButtonClass,
+  getNavigationItemClass,
+  getSubmitButtonText,
+  onboardingStyles,
+} from '../../_utils';
+
+import type { AllergyStepData } from '../../_types';
 
 // categories 배열에서 섹션 정보 동적 생성 (실제 렌더링과 일치)
 const ALLERGY_SECTIONS = categories.map((category, index) => ({
@@ -15,17 +25,15 @@ const ALLERGY_SECTIONS = categories.map((category, index) => ({
   label: category.title,
 }));
 
-// 스크롤바 숨김 스타일
-const scrollbarHideStyle = {
-  msOverflowStyle: 'none' as const,
-  scrollbarWidth: 'none' as const,
-};
-
 export default function AllergyStep() {
+  // 온보딩 스텝 로직
+  const { handleError, isSubmitting, saveAndProceed } = useOnboardingStep(1);
+
+  // 온보딩 액션들
+  const { clearRefreshFlag, isRefreshed } = useOnboardingActions();
+
   // 저장된 데이터 불러오기
   const stepData = useOnboardingStore(state => state.stepData[1]);
-  const isRefreshed = useOnboardingStore(state => state.isRefreshed);
-  const clearRefreshFlag = useOnboardingStore(state => state.clearRefreshFlag);
   const savedSelectedItems = stepData?.selectedItems ?? [];
 
   const { handleItemToggle, resetItems, selectedItems } =
@@ -38,24 +46,20 @@ export default function AllergyStep() {
       clearRefreshFlag(); // 플래그 리셋
     }
   }, [stepData, isRefreshed, resetItems, clearRefreshFlag]);
-  const goToNextStep = useOnboardingStore(state => state.goToNextStep);
-  const markStepCompleted = useOnboardingStore(
-    state => state.markStepCompleted
-  );
-  const setStepData = useOnboardingStore(state => state.setStepData);
 
   // 스크롤 상태 추적
   const [hasScrolled, setHasScrolled] = useState(false);
 
   // ScrollSpy 훅 사용
   const sectionIds = ALLERGY_SECTIONS.map(section => section.id);
-  const { activeSection, gnbRef } = useScrollSpy(sectionIds, { offset: 100 });
+  const { activeSection, gnbRef } = useScrollSpy(sectionIds, {
+    offset: ONBOARDING_CONSTANTS.SCROLL_SPY_OFFSET,
+  });
 
   // 스크롤 감지
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 50) {
-        // 50px 이상 스크롤했을 때
+      if (window.scrollY > ONBOARDING_CONSTANTS.SCROLL_THRESHOLD) {
         setHasScrolled(true);
       }
     };
@@ -64,34 +68,16 @@ export default function AllergyStep() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // 로딩 상태 관리 (기존 mutation 대신)
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
   const handleSubmit = async (data: { items: number[] }) => {
     try {
-      setIsSubmitting(true);
-
-      // localStorage에 알레르기 데이터 저장
-      onboardingStorage.saveStepData(1, {
-        allergies: data.items,
-      });
-
-      // 스토어 업데이트 (UI 상태 관리용)
-      setStepData(1, { allergies: data.items, selectedItems });
-      markStepCompleted(1);
-
-      console.info('✅ Step 1 완료: 알레르기 정보 저장됨', {
+      const allergyData: AllergyStepData = {
         allergies: data.items,
         selectedItems,
-      });
+      };
 
-      // 다음 단계로 이동
-      goToNextStep();
+      await saveAndProceed(allergyData);
     } catch (error) {
-      console.error('❌ 알레르기 데이터 저장 실패:', error);
-      // TODO: 에러 토스트 메시지 표시
-    } finally {
-      setIsSubmitting(false);
+      handleError(error as Error);
     }
   };
 
@@ -107,30 +93,27 @@ export default function AllergyStep() {
   };
 
   return (
-    <div className="container mx-auto max-w-4xl">
+    <div className={onboardingStyles.container}>
       {/* 네비게이션 바 */}
-      <div className="sticky top-0 z-10 bg-white py-4">
+      <div className={onboardingStyles.navigation.wrapper}>
         <ul
           ref={gnbRef}
-          className="flex gap-2 overflow-x-auto [&::-webkit-scrollbar]:hidden"
-          style={scrollbarHideStyle}
+          className={onboardingStyles.navigation.list}
+          style={SCROLLBAR_HIDE_STYLE}
         >
           {ALLERGY_SECTIONS.map((section, index) => (
             <li
               key={section.id}
               data-section-id={section.id}
-              className={`flex-shrink-0 ${index === 0 ? 'pl-4' : ''} ${
-                index === ALLERGY_SECTIONS.length - 1 ? 'pr-4' : ''
-              }`}
+              className={getNavigationItemClass(index, ALLERGY_SECTIONS.length)}
             >
               <button
                 type="button"
                 onClick={() => scrollToSection(section.id)}
-                className={`text-15sb inline-block cursor-pointer rounded-full px-4 py-2 transition-all duration-200 ${
-                  hasScrolled && activeSection === section.id
-                    ? 'bg-black text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                } `}
+                className={getNavigationButtonClass(
+                  activeSection === section.id,
+                  hasScrolled
+                )}
                 aria-label={`${section.label} 섹션으로 이동`}
               >
                 {section.label}
@@ -141,7 +124,7 @@ export default function AllergyStep() {
       </div>
 
       {/* 메인 콘텐츠 */}
-      <div className="p-6">
+      <div className={onboardingStyles.content.wrapper}>
         <AllergyCheckContainer
           formId="allergy-form"
           onSubmit={handleSubmit}
@@ -151,9 +134,9 @@ export default function AllergyStep() {
       </div>
 
       {/* 하단 버튼 */}
-      <div className="fixed right-0 bottom-0 left-0 flex justify-center bg-gradient-to-t from-white via-white to-transparent px-6 py-[10px] pt-8">
+      <div className={onboardingStyles.submitButton.wrapper}>
         <Button form="allergy-form" disabled={isSubmitting} type="submit">
-          {isSubmitting ? '저장 중...' : '여유에 맞는 요리 추천받기'}
+          {getSubmitButtonText(isSubmitting, 1)}
         </Button>
       </div>
     </div>

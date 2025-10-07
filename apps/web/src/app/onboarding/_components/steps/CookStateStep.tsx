@@ -5,19 +5,21 @@ import { useEffect, useState } from 'react';
 import { Button } from '@/components/common/Button';
 import EmotionState, { type MoodType } from '@/components/EmotionState';
 import { useOnboardingStore } from '@/stores/onboardingStore';
-import { onboardingStorage } from '@/utils/onboardingStorage';
+
+import { useOnboardingActions, useOnboardingStep } from '../../_hooks';
+import { getSubmitButtonText } from '../../_utils';
+
+import type { CookStateStepData } from '../../_types';
 
 export default function CookStateStep() {
-  const goToNextStep = useOnboardingStore(state => state.goToNextStep);
-  const markStepCompleted = useOnboardingStore(
-    state => state.markStepCompleted
-  );
-  const setStepData = useOnboardingStore(state => state.setStepData);
+  // 온보딩 스텝 로직
+  const { handleError, isSubmitting, saveAndProceed } = useOnboardingStep(2);
+
+  // 온보딩 액션들
+  const { clearRefreshFlag, isRefreshed } = useOnboardingActions();
 
   // 저장된 데이터 불러오기
   const stepData = useOnboardingStore(state => state.stepData[2]);
-  const isRefreshed = useOnboardingStore(state => state.isRefreshed);
-  const clearRefreshFlag = useOnboardingStore(state => state.clearRefreshFlag);
   const savedMood = stepData?.mood ?? null;
 
   const [selectedMood, setSelectedMood] = useState<MoodType | null>(savedMood);
@@ -30,9 +32,6 @@ export default function CookStateStep() {
     }
   }, [stepData, isRefreshed, clearRefreshFlag]);
 
-  // 로딩 상태 관리 (기존 mutation 대신)
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
   const handleMoodChange = (mood: MoodType | null) => {
     setSelectedMood(mood);
   };
@@ -41,29 +40,13 @@ export default function CookStateStep() {
     if (!selectedMood) return;
 
     try {
-      setIsSubmitting(true);
-
-      // localStorage에 기분 상태 저장
-      onboardingStorage.saveStepData(2, {
-        mood: selectedMood,
-      });
-
-      // 스토어 업데이트 (UI 상태 관리용)
-      const cookStateData = {
+      const cookStateData: CookStateStepData = {
         mood: selectedMood,
       };
-      setStepData(2, cookStateData);
-      markStepCompleted(2);
 
-      console.info('✅ Step 2 완료: 기분 상태 저장됨', { mood: selectedMood });
-
-      // 다음 단계로 이동
-      goToNextStep();
+      await saveAndProceed(cookStateData);
     } catch (error) {
-      console.error('❌ 기분 상태 저장 실패:', error);
-      // TODO: 에러 토스트 메시지 표시
-    } finally {
-      setIsSubmitting(false);
+      handleError(error as Error);
     }
   };
 
@@ -83,7 +66,7 @@ export default function CookStateStep() {
           onClick={handleNext}
           disabled={selectedMood === null || isSubmitting}
         >
-          {isSubmitting ? '저장 중...' : '여유에 맞는 요리 추천받기'}
+          {getSubmitButtonText(isSubmitting, 2)}
         </Button>
       </div>
     </>
