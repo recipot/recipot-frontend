@@ -2,16 +2,10 @@ import { PageHeader } from '@/app/mypage/_components/PageHeader';
 import LogoutButton from '@/app/mypage/settings/_components/LogoutButton';
 import ProfileSection from '@/app/mypage/settings/_components/ProfileSection';
 import SnsLinkageSection from '@/app/mypage/settings/_components/SnsLinkageSection';
-
-// 임시 유저 데이터
-const MOCK_USER = {
-  avatarUrl: '/mypage/default-profile.png',
-  email: 'abc@facebook.com',
-  nickname: '오리무중체다치즈',
-};
+import { mockUser } from '@/mocks/data/myPage.mock';
 
 export default function SettingsPage() {
-  const user = MOCK_USER;
+  const user = mockUser;
   return (
     <div className="flex min-h-screen flex-col">
       <div className="px-5">
@@ -19,11 +13,11 @@ export default function SettingsPage() {
       </div>
 
       <main className="flex flex-1 flex-col">
-        <div className="px-5">
+        <div className="px-6">
           <ProfileSection user={user} />
         </div>
         <div className="h-2 bg-gray-50" />
-        <div className="px-5">
+        <div className="pr-[1.8125rem] pl-6">
           <SnsLinkageSection />
         </div>
       </main>

@@ -13,6 +13,7 @@ const QUICK_LINKS_DATA = [
     },
     href: '/mypage/recipes/saved',
     Icon: MyFileIcon,
+    paddingX: 'px-[1.8125rem]',
     text: '보관한 레시피',
   },
   {
@@ -24,6 +25,7 @@ const QUICK_LINKS_DATA = [
     },
     href: '/mypage/recipes/recent',
     Icon: MyOpenFileIcon,
+    paddingX: 'px-[1.6875rem]',
     text: '최근 본 레시피',
   },
 ];
@@ -31,18 +33,18 @@ const QUICK_LINKS_DATA = [
 export default function QuickLinks() {
   return (
     <div className="mb-3 flex w-full items-center gap-3">
-      {QUICK_LINKS_DATA.map(({ colors, href, Icon, text }) => (
+      {QUICK_LINKS_DATA.map(({ colors, href, Icon, paddingX, text }) => (
         <Link key={href} href={href} className="flex min-w-0 flex-1">
           <Button
             size="lg"
             shape="square"
-            className={`flex w-full items-center justify-center gap-1.5 rounded-[0.875rem] px-7 py-4 leading-[100%] font-medium ${colors.bg} ${colors.activeBg}`}
+            className={`flex w-full items-center justify-center gap-1.5 rounded-[0.875rem] py-4 leading-[100%] font-medium ${colors.bg} ${colors.activeBg} ${paddingX}`}
           >
             <div className="flex-shrink-0">
               <Icon size={18} color={colors.icon} />
             </div>
 
-            <span className={`text-16 truncate ${colors.text}`}>{text}</span>
+            <span className={`text-16 ${colors.text}`}>{text}</span>
           </Button>
         </Link>
       ))}

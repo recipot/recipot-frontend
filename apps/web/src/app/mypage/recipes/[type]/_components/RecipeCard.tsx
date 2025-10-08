@@ -1,16 +1,12 @@
 import Image from 'next/image';
 
 import { ArrowIcon, HeartIcon } from '@/components/Icons';
-import type { Recipe } from '@/types/MyPage.types';
+import type { RecipeCardProps } from '@/types/MyPage.types';
 
-interface RecipeCardProps {
-  recipe: Recipe;
-}
-
-export default function RecipeCard({ recipe }: RecipeCardProps) {
+export default function RecipeCard({ onToggleSave, recipe }: RecipeCardProps) {
   return (
-    <div className="flex items-center gap-3 rounded-2xl bg-white p-4">
-      <div className="relative h-16 w-16 flex-shrink-0">
+    <div className="flex items-center gap-3 rounded-2xl bg-white py-3 pr-5 pl-3">
+      <div className="relative h-[3.75rem] w-[3.75rem] flex-shrink-0">
         <Image
           src={recipe.imageUrl}
           alt={recipe.title}
@@ -27,8 +23,12 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
           {recipe.description}
         </p>
       </div>
-      <button className="flex-shrink-0 text-gray-400 active:text-red-500">
-        <HeartIcon active={recipe.isSaved} color="var(--brand-primary)" />
+      <button onClick={() => onToggleSave(recipe.id)} className="flex-shrink-0">
+        <HeartIcon
+          size={20}
+          active={recipe.isSaved}
+          color="var(--brand-primary)"
+        />
       </button>
     </div>
   );

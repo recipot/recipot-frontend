@@ -6,7 +6,7 @@ export default function ProfileSection({ user }: ProfileSectionProps) {
   return (
     <section className="flex items-center gap-4 py-6">
       <Image
-        src={user.avatarUrl}
+        src={user.profileImageUrl}
         alt="사용자 프로필 이미지"
         width={54}
         height={54}

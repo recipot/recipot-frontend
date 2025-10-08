@@ -1,28 +1,24 @@
 import { Button } from '@/components/common/Button';
 import { AddIcon } from '@/components/Icons';
+import type { DietaryRestriction } from '@/types/MyPage.types';
 
-const MOCK_RESTRICTIONS = [
-  { id: 1, name: '게' },
-  { id: 2, name: '능이' },
-  { id: 3, name: '느타리' },
-  { id: 4, name: '복숭아' },
-  { id: 5, name: '새우' },
-  { id: 6, name: '고등어' },
-];
-
-export default function DietaryRestrictions() {
-  const hasRestrictions = MOCK_RESTRICTIONS.length > 0;
+export default function DietaryRestrictions({
+  restrictions,
+}: {
+  restrictions: DietaryRestriction[];
+}) {
+  const hasRestrictions = restrictions.length > 0;
 
   return (
     <div className="mb-10 flex flex-col gap-5">
       <span className="text-17sb">
-        못먹는 음식{hasRestrictions && ` ${MOCK_RESTRICTIONS.length}개`}
+        못먹는 음식{hasRestrictions && ` ${restrictions.length}개`}
       </span>
 
       {hasRestrictions ? (
         <div className="relative">
           <div className="no-scrollbar flex items-start gap-3 overflow-x-auto">
-            {MOCK_RESTRICTIONS.map(item => (
+            {restrictions.map(item => (
               <div
                 key={item.id}
                 className="flex flex-shrink-0 flex-col items-center"

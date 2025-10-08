@@ -3,7 +3,7 @@ export interface PageHeaderProps {
 }
 
 export interface User {
-  avatarUrl: string;
+  profileImageUrl: string;
   nickname: string;
   email: string;
 }
@@ -41,10 +41,21 @@ export type configType = {
 export interface DefaultRecipeListProps {
   recipes: Recipe[];
   config: configType;
-  type: string;
+  onToggleSave: (recipeId: number) => void;
 }
 
 export interface CookedRecipeListProps {
   recipes: CookedRecipe[];
   config: configType;
+  onToggleSave: (recipeId: number) => void;
+}
+
+export interface RecipeCardProps {
+  recipe: Recipe;
+  onToggleSave: (recipeId: number) => void;
+}
+
+export interface DietaryRestriction {
+  id: number;
+  name: string;
 }

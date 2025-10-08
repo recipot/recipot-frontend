@@ -4,18 +4,26 @@ import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/common/Button';
 import { SettingsIcon } from '@/components/Icons';
+import type { User } from '@/types/MyPage.types';
 
-export default function UserProfile() {
+interface UserProfileProps {
+  user: User | null;
+}
+
+export default function UserProfile({ user }: UserProfileProps) {
   const router = useRouter();
 
   const handleNavigateToSettings = () => {
     router.push('/mypage/settings');
   };
+
+  if (!user) return null;
+
   return (
-    <div className="py-6">
+    <div className="px-1 py-6">
       <div className="flex items-center gap-4">
         <Image
-          src="/mypage/default-profile.png"
+          src={user.profileImageUrl}
           alt="사용자 프로필 이미지"
           width={54}
           height={54}
@@ -23,21 +31,19 @@ export default function UserProfile() {
         />
         <div className="flex min-w-0 flex-1 flex-col gap-[0.188rem]">
           <span className="text-20 truncate text-gray-900">
-            오리무중체다치즈
+            {user.nickname}
           </span>
-          <span className="text-16 truncate text-[#999999]">
-            abc@facebook.com
-          </span>
+          <span className="text-16 truncate text-[#999999]">{user.email}</span>
         </div>
         <Button
           variant="default"
           size="sm"
           shape="square"
-          className="bg-gray-100 px-2 py-1 active:bg-[#E9ECEF]"
+          className="gap-1 bg-gray-100 px-2 py-[0.1875rem] active:bg-[#E9ECEF]"
           onClick={handleNavigateToSettings}
         >
           <SettingsIcon size={18} color="var(--gray-600)" />
-          <span className="text-14b text-gray-600">설정</span>
+          <span className="text-14sb text-gray-600">설정</span>
         </Button>
       </div>
     </div>

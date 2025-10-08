@@ -8,7 +8,7 @@ export default function MyRecipesLink() {
     <Link href="/mypage/recipes/cooked">
       <Button
         shape="square"
-        className="mb-[1.875rem] flex h-[4.313rem] w-full items-center justify-between rounded-[0.875rem] bg-[#F4FCE3] py-6 pr-5 pl-7"
+        className="mb-[1.875rem] flex h-[4.313rem] w-full items-center justify-between rounded-[0.875rem] bg-[#F4FCE3] py-[1.5625rem] pr-5 pl-7"
       >
         <div className="flex items-center gap-1.5">
           <CookIcon size={18} />
