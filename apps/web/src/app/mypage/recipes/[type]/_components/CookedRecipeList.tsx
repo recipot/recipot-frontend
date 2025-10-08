@@ -1,6 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
-
 import { Button } from '@/components/common/Button';
+import { useScrollGradient } from '@/hooks/useScrollGradient';
 import type { CookedRecipe, CookedRecipeListProps } from '@/types/MyPage.types';
 
 import RecipeCard from './RecipeCard';
@@ -10,29 +9,7 @@ export default function CookedRecipeList({
   onToggleSave,
   recipes,
 }: CookedRecipeListProps) {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [showGradient, setShowGradient] = useState(false);
-
-  useEffect(() => {
-    const checkScroll = () => {
-      if (scrollRef.current) {
-        const { clientHeight, scrollHeight, scrollTop } = scrollRef.current;
-        const isScrollable = scrollHeight > clientHeight;
-        const isAtBottom = scrollHeight - scrollTop - clientHeight < 1;
-        setShowGradient(isScrollable && !isAtBottom);
-      }
-    };
-
-    checkScroll();
-    const scrollElement = scrollRef.current;
-    scrollElement?.addEventListener('scroll', checkScroll);
-    window.addEventListener('resize', checkScroll);
-
-    return () => {
-      scrollElement?.removeEventListener('scroll', checkScroll);
-      window.removeEventListener('resize', checkScroll);
-    };
-  }, [recipes]);
+  const { scrollRef, showGradient } = useScrollGradient([recipes]);
 
   if (recipes.length === 0) {
     return (
