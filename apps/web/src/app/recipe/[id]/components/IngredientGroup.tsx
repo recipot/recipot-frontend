@@ -71,14 +71,13 @@ const IngredientGroup = ({ ingredients, status }: IngredientGroupProps) => {
       </div>
       <div className="flex flex-wrap gap-2">
         {filtered.map(ingredient => {
-          const Comp = config.as as keyof JSX.IntrinsicElements;
           return (
-            <Comp
+            <div
               key={ingredient.id}
               className={`rounded-md border px-3 py-1.5 text-sm font-bold ${config.color} ${status === 'substitutable' ? 'flex' : ''}`}
             >
               {config.render(ingredient)}
-            </Comp>
+            </div>
           );
         })}
       </div>
