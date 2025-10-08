@@ -34,6 +34,7 @@ function OnboardingContent() {
   return (
     <>
       {/* 데이터 복구 다이얼로그 */}
+      {/* TODO: 추후 공통 모달로 변경 */}
       {showRestoreDialog && (
         <div className={onboardingStyles.dialog.overlay}>
           <div className={onboardingStyles.dialog.content}>

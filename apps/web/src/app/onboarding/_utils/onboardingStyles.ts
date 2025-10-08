@@ -31,13 +31,13 @@ export const onboardingStyles = {
     },
     item: 'flex-shrink-0',
     list: 'flex gap-2 overflow-x-auto [&::-webkit-scrollbar]:hidden',
-    wrapper: 'sticky top-0 z-10 bg-white py-4',
+    wrapper: 'sticky top-[60px] z-10 bg-white py-4',
   },
 
   stepHeader: {
     description: 'text-18 text-gray-600',
     title: 'text-24 mb-1 whitespace-pre-line',
-    wrapper: 'mt-10 mb-4 text-center',
+    wrapper: 'mt-10 mb-4 text-center pt-[60px]',
   },
 
   submitButton: {

@@ -85,9 +85,15 @@ export default function AllergyStep() {
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
-      element.scrollIntoView({
+      const navigationOffset = 130;
+
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition =
+        elementPosition + window.pageYOffset - navigationOffset;
+
+      window.scrollTo({
         behavior: 'smooth',
-        block: 'start',
+        top: Math.max(0, offsetPosition),
       });
     }
   };
