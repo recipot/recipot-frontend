@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 
+import type { MoodType } from '@/components/EmotionState';
+
 import { onboardingStorage } from '../_utils/onboardingStorage';
 import { useOnboardingActions } from './useOnboardingActions';
 
@@ -79,7 +81,7 @@ export function useOnboardingRestore() {
         });
       }
       if (step2Data) {
-        setStepData(2, { mood: step2Data.mood });
+        setStepData(2, { mood: step2Data.mood as MoodType });
       }
       if (step3Data) {
         setStepData(3, { selectedFoods: step3Data.selectedFoods });

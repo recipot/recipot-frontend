@@ -5,6 +5,11 @@ import { useOnboardingActions } from './useOnboardingActions';
 
 import type { OnboardingStepNumber } from '../_constants';
 import type { OnboardingStepDataMap } from '../_types';
+import type {
+  Step1Data,
+  Step2Data,
+  Step3Data,
+} from '../_utils/onboardingStorage';
 
 /**
  * 온보딩 스텝 공통 로직 훅
@@ -22,9 +27,17 @@ export function useOnboardingStep<T extends OnboardingStepNumber>(
   const saveAndProceed = async (data: OnboardingStepDataMap[T]) => {
     try {
       setIsSubmitting(true);
-
       // localStorage에 데이터 저장
-      onboardingStorage.saveStepData(stepNumber, data);
+      // 타입 안전성을 위한 조건부 호출
+      if (stepNumber === 1) {
+        onboardingStorage.saveStepData(1, data as Omit<Step1Data, 'timestamp'>);
+      } else if (stepNumber === 2) {
+        onboardingStorage.saveStepData(2, data as Omit<Step2Data, 'timestamp'>);
+      } else if (stepNumber === 3) {
+        onboardingStorage.saveStepData(3, data as Omit<Step3Data, 'timestamp'>);
+      } else {
+        throw new Error(`지원하지 않는 스텝 번호: ${stepNumber}`);
+      }
 
       // 스토어 업데이트 (UI 상태 관리용)
       setStepData(stepNumber, data);
