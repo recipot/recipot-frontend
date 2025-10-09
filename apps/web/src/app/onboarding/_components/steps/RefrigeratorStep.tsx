@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '@recipot/contexts';
+import { useRouter } from 'next/navigation';
 
 import { onboardingAPI } from '@/api/onboardingAPI';
 import { Button } from '@/components/common/Button';
@@ -15,7 +16,7 @@ import { getSubmitButtonText, onboardingStorage } from '../../_utils';
 
 export default function RefrigeratorStep() {
   const { setUser, user } = useAuth();
-
+  const router = useRouter();
   // 온보딩 액션들
   const { clearRefreshFlag, isRefreshed, markStepCompleted, setStepData } =
     useOnboardingActions();
@@ -94,7 +95,7 @@ export default function RefrigeratorStep() {
           selectedFoods: completeData.selectedFoods,
         });
 
-        // TODO: 메인 페이지로 이동하거나 완료 처리
+        router.push('/');
       } else {
         throw new Error(result.message || '온보딩 완료 처리에 실패했습니다.');
       }
@@ -102,6 +103,7 @@ export default function RefrigeratorStep() {
       console.error('❌ 온보딩 완료 실패:', error);
 
       // 사용자에게 에러 메시지 표시
+      // TODO: 에러 토스트 메시지 표시
       const errorMessage =
         error instanceof Error
           ? error.message
@@ -120,11 +122,7 @@ export default function RefrigeratorStep() {
 
   return (
     <>
-      <IngredientsSearch
-        onSubmissionSuccess={() => {}} // 더 이상 사용하지 않음
-        onSelectionChange={handleSelectionChange}
-        onSubmissionStateChange={() => {}} // 더 이상 사용하지 않음
-      />
+      <IngredientsSearch onSelectionChange={handleSelectionChange} />
 
       <div className="fixed right-0 bottom-0 left-0 flex justify-center px-6 py-[10px]">
         <Button
