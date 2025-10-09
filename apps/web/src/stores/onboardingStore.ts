@@ -2,6 +2,8 @@
 
 import { create } from 'zustand';
 
+import type { OnboardingStepDataMap } from '@/app/onboarding/_types';
+
 /**
  * 온보딩 스테이트 인터페이스
  */
@@ -11,9 +13,7 @@ interface OnboardingState {
   /** 완료된 단계들 */
   completedSteps: number[];
   /** 각 단계별 데이터 */
-  stepData: {
-    [key: number]: any;
-  };
+  stepData: Partial<OnboardingStepDataMap>;
   /** 새로고침 플래그 */
   isRefreshed: boolean;
 }
@@ -25,7 +25,10 @@ interface OnboardingActions {
   /** 현재 단계 설정 */
   setCurrentStep: (step: number) => void;
   /** 특정 단계의 데이터 설정 */
-  setStepData: (step: number, data: any) => void;
+  setStepData: <T extends keyof OnboardingStepDataMap>(
+    step: T,
+    data: OnboardingStepDataMap[T]
+  ) => void;
   /** 단계 완료 표시 */
   markStepCompleted: (step: number) => void;
   /** 다음 단계로 이동 */
@@ -121,13 +124,14 @@ export const useOnboardingStore = create<OnboardingState & OnboardingActions>(
 
     resetCurrentStep: () => {
       const { currentStep } = get();
-      set(state => ({
-        isRefreshed: true, // 새로고침 플래그 설정
-        stepData: {
-          ...state.stepData,
-          [currentStep]: {}, // 현재 단계의 데이터만 초기화
-        },
-      }));
+      set(state => {
+        const newStepData = { ...state.stepData };
+        delete newStepData[currentStep as keyof OnboardingStepDataMap];
+        return {
+          isRefreshed: true, // 새로고침 플래그 설정
+          stepData: newStepData,
+        };
+      });
     },
 
     resetStore: () => {
@@ -140,7 +144,10 @@ export const useOnboardingStore = create<OnboardingState & OnboardingActions>(
       }
     },
 
-    setStepData: (step: number, data: any) => {
+    setStepData: <T extends keyof OnboardingStepDataMap>(
+      step: T,
+      data: OnboardingStepDataMap[T]
+    ) => {
       set(state => ({
         stepData: {
           ...state.stepData,
@@ -164,9 +171,17 @@ export const useCurrentStep = () =>
 export const useCompletedSteps = () =>
   useOnboardingStore(state => state.completedSteps);
 
-/** 특정 단계의 데이터만 구독 */
-export const useStepData = (step: number) =>
-  useOnboardingStore(state => state.stepData[step] ?? {});
+/** 1단계 (알레르기) 데이터 구독 */
+export const useAllergyStepData = () =>
+  useOnboardingStore(state => state.stepData[1]);
+
+/** 2단계 (요리 상태) 데이터 구독 */
+export const useCookStateStepData = () =>
+  useOnboardingStore(state => state.stepData[2]);
+
+/** 3단계 (냉장고) 데이터 구독 */
+export const useRefrigeratorStepData = () =>
+  useOnboardingStore(state => state.stepData[3]);
 
 /** 네비게이션 액션들만 구독 */
 export const useOnboardingNavigation = () => {
