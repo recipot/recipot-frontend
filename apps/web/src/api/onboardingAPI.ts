@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import type { CompleteOnboardingData } from '@/utils/onboardingStorage';
+import type { CompleteOnboardingData } from '@/app/onboarding/_utils/onboardingStorage';
 
 export interface OnboardingCompleteResponse {
   success: boolean;
@@ -94,7 +94,7 @@ export const onboardingAPI = {
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 400) {
           errorMessage = '입력 데이터에 오류가 있습니다. 다시 확인해주세요.';
-        } else if (error.response?.status >= 500) {
+        } else if (error.response && error.response.status >= 500) {
           errorMessage = '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
         } else if (error.code === 'NETWORK_ERROR') {
           errorMessage = '네트워크 연결을 확인해주세요.';
