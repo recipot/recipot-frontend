@@ -1,4 +1,10 @@
-import { forwardRef, useEffect, useMemo, useState } from 'react';
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useState,
+} from 'react';
 import { Loader2, XIcon } from 'lucide-react';
 
 import { HighlightText } from '@/components/common/HighlightText';
@@ -22,8 +28,9 @@ const IngredientsSearch = forwardRef<
   {
     onSelectionChange?: (count: number) => void;
   }
->(({ onSelectionChange }) => {
+>(({ onSelectionChange }, ref) => {
   const [value, setValue] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // 서버에서 재료 목록 조회
   const { data: foodList = [], isLoading: isFoodListLoading } = useFoodList();
@@ -64,6 +71,22 @@ const IngredientsSearch = forwardRef<
       onSelectionChange(getSelectedCount());
     }
   }, [selectedFoodIds, onSelectionChange, getSelectedCount]);
+
+  // ref를 통해 외부에서 접근 가능한 메서드들 노출
+  useImperativeHandle(
+    ref,
+    () => ({
+      getSelectedCount: () => getSelectedCount(),
+      isSubmitting,
+      submitSelectedFoods: () => {
+        setIsSubmitting(true);
+        // 실제 제출 로직은 부모 컴포넌트에서 처리
+        console.info('선택된 재료 제출:', selectedFoodIds);
+        setIsSubmitting(false);
+      },
+    }),
+    [selectedFoodIds, getSelectedCount, isSubmitting]
+  );
 
   const StyleActive =
     'border-secondary-soft-green bg-secondary-light-green text-primary';
