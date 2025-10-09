@@ -5,6 +5,17 @@ import { useRouter, useSearchParams } from 'next/navigation';
 
 import type { UserInfo } from '@recipot/types';
 
+/**
+ * 온보딩 완료 상태를 안전하게 확인하는 함수
+ * @param isOnboardingCompleted - 온보딩 완료 상태 (boolean | undefined)
+ * @returns true인 경우에만 true, 그 외 모든 경우 false
+ */
+const isOnboardingComplete = (
+  isOnboardingCompleted: boolean | undefined
+): boolean => {
+  return isOnboardingCompleted === true;
+};
+
 export type OAuthProvider = 'google' | 'kakao';
 
 interface UseOAuthCallbackProps {
@@ -24,7 +35,7 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
     (delay: number = 1000) => {
       setTimeout(() => {
         // 사용자 정보가 설정된 후 온보딩 상태에 따라 리다이렉트
-        if (user?.isOnboardingCompleted === true) {
+        if (isOnboardingComplete(user?.isOnboardingCompleted)) {
           router.push('/');
         } else {
           router.push('/onboarding');
@@ -51,7 +62,7 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
       setUser(user);
       // 사용자 정보 설정 후 온보딩 상태에 따라 리다이렉트
       setTimeout(() => {
-        if (user.isOnboardingCompleted === true) {
+        if (isOnboardingComplete(user.isOnboardingCompleted)) {
           router.push('/');
         } else {
           router.push('/onboarding');
