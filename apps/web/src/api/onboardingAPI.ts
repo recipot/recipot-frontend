@@ -2,6 +2,11 @@ import axios from 'axios';
 
 import type { CompleteOnboardingData } from '@/app/onboarding/_utils/onboardingStorage';
 
+interface ApiRequest {
+  call: Promise<unknown>;
+  name: string;
+}
+
 export interface OnboardingCompleteResponse {
   success: boolean;
   message: string;
@@ -29,36 +34,76 @@ export const onboardingAPI = {
     try {
       console.info('🚀 통합 온보딩 데이터 전송 시작:', data);
 
-      // 기존 개별 API들을 병렬로 호출
-      const apiCalls = [
-        // 1. 알레르기 정보 전송
-        axios.post('/api/allergy', {
-          categories: data.allergies,
-        }),
+      // API 이름 상수 정의
+      const API_NAMES = {
+        ALLERGY: '알레르기 정보',
+        MOOD: '기분 상태',
+        SELECTED_FOODS: '선택된 재료',
+      } as const;
 
-        // 2. 기분/요리 여유 상태 전송
-        axios.post('/api/user/mood', {
-          mood: data.mood,
-        }),
-
-        // 3. 선택된 재료 전송
-        axios.post('/api/user/selected-foods', {
-          selectedFoodIds: data.selectedFoods,
-        }),
+      // API 호출과 이름을 객체로 묶어서 관리
+      const apiRequests: ApiRequest[] = [
+        {
+          call: axios.post('/api/allergy', {
+            categories: data.allergies,
+          }),
+          name: API_NAMES.ALLERGY,
+        },
+        {
+          call: axios.post('/api/user/mood', {
+            mood: data.mood,
+          }),
+          name: API_NAMES.MOOD,
+        },
+        {
+          call: axios.post('/api/user/selected-foods', {
+            selectedFoodIds: data.selectedFoods,
+          }),
+          name: API_NAMES.SELECTED_FOODS,
+        },
       ];
 
       // 모든 API 호출을 병렬로 실행
-      const results = await Promise.allSettled(apiCalls);
+      const results = await Promise.allSettled(
+        apiRequests.map(request => request.call)
+      );
 
       // 결과 분석
       const failures: string[] = [];
-      results.forEach((result, index) => {
+      const successes: string[] = [];
+
+      // 결과와 API 이름을 안전하게 매핑
+      const resultPairs = results.map((result, index) => {
+        let name: string;
+        switch (index) {
+          case 0:
+            name = API_NAMES.ALLERGY;
+            break;
+          case 1:
+            name = API_NAMES.MOOD;
+            break;
+          case 2:
+            name = API_NAMES.SELECTED_FOODS;
+            break;
+          default:
+            name = `API ${index + 1}`;
+        }
+        return { name, result };
+      });
+
+      resultPairs.forEach(({ name, result }) => {
         if (result.status === 'rejected') {
-          const apiNames = ['알레르기 정보', '기분 상태', '선택된 재료'];
-          failures.push(apiNames[index]);
-          console.error(`❌ ${apiNames[index]} 전송 실패:`, result.reason);
+          failures.push(name);
+          console.error(`❌ ${name} 전송 실패:`, result.reason);
+        } else {
+          successes.push(name);
+          console.info(`✅ ${name} 전송 성공`);
         }
       });
+
+      console.info(
+        `📊 API 호출 결과: 성공 ${successes.length}개, 실패 ${failures.length}개`
+      );
 
       // 일부 실패가 있어도 성공으로 처리 (부분 성공)
       if (failures.length > 0) {
