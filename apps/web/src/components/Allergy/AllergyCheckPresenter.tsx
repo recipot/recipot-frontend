@@ -48,6 +48,8 @@ export default function AllergyCheckPresenter({
             items={category.items}
             selectedItems={selectedItems}
             onItemToggle={onItemToggle}
+            groupLabel={category.title}
+            useFieldset={false}
           />
         </fieldset>
       ))}

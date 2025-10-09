@@ -13,39 +13,63 @@ import type { AllergyCheckItem } from './Allergy.constants';
  * @param items - AllergyCheckItem[]
  * @param selectedItems - number[]
  * @param onItemToggle - (itemId: number) => void
+ * @param groupLabel - 그룹의 라벨 (접근성용, 선택적)
+ * @param useFieldset - fieldset/legend 사용 여부 (기본값: true)
  * @returns AllergyCheckItem component
  */
 function AllergyCheckItem({
+  groupLabel,
   items,
   onItemToggle,
   selectedItems,
+  useFieldset = true,
 }: {
+  groupLabel?: string;
   items: AllergyCheckItem[];
-  selectedItems: number[];
   onItemToggle: (itemId: number) => void;
+  selectedItems: number[];
+  useFieldset?: boolean;
 }) {
   const StyleActive =
     'border-secondary-soft-green bg-secondary-light-green text-primary';
 
+  const buttonElements = items.map(item => (
+    <Button
+      key={item.id}
+      size="full"
+      shape="square"
+      type="button"
+      onClick={() => onItemToggle(item.id)}
+      variant="outline"
+      className={cn('h-10', selectedItems.includes(item.id) ? StyleActive : '')}
+    >
+      {item.label}
+    </Button>
+  ));
+
+  // fieldset을 사용하지 않는 경우 (AllergyCheckPresenter에서 이미 fieldset으로 감싸진 경우)
+  if (!useFieldset) {
+    return (
+      <div
+        className="text-15sb grid grid-cols-3 gap-3"
+        role="group"
+        aria-label={groupLabel}
+      >
+        {buttonElements}
+      </div>
+    );
+  }
+
+  // 독립적으로 사용되는 경우 fieldset/legend 제공
   return (
-    <div className="text-15sb grid grid-cols-3 gap-3">
-      {items.map(item => (
-        <Button
-          key={item.id}
-          size="full"
-          shape="square"
-          type="button"
-          onClick={() => onItemToggle(item.id)}
-          variant="outline"
-          className={cn(
-            'h-10',
-            selectedItems.includes(item.id) ? StyleActive : ''
-          )}
-        >
-          {item.label}
-        </Button>
-      ))}
-    </div>
+    <fieldset className="space-y-4">
+      {groupLabel && (
+        <legend className="text-xl font-semibold text-gray-900">
+          {groupLabel}
+        </legend>
+      )}
+      <div className="text-15sb grid grid-cols-3 gap-3">{buttonElements}</div>
+    </fieldset>
   );
 }
 
