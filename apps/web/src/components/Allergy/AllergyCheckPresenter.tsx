@@ -37,20 +37,19 @@ export default function AllergyCheckPresenter({
       aria-label="알레르기 선택 양식"
     >
       {categories.map((category, index) => (
-        <div key={category.title} className="space-y-4">
-          <h2
+        <fieldset key={category.title} className="space-y-4">
+          <legend
             id={`allergy-section-${index}`}
             className="scroll-mt-20 text-xl font-semibold text-gray-900"
           >
             {category.title}
-          </h2>
+          </legend>
           <AllergyCheckItem
             items={category.items}
-            label=""
             selectedItems={selectedItems}
             onItemToggle={onItemToggle}
           />
-        </div>
+        </fieldset>
       ))}
     </form>
   );
