@@ -14,6 +14,43 @@ interface Step3Data extends OnboardingStepData {
   selectedFoods: number[];
 }
 
+// 타입 가드 함수들
+function isStep1Data(data: unknown): data is Step1Data {
+  if (typeof data !== 'object' || data === null) return false;
+
+  const obj = data as Record<string, unknown>;
+  return (
+    'allergies' in obj &&
+    Array.isArray(obj.allergies) &&
+    'timestamp' in obj &&
+    typeof obj.timestamp === 'number'
+  );
+}
+
+function isStep2Data(data: unknown): data is Step2Data {
+  if (typeof data !== 'object' || data === null) return false;
+
+  const obj = data as Record<string, unknown>;
+  return (
+    'mood' in obj &&
+    typeof obj.mood === 'string' &&
+    'timestamp' in obj &&
+    typeof obj.timestamp === 'number'
+  );
+}
+
+function isStep3Data(data: unknown): data is Step3Data {
+  if (typeof data !== 'object' || data === null) return false;
+
+  const obj = data as Record<string, unknown>;
+  return (
+    'selectedFoods' in obj &&
+    Array.isArray(obj.selectedFoods) &&
+    'timestamp' in obj &&
+    typeof obj.timestamp === 'number'
+  );
+}
+
 interface OnboardingData {
   step1?: Step1Data;
   step2?: Step2Data;
@@ -36,8 +73,11 @@ class OnboardingStorage {
   private readonly VERSION = '1.0.0';
 
   /**
-   * 스텝 데이터 저장 (localStorage)
+   * 스텝 데이터 저장 (localStorage) - 함수 오버로딩
    */
+  saveStepData(step: 1, data: Omit<Step1Data, 'timestamp'>): void;
+  saveStepData(step: 2, data: Omit<Step2Data, 'timestamp'>): void;
+  saveStepData(step: 3, data: Omit<Step3Data, 'timestamp'>): void;
   saveStepData(
     step: 1 | 2 | 3,
     data: Omit<Step1Data | Step2Data | Step3Data, 'timestamp'>
@@ -50,7 +90,35 @@ class OnboardingStorage {
         timestamp: Date.now(),
       };
 
-      existingData[`step${step}`] = stepData as any;
+      // 타입 안전한 할당을 위한 switch 문
+      switch (step) {
+        case 1: {
+          if (isStep1Data(stepData)) {
+            existingData.step1 = stepData;
+          } else {
+            throw new Error('Step 1 데이터 형식이 올바르지 않습니다.');
+          }
+          break;
+        }
+        case 2: {
+          if (isStep2Data(stepData)) {
+            existingData.step2 = stepData;
+          } else {
+            throw new Error('Step 2 데이터 형식이 올바르지 않습니다.');
+          }
+          break;
+        }
+        case 3: {
+          if (isStep3Data(stepData)) {
+            existingData.step3 = stepData;
+          } else {
+            throw new Error('Step 3 데이터 형식이 올바르지 않습니다.');
+          }
+          break;
+        }
+        default:
+          throw new Error(`유효하지 않은 스텝: ${step}`);
+      }
 
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(existingData));
       console.info(`✅ Step ${step} 데이터가 로컬에 저장되었습니다.`, stepData);
@@ -214,7 +282,7 @@ class OnboardingStorage {
    * 세션 ID 생성
    */
   private generateSessionId(): string {
-    return `onboarding_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    return `onboarding_${crypto.randomUUID()}`;
   }
 
   /**
