@@ -14,6 +14,19 @@ import { ONBOARDING_CONSTANTS } from '../../_constants';
 import { useOnboardingActions } from '../../_hooks';
 import { getSubmitButtonText, onboardingStorage } from '../../_utils';
 
+/**
+ * stepData가 빈 객체인지 안전하게 확인하는 헬퍼 함수
+ * @param stepData - 확인할 스텝 데이터
+ * @returns stepData가 존재하고 빈 객체인 경우 true
+ */
+const isStepDataEmpty = (stepData: unknown): boolean => {
+  return (
+    stepData != null &&
+    typeof stepData === 'object' &&
+    Object.keys(stepData).length === 0
+  );
+};
+
 export default function RefrigeratorStep() {
   const { setUser, user } = useAuth();
   const router = useRouter();
@@ -30,12 +43,13 @@ export default function RefrigeratorStep() {
 
   // 새로고침 버튼을 눌렀을 때만 선택된 재료들 초기화
   useEffect(() => {
-    if (isRefreshed && stepData && Object.keys(stepData).length === 0) {
+    if (isRefreshed && isStepDataEmpty(stepData)) {
       clearAllFoods();
       setSelectedCount(0);
-      clearRefreshFlag(); // 플래그 리셋
+      clearRefreshFlag();
     }
-  }, [stepData, isRefreshed, clearAllFoods, clearRefreshFlag]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stepData, isRefreshed]);
 
   // 온보딩 완료 처리
   const completeOnboarding = () => {
