@@ -12,9 +12,10 @@ import {
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 
-import type { ComponentPropsWithoutRef } from 'react';
+import type { ModalProps as ComponentModalProps } from './types';
 
-export interface ModalProps extends ComponentPropsWithoutRef<typeof Dialog> {
+export interface ModalProps
+  extends Pick<ComponentModalProps, 'open' | 'onOpenChange'> {
   title?: string;
   description?: string | React.ReactNode;
   disableOverlayClick?: boolean;

@@ -4,12 +4,8 @@ import { Button } from '@/components/common/Button/Button';
 
 import { Modal } from './Modal';
 
+import type { ModalProps } from './types';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-
-interface ModalProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}
 
 const LoginRequiredModal = ({ onOpenChange, open }: ModalProps) => (
   <Modal
