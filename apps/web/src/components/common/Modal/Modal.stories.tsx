@@ -11,27 +11,6 @@ interface ModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
-const ShareRecipeModal = ({ onOpenChange, open }: ModalProps) => {
-  const handleCopyClick = () => {
-    onOpenChange(false);
-    navigator.clipboard.writeText('https://recipot.com/recipes/12345');
-  };
-  return (
-    <Modal
-      open={open}
-      onOpenChange={onOpenChange}
-      title="레시피 공유"
-      description="해당 레시피를 공유해보세요!"
-    >
-      <div className="flex justify-center space-y-4">
-        <Button onClick={handleCopyClick} size="full" variant="default">
-          복사하기
-        </Button>
-      </div>
-    </Modal>
-  );
-};
-
 const LoginRequiredModal = ({ onOpenChange, open }: ModalProps) => (
   <Modal
     open={open}
@@ -99,27 +78,6 @@ const meta = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
-
-const ShareRecipeStory = () => {
-  const [open, setOpen] = useState(false);
-  return (
-    <div>
-      <Button onClick={() => setOpen(true)}>레시피 공유 모달 열기</Button>
-      <ShareRecipeModal open={open} onOpenChange={setOpen} />
-    </div>
-  );
-};
-
-export const ShareRecipe: Story = {
-  args: {
-    children: <div>Example children</div>,
-    description: '해당 레시피를 공유해보세요!',
-    onOpenChange: () => {},
-    open: false,
-    title: '레시피 공유',
-  },
-  render: () => <ShareRecipeStory />,
-};
 
 const LoginRequiredStory = () => {
   const [open, setOpen] = useState(false);
