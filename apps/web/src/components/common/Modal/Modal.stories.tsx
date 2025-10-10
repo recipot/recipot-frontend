@@ -19,18 +19,10 @@ const LoginRequiredModal = ({ onOpenChange, open }: ModalProps) => (
     description="로그인이 필요한 서비스입니다."
   >
     <div className="flex justify-center space-x-2">
-      <Button
-        className="w-full px-8 py-[0.938rem]"
-        size="full"
-        variant="outline"
-      >
+      <Button className="px-8 py-[0.938rem]" size="full" variant="outline">
         취소
       </Button>
-      <Button
-        className="w-full px-8 py-[0.938rem]"
-        size="full"
-        variant="default"
-      >
+      <Button className="px-8 py-[0.938rem]" size="full" variant="default">
         로그인
       </Button>
     </div>
