@@ -8,7 +8,6 @@ interface UseCookingOrderReturn {
   isLoading: boolean;
   error: string | null;
   completeStep: (stepNumber: number) => void;
-  resetProgress: () => void;
   isStepCompleted: (stepNumber: number) => boolean;
   getProgressPercentage: () => number;
 }
@@ -42,10 +41,6 @@ export function useCookingOrder(recipeId: string): UseCookingOrderReturn {
     setCompletedSteps(prev => new Set([...prev, stepNumber]));
   };
 
-  const resetProgress = () => {
-    setCompletedSteps(new Set());
-  };
-
   const isStepCompleted = (stepNumber: number): boolean => {
     return completedSteps.has(stepNumber);
   };
@@ -62,6 +57,5 @@ export function useCookingOrder(recipeId: string): UseCookingOrderReturn {
     isLoading,
     isStepCompleted,
     recipe,
-    resetProgress,
   };
 }

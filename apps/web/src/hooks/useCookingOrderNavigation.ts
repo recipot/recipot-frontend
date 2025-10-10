@@ -17,10 +17,6 @@ export function useCookingOrderNavigation(recipe: Recipe | null) {
     }
   };
 
-  const handleReset = () => {
-    setCurrentStep(1);
-  };
-
   const isFirstStep = currentStep === 1;
   const isLastStep = recipe
     ? currentStep === recipe.cookingSteps.length
@@ -30,7 +26,7 @@ export function useCookingOrderNavigation(recipe: Recipe | null) {
     currentStep,
     handleNextStep,
     handlePrevStep,
-    handleReset,
+
     isFirstStep,
     isLastStep,
   };

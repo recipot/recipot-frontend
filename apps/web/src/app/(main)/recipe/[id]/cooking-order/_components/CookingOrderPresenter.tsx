@@ -6,11 +6,10 @@ import { useRouter } from 'next/navigation';
 import { useCookingOrder } from '@/hooks/useCookingOrder';
 
 import { useCookingOrderNavigation } from '../../../../../../hooks/useCookingOrderNavigation';
-import CompletionSidebar from './CompletionSidebar';
 import CookingOrderContent from './CookingOrderContent';
 import CookingOrderFooter from './CookingOrderFooter';
 import CookingOrderHeader from './CookingOrderHeader';
-import IngredientsSidebar from './IngredientsSidebar';
+import { IngredientsSidebar } from './IngredientsSidebar';
 import WarningModal from './WarningModal';
 
 interface CookingOrderPresenterProps {
@@ -20,11 +19,9 @@ interface CookingOrderPresenterProps {
 export default function CookingOrderPresenter({
   recipeId,
 }: CookingOrderPresenterProps) {
-  const { completeStep, error, isLoading, recipe, resetProgress } =
-    useCookingOrder(recipeId);
+  const { completeStep, error, isLoading, recipe } = useCookingOrder(recipeId);
 
   const [showIngredientsModal, setShowIngredientsModal] = useState(false);
-  const [showCompletionSidebar, setShowCompletionSidebar] = useState(false);
   const [showWarningModal, setShowWarningModal] = useState(false);
 
   const router = useRouter();
@@ -33,7 +30,6 @@ export default function CookingOrderPresenter({
     currentStep,
     handleNextStep,
     handlePrevStep,
-    handleReset,
     isFirstStep,
     isLastStep,
   } = useCookingOrderNavigation(recipe);
@@ -49,11 +45,6 @@ export default function CookingOrderPresenter({
     } else {
       handleNextStep();
     }
-  };
-
-  const handleResetWithNavigation = () => {
-    resetProgress();
-    handleReset();
   };
 
   const handleBack = () => {
@@ -120,13 +111,6 @@ export default function CookingOrderPresenter({
       <IngredientsSidebar
         isOpen={showIngredientsModal}
         onClose={() => setShowIngredientsModal(false)}
-        recipe={recipe}
-      />
-
-      <CompletionSidebar
-        isOpen={showCompletionSidebar}
-        onClose={() => setShowCompletionSidebar(false)}
-        onReset={handleResetWithNavigation}
         recipe={recipe}
       />
 

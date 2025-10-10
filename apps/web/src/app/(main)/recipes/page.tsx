@@ -127,6 +127,8 @@ export default function RecipesPage() {
                 <div className="relative aspect-video overflow-hidden bg-gray-200">
                   {recipe.imageUrl ? (
                     <Image
+                      width={390}
+                      height={260}
                       src={recipe.imageUrl}
                       alt={recipe.title}
                       className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"

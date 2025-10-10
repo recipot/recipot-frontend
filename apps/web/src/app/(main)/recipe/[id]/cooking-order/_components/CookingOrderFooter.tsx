@@ -35,7 +35,7 @@ export default function CookingOrderFooter({
             onClick={onStepComplete}
             className="bg-primary w-full rounded-full py-3 text-white"
           >
-            <p className={buttonTextClassName}>요리 완성</p>
+            <p className={buttonTextClassName}>해먹기 완료!</p>
           </Button>
         ) : (
           <div className="flex space-x-3">
