@@ -30,10 +30,6 @@ export function Modal({
   title,
   ...props
 }: ModalProps) {
-  const handleOpenChange = (open: boolean) => {
-    if (onOpenChange) onOpenChange(open);
-  };
-
   const handleOverlayClick: React.MouseEventHandler<HTMLDivElement> = event => {
     if (disableOverlayClick) {
       event.preventDefault();
@@ -42,7 +38,7 @@ export function Modal({
   };
 
   return (
-    <Dialog onOpenChange={handleOpenChange} {...props}>
+    <Dialog onOpenChange={onOpenChange} {...props}>
       <DialogPortal>
         <DialogOverlay
           onPointerDown={handleOverlayClick}
