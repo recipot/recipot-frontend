@@ -51,7 +51,7 @@ interface IngredientGroupProps {
   status: keyof typeof STATUS_CONFIG;
 }
 
-const IngredientGroup = ({ ingredients, status }: IngredientGroupProps) => {
+export function IngredientGroup({ ingredients, status }: IngredientGroupProps) {
   const config = STATUS_CONFIG[status];
   if (!config) {
     return null;
@@ -83,6 +83,6 @@ const IngredientGroup = ({ ingredients, status }: IngredientGroupProps) => {
       </div>
     </div>
   );
-};
+}
 
 export default IngredientGroup;

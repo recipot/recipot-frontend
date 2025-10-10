@@ -7,7 +7,7 @@ interface StepSectionProps {
   stepsRef: React.RefObject<HTMLDivElement>;
 }
 
-const StepSection = ({ steps, stepsRef }: StepSectionProps) => {
+export function StepSection({ steps, stepsRef }: StepSectionProps) {
   return (
     <div
       ref={stepsRef}
@@ -31,6 +31,6 @@ const StepSection = ({ steps, stepsRef }: StepSectionProps) => {
       </div>
     </div>
   );
-};
+}
 
 export default StepSection;

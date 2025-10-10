@@ -9,7 +9,10 @@ interface CookwareSectionProps {
   cookwareRef: React.RefObject<HTMLDivElement>;
 }
 
-const CookwareSection = ({ cookware, cookwareRef }: CookwareSectionProps) => {
+export function CookwareSection({
+  cookware,
+  cookwareRef,
+}: CookwareSectionProps) {
   return (
     <div
       ref={cookwareRef}
@@ -30,6 +33,6 @@ const CookwareSection = ({ cookware, cookwareRef }: CookwareSectionProps) => {
       </div>
     </div>
   );
-};
+}
 
 export default CookwareSection;

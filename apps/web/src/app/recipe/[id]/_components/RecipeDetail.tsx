@@ -17,7 +17,7 @@ import TabNavigation from './TabNavigation';
 
 import type { RecipeDetailProps, TabId } from '../types/recipe.types';
 
-const RecipeDetail = ({ recipe }: RecipeDetailProps) => {
+export function RecipeDetail({ recipe }: RecipeDetailProps) {
   const ingredientsRef = useRef<HTMLDivElement>(null);
   const cookwareRef = useRef<HTMLDivElement>(null);
   const stepsRef = useRef<HTMLDivElement>(null);
@@ -30,7 +30,7 @@ const RecipeDetail = ({ recipe }: RecipeDetailProps) => {
 
   const { activeSection: activeTab, setActiveSection } =
     useIntersectionScrollSpy({
-      initialState: 'ingredients', 
+      initialState: 'ingredients',
       rootRef: tabContainerRef,
       sectionRefs,
     });
@@ -107,6 +107,6 @@ const RecipeDetail = ({ recipe }: RecipeDetailProps) => {
       </div>
     </div>
   );
-};
+}
 
 export default RecipeDetail;

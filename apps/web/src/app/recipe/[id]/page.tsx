@@ -1,4 +1,4 @@
-import RecipeDetail from './components/RecipeDetail';
+import RecipeDetail from './_components/RecipeDetail';
 
 const sampleRecipe = {
   cookware: [{ name: '냄비' }, { name: '프라이팬' }, { name: '에어프라이어' }],
@@ -43,6 +43,8 @@ const sampleRecipe = {
     { amount: '1꼬집', name: '소금' },
     { amount: '1스푼', name: '간장' },
     { amount: '1스푼', name: '고추장' },
+    { amount: '1큰술가득히넘치도록', name: '매우매우긴양념이름테스트' },
+    { amount: '엄청나게긴양의표현', name: '일반적인양념' },
   ],
   steps: [
     {

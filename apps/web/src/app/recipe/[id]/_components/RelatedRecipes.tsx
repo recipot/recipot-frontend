@@ -9,7 +9,7 @@ interface RelatedRecipesProps {
   relatedRecipes: RecipeCard[];
 }
 
-const RelatedRecipes = ({ relatedRecipes }: RelatedRecipesProps) => {
+export function RelatedRecipes({ relatedRecipes }: RelatedRecipesProps) {
   return (
     <div className="mt-6">
       <h3 className="text-20 mb-5 text-gray-900">다른 레시피는 어떠세요?</h3>
@@ -41,6 +41,6 @@ const RelatedRecipes = ({ relatedRecipes }: RelatedRecipesProps) => {
       </div>
     </div>
   );
-};
+}
 
 export default RelatedRecipes;

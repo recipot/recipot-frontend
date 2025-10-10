@@ -21,11 +21,11 @@ interface TabNavigationProps {
   tabContainerRef: React.RefObject<HTMLDivElement>;
 }
 
-const TabNavigation = ({
+export function TabNavigation({
   activeTab,
   onTabClick,
   tabContainerRef,
-}: TabNavigationProps) => {
+}: TabNavigationProps) {
   const tabs: Tab[] = [
     { icon: IngredientIcon, id: 'ingredients', label: '재료' },
     { icon: CookwareIcon, id: 'cookware', label: '조리도구' },
@@ -62,6 +62,6 @@ const TabNavigation = ({
       </div>
     </div>
   );
-};
+}
 
 export default TabNavigation;

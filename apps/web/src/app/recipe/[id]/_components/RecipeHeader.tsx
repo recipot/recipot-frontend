@@ -15,7 +15,7 @@ interface RecipeHeaderProps {
   recipe: Recipe;
 }
 
-const RecipeHeader = ({ recipe }: RecipeHeaderProps) => {
+export function RecipeHeader({ recipe }: RecipeHeaderProps) {
   const backgroundImageStyle = useMemo(
     () => ({ backgroundImage: `url(${recipe.image})` }),
     [recipe.image]
@@ -88,6 +88,6 @@ const RecipeHeader = ({ recipe }: RecipeHeaderProps) => {
       </div>
     </>
   );
-};
+}
 
 export default RecipeHeader;
