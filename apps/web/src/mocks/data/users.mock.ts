@@ -8,6 +8,7 @@ export const mockUsers: UserInfo[] = [
     provider: 'kakao',
     createdAt: '2024-01-15T00:00:00.000Z',
     updatedAt: '2024-12-19T00:00:00.000Z',
+    isOnboardingCompleted: true, // 온보딩 완료된 사용자
   },
   {
     id: '2',
@@ -16,6 +17,7 @@ export const mockUsers: UserInfo[] = [
     provider: 'google',
     createdAt: '2024-02-20T00:00:00.000Z',
     updatedAt: '2024-12-19T00:00:00.000Z',
+    isOnboardingCompleted: false, // 온보딩 미완료 사용자
   },
   {
     id: '3',
@@ -24,6 +26,7 @@ export const mockUsers: UserInfo[] = [
     provider: 'kakao',
     createdAt: '2024-01-01T00:00:00.000Z',
     updatedAt: '2024-12-19T00:00:00.000Z',
+    isOnboardingCompleted: true, // 온보딩 완료된 사용자
   },
 ];
 

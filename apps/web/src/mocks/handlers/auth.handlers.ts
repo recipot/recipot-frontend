@@ -29,12 +29,21 @@ const isValidMockRefreshToken = (token: string): boolean => {
 
 // 토큰에서 사용자 제공자 식별
 const getUserFromToken = (token: string): UserInfo => {
+  console.log('getUserFromToken - 토큰:', token);
+
   if (token.includes('google')) {
-    return mockUsers.find(u => u.provider === 'google') || mockUsers[1];
+    const googleUser =
+      mockUsers.find(u => u.provider === 'google') || mockUsers[1];
+    console.log('getUserFromToken - 구글 사용자:', googleUser);
+    return googleUser;
   } else if (token.includes('kakao')) {
-    return mockUsers.find(u => u.provider === 'kakao') || mockUsers[0];
+    const kakaoUser =
+      mockUsers.find(u => u.provider === 'kakao') || mockUsers[0];
+    console.log('getUserFromToken - 카카오 사용자:', kakaoUser);
+    return kakaoUser;
   }
   // 기본값은 카카오 사용자
+  console.log('getUserFromToken - 기본 사용자:', mockUsers[0]);
   return mockUsers[0];
 };
 
@@ -134,6 +143,11 @@ export const authHandlers = [
       mockUsers.find(u => u.provider === 'google') ||
       mockUsers[1] ||
       mockUsers[0];
+    console.log('구글 로그인 콜백 - 반환할 사용자:', user);
+    console.log(
+      '구글 로그인 콜백 - 온보딩 완료 상태:',
+      user.isOnboardingCompleted
+    );
     const tokenData: TokenResponse = {
       accessToken: `google_mock_token_${Date.now()}`,
       refreshToken: `google_mock_refresh_${Date.now()}`,
@@ -178,6 +192,8 @@ export const authHandlers = [
 
     await delay(300);
     const user = getUserFromToken(token);
+    console.log('토큰 검증 - 반환할 사용자:', user);
+    console.log('토큰 검증 - 온보딩 완료 상태:', user.isOnboardingCompleted);
     const successResponse: AuthResponse = {
       success: true,
       data: user,

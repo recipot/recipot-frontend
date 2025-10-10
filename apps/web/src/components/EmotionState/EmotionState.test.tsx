@@ -104,16 +104,12 @@ describe('EmotionState', () => {
 
   describe('배경 그라디언트', () => {
     it('선택된 감정에 따라 올바른 배경 그라디언트가 적용된다', () => {
-      // 기본 상태 (선택 없음) - 랜덤 그라디언트가 적용되므로 3가지 중 하나
+      // 기본 상태 (선택 없음) - 기본 그라디언트가 적용됨
       const { container: containerDefault } = render(
         <EmotionState {...defaultProps} />
       );
       const mainContainerDefault = containerDefault.firstChild as HTMLElement;
-      const hasDefaultGradient =
-        mainContainerDefault.classList.contains('emotion-gradient-bad') ||
-        mainContainerDefault.classList.contains('emotion-gradient-good') ||
-        mainContainerDefault.classList.contains('emotion-gradient-neutral');
-      expect(hasDefaultGradient).toBe(true);
+      expect(mainContainerDefault).toHaveClass('emotion-gradient-default');
 
       // bad 감정 선택
       const { container: containerBad } = render(
