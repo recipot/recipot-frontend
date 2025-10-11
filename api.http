@@ -1,0 +1,53 @@
+### 백엔드 API 테스트
+@baseUrl = http://3.34.40.123
+
+### 1. 카카오 로그인 URL 생성 (로그인)
+GET http://3.34.40.123/v1/login/kakao
+
+### 2. 카카오 콜백 테스트 (인증 코드 필요)
+GET {{baseUrl}}/v1/login/kakao/callback?code=test_code
+
+### 3. 토큰 검증 (인증 관리)
+POST {{baseUrl}}/v1/auth/verify
+Content-Type: application/json
+Authorization: Bearer test_token
+
+{}
+
+### 4. 토큰 갱신 (인증 관리)
+POST {{baseUrl}}/v1/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "test_refresh_token"
+}
+
+### 5. 사용자 정보 조회 (인증 관리)
+GET {{baseUrl}}/v1/auth/info/1
+Authorization: Bearer test_token
+
+### 6. 토큰 만료 확인 (인증 관리)
+GET {{baseUrl}}/v1/auth/expiration/test_token
+Authorization: Bearer test_token
+
+### 7. 로그아웃 (인증 관리)
+POST {{baseUrl}}/v1/auth/logout
+Content-Type: application/json
+Authorization: Bearer test_token
+
+{}
+
+### 8. 디버그 API (인증 관리)
+POST {{baseUrl}}/v1/auth/debug
+Content-Type: application/json
+
+{}
+
+### 9. 서버 상태 확인 (기본 테스트)
+GET {{baseUrl}}/
+
+### 10. Health Check (존재할 수도 있는 엔드포인트)
+GET {{baseUrl}}/v1/health
+
+### 11. Status Check (존재할 수도 있는 엔드포인트)
+GET {{baseUrl}}/status
