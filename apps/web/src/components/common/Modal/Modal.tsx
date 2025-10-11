@@ -19,12 +19,14 @@ export interface ModalProps
   title?: string;
   description?: string | React.ReactNode;
   disableOverlayClick?: boolean;
+  contentGap?: number;
   children: React.ReactNode;
   onOpenChange: (open: boolean) => void;
 }
 
 export function Modal({
   children,
+  contentGap,
   description,
   disableOverlayClick = false,
   onOpenChange,
@@ -46,9 +48,13 @@ export function Modal({
           className="fixed inset-0 z-50 bg-gray-300 backdrop-blur-sm"
         />
         <DialogContent
-          className={cn(
-            'bg-background flex w-[20rem] flex-col items-center justify-center gap-[30px] rounded-3xl border px-5 pt-[30px] max-[320px]:w-[18rem]'
-          )}
+          className="bg-background flex w-[17.5rem] flex-col items-center justify-center gap-[var(--modal-gap)] rounded-3xl border"
+          style={
+            {
+              ...(contentGap && { '--modal-gap': `${contentGap}px` }),
+              boxShadow: 'var(--modal-shadow)',
+            } as React.CSSProperties
+          }
         >
           <DialogHeader
             className={cn('text-center', title ? 'space-y-1.2' : 'space-y-0')}

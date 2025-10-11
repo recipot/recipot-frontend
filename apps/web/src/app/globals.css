@@ -78,6 +78,10 @@
     /* Anchor offset for sticky header (used by scroll-margin) */
     --anchor-offset: 80px;
 
+    /* Modal */
+    --modal-shadow: 0 14px 16px 0 rgba(15, 21, 34, 0.1);
+    --modal-gap: 24px;
+
     --font-pretendard: 'Pretendard', sans-serif;
   }
   .dark {

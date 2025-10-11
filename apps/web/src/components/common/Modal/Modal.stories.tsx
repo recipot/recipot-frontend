@@ -13,13 +13,24 @@ const LoginRequiredModal = ({ onOpenChange, open }: ModalProps) => (
     onOpenChange={onOpenChange}
     title="로그인이 필요한 서비스입니다."
     description="로그인이 필요한 서비스입니다."
+    contentGap={24}
   >
     <div className="flex justify-center space-x-2">
-      <Button className="px-8 py-[0.938rem]" size="full" variant="outline">
-        취소
+      <Button
+        className="px-5 py-2"
+        size="full"
+        variant="outline"
+        onClick={() => onOpenChange(false)}
+      >
+        <p className="text-15sb">취소</p>
       </Button>
-      <Button className="px-8 py-[0.938rem]" size="full" variant="default">
-        로그인
+      <Button
+        className="px-5 py-2"
+        size="full"
+        variant="default"
+        onClick={() => onOpenChange(false)}
+      >
+        <p className="text-15sb">로그인</p>
       </Button>
     </div>
   </Modal>
@@ -38,7 +49,7 @@ const LeavePageWarningModal = ({ onOpenChange, open }: ModalProps) => (
       </>
     }
   >
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="flex justify-center space-x-2">
         <Button
           variant="outline"
@@ -47,7 +58,11 @@ const LeavePageWarningModal = ({ onOpenChange, open }: ModalProps) => (
         >
           확인
         </Button>
-        <Button variant="default" size="full">
+        <Button
+          variant="default"
+          size="full"
+          onClick={() => onOpenChange(false)}
+        >
           취소
         </Button>
       </div>
