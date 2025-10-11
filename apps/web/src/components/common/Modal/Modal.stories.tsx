@@ -41,13 +41,8 @@ const LeavePageWarningModal = ({ onOpenChange, open }: ModalProps) => (
     open={open}
     onOpenChange={onOpenChange}
     title="페이지 나가기"
-    description={
-      <>
-        해당 페이지를 벗어나면
-        <br />
-        요리 진행이 중단 됩니다.
-      </>
-    }
+    description={`해당 페이지를 벗어나면
+요리 진행이 중단 됩니다.`}
   >
     <div className="space-y-6">
       <div className="flex justify-center space-x-2">

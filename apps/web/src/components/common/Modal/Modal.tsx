@@ -60,11 +60,11 @@ export function Modal({
             className={cn('text-center', title ? 'space-y-1.2' : 'space-y-0')}
           >
             <VisuallyHidden asChild>
-              <DialogTitle className="text-17">{title}</DialogTitle>
+              <DialogTitle className="text-base">{title}</DialogTitle>
             </VisuallyHidden>
 
             {description ? (
-              <DialogDescription className="text-17">
+              <DialogDescription className="text-center text-base whitespace-pre-line">
                 {description}
               </DialogDescription>
             ) : null}
