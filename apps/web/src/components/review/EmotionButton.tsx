@@ -15,6 +15,7 @@ export function EmotionButton({
 }: EmotionButtonProps) {
   return (
     <button
+      type="button"
       onClick={onClick}
       className={cn(
         'w-full rounded-[10px] border p-3',

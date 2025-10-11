@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import type { ReviewData } from '@/types/review.types';
+import type { ReviewData, ReviewFormData } from '@/types/review.types';
 
 import { ReviewBottomSheet } from './ReviewBottomSheet';
 
@@ -47,14 +47,7 @@ function ReviewBottomSheetWrapper() {
     setIsOpen(false);
   };
 
-  const handleSubmit = (data: {
-    comment: string;
-    emotions: {
-      difficulty: string | null;
-      experience: string | null;
-      taste: string | null;
-    };
-  }) => {
+  const handleSubmit = (data: ReviewFormData) => {
     // eslint-disable-next-line no-console
     console.log('Review submitted:', data);
     setIsOpen(false);
