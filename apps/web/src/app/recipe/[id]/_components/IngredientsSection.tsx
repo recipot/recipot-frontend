@@ -56,7 +56,7 @@ export function IngredientsSection({
 
             {isOpen && (
               <div className="rounded-xl border-[1px] border-dashed">
-                <div className="flex w-full flex-nowrap items-start space-x-4 self-stretch overflow-x-auto px-4 pt-3 pb-4">
+                <div className="no-scrollbar flex w-full flex-nowrap items-start space-x-4 self-stretch overflow-x-auto px-4 pt-3 pb-4">
                   {MEASUREMENT_TABS.map(tab => (
                     <MeasurementTab
                       key={tab.id}

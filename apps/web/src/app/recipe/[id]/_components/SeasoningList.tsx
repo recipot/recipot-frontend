@@ -24,7 +24,7 @@ export function SeasoningList({ seasonings }: SeasoningListProps) {
             </span>
           </div>
           <div className="mx-[18px] h-1 flex-1 border-b border-dashed border-gray-200" />
-          <span className="text-15sb flex-shrink-0 truncate text-gray-700">
+          <span className="text-15sb max-w-[100px] flex-shrink-0 truncate text-gray-700">
             {seasoning.amount}
           </span>
         </div>

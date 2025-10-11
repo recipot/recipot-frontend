@@ -30,15 +30,17 @@ export function MeasurementTab({
     <div
       role="button"
       tabIndex={0}
-      className={`flex cursor-pointer items-center gap-1 pb-2 ${
-        isActive ? 'border-b-2 border-solid border-gray-900' : ''
+      className={`flex h-[34px] w-fit cursor-pointer items-center justify-center gap-1 px-2 ${
+        isActive ? 'border-b-2 border-solid border-black' : ''
       }`}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
     >
-      {iconToShow}
+      <div className="order-0 flex-none flex-grow-0">{iconToShow}</div>
       <p
-        className={`text-14 whitespace-nowrap ${isActive ? 'text-gray-900' : 'text-gray-600'}`}
+        className={`order-1 h-[21px] flex-none flex-grow-0 text-sm leading-[150%] font-semibold whitespace-nowrap ${
+          isActive ? 'text-gray-900' : 'text-gray-600'
+        }`}
       >
         {tab.label}
       </p>

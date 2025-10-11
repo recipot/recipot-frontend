@@ -64,45 +64,50 @@ export function RecipeDetail({ recipe }: RecipeDetailProps) {
     }
   };
   return (
-    <div className="min-h-screen bg-gray-50">
-      <RecipeHeader recipe={recipe} />
+    <div className="flex min-h-screen w-full justify-center bg-gray-50">
+      <div className="w-[390px] bg-gray-50">
+        <RecipeHeader recipe={recipe} />
 
-      <TabNavigation
-        activeTab={activeTab as TabId}
-        onTabClick={handleTabClick}
-        tabContainerRef={tabContainerRef}
-      />
-
-      <div className="px-4 pb-24">
-        <div className="bg-secondary-light-green border-secondary-soft-green my-4 rounded-2xl border-[1px] p-5">
-          <p className="recipe-description text-15sb leading-relaxed">
-            {recipe.description}
-          </p>
-        </div>
-
-        <IngredientsSection
-          ingredients={recipe.ingredients}
-          seasonings={recipe.seasonings}
-          ingredientsRef={ingredientsRef}
+        <TabNavigation
+          activeTab={activeTab as TabId}
+          onTabClick={handleTabClick}
+          tabContainerRef={tabContainerRef}
         />
 
-        <CookwareSection cookware={recipe.cookware} cookwareRef={cookwareRef} />
+        <div className="px-4 pb-24">
+          <div className="bg-secondary-light-green border-secondary-soft-green my-4 rounded-2xl border-[1px] p-5">
+            <p className="recipe-description text-15sb leading-relaxed">
+              {recipe.description}
+            </p>
+          </div>
 
-        <StepSection steps={recipe.steps} stepsRef={stepsRef} />
+          <IngredientsSection
+            ingredients={recipe.ingredients}
+            seasonings={recipe.seasonings}
+            ingredientsRef={ingredientsRef}
+          />
 
-        <RelatedRecipes relatedRecipes={recipe.relatedRecipes} />
-      </div>
+          <CookwareSection
+            cookware={recipe.cookware}
+            cookwareRef={cookwareRef}
+          />
 
-      <div className="fixed right-0 bottom-0 left-0">
-        <div className="flex bg-white/50 px-[50px] py-[10px]">
-          <Button
-            variant="default"
-            size="full"
-            className="bg-primary px-8 py-[15px]"
-          >
-            <CookIcon className="mr-[6px] h-6 w-6" color="#ffffff" />
-            <p className="text-17sb text-white">요리하러 가기</p>
-          </Button>
+          <StepSection steps={recipe.steps} stepsRef={stepsRef} />
+
+          <RelatedRecipes relatedRecipes={recipe.relatedRecipes} />
+        </div>
+
+        <div className="fixed right-0 bottom-0 left-0 flex justify-center">
+          <div className="flex w-[390px] bg-white/50 px-[50px] py-[10px]">
+            <Button
+              variant="default"
+              size="full"
+              className="bg-primary px-8 py-[15px]"
+            >
+              <CookIcon className="mr-[6px] h-6 w-6" color="#ffffff" />
+              <p className="text-17sb text-white">요리하러 가기</p>
+            </Button>
+          </div>
         </div>
       </div>
     </div>
