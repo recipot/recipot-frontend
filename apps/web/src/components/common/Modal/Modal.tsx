@@ -21,7 +21,6 @@ export interface ModalProps
   disableOverlayClick?: boolean;
   contentGap?: number;
   children: React.ReactNode;
-  onOpenChange: (open: boolean) => void;
 }
 
 export function Modal({

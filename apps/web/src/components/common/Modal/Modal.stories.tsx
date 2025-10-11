@@ -89,14 +89,7 @@ const LoginRequiredStory = () => {
   );
 };
 
-export const LoginRequired: Story = {
-  args: {
-    children: <div>Example children</div>,
-    description: '로그인이 필요한 서비스입니다.',
-    onOpenChange: () => {},
-    open: false,
-    title: '로그인이 필요한 서비스입니다.',
-  },
+export const LoginRequired = {
   render: () => <LoginRequiredStory />,
 };
 
