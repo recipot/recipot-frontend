@@ -12,7 +12,7 @@ export function MeasurementGuideContent({
   }
 
   return (
-    <div className="no-scrollbar mt-4 flex w-full flex-nowrap items-start justify-center gap-[20px] self-stretch overflow-x-hidden rounded-xl px-4 pt-3 pb-4">
+    <div className="no-scrollbar flex w-full flex-nowrap justify-center gap-[20px] self-stretch overflow-x-hidden rounded-xl px-4 pb-5">
       <div className="flex flex-col items-center justify-center">
         <div className="flex h-[125px] w-[125px] items-center justify-center rounded-lg bg-gray-100" />
         <div className="mt-3">
