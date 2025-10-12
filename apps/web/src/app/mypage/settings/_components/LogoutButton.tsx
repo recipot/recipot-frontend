@@ -39,14 +39,14 @@ export default function LogoutButton() {
         <div className="flex items-center justify-end gap-[0.375rem]">
           <Button
             onClick={handleLogout}
-            className="text-14 border border-[#747474] bg-white px-[0.9375rem] py-3 leading-[0.9375rem] text-black"
+            className="text-14 h-[2.125rem] border border-[#747474] bg-white px-[0.9375rem] py-3 text-black"
             shape="square"
           >
             로그아웃
           </Button>
           <Button
             onClick={() => setIsModalOpen(false)}
-            className="text-14b bg-[#747474] px-4 py-3 leading-[0.9375rem] text-white"
+            className="text-14b h-[2.125rem] bg-[#747474] px-4 py-3 text-white"
             shape="square"
           >
             닫기
