@@ -44,23 +44,23 @@ describe('AllergyCheck', () => {
     const user = userEvent.setup();
 
     renderWithProviders(<TestWrapper formId="test-form" onSubmit={() => {}} />);
-    const fishButton = screen.getByRole('button', { name: '어류' });
-    const crabButton = screen.getByRole('button', { name: '게' });
+    const tunaButton = screen.getByRole('button', { name: '참치' });
+    const mackerelButton = screen.getByRole('button', { name: '고등어' });
 
-    // '어류' 선택
-    await user.click(fishButton);
-    expect(fishButton).toHaveClass('bg-secondary-light-green');
-    expect(crabButton).not.toHaveClass('bg-secondary-light-green');
+    // '참치' 선택
+    await user.click(tunaButton);
+    expect(tunaButton).toHaveClass('bg-secondary-light-green');
+    expect(mackerelButton).not.toHaveClass('bg-secondary-light-green');
 
-    // '게' 선택
-    await user.click(crabButton);
-    expect(fishButton).toHaveClass('bg-secondary-light-green');
-    expect(crabButton).toHaveClass('bg-secondary-light-green');
+    // '고등어' 선택
+    await user.click(mackerelButton);
+    expect(tunaButton).toHaveClass('bg-secondary-light-green');
+    expect(mackerelButton).toHaveClass('bg-secondary-light-green');
 
-    // '어류' 선택 해제
-    await user.click(fishButton);
-    expect(fishButton).not.toHaveClass('bg-secondary-light-green');
-    expect(crabButton).toHaveClass('bg-secondary-light-green');
+    // '참치' 선택 해제
+    await user.click(tunaButton);
+    expect(tunaButton).not.toHaveClass('bg-secondary-light-green');
+    expect(mackerelButton).toHaveClass('bg-secondary-light-green');
   });
 
   it('제출 시 선택된 항목들의 ID 배열이 전달되어야 한다', async () => {
@@ -70,12 +70,12 @@ describe('AllergyCheck', () => {
       <TestWrapper formId="test-form" onSubmit={mockOnSubmit} />
     );
 
-    // '어류'(id:1), '게'(id:2) 순서로 클릭
-    const fishButton = screen.getByRole('button', { name: '어류' });
-    const crabButton = screen.getByRole('button', { name: '게' });
+    // '참치'(id:1), '고등어'(id:2) 순서로 클릭
+    const tunaButton = screen.getByRole('button', { name: '참치' });
+    const mackerelButton = screen.getByRole('button', { name: '고등어' });
 
-    await user.click(fishButton);
-    await user.click(crabButton);
+    await user.click(tunaButton);
+    await user.click(mackerelButton);
 
     const form = screen.getByRole('form', { name: '알레르기 선택 양식' });
     fireEvent.submit(form);

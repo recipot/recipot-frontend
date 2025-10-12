@@ -5,6 +5,17 @@ import { useRouter, useSearchParams } from 'next/navigation';
 
 import type { UserInfo } from '@recipot/types';
 
+/**
+ * 온보딩 완료 상태를 안전하게 확인하는 함수
+ * @param isOnboardingCompleted - 온보딩 완료 상태 (boolean | undefined)
+ * @returns true인 경우에만 true, 그 외 모든 경우 false
+ */
+const isOnboardingComplete = (
+  isOnboardingCompleted: boolean | undefined
+): boolean => {
+  return isOnboardingCompleted === true;
+};
+
 export type OAuthProvider = 'google' | 'kakao';
 
 interface UseOAuthCallbackProps {
@@ -14,7 +25,7 @@ interface UseOAuthCallbackProps {
 export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { setRefreshToken, setToken, setUser } = useAuth();
+  const { setRefreshToken, setToken, setUser, user } = useAuth();
   const [status, setStatus] = useState(
     `${provider === 'google' ? '구글' : '카카오'} 로그인 처리 중...`
   );
@@ -22,9 +33,16 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
   // 페이지 이동 로직 분리
   const navigateWithDelay = useCallback(
     (delay: number = 1000) => {
-      setTimeout(() => router.push('/'), delay);
+      setTimeout(() => {
+        // 사용자 정보가 설정된 후 온보딩 상태에 따라 리다이렉트
+        if (isOnboardingComplete(user?.isOnboardingCompleted)) {
+          router.push('/');
+        } else {
+          router.push('/onboarding');
+        }
+      }, delay);
     },
-    [router]
+    [router, user]
   );
 
   // 토큰 저장 로직 분리
@@ -42,15 +60,17 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
   const setupUser = useCallback(
     (user: UserInfo) => {
       setUser(user);
+      // 사용자 정보 설정 후 온보딩 상태에 따라 리다이렉트
+      setTimeout(() => {
+        if (isOnboardingComplete(user.isOnboardingCompleted)) {
+          router.push('/');
+        } else {
+          router.push('/onboarding');
+        }
+      }, 1000);
     },
-    [setUser]
+    [setUser, router]
   );
-
-  // 성공 처리 로직 분리
-  const handleSuccess = useCallback(() => {
-    setStatus('로그인 성공! 메인 페이지로 이동합니다...');
-    navigateWithDelay(1000);
-  }, [navigateWithDelay]);
 
   // 에러 처리 로직 분리
   const handleError = useCallback(
@@ -76,12 +96,11 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
 
         saveTokens(token, `temp_refresh_${Date.now()}`);
         setupUser(userResponse.data);
-        handleSuccess();
       } catch (error) {
         handleError(error, '토큰 처리 실패');
       }
     },
-    [saveTokens, setupUser, handleSuccess, handleError]
+    [saveTokens, setupUser, handleError]
   );
 
   const handleAuthCode = useCallback(
@@ -99,7 +118,6 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
         const { accessToken, refreshToken, user } = tokenData;
         saveTokens(accessToken, refreshToken);
         setupUser(user);
-        handleSuccess();
       } catch (error) {
         handleError(
           error,
@@ -107,7 +125,7 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
         );
       }
     },
-    [provider, saveTokens, setupUser, handleSuccess, handleError]
+    [provider, saveTokens, setupUser, handleError]
   );
 
   useEffect(() => {
