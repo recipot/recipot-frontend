@@ -149,51 +149,21 @@ const createAuthApiInstance = (): AxiosInstance => {
 const authApi = createAuthApiInstance();
 
 export const authService = {
-  // 카카오 로그인 URL 생성
+  // 카카오 로그인 URL 생성 (백엔드 리다이렉트 방식)
   async getKakaoLoginUrl() {
     try {
-      // 프론트엔드 redirect_uri를 백엔드에 전달
-      const frontendRedirectUri = `${window.location.origin}/v1/login/kakao/callback`;
-
-      const response = await authApi.get('/v1/login/kakao', {
-        params: {
-          redirect_uri: frontendRedirectUri,
-        },
-      });
+      // 백엔드가 자체적으로 redirect_uri를 백엔드 주소로 설정
+      const response = await authApi.get('/v1/login/kakao');
       console.log('카카오 로그인 URL 생성 성공:', response.data);
-      console.log('사용된 redirect_uri:', frontendRedirectUri);
 
       // 실제 백엔드 응답: { status: 200, data: "https://kauth.kakao.com/oauth/authorize?..." }
       if (response.data.status === 200 && response.data.data) {
-        let kakaoUrl = response.data.data;
+        const kakaoUrl = response.data.data;
+        console.log('카카오 OAuth URL (백엔드 리다이렉트):', kakaoUrl);
 
-        // 임시 해결책: 백엔드에서 잘못된 redirect_uri를 사용하는 경우 프론트엔드에서 수정
-        const backendRedirectPattern =
-          /redirect_uri=http%3A%2F%2F3\.34\.40\.123%2Fv1%2Flogin%2Fkakao%2Fcallback/;
-        const backendRedirectPatternPlain =
-          'redirect_uri=http://3.34.40.123/v1/login/kakao/callback';
-
-        if (
-          kakaoUrl.includes('redirect_uri=http%3A%2F%2F3.34.40.123') ||
-          kakaoUrl.includes('redirect_uri=http://3.34.40.123')
-        ) {
-          console.warn(
-            '백엔드에서 잘못된 redirect_uri를 사용하고 있습니다. 프론트엔드에서 수정합니다.'
-          );
-          console.log('원본 카카오 URL:', kakaoUrl);
-
-          // URL 인코딩된 버전과 일반 버전 모두 처리
-          kakaoUrl = kakaoUrl
-            .replace(
-              backendRedirectPattern,
-              `redirect_uri=${encodeURIComponent(frontendRedirectUri)}`
-            )
-            .replace(
-              backendRedirectPatternPlain,
-              `redirect_uri=${encodeURIComponent(frontendRedirectUri)}`
-            );
-
-          console.log('수정된 카카오 URL:', kakaoUrl);
+        // 백엔드 주소로 리다이렉트되는 것이 정상
+        if (kakaoUrl.includes('redirect_uri=http%3A%2F%2F3.34.40.123')) {
+          console.log('✅ 백엔드 리다이렉트 방식으로 설정됨');
         }
 
         return kakaoUrl;
@@ -208,32 +178,41 @@ export const authService = {
     }
   },
 
-  // 카카오 콜백에서 토큰 받기 (GET 요청)
-  async getTokenFromCallback(code: string) {
+  // 사용자 ID로 토큰 정보 조회 (백엔드 방식)
+  async getTokenByUserId(userId: number) {
     try {
-      console.log('카카오 콜백 API 호출 시작:', {
-        code: code.substring(0, 20) + '...', // 보안을 위해 일부만 로깅
-        codeLength: code.length,
-        url: `/v1/login/kakao/callback?code=${code.substring(0, 20)}...`,
+      console.log('사용자 토큰 정보 조회 시작:', {
+        userId,
         timestamp: new Date().toISOString(),
       });
 
-      const response = await authApi.get(
-        `/v1/login/kakao/callback?code=${code}`
-      );
+      const response = await authApi.get(`/v1/auth/info/${userId}`);
+      console.log('토큰 정보 조회 응답:', response.data);
 
-      console.log('카카오 콜백 응답 성공:', response.data);
-      return response.data;
+      if (response.data.status === 200 && response.data.data) {
+        const data = response.data.data;
+
+        // 토큰 저장
+        setStoredToken(data.accessToken);
+        if (data.refreshToken) {
+          localStorage.setItem('refreshToken', data.refreshToken);
+        }
+
+        // 사용자 정보 조회
+        const userInfo = await this.getUserInfo();
+
+        return {
+          accessToken: data.accessToken,
+          refreshToken: data.refreshToken,
+          expiresIn: 3600, // 계산 필요 시 accessExpiresAt 사용
+          user: userInfo,
+        };
+      } else {
+        throw new Error('토큰 정보 응답 형식이 올바르지 않습니다.');
+      }
     } catch (error) {
-      console.error('카카오 콜백 API 호출 실패:', {
-        error: error,
-        response: error.response?.data,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        message: error.message,
-        url: error.config?.url,
-      });
-      throw new Error('카카오 로그인 처리에 실패했습니다.', { cause: error });
+      console.error('토큰 정보 조회 실패:');
+      throw new Error('토큰 정보 조회에 실패했습니다.', { cause: error });
     }
   },
 
@@ -272,7 +251,7 @@ export const authService = {
   },
 
   // 백엔드에서 JWT 토큰 검증
-  async verifyToken(token?: string): Promise<AuthResponse<UserInfo>> {
+  async verifyToken(token?: string) {
     try {
       // 토큰이 제공되면 임시로 저장 (인터셉터에서 사용하기 위해)
       if (token) {
@@ -296,17 +275,6 @@ export const authService = {
         } catch (userError) {
           // 사용자 정보 조회 실패 시 기본 정보로 처리
           console.warn('사용자 정보 조회 실패, 기본 정보 사용:', userError);
-          return {
-            success: true,
-            data: {
-              id: 'unknown',
-              name: '사용자',
-              email: 'user@example.com',
-              provider: 'kakao',
-              isOnboardingCompleted: false,
-            } as UserInfo,
-            message: '토큰 검증 성공 (사용자 정보 미완성)',
-          };
         }
       } else {
         throw new Error('토큰이 유효하지 않습니다.');

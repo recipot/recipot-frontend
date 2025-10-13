@@ -14,7 +14,7 @@ GET {{baseUrl}}/v1/login/kakao/callback?code=D1c6GoR_GNV6IeVx-2v5KvdArnUTFIUZhr1
 GET {{baseUrl}}/v1/login/kakao/callback?code=IoNYV51NhGhPJdH2CqGA
 
 ### 2-3. 카카오 콜백 테스트 (최신 인가코드)
-GET {{baseUrl}}/v1/login/kakao/callback?code=rw2APNcIIE5Y44zkijG88d-kUQDSC87UjR1rIesrRgu6s89pwabqTwAAAAQKDQ1fAAABmdijl18tjdRiIM79qQ
+GET {{baseUrl}}/v1/login/kakao/callback?code=D2fqmcZ2YNIsEbZkGubnZG5DU0Ox1oqKrKlbx2GlL3eAiA9facx-zQAAAAQKFwtrAAABmd13AsbRDLJpR7eCqA
 
 ### 3. 토큰 검증 (인증 관리)
 POST {{baseUrl}}/v1/auth/verify

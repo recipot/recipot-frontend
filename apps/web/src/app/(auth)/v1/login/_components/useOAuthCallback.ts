@@ -90,7 +90,7 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
         setStatus('사용자 정보를 확인하는 중...');
 
         const userResponse = await authService.verifyToken(token);
-        if (!userResponse.success || !userResponse.data) {
+        if (!userResponse?.success || !userResponse?.data) {
           throw new Error('사용자 정보 조회 실패');
         }
 
@@ -103,6 +103,36 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
     [saveTokens, setupUser, handleError]
   );
 
+  // 백엔드에서 userId를 받아 토큰 정보 조회 (백엔드 방식)
+  const handleBackendUserId = useCallback(
+    async (userId: string) => {
+      try {
+        setStatus(
+          `${provider === 'google' ? '구글' : '카카오'} 로그인 정보를 가져오는 중...`
+        );
+
+        console.log(`${provider} 사용자 ID로 토큰 조회:`, userId);
+
+        const tokenData = await authService.getTokenByUserId(Number(userId));
+
+        console.log(`${provider} 토큰 조회 완료:`, {
+          accessToken: `${tokenData.accessToken.substring(0, 20)}...`,
+          user: tokenData.user,
+        });
+
+        saveTokens(tokenData.accessToken, tokenData.refreshToken);
+        setupUser(tokenData.user);
+      } catch (error) {
+        handleError(
+          error,
+          `${provider === 'google' ? '구글' : '카카오'} 로그인 정보 조회 실패`
+        );
+      }
+    },
+    [provider, saveTokens, setupUser, handleError]
+  );
+
+  // 기존 인가코드 처리 (구글 등 다른 제공자용 유지)
   const handleAuthCode = useCallback(
     async (code: string) => {
       try {
@@ -118,35 +148,12 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
         const tokenData =
           provider === 'google'
             ? await authService.getTokenFromGoogleCallback(code)
-            : await authService.getTokenFromCallback(code);
+            : await authService.getTokenFromGoogleCallback(code);
 
         console.log(`${provider} 토큰 응답:`, tokenData);
 
-        // 백엔드 응답 구조에 따라 처리
-        if (tokenData.status === 200 && tokenData.data) {
-          const { data } = tokenData;
-          const accessToken = data.accessToken ?? data.access_token;
-          const refreshToken = data.refreshToken ?? data.refresh_token;
-          const user = data.user ??
-            data.userInfo ?? {
-              email: data.email,
-              id: data.userId,
-              isOnboardingCompleted: data.isOnboardingCompleted ?? false,
-              name: data.name ?? data.nickname,
-              provider,
-            };
-
-          console.log('추출된 토큰 정보:', {
-            accessToken: `${accessToken?.substring(0, 20)}...`,
-            user,
-          });
-
-          saveTokens(accessToken, refreshToken);
-          setupUser(user);
-        } else {
-          console.error('토큰 응답 형식 오류:', tokenData);
-          throw new Error('토큰 응답 형식이 올바르지 않습니다.');
-        }
+        saveTokens(tokenData.accessToken, tokenData.refreshToken);
+        setupUser(tokenData.user);
       } catch (error) {
         handleError(
           error,
@@ -160,6 +167,7 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
   useEffect(() => {
     const code = searchParams.get('code');
     const token = searchParams.get('token');
+    const userId = searchParams.get('userId');
     const error = searchParams.get('error');
 
     if (error) {
@@ -170,11 +178,20 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
       return;
     }
 
-    if (process.env.NODE_ENV === 'development' && token) {
-      // 백엔드에서 JWT 토큰을 쿼리 파라미터로 전달받는 경우 (테스트용)
+    if (userId) {
+      // 백엔드에서 userId를 받아 토큰 정보 조회 (백엔드 방식)
+      console.log(`${provider} 사용자 ID 수신:`, userId);
+      handleBackendUserId(userId);
+    } else if (token) {
+      // 백엔드에서 JWT 토큰을 쿼리 파라미터로 전달받는 경우 (직접 토큰 방식)
+      console.log(
+        `${provider} 백엔드 토큰 수신:`,
+        `${token.substring(0, 20)}...`
+      );
       handleTokenReceived(token);
     } else if (code) {
-      // OAuth에서 받은 인증 코드를 백엔드로 전달 (실제 플로우)
+      // OAuth에서 받은 인증 코드를 백엔드로 전달 (기존 방식 - 구글 등)
+      console.log(`${provider} 인가코드 수신:`, `${code.substring(0, 20)}...`);
       handleAuthCode(code);
     } else {
       setStatus(
@@ -185,6 +202,7 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
   }, [
     searchParams,
     handleAuthCode,
+    handleBackendUserId,
     handleTokenReceived,
     provider,
     navigateWithDelay,
