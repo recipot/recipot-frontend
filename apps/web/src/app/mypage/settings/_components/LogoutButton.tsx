@@ -19,7 +19,7 @@ export default function LogoutButton() {
       <footer className="p-4">
         <button
           onClick={() => setIsModalOpen(true)}
-          className="text-16 w-full text-center text-neutral-600 underline decoration-solid underline-offset-4"
+          className="text-16 w-full text-center text-[#ADB5BD] underline decoration-[#ADB5BD] decoration-solid underline-offset-4"
         >
           로그아웃
         </button>
