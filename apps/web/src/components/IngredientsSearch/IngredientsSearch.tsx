@@ -1,10 +1,15 @@
-import { useMemo, useState } from 'react';
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useState,
+} from 'react';
 import { Loader2, XIcon } from 'lucide-react';
 
 import { HighlightText } from '@/components/common/HighlightText';
 import { SearchInput } from '@/components/common/SearchInput';
 import { useFoodList } from '@/hooks/useFoodList';
-import { useSubmitSelectedFoods } from '@/hooks/useSubmitSelectedFoods';
 import { cn } from '@/lib/utils';
 import { useSelectedFoodsStore } from '@/stores/selectedFoodsStore';
 import type { Food } from '@/types/food.types';
@@ -12,12 +17,20 @@ import { filterByKoreanSearch } from '@/utils/koreanSearch';
 
 import { Button } from '../common/Button';
 
-export default function IngredientsSearch({
-  onSubmissionSuccess,
-}: {
-  onSubmissionSuccess: () => void;
-}) {
+export interface IngredientsSearchRef {
+  submitSelectedFoods: () => void;
+  getSelectedCount: () => number;
+  isSubmitting: boolean;
+}
+
+const IngredientsSearch = forwardRef<
+  IngredientsSearchRef,
+  {
+    onSelectionChange?: (count: number) => void;
+  }
+>(({ onSelectionChange }, ref) => {
   const [value, setValue] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // 서버에서 재료 목록 조회
   const { data: foodList = [], isLoading: isFoodListLoading } = useFoodList();
@@ -30,10 +43,6 @@ export default function IngredientsSearch({
     selectedFoodIds,
     toggleFood,
   } = useSelectedFoodsStore();
-
-  // 선택된 재료 전송 mutation
-  const { isPending: isSubmitting, mutate: submitSelectedFoods } =
-    useSubmitSelectedFoods();
 
   // 검색어에 따른 필터링된 재료 목록 계산
   const filteredFoodList: Food[] = useMemo(() => {
@@ -55,6 +64,29 @@ export default function IngredientsSearch({
       (food: Food | undefined): food is Food => food !== undefined
     );
   }, [selectedFoodIds, foodList]);
+
+  // 선택된 재료 개수 변경 시 부모에게 알림
+  useEffect(() => {
+    if (onSelectionChange) {
+      onSelectionChange(getSelectedCount());
+    }
+  }, [selectedFoodIds, onSelectionChange, getSelectedCount]);
+
+  // ref를 통해 외부에서 접근 가능한 메서드들 노출
+  useImperativeHandle(
+    ref,
+    () => ({
+      getSelectedCount: () => getSelectedCount(),
+      isSubmitting,
+      submitSelectedFoods: () => {
+        setIsSubmitting(true);
+        // 실제 제출 로직은 부모 컴포넌트에서 처리
+        console.info('선택된 재료 제출:', selectedFoodIds);
+        setIsSubmitting(false);
+      },
+    }),
+    [selectedFoodIds, getSelectedCount, isSubmitting]
+  );
 
   const StyleActive =
     'border-secondary-soft-green bg-secondary-light-green text-primary';
@@ -80,15 +112,6 @@ export default function IngredientsSearch({
     setValue('');
   };
 
-  const handleSubmitSelectedFoods = () => {
-    // 선택된 재료를 서버로 전송
-    submitSelectedFoods(selectedFoodIds, {
-      onSuccess: () => {
-        onSubmissionSuccess(); // 성공 시 부모 컴포넌트에 알림
-      },
-    });
-  };
-
   // 재료 목록 로딩 중
   if (isFoodListLoading) {
     return (
@@ -100,86 +123,74 @@ export default function IngredientsSearch({
   }
 
   return (
-    <>
-      <div className="relative p-8">
-        <SearchInput
-          value={value}
-          onChange={e => setValue(e.target.value)}
-          onClear={handleClearSearch}
-        />
+    <div className="relative p-8">
+      <SearchInput
+        value={value}
+        onChange={e => setValue(e.target.value)}
+        onClear={handleClearSearch}
+      />
 
-        {/* 검색된 재료 리스트 */}
-        {value && filteredFoodList.length > 0 && (
-          <div className="absolute top-[84px] left-0 grid w-full grid-cols-3 gap-3 bg-white px-8 py-5">
-            {filteredFoodList.map(food => (
-              <Button
-                key={food.id}
-                onClick={() => handleSelectedFood(food.id)}
-                variant="outline"
-                shape="square"
-                className={cn(
-                  'text-15sb h-10',
-                  isSelected(food.id) ? StyleActive : ''
-                )}
-              >
-                <HighlightText
-                  text={food.name}
-                  searchQuery={value}
-                  highlightClassName="text-primary font-bold"
-                />
-              </Button>
-            ))}
+      {/* 검색된 재료 리스트 */}
+      {value && filteredFoodList.length > 0 && (
+        <div className="absolute top-[84px] left-0 grid w-full grid-cols-3 gap-3 bg-white px-8 py-5">
+          {filteredFoodList.map(food => (
+            <Button
+              key={food.id}
+              onClick={() => handleSelectedFood(food.id)}
+              variant="outline"
+              shape="square"
+              className={cn(
+                'text-15sb h-10',
+                isSelected(food.id) ? StyleActive : ''
+              )}
+            >
+              <HighlightText
+                text={food.name}
+                searchQuery={value}
+                highlightClassName="text-primary font-bold"
+              />
+            </Button>
+          ))}
+        </div>
+      )}
+
+      {/* 선택한 재료 리스트 */}
+      <div>
+        {selectedFoodIds.length !== 0 && (
+          <div className="mt-5 mb-3 flex items-center justify-between">
+            <h3 className="text-15sb text-gray-600">내가 선택한 재료</h3>
+            <Button onClick={() => clearAllFoods()} variant="outline" size="sm">
+              전체 삭제
+            </Button>
           </div>
         )}
 
-        {/* 선택한 재료 리스트 */}
-        <div>
-          {selectedFoodIds.length !== 0 && (
-            <div className="mt-5 mb-3 flex items-center justify-between">
-              <h3 className="text-15sb text-gray-600">내가 선택한 재료</h3>
-              <Button
-                onClick={() => clearAllFoods()}
-                variant="outline"
-                size="sm"
+        <div className="flex flex-wrap gap-2">
+          {selectedFoods.length > 0 &&
+            selectedFoods.map((food: Food) => (
+              <span
+                key={food.id}
+                className={cn(
+                  'text-14b border-secondary-soft-green flex items-center justify-center gap-2 gap-x-1 rounded-[6px] border py-[3px] pr-2 pl-3',
+                  StyleActive
+                )}
               >
-                전체 삭제
-              </Button>
-            </div>
-          )}
-
-          <div className="flex flex-wrap gap-2">
-            {selectedFoods.length > 0 &&
-              selectedFoods.map((food: Food) => (
-                <span
-                  key={food.id}
-                  className={cn(
-                    'text-14b border-secondary-soft-green flex items-center justify-center gap-2 gap-x-1 rounded-[6px] border py-[3px] pr-2 pl-3',
-                    StyleActive
-                  )}
+                {food.name}
+                <button
+                  type="button"
+                  aria-label={`${food.name} 삭제`}
+                  onClick={() => handleSelectedFoodRemove(food.id)}
                 >
-                  {food.name}
-                  <button
-                    type="button"
-                    aria-label={`${food.name} 삭제`}
-                    onClick={() => handleSelectedFoodRemove(food.id)}
-                  >
-                    <XIcon size={12} />
-                  </button>
-                </span>
-              ))}
-          </div>
+                  <XIcon size={12} />
+                </button>
+              </span>
+            ))}
         </div>
       </div>
-      <div className="absolute bottom-8 flex w-full justify-center py-[10px]">
-        <Button
-          onClick={handleSubmitSelectedFoods}
-          disabled={getSelectedCount() < 2 || isSubmitting}
-          className="relative"
-        >
-          {isSubmitting && <Loader2 className="mr-2 animate-spin" size={16} />}
-          여유에 맞는 요리 추천받기
-        </Button>
-      </div>
-    </>
+    </div>
   );
-}
+});
+
+IngredientsSearch.displayName = 'IngredientsSearch';
+
+export default IngredientsSearch;

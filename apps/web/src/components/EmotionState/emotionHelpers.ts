@@ -135,5 +135,5 @@ export const getIconColor = (
         : 'rgba(234, 179, 8, 0.3)',
   };
 
-  return opacityColors[color] || '#9CA3AF';
+  return opacityColors[color] || '#E8FFD0';
 };

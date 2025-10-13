@@ -57,17 +57,17 @@ describe('Allergy.integration', () => {
       <TestWrapper formId="test-form" onSubmit={mockOnSubmit} />
     );
 
-    // '어류'(id:1), '게'(id:2) 클릭
-    const fishButton = screen.getByRole('button', { name: '어류' });
-    const crabButton = screen.getByRole('button', { name: '게' });
+    // '참치'(id:1), '고등어'(id:2) 클릭
+    const tunaButton = screen.getByRole('button', { name: '참치' });
+    const mackerelButton = screen.getByRole('button', { name: '고등어' });
 
-    await user.click(fishButton);
-    await user.click(crabButton);
+    await user.click(tunaButton);
+    await user.click(mackerelButton);
 
     // 참고: AllergyCheckItem.tsx의 활성 상태 스타일은 'bg-secondary-light-green'을 포함합니다.
     // 다른 테스트 파일에서는 'border-primary-pressed'를 확인하고 있어 불일치가 있을 수 있습니다.
-    expect(fishButton).toHaveClass('bg-secondary-light-green');
-    expect(crabButton).toHaveClass('bg-secondary-light-green');
+    expect(tunaButton).toHaveClass('bg-secondary-light-green');
+    expect(mackerelButton).toHaveClass('bg-secondary-light-green');
 
     // 폼 제출
     const form = screen.getByRole('form', { name: '알레르기 선택 양식' });
@@ -84,14 +84,14 @@ describe('Allergy.integration', () => {
       <TestWrapper formId="test-form" onSubmit={mockOnSubmit} />
     );
 
-    const fishButton = screen.getByRole('button', { name: '어류' });
+    const tunaButton = screen.getByRole('button', { name: '참치' });
 
     // 선택했다가 해제
-    await user.click(fishButton);
-    expect(fishButton).toHaveClass('bg-secondary-light-green');
+    await user.click(tunaButton);
+    expect(tunaButton).toHaveClass('bg-secondary-light-green');
 
-    await user.click(fishButton);
-    expect(fishButton).not.toHaveClass('bg-secondary-light-green');
+    await user.click(tunaButton);
+    expect(tunaButton).not.toHaveClass('bg-secondary-light-green');
 
     // 폼 제출
     const form = screen.getByRole('form', { name: '알레르기 선택 양식' });
