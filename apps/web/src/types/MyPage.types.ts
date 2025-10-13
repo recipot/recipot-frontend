@@ -36,6 +36,7 @@ export type configType = {
   themeColor: string;
   title: string;
   titleColor: string;
+  noneBackImage: string;
 };
 
 export interface DefaultRecipeListProps {
