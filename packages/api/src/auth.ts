@@ -152,12 +152,51 @@ export const authService = {
   // 카카오 로그인 URL 생성
   async getKakaoLoginUrl() {
     try {
-      const response = await authApi.get('/v1/login/kakao');
+      // 프론트엔드 redirect_uri를 백엔드에 전달
+      const frontendRedirectUri = `${window.location.origin}/v1/login/kakao/callback`;
+
+      const response = await authApi.get('/v1/login/kakao', {
+        params: {
+          redirect_uri: frontendRedirectUri,
+        },
+      });
       console.log('카카오 로그인 URL 생성 성공:', response.data);
+      console.log('사용된 redirect_uri:', frontendRedirectUri);
 
       // 실제 백엔드 응답: { status: 200, data: "https://kauth.kakao.com/oauth/authorize?..." }
       if (response.data.status === 200 && response.data.data) {
-        return response.data.data;
+        let kakaoUrl = response.data.data;
+
+        // 임시 해결책: 백엔드에서 잘못된 redirect_uri를 사용하는 경우 프론트엔드에서 수정
+        const backendRedirectPattern =
+          /redirect_uri=http%3A%2F%2F3\.34\.40\.123%2Fv1%2Flogin%2Fkakao%2Fcallback/;
+        const backendRedirectPatternPlain =
+          'redirect_uri=http://3.34.40.123/v1/login/kakao/callback';
+
+        if (
+          kakaoUrl.includes('redirect_uri=http%3A%2F%2F3.34.40.123') ||
+          kakaoUrl.includes('redirect_uri=http://3.34.40.123')
+        ) {
+          console.warn(
+            '백엔드에서 잘못된 redirect_uri를 사용하고 있습니다. 프론트엔드에서 수정합니다.'
+          );
+          console.log('원본 카카오 URL:', kakaoUrl);
+
+          // URL 인코딩된 버전과 일반 버전 모두 처리
+          kakaoUrl = kakaoUrl
+            .replace(
+              backendRedirectPattern,
+              `redirect_uri=${encodeURIComponent(frontendRedirectUri)}`
+            )
+            .replace(
+              backendRedirectPatternPlain,
+              `redirect_uri=${encodeURIComponent(frontendRedirectUri)}`
+            );
+
+          console.log('수정된 카카오 URL:', kakaoUrl);
+        }
+
+        return kakaoUrl;
       } else {
         throw new Error('카카오 로그인 URL 형식이 올바르지 않습니다.');
       }
@@ -170,40 +209,31 @@ export const authService = {
   },
 
   // 카카오 콜백에서 토큰 받기 (GET 요청)
-  async getTokenFromCallback(code: string): Promise<{
-    accessToken: string;
-    refreshToken: string;
-    expiresIn: number;
-    user: UserInfo;
-  }> {
+  async getTokenFromCallback(code: string) {
     try {
+      console.log('카카오 콜백 API 호출 시작:', {
+        code: code.substring(0, 20) + '...', // 보안을 위해 일부만 로깅
+        codeLength: code.length,
+        url: `/v1/login/kakao/callback?code=${code.substring(0, 20)}...`,
+        timestamp: new Date().toISOString(),
+      });
+
       const response = await authApi.get(
         `/v1/login/kakao/callback?code=${code}`
       );
 
-      console.log('카카오 콜백 응답:', response.data);
-
-      // 실제 백엔드 응답 구조에 맞춰 처리
-      if (response.data.status === 200 && response.data.data) {
-        const data = response.data.data;
-        return {
-          accessToken: data.accessToken || data.access_token,
-          refreshToken: data.refreshToken || data.refresh_token,
-          expiresIn: data.expiresIn || data.expires_in || 3600,
-          user: data.user ||
-            data.userInfo || {
-              id: data.userId,
-              name: data.name || data.nickname,
-              email: data.email,
-              provider: 'kakao',
-              isOnboardingCompleted: data.isOnboardingCompleted || false,
-            },
-        };
-      } else {
-        throw new Error('카카오 콜백 응답 형식이 올바르지 않습니다.');
-      }
+      console.log('카카오 콜백 응답 성공:', response.data);
+      return response.data;
     } catch (error) {
-      throw new Error('카카오 로그인 처리에 실패했습니다.');
+      console.error('카카오 콜백 API 호출 실패:', {
+        error: error,
+        response: error.response?.data,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        message: error.message,
+        url: error.config?.url,
+      });
+      throw new Error('카카오 로그인 처리에 실패했습니다.', { cause: error });
     }
   },
 

@@ -10,11 +10,11 @@ import type { UserInfo } from '@recipot/types';
  * @param isOnboardingCompleted - 온보딩 완료 상태 (boolean | undefined)
  * @returns true인 경우에만 true, 그 외 모든 경우 false
  */
-const isOnboardingComplete = (
-  isOnboardingCompleted: boolean | undefined
-): boolean => {
-  return isOnboardingCompleted === true;
-};
+// const isOnboardingComplete = (
+//   isOnboardingCompleted: boolean | undefined
+// ): boolean => {
+//   return isOnboardingCompleted === true;
+// };
 
 export type OAuthProvider = 'google' | 'kakao';
 
@@ -34,12 +34,12 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
   const navigateWithDelay = useCallback(
     (delay: number = 1000) => {
       setTimeout(() => {
+        router.push('/');
         // 사용자 정보가 설정된 후 온보딩 상태에 따라 리다이렉트
-        if (isOnboardingComplete(user?.isOnboardingCompleted)) {
-          router.push('/');
-        } else {
-          router.push('/onboarding');
-        }
+        // if (isOnboardingComplete(user?.isOnboardingCompleted)) {
+        // } else {
+        //   router.push('/onboarding');
+        // }
       }, delay);
     },
     [router, user]
@@ -61,13 +61,13 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
     (user: UserInfo) => {
       setUser(user);
       // 사용자 정보 설정 후 온보딩 상태에 따라 리다이렉트
-      setTimeout(() => {
-        if (isOnboardingComplete(user.isOnboardingCompleted)) {
-          router.push('/');
-        } else {
-          router.push('/onboarding');
-        }
-      }, 1000);
+      router.push('/');
+      // setTimeout(() => {
+      //   if (isOnboardingComplete(user.isOnboardingCompleted)) {
+      //   } else {
+      //     router.push('/onboarding');
+      //   }
+      // }, 1000);
     },
     [setUser, router]
   );
@@ -110,14 +110,43 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
           `${provider === 'google' ? '구글' : '카카오'} 인증을 처리하는 중...`
         );
 
+        console.log(
+          `${provider} 인증 코드로 토큰 요청:`,
+          `${code.substring(0, 20)}...`
+        );
+
         const tokenData =
           provider === 'google'
             ? await authService.getTokenFromGoogleCallback(code)
             : await authService.getTokenFromCallback(code);
 
-        const { accessToken, refreshToken, user } = tokenData;
-        saveTokens(accessToken, refreshToken);
-        setupUser(user);
+        console.log(`${provider} 토큰 응답:`, tokenData);
+
+        // 백엔드 응답 구조에 따라 처리
+        if (tokenData.status === 200 && tokenData.data) {
+          const { data } = tokenData;
+          const accessToken = data.accessToken ?? data.access_token;
+          const refreshToken = data.refreshToken ?? data.refresh_token;
+          const user = data.user ??
+            data.userInfo ?? {
+              email: data.email,
+              id: data.userId,
+              isOnboardingCompleted: data.isOnboardingCompleted ?? false,
+              name: data.name ?? data.nickname,
+              provider,
+            };
+
+          console.log('추출된 토큰 정보:', {
+            accessToken: `${accessToken?.substring(0, 20)}...`,
+            user,
+          });
+
+          saveTokens(accessToken, refreshToken);
+          setupUser(user);
+        } else {
+          console.error('토큰 응답 형식 오류:', tokenData);
+          throw new Error('토큰 응답 형식이 올바르지 않습니다.');
+        }
       } catch (error) {
         handleError(
           error,

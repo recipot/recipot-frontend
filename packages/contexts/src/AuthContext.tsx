@@ -69,10 +69,10 @@ export function AuthProvider({ children }: { children: any }) {
     try {
       // 카카오 로그인 URL 생성
       const kakaoUrl = await authService.getKakaoLoginUrl();
-      console.log('kakaoUrl', kakaoUrl.data);
+      console.log('kakaoUrl', kakaoUrl);
 
       // 카카오 인증 페이지로 리디렉션
-      window.location.href = kakaoUrl.data;
+      window.location.href = kakaoUrl;
     } catch (error) {
       console.error('카카오 로그인 URL 생성 실패:', error);
     }
