@@ -29,11 +29,11 @@ export default function LogoutButton() {
         open={isModalOpen}
         onOpenChange={setIsModalOpen}
         description={
-          <>
+          <span className="block text-left">
             정말로 로그아웃 하시겠습니까?
             <br />
             로그아웃 후, 서비스 이용 시 재로그인이 필요합니다.
-          </>
+          </span>
         }
       >
         <div className="flex items-center justify-end gap-[0.375rem]">
