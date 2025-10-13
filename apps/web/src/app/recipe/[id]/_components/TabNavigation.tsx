@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 
 import {
   CookOrderIcon,
@@ -32,6 +33,11 @@ export function TabNavigation({
     { icon: CookOrderIcon, id: 'steps', label: '조리순서' },
   ];
 
+  const handleTabClick = (tabId: TabId, e: React.MouseEvent) => {
+    e.preventDefault();
+    onTabClick(tabId);
+  };
+
   return (
     <div
       ref={tabContainerRef}
@@ -41,9 +47,11 @@ export function TabNavigation({
         {tabs.map(tab => {
           const IconComponent = tab.icon;
           return (
-            <button
+            <Link
               key={tab.id}
-              onClick={() => onTabClick(tab.id)}
+              href={`#${tab.id}`}
+              scroll={false}
+              onClick={e => handleTabClick(tab.id, e)}
               className={`flex items-center space-x-2 rounded-[100px] px-3 py-[9px] transition-all duration-200 ${
                 activeTab === tab.id
                   ? 'bg-gray-900 text-white'
@@ -56,7 +64,7 @@ export function TabNavigation({
                 color={activeTab === tab.id ? '#ffffff' : '#6B7280'}
               />
               <p className="text-15">{tab.label}</p>
-            </button>
+            </Link>
           );
         })}
       </div>

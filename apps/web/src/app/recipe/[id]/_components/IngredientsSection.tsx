@@ -33,7 +33,12 @@ export function IngredientsSection({
     setActiveTab(activeTab === tabId ? null : tabId);
   };
   return (
-    <div ref={ingredientsRef} data-section="ingredients" className="space-y-4">
+    <div
+      ref={ingredientsRef}
+      id="ingredients"
+      data-section="ingredients"
+      className="space-y-4"
+    >
       {/* Ingredients */}
       <div className="rounded-2xl bg-white p-4">
         <div className="mb-4 flex items-center justify-between">

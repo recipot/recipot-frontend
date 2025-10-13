@@ -16,6 +16,7 @@ export function CookwareSection({
   return (
     <div
       ref={cookwareRef}
+      id="cookware"
       data-section="cookware"
       className="mt-6 rounded-2xl bg-white p-6"
     >

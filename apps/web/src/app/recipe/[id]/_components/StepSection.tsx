@@ -11,6 +11,7 @@ export function StepSection({ steps, stepsRef }: StepSectionProps) {
   return (
     <div
       ref={stepsRef}
+      id="steps"
       data-section="steps"
       className="mt-6 rounded-2xl bg-white p-6"
     >
