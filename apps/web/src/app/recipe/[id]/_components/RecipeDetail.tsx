@@ -1,7 +1,5 @@
 'use client';
 
-import './RecipeDetail.css';
-
 import React, { useMemo, useRef } from 'react';
 
 import { Button } from '@/components/common/Button';
@@ -75,8 +73,8 @@ export function RecipeDetail({ recipe }: RecipeDetailProps) {
         />
 
         <div className="px-4 pb-24">
-          <div className="bg-secondary-light-green border-secondary-soft-green my-4 rounded-2xl border-[1px] p-5">
-            <p className="recipe-description text-15sb leading-relaxed">
+          <div className="bg-secondary-light-green border-secondary-soft-green my-4 rounded-2xl border-[1px] px-5 py-4">
+            <p className="text-15sb text-primary-pressed">
               {recipe.description}
             </p>
           </div>
