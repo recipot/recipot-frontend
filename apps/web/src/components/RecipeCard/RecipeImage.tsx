@@ -15,10 +15,7 @@ interface RecipeImageProps {
 export const RecipeImage = memo(
   ({ index, isMainCard, recipe }: RecipeImageProps) => {
     return (
-      <div
-        className="relative h-full w-full"
-        style={getBackgroundColor(index)}
-      >
+      <div className="relative h-full w-full" style={getBackgroundColor(index)}>
         <Image
           src={recipe.image}
           alt={recipe.title}
