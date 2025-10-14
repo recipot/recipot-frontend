@@ -4,17 +4,11 @@ import type { CookingStep } from '../types/recipe.types';
 
 interface StepSectionProps {
   steps: CookingStep[];
-  stepsRef: React.RefObject<HTMLDivElement>;
 }
 
-export function StepSection({ steps, stepsRef }: StepSectionProps) {
+export function StepSection({ steps }: StepSectionProps) {
   return (
-    <div
-      ref={stepsRef}
-      id="steps"
-      data-section="steps"
-      className="mt-6 rounded-2xl bg-white p-6"
-    >
+    <div id="steps" className="mt-6 rounded-2xl bg-white p-6">
       <h3 className="text-17sb mb-4 text-gray-900">요리순서</h3>
       <div className="space-y-6">
         {steps?.map(step => (

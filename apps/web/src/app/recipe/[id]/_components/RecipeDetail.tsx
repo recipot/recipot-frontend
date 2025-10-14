@@ -6,7 +6,7 @@ import axios from 'axios';
 
 import { Button } from '@/components/common/Button';
 import { CookIcon } from '@/components/Icons';
-import { useIntersectionScrollSpy } from '@/hooks/useIntersectionScrollSpy';
+import { useScrollSpy } from '@/hooks/useScrollSpy';
 
 import CookwareSection from './CookwareSection';
 import IngredientsSection from './IngredientsSection';
@@ -17,15 +17,7 @@ import TabNavigation from './TabNavigation';
 import type { ApiResponse, TabId } from '../types/recipe.types';
 
 export function RecipeDetail({ recipeId }: { recipeId: string }) {
-  const ingredientsRef = useRef<HTMLDivElement>(null);
-  const cookwareRef = useRef<HTMLDivElement>(null);
-  const stepsRef = useRef<HTMLDivElement>(null);
   const tabContainerRef = useRef<HTMLDivElement>(null);
-
-  const sectionRefs = useMemo(
-    () => [ingredientsRef, cookwareRef, stepsRef],
-    []
-  );
 
   const [error] = useState<string | null>(null);
 
@@ -62,34 +54,62 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
 
   const recipeData = recipeResponse?.data;
 
-  const { activeSection: activeTab, setActiveSection } =
-    useIntersectionScrollSpy({
-      initialState: 'ingredients',
-      rootRef: tabContainerRef,
-      sectionRefs,
-    });
+  // 섹션 ID 배열 생성
+  const sectionIds = useMemo(() => ['ingredients', 'cookware', 'steps'], []);
 
-  const handleTabClick = (tabId: TabId) => {
-    setActiveSection(tabId);
+  const { gnbRef } = useScrollSpy(sectionIds, {
+    offset: 80, // 탭 높이 + 여유공간
+  });
 
-    let targetRef: React.RefObject<HTMLDivElement> | null = null;
+  const [activeTab, setActiveTab] = useState<TabId>('ingredients');
 
-    switch (tabId) {
-      case 'ingredients':
-        targetRef = ingredientsRef;
-        break;
-      case 'cookware':
-        targetRef = cookwareRef;
-        break;
-      case 'steps':
-        targetRef = stepsRef;
-        break;
-    }
+  // 커스텀 스크롤 감지 로직
+  useEffect(() => {
+    const handleScroll = () => {
+      const tabHeight = tabContainerRef.current?.offsetHeight ?? 80;
+      const viewportCenter = window.innerHeight / 2;
 
-    if (targetRef?.current && tabContainerRef.current) {
-      // 탭 컨테이너 높이를 고려한 정확한 스크롤
+      // 페이지 끝에 도달했을 때 마지막 섹션 활성화
+      const isAtBottom =
+        window.innerHeight + window.scrollY >= document.body.offsetHeight - 2;
+
+      if (isAtBottom) {
+        setActiveTab(sectionIds[sectionIds.length - 1] as TabId);
+        return;
+      }
+
+      let closestSection = 'ingredients';
+      let minDistance = Infinity;
+
+      sectionIds.forEach(sectionId => {
+        const element = document.getElementById(sectionId);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          const sectionMiddle = rect.top + rect.height / 2;
+          const distance = Math.abs(sectionMiddle - viewportCenter);
+
+          if (distance < minDistance && rect.bottom > tabHeight) {
+            minDistance = distance;
+            closestSection = sectionId;
+          }
+        }
+      });
+
+      setActiveTab(closestSection as TabId);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [sectionIds]);
+
+  const handleTabClick = (tabId: TabId, e: React.MouseEvent) => {
+    e.preventDefault();
+
+    const targetElement = document.getElementById(tabId);
+    if (targetElement && tabContainerRef.current) {
       const tabHeight = tabContainerRef.current.offsetHeight;
-      const elementTop = targetRef.current.offsetTop - tabHeight - 20;
+      const elementTop = targetElement.offsetTop - tabHeight - 20;
 
       window.scrollTo({
         behavior: 'smooth',
@@ -143,7 +163,8 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
         <RecipeHeader recipe={recipeData} />
 
         <TabNavigation
-          activeTab={activeTab as TabId}
+          activeTab={activeTab}
+          gnbRef={gnbRef}
           onTabClick={handleTabClick}
           tabContainerRef={tabContainerRef}
         />
@@ -158,15 +179,11 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
           <IngredientsSection
             ingredients={recipeData.ingredients}
             seasonings={recipeData?.seasonings}
-            ingredientsRef={ingredientsRef}
           />
 
-          <CookwareSection
-            cookware={recipeData?.tools}
-            cookwareRef={cookwareRef}
-          />
+          <CookwareSection cookware={recipeData?.tools} />
 
-          <StepSection steps={recipeData?.steps} stepsRef={stepsRef} />
+          <StepSection steps={recipeData?.steps} />
         </div>
 
         <div className="fixed right-0 bottom-0 left-0 flex justify-center">

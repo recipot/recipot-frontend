@@ -14,12 +14,10 @@ import type { IngredientsGroup, Seasoning } from '../types/recipe.types';
 interface IngredientsSectionProps {
   ingredients: IngredientsGroup;
   seasonings: Seasoning[];
-  ingredientsRef: React.RefObject<HTMLDivElement>;
 }
 
 export function IngredientsSection({
   ingredients,
-  ingredientsRef,
   seasonings,
 }: IngredientsSectionProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -33,12 +31,7 @@ export function IngredientsSection({
     setActiveTab(activeTab === tabId ? null : tabId);
   };
   return (
-    <div
-      ref={ingredientsRef}
-      id="ingredients"
-      data-section="ingredients"
-      className="space-y-4"
-    >
+    <div id="ingredients" className="space-y-4">
       {/* Ingredients */}
       <div className="rounded-2xl bg-white p-4">
         <div className="mb-4 flex items-center justify-between">

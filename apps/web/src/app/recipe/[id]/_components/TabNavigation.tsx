@@ -18,12 +18,14 @@ interface Tab {
 
 interface TabNavigationProps {
   activeTab: TabId;
-  onTabClick: (tabId: TabId) => void;
+  gnbRef?: React.RefObject<HTMLUListElement>;
+  onTabClick: (tabId: TabId, e: React.MouseEvent) => void;
   tabContainerRef: React.RefObject<HTMLDivElement>;
 }
 
 export function TabNavigation({
   activeTab,
+  gnbRef,
   onTabClick,
   tabContainerRef,
 }: TabNavigationProps) {
@@ -35,7 +37,7 @@ export function TabNavigation({
 
   const handleTabClick = (tabId: TabId, e: React.MouseEvent) => {
     e.preventDefault();
-    onTabClick(tabId);
+    onTabClick(tabId, e);
   };
 
   return (
@@ -43,15 +45,15 @@ export function TabNavigation({
       ref={tabContainerRef}
       className="sticky top-0 z-10 bg-gray-100 px-4 py-3"
     >
-      <div className="flex space-x-1">
+      <ul ref={gnbRef} className="flex space-x-1">
         {tabs.map(tab => {
           const IconComponent = tab.icon;
           return (
             <Link
               key={tab.id}
               href={`#${tab.id}`}
-              scroll={false}
               onClick={e => handleTabClick(tab.id, e)}
+              data-section-id={tab.id}
               className={`flex items-center space-x-2 rounded-[100px] px-3 py-[9px] transition-all duration-200 ${
                 activeTab === tab.id
                   ? 'bg-gray-900 text-white'
@@ -67,7 +69,7 @@ export function TabNavigation({
             </Link>
           );
         })}
-      </div>
+      </ul>
     </div>
   );
 }
