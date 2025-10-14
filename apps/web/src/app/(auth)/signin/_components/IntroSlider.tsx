@@ -3,7 +3,7 @@
 import 'swiper/css';
 import 'swiper/css/pagination';
 
-import { useEffect, useMemo, useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import Image from 'next/image';
 import { Autoplay, Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -51,23 +51,6 @@ export function IntroSlider({
     }),
     []
   );
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (swiperRef.current && paginationRef.current) {
-        // Swiper 페이지네이션 강제 업데이트
-        try {
-          swiperRef.current.pagination.init();
-          swiperRef.current.pagination.render();
-          swiperRef.current.pagination.update();
-        } catch (error) {
-          console.warn('Pagination update failed:', error);
-        }
-      }
-    }, 100);
-
-    return () => clearTimeout(timer);
-  }, []);
 
   return (
     <div className="relative h-screen pb-[calc(128px+env(safe-area-inset-bottom))]">
