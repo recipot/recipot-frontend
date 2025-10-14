@@ -2,8 +2,9 @@ import React from 'react';
 import Image from 'next/image';
 
 import type { Recipe } from '@/types/recipe.types';
+
 import { CARD_DIMENSIONS } from './constants';
-import { getBackgroundStyle } from './utils';
+import { getBackgroundColor } from './utils';
 
 interface RecipeImageProps {
   index: number;
@@ -28,7 +29,5 @@ export const RecipeImage = ({
     );
   }
 
-  return <div className="h-full w-full" style={getBackgroundStyle(index)} />;
+  return <div className="h-full w-full" style={getBackgroundColor(index)} />;
 };
-
-

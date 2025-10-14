@@ -1,10 +1,5 @@
-export const getBackgroundColor = (index: number): string => {
-  const opacity = index % 2 === 0 ? 0.15 : 0.3;
-  return `rgba(79, 112, 181, ${opacity})`;
-};
-
-export const getBackgroundStyle = (index: number) => ({
-  backgroundColor: getBackgroundColor(index),
+export const getBackgroundColor = (index: number) => ({
+  backgroundColor: `rgba(79, 112, 181, ${index % 2 === 0 ? 0.15 : 0.3})`,
 });
 
 // 헬퍼 함수들
