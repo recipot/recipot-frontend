@@ -56,16 +56,18 @@ Content-Type: application/json
 }
 
 ### 9. 서버 상태 확인 (기본 테스트)
-GET {{baseUrl}}/
-
-### 10. Health Check (존재할 수도 있는 엔드포인트)
 GET {{baseUrl}}/v1/health
 
-### 11. 재료 목록 조회
+
+### 10. 재료 목록 조회
 GET {{baseUrl}}/v1/ingredients
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwicm9sZSI6IlUwMTAwMSIsInR5cGUiOiJhY2Nlc3MiLCJpYXQiOjE3NjA0NDc1NDQsImV4cCI6MTc2MDQ1MTE0NH0.eQexluHfa7Fu5ke7_vQSy8kVk9UPh6H0jktS9pwR9Kk
 
 
-### 12. 재료 카테고리 관리자 목록 조회
+### 11. 재료 카테고리 관리자 목록 조회
 GET {{baseUrl}}/v1/ingredients/admin/categories?page=1&limit=10
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwicm9sZSI6IlUwMTAwMSIsInR5cGUiOiJhY2Nlc3MiLCJpYXQiOjE3NjA0NDc1NDQsImV4cCI6MTc2MDQ1MTE0NH0.eQexluHfa7Fu5ke7_vQSy8kVk9UPh6H0jktS9pwR9Kk
+
+### 12. 컨디션 조회
+GET {{baseUrl}}/v1/conditions
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwicm9sZSI6IlUwMTAwMSIsInR5cGUiOiJhY2Nlc3MiLCJpYXQiOjE3NjA0NDc1NDQsImV4cCI6MTc2MDQ1MTE0NH0.eQexluHfa7Fu5ke7_vQSy8kVk9UPh6H0jktS9pwR9Kk
