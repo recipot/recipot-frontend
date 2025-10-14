@@ -1,6 +1,8 @@
 'use client';
 
-import React, { useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
 
 import { Button } from '@/components/common/Button';
 import { CookIcon } from '@/components/Icons';
@@ -9,13 +11,12 @@ import { useIntersectionScrollSpy } from '@/hooks/useIntersectionScrollSpy';
 import CookwareSection from './CookwareSection';
 import IngredientsSection from './IngredientsSection';
 import RecipeHeader from './RecipeHeader';
-import RelatedRecipes from './RelatedRecipes';
 import StepSection from './StepSection';
 import TabNavigation from './TabNavigation';
 
-import type { RecipeDetailProps, TabId } from '../types/recipe.types';
+import type { TabId } from '../types/recipe.types';
 
-export function RecipeDetail({ recipe }: RecipeDetailProps) {
+export function RecipeDetail({ recipeId }: { recipeId: string }) {
   const ingredientsRef = useRef<HTMLDivElement>(null);
   const cookwareRef = useRef<HTMLDivElement>(null);
   const stepsRef = useRef<HTMLDivElement>(null);
@@ -25,6 +26,33 @@ export function RecipeDetail({ recipe }: RecipeDetailProps) {
     () => [ingredientsRef, cookwareRef, stepsRef],
     []
   );
+
+  const [error] = useState<string | null>(null);
+
+  const [token, setToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    const getAccessToken = async () => {
+      const { data } = await axios.post('http://3.34.40.123/v1/auth/debug', {
+        role: 'U01001',
+        userId: '1',
+      });
+      // console.log(data.data.accessToken, 'getToken');
+      setToken(data.data.accessToken);
+    };
+    getAccessToken();
+  }, []);
+
+  const { data: recipeResponse, isLoading } = useQuery({
+    enabled: !!token, // 토큰이 있을 때만 쿼리 실행
+    queryFn: () =>
+      axios.get(`http://3.34.40.123/v1/recipes/${recipeId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+    queryKey: ['recipe', recipeId],
+  });
+
+  const recipeData = recipeResponse?.data.data;
 
   const { activeSection: activeTab, setActiveSection } =
     useIntersectionScrollSpy({
@@ -61,10 +89,50 @@ export function RecipeDetail({ recipe }: RecipeDetailProps) {
       });
     }
   };
+
+  if (isLoading || !token) {
+    return (
+      <div className="flex min-h-screen w-full items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="border-primary mb-4 h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" />
+          <p className="text-gray-600">레시피를 불러오는 중...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex min-h-screen w-full items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <p className="mb-4 text-red-600">{error}</p>
+          <Button
+            variant="default"
+            onClick={() => window.location.reload()}
+            className="bg-primary px-4 py-2"
+          >
+            다시 시도
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!recipeData) {
+    return (
+      <div className="flex min-h-screen w-full items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="border-primary mb-4 h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" />
+          <p className="text-gray-600">레시피를 불러오는 중...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex min-h-screen w-full justify-center bg-gray-50">
       <div className="w-[390px] bg-gray-50">
-        <RecipeHeader recipe={recipe} />
+        <RecipeHeader recipe={recipeData} />
 
         <TabNavigation
           activeTab={activeTab as TabId}
@@ -75,24 +143,22 @@ export function RecipeDetail({ recipe }: RecipeDetailProps) {
         <div className="px-4 pb-24">
           <div className="bg-secondary-light-green border-secondary-soft-green my-4 rounded-2xl border-[1px] px-5 py-4">
             <p className="text-15sb text-primary-pressed">
-              {recipe.description}
+              {recipeData?.description}
             </p>
           </div>
 
           <IngredientsSection
-            ingredients={recipe.ingredients}
-            seasonings={recipe.seasonings}
+            ingredients={recipeData.ingredients}
+            seasonings={recipeData?.seasonings}
             ingredientsRef={ingredientsRef}
           />
 
           <CookwareSection
-            cookware={recipe.cookware}
+            cookware={recipeData?.tools}
             cookwareRef={cookwareRef}
           />
 
-          <StepSection steps={recipe.steps} stepsRef={stepsRef} />
-
-          <RelatedRecipes relatedRecipes={recipe.relatedRecipes} />
+          <StepSection steps={recipeData?.steps} stepsRef={stepsRef} />
         </div>
 
         <div className="fixed right-0 bottom-0 left-0 flex justify-center">

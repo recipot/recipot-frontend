@@ -9,13 +9,13 @@ interface SeasoningListProps {
 }
 
 export function SeasoningList({ seasonings }: SeasoningListProps) {
-  if (seasonings.length === 0) {
+  if (seasonings?.length === 0) {
     return null;
   }
 
   return (
     <div className="w-full space-y-0 rounded-xl bg-gray-50 px-4 py-5">
-      {seasonings.map((seasoning, index) => (
+      {seasonings?.map((seasoning, index) => (
         <div className="flex items-center py-3" key={index}>
           <div className="flex min-w-0 flex-shrink-0 items-center">
             <PowderIcon />

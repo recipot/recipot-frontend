@@ -1,23 +1,36 @@
 export interface Ingredient {
-  id: string;
+  id: number;
   name: string;
   amount: string;
-  status: 'owned' | 'substitutable' | 'required';
-  substitutes?: string;
+  isAlternative: boolean;
 }
 
 export interface Seasoning {
+  id: number;
   name: string;
   amount: string;
 }
 
 export interface Cookware {
+  id: number;
   name: string;
+  imageUrl: string;
 }
 
 export interface CookingStep {
-  step: number;
   description: string;
+  orderNum: number;
+  step: number;
+  summary: string;
+}
+
+export interface HealthPoint {
+  content: string;
+}
+
+export interface Condition {
+  id: number;
+  name: string;
 }
 
 export interface RecipeCard {
@@ -27,19 +40,27 @@ export interface RecipeCard {
   image: string;
 }
 
+export interface IngredientsGroup {
+  owned: Ingredient[];
+  notOwned: Ingredient[];
+  alternativeUnavailable: Ingredient[];
+}
+
 export interface Recipe {
-  id: string;
+  id: number;
   title: string;
-  subtitle: string;
-  image: string;
-  time: string;
-  difficulty: string;
   description: string;
-  ingredients: Ingredient[];
+  duration: string;
+  condition: Condition;
+  images: {
+    id: number;
+    imageUrl: string;
+  }[];
+  ingredients: IngredientsGroup;
   seasonings: Seasoning[];
-  cookware: Cookware[];
+  tools: Cookware[];
   steps: CookingStep[];
-  relatedRecipes: RecipeCard[];
+  healthPoints: HealthPoint[];
 }
 
 export interface RecipeDetailProps {

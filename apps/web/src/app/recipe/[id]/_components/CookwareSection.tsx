@@ -22,10 +22,10 @@ export function CookwareSection({
     >
       <div className="mb-4 flex items-center">
         <h3 className="text-17 mr-1 text-gray-900">조리도구</h3>
-        <span className="text-18sb text-primary">{cookware.length}</span>
+        <span className="text-18sb text-primary">{cookware?.length}</span>
       </div>
       <div className="grid grid-cols-3 gap-4">
-        {cookware.map((item, index) => (
+        {cookware?.map((item, index) => (
           <div key={index} className="flex flex-col items-center">
             <CookWareTransparentIcon size={40} />
             <span className="text-15">{item.name}</span>

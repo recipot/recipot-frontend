@@ -1,65 +1,23 @@
 import React from 'react';
 
-import type { Ingredient } from '../types/recipe.types';
+import {
+  INGREDIENT_STATUS_CONFIG,
+  type IngredientStatus,
+} from './IngredientGroup.constants';
 
-export const STATUS_CONFIG = {
-  owned: {
-    as: 'button',
-    color:
-      'bg-secondary-light-green border-[0.5px] border-secondary-soft-green rounded-[6px] px-3 py-[3px] text-[#8EB35B]',
-    label: '보유',
-    labelClass: 'text-15sb text-primary',
-    render: (ingredient: Ingredient) => (
-      <p className="text-14sb text-[#8EB35B]">
-        {ingredient.name} {ingredient.amount}
-      </p>
-    ),
-  },
-  required: {
-    as: 'div',
-    color:
-      'bg-secondary-light-red border-[0.5px] border-secondary-soft-red rounded-[6px] px-3 py-[3px]',
-    label: '대체불가',
-    labelClass: 'text-15 text-[#FC5845]',
-    render: (ingredient: Ingredient) => (
-      <span className="text-14sb text-[#FC5845]">
-        {ingredient.name} {ingredient.amount}
-      </span>
-    ),
-  },
-  substitutable: {
-    as: 'div',
-    color:
-      'bg-secondary-light-orange border-[0.5px] border-secondary-soft-orange rounded-[6px] px-3 py-[3px] text-[#F88014]',
-    label: '대체가능',
-    labelClass: 'text-15sb text-primary',
-    render: (ingredient: Ingredient) => (
-      <>
-        <p className="text-14sb mr-[5px] text-[#F88014]">
-          {ingredient.name} {ingredient.amount}
-        </p>
-        <span className="text-13 text-neutral-600 opacity-80">
-          {ingredient.substitutes}
-        </span>
-      </>
-    ),
-  },
-} as const;
+export type { IngredientStatus };
+
+import type { Ingredient, IngredientsGroup } from '../types/recipe.types';
 
 interface IngredientGroupProps {
-  ingredients: Ingredient[];
-  status: keyof typeof STATUS_CONFIG;
+  ingredients: IngredientsGroup;
+  status: IngredientStatus;
 }
 
 export function IngredientGroup({ ingredients, status }: IngredientGroupProps) {
-  const config = STATUS_CONFIG[status];
-  if (!config) {
-    return null;
-  }
-  const filtered = ingredients.filter(
-    ingredient => ingredient.status === status
-  );
-  if (filtered.length === 0) return null;
+  const config = INGREDIENT_STATUS_CONFIG[status];
+  const filtered = ingredients[status as keyof IngredientsGroup];
+
   return (
     <div className="mb-4">
       <div className="mb-2 flex items-center justify-between">
@@ -69,18 +27,20 @@ export function IngredientGroup({ ingredients, status }: IngredientGroupProps) {
           <span className={config.labelClass}>{config.label}</span>
         )}
       </div>
-      <div className="flex flex-wrap gap-2">
-        {filtered.map(ingredient => {
-          return (
+      {filtered.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {filtered.map((ingredient: Ingredient) => (
             <div
               key={ingredient.id}
-              className={`rounded-md border px-3 py-1.5 text-sm font-bold ${config.color} ${status === 'substitutable' ? 'flex' : ''}`}
+              className={`rounded-md border px-3 py-1.5 text-sm font-bold ${config.color}`}
             >
-              {config.render(ingredient)}
+              <span className={`text-14sb ${config.textColor}`}>
+                {ingredient.name} {ingredient.amount}
+              </span>
             </div>
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

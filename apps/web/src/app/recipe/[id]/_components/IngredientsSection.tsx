@@ -9,10 +9,10 @@ import MeasurementGuideToggle from './MeasurementGuideToggle';
 import { MeasurementTab } from './MeasurementTab';
 import SeasoningList from './SeasoningList';
 
-import type { Ingredient, Seasoning } from '../types/recipe.types';
+import type { IngredientsGroup, Seasoning } from '../types/recipe.types';
 
 interface IngredientsSectionProps {
-  ingredients: Ingredient[];
+  ingredients: IngredientsGroup;
   seasonings: Seasoning[];
   ingredientsRef: React.RefObject<HTMLDivElement>;
 }
@@ -46,8 +46,11 @@ export function IngredientsSection({
           <p className="text-15 text-gray-500">1인분</p>
         </div>
         <IngredientGroup ingredients={ingredients} status="owned" />
-        <IngredientGroup ingredients={ingredients} status="substitutable" />
-        <IngredientGroup ingredients={ingredients} status="required" />
+        <IngredientGroup ingredients={ingredients} status="notOwned" />
+        <IngredientGroup
+          ingredients={ingredients}
+          status="alternativeUnavailable"
+        />
 
         <div className="mt-8">
           <div className="white rounded-2xl p-4">
