@@ -21,7 +21,7 @@ export default function InfoLinks() {
           className="flex w-fit items-center py-[0.688rem] pl-2"
         >
           <span className="text-17sb">{label}</span>
-          <ArrowIcon size={18} color="var(--gray-900)" />
+          <ArrowIcon size={18} color="hsl(var(--gray-900))" />
         </Link>
       ))}
     </div>
