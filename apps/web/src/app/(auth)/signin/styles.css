@@ -5,6 +5,7 @@
 /* Swiper pagination: active 상태를 Neutral-900로 */
 .intro-swiper {
   --swiper-pagination-color: #111827; /* neutral-900 */
+  height: 100%;
 }
 .intro-swiper .swiper-pagination-bullet-active {
   @apply bg-neutral-900;
@@ -12,7 +13,7 @@
 
 /* 외부 페이지네이션 컨테이너 스타일 */
 .intro-pagination {
-  @apply mt-4 flex items-center justify-center;
+  @apply flex items-center justify-center;
 }
 .intro-pagination .swiper-pagination-bullet {
   @apply h-2 w-2 bg-neutral-200 opacity-100;

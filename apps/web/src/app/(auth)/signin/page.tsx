@@ -2,7 +2,7 @@
 
 import './styles.css';
 
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useAuth } from '@recipot/contexts';
 import { useRouter } from 'next/navigation';
 
@@ -22,9 +22,17 @@ const isOnboardingComplete = (
 };
 
 export default function SignInPage() {
-  const { current, handleSlideChange, intro } = useIntroSlider();
+  const { activeIndex, handleSlideChange, intro } = useIntroSlider();
   const { googleLogin, loading, login, logout, user } = useAuth();
   const router = useRouter();
+
+  // 슬라이드별 페이지 배경색 설정
+  const pageStyle = useMemo(() => {
+    const isFirstSlide = activeIndex === 0;
+    return {
+      backgroundColor: isFirstSlide ? '#3D2A58' : '#FFEFC7',
+    };
+  }, [activeIndex]);
 
   // 로그인 성공 후 온보딩 상태에 따른 리다이렉트
   useEffect(() => {
@@ -51,12 +59,8 @@ export default function SignInPage() {
   }, [user, loading, router]);
 
   return (
-    <div className="mx-auto min-h-screen w-full">
-      <IntroSlider
-        intro={intro}
-        current={current}
-        onSlideChange={handleSlideChange}
-      />
+    <div className="mx-auto min-h-screen w-full" style={pageStyle}>
+      <IntroSlider intro={intro} onSlideChange={handleSlideChange} />
       {/* TODO: 테스트를 위한 로그인 */}
       {user && process.env.NODE_ENV === 'development' ? (
         <div className="fixed top-0 left-1/2 z-50 flex w-full -translate-x-1/2 flex-col items-center gap-3 bg-white/60 px-6 pt-[10px] pb-[calc(10px+env(safe-area-inset-bottom))] backdrop-blur">
@@ -72,7 +76,11 @@ export default function SignInPage() {
           </div>
         </div>
       ) : (
-        <AuthButtons kakaoLogin={login} googleLogin={googleLogin} />
+        <AuthButtons
+          activeIndex={activeIndex}
+          kakaoLogin={login}
+          googleLogin={googleLogin}
+        />
       )}
     </div>
   );

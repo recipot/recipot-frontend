@@ -1,15 +1,31 @@
+import { useMemo } from 'react';
+
 import { Button } from '@/components/common/Button/Button';
 import { GoogleIcon, KakaoIcon } from '@/components/Icons';
 
 export function AuthButtons({
+  activeIndex,
   googleLogin,
   kakaoLogin,
 }: {
-  kakaoLogin: () => void;
+  activeIndex: number;
   googleLogin: () => void;
+  kakaoLogin: () => void;
 }) {
+  // 첫 번째 슬라이드(index 0)일 때는 #3D2A58, 아닐 때는 #FFEFC7
+  const containerStyle = useMemo(() => {
+    const isFirstSlide = activeIndex === 0;
+    const baseColor = isFirstSlide ? '#3D2A58' : '#FFEFC7';
+    return {
+      background: `linear-gradient(to bottom, transparent 0%, ${baseColor} 30%, ${baseColor} 100%)`,
+    };
+  }, [activeIndex]);
+
   return (
-    <div className="fixed bottom-0 left-1/2 z-50 flex w-full -translate-x-1/2 flex-col items-center gap-3 bg-white/60 px-6 pt-[10px] pb-[calc(10px+env(safe-area-inset-bottom))] backdrop-blur">
+    <div
+      className="fixed bottom-0 left-1/2 z-50 flex w-full -translate-x-1/2 flex-col items-center gap-3 px-6 pt-[100px] pb-[calc(10px+env(safe-area-inset-bottom))]"
+      style={containerStyle}
+    >
       <Button
         size="full"
         shape="round"
