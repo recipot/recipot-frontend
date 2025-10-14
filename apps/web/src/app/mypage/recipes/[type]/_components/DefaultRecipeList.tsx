@@ -1,3 +1,6 @@
+import Image from 'next/image';
+
+import { Button } from '@/components/common/Button';
 import { useScrollGradient } from '@/hooks/useScrollGradient';
 import type { DefaultRecipeListProps } from '@/types/MyPage.types';
 
@@ -12,8 +15,46 @@ export default function DefaultRecipeList({
 
   if (recipes.length === 0) {
     return (
-      <div className="py-20 text-center text-gray-500">
-        목록이 비어있습니다.
+      <div className="relative">
+        <div
+          className="h-[calc(100vh-100px)] max-h-full rounded-[1.25rem] px-3"
+          style={{
+            backgroundImage: `url(${config.noneBackImage})`,
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            backgroundSize: '100% 100%',
+          }}
+        >
+          <div className="flex h-full flex-col items-center justify-center gap-6">
+            <div className="text-center">
+              <p className="text-22sb text-gray-900">
+                앗, 냉장고가 텅 비었어요!
+              </p>
+            </div>
+
+            <div className="relative">
+              <Image
+                src="/mypage/none-refrigrator.png"
+                alt="빈 냉장고"
+                width={160}
+                height={160}
+                priority
+              />
+            </div>
+
+            <Button
+              shape="round"
+              variant="outline"
+              className="text-17sb bg-white px-6 py-3 text-gray-900"
+              onClick={() => {
+                // TODO: 레시피 추천 페이지로 이동하는 로직
+                console.log('레시피 추천 받으러 가기');
+              }}
+            >
+              레시피 추천 받으러 가기
+            </Button>
+          </div>
+        </div>
       </div>
     );
   }

@@ -17,7 +17,7 @@ export default function DietaryRestrictions({
 
       {hasRestrictions ? (
         <div className="relative">
-          <div className="no-scrollbar flex items-start gap-3 overflow-x-auto">
+          <div className="no-scrollbar flex items-start gap-3 overflow-x-auto pr-20">
             {restrictions.map(item => (
               <div
                 key={item.id}

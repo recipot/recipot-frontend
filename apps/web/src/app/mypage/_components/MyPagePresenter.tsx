@@ -1,5 +1,9 @@
 import { PageHeader } from '@/app/mypage/_components/PageHeader';
-import type { DietaryRestriction, User } from '@/types/MyPage.types';
+import type {
+  CookedRecipe,
+  DietaryRestriction,
+  User,
+} from '@/types/MyPage.types';
 
 import DietaryRestrictions from './DietaryRestrictions';
 import InfoLinks from './InfoLinks';
@@ -10,9 +14,14 @@ import UserProfile from './UserProfile';
 interface MyPagePresenterProps {
   user: User | null;
   restrictions: DietaryRestriction[];
+  cookedRecipes: CookedRecipe[];
 }
 
-export function MyPagePresenter({ restrictions, user }: MyPagePresenterProps) {
+export function MyPagePresenter({
+  cookedRecipes,
+  restrictions,
+  user,
+}: MyPagePresenterProps) {
   return (
     <div>
       <div className="px-5">
@@ -21,7 +30,7 @@ export function MyPagePresenter({ restrictions, user }: MyPagePresenterProps) {
       <main className="px-5">
         <UserProfile user={user} />
         <QuickLinks />
-        <MyRecipesLink />
+        <MyRecipesLink cookedRecipes={cookedRecipes} />
         <DietaryRestrictions restrictions={restrictions} />
       </main>
 

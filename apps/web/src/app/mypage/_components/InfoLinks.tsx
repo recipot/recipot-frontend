@@ -5,7 +5,10 @@ import { ArrowIcon } from '@/components/Icons';
 const links = [
   { href: '/mypage/faq', label: '자주묻는 질문' },
   { href: '/mypage/feedback', label: '앱 피드백 남기기' },
-  { href: '/mypage/terms', label: '이용약관' },
+  {
+    href: 'https://www.notion.so/21c4ef560994809ba1f7e0ac853f0b24?source=copy_link',
+    label: '이용약관',
+  },
 ];
 
 export default function InfoLinks() {
