@@ -14,7 +14,7 @@ const RecipeHeader = ({ onRefresh }: RecipeHeaderProps) => {
     <div className="container mx-auto px-4 sm:px-6 lg:px-8">
       <div className="mx-auto flex max-w-sm items-center justify-between sm:max-w-md md:max-w-lg">
         <BackIcon
-          onClick={() => router.push('/')}
+          onClick={() => router.back()}
           className="cursor-pointer transition-opacity hover:opacity-70"
         />
 
