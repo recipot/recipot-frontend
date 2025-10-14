@@ -1,16 +1,5 @@
 /* Swiper Cards Effect 스타일 */
 .recipe-swiper {
-  /* Swiper 기본 padding을 제거하기 위해 더 구체적인 선택자 사용 */
-  padding: 0;
-}
-
-/* Swiper 기본 스타일 오버라이드 */
-.recipe-swiper.swiper {
-  padding: 0;
-}
-
-/* 더 구체적인 선택자로 Swiper 컨테이너 스타일 강제 적용 */
-.recipe-swiper.swiper-container {
   padding: 0;
 }
 
@@ -41,5 +30,4 @@
 
 .recipe-pagination .swiper-pagination-bullet-active {
   background: #212529;
-  transform: scale(1);
 }

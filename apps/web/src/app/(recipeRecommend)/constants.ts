@@ -3,7 +3,6 @@ import { EffectCards, Pagination } from 'swiper/modules';
 export const SWIPER_MODULES = [EffectCards, Pagination];
 
 export const SWIPER_CONFIG = {
-  allowTouchMove: true,
   cardsEffect: {
     perSlideOffset: 12,
     perSlideRotate: 3,
@@ -11,16 +10,12 @@ export const SWIPER_CONFIG = {
     slideShadows: false,
   },
   effect: 'cards' as const,
-  grabCursor: true,
-  pagination: {
-    clickable: true,
-    el: '.recipe-pagination',
-  },
-  resistanceRatio: 0.85,
   slidesPerView: 1,
   spaceBetween: 0,
-  threshold: 5,
-  touchRatio: 1,
+
+  // 터치/스와이프 설정
+  allowTouchMove: true,
+  grabCursor: true,
 };
 
 // Swiper 스타일 상수
