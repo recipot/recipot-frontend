@@ -15,8 +15,30 @@ interface IngredientGroupProps {
 }
 
 export function IngredientGroup({ ingredients, status }: IngredientGroupProps) {
-  const config = INGREDIENT_STATUS_CONFIG[status];
-  const filtered = ingredients[status as keyof IngredientsGroup];
+  const config = (() => {
+    switch (status) {
+      case 'owned':
+        return INGREDIENT_STATUS_CONFIG.owned;
+      case 'notOwned':
+        return INGREDIENT_STATUS_CONFIG.notOwned;
+      case 'alternativeUnavailable':
+        return INGREDIENT_STATUS_CONFIG.alternativeUnavailable;
+      default:
+        return INGREDIENT_STATUS_CONFIG.owned;
+    }
+  })();
+  const filtered = (() => {
+    switch (status) {
+      case 'owned':
+        return ingredients.owned;
+      case 'notOwned':
+        return ingredients.notOwned;
+      case 'alternativeUnavailable':
+        return ingredients.alternativeUnavailable;
+      default:
+        return [];
+    }
+  })();
 
   return (
     <div className="mb-4">
