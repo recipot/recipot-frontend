@@ -23,7 +23,7 @@ export const RecipeImage = ({
         src={recipe.image}
         alt={recipe.title}
         width={CARD_DIMENSIONS.width}
-        height={386}
+        height={CARD_DIMENSIONS.height}
         className="h-full w-full object-cover"
       />
     );
