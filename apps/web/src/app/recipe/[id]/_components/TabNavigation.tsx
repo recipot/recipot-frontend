@@ -41,7 +41,7 @@ export function TabNavigation({
   return (
     <div
       ref={tabContainerRef}
-      className="sticky top-0 z-10 border-b border-gray-200 bg-white/95 px-4 py-3 backdrop-blur-sm"
+      className="sticky top-0 z-10 px-4 py-3 backdrop-blur-sm"
     >
       <div className="flex space-x-1">
         {tabs.map(tab => {
