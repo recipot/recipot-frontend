@@ -24,12 +24,6 @@ interface IntroSliderProps {
     backSrc?: string;
     contentSrc?: string;
   }>;
-  current: {
-    alt: string;
-    id: number;
-    backSrc?: string;
-    contentSrc?: string;
-  };
   onSlideChange: (swiper: { realIndex: number }) => void;
 }
 
@@ -101,7 +95,7 @@ export function IntroSlider({
                   fill
                   className="object-cover object-center"
                   sizes="100vw"
-                  priority
+                  priority={item.id === 1}
                 />
                 {/* 콘텐츠 이미지 */}
                 <div className="relative z-10 flex h-full w-full items-center justify-center">
@@ -112,7 +106,7 @@ export function IntroSlider({
                     height={460}
                     className="h-auto w-full max-w-[390px]"
                     sizes="(max-width: 768px) 100vw, 390px"
-                    priority
+                    priority={item.id === 1}
                   />
                 </div>
               </>
