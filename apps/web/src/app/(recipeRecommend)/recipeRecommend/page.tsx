@@ -4,7 +4,7 @@ import 'swiper/css';
 import 'swiper/css/effect-cards';
 import './styles.css';
 
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
@@ -66,25 +66,40 @@ export default function RecipeRecommend() {
   const [toastIcon, setToastIcon] = useState<'heart' | 'recipe'>('recipe');
 
   // 하트 아이콘 클릭 시 토스트 표시를 위한 래퍼 함수
-  const handleToggleLike = (index: number, recipeId: number) => {
-    const isCurrentlyLiked = likedRecipes[index] ?? false;
-    toggleLike(index, recipeId);
+  const handleToggleLike = useCallback(
+    (index: number, recipeId: number) => {
+      const isCurrentlyLiked = likedRecipes[index] ?? false;
+      toggleLike(index, recipeId);
 
-    // 좋아요 상태가 변경될 때 토스트 표시
-    if (!isCurrentlyLiked) {
-      setToastIcon('heart');
-      showToast('레시피가 저장되었어요');
-    }
-  };
+      // 좋아요 상태가 변경될 때 토스트 표시
+      if (!isCurrentlyLiked) {
+        setToastIcon('heart');
+        showToast('레시피가 저장되었어요');
+      }
+    },
+    [likedRecipes, toggleLike, showToast]
+  );
 
   // 새로고침 버튼 클릭 시 토스트 표시를 위한 래퍼 함수
-  const handleRefresh = () => {
+  const handleRefresh = useCallback(() => {
     refetch();
     setToastIcon('recipe');
     showToast('새로운 레시피가 추천되었어요');
-  };
+  }, [refetch, showToast]);
 
   const recipes = data?.recipes ?? [];
+
+  // 이미지 사전 로딩
+  useEffect(() => {
+    if (recipes.length > 0) {
+      // 현재 카드와 다음 2개 카드의 이미지를 미리 로딩
+      const preloadImages = recipes.slice(activeIndex, activeIndex + 3);
+      preloadImages.forEach(recipe => {
+        const img = new Image();
+        img.src = recipe.image;
+      });
+    }
+  }, [activeIndex, recipes]);
 
   // 로딩 상태
   if (isLoading) {

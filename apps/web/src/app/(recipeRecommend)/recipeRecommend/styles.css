@@ -1,6 +1,9 @@
 /* Swiper Cards Effect 스타일 */
 .recipe-swiper {
   padding: 0;
+  /* 하드웨어 가속 활성화 */
+  transform: translateZ(0);
+  will-change: transform;
 }
 
 .recipe-swiper .swiper-slide {
@@ -8,6 +11,11 @@
   align-items: center;
   justify-content: center;
   transform-origin: center center;
+  /* 하드웨어 가속 활성화 */
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+  perspective: 1000px;
 }
 
 .recipe-swiper .swiper-slide-shadow {

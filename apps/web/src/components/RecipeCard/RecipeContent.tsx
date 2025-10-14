@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 
 import type { Recipe } from '@/types/recipe.types';
 
@@ -9,7 +9,7 @@ interface RecipeContentProps {
   recipe: Recipe;
 }
 
-export const RecipeContent = ({ recipe }: RecipeContentProps) => (
+export const RecipeContent = memo(({ recipe }: RecipeContentProps) => (
   <div
     className="absolute bottom-0 left-0 h-[244px] w-[310px]"
     style={GRADIENT_STYLE}
@@ -28,4 +28,6 @@ export const RecipeContent = ({ recipe }: RecipeContentProps) => (
       </h2>
     </div>
   </div>
-);
+));
+
+RecipeContent.displayName = 'RecipeContent';

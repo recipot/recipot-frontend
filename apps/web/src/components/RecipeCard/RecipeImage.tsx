@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import Image from 'next/image';
 
 import type { Recipe } from '@/types/recipe.types';
@@ -12,22 +12,26 @@ interface RecipeImageProps {
   recipe: Recipe;
 }
 
-export const RecipeImage = ({
-  index,
-  isMainCard,
-  recipe,
-}: RecipeImageProps) => {
-  if (isMainCard) {
+export const RecipeImage = memo(
+  ({ index, isMainCard, recipe }: RecipeImageProps) => {
     return (
-      <Image
-        src={recipe.image}
-        alt={recipe.title}
-        width={CARD_DIMENSIONS.width}
-        height={CARD_DIMENSIONS.height}
-        className="h-full w-full object-cover"
-      />
+      <div
+        className="relative h-full w-full"
+        style={getBackgroundColor(index)}
+      >
+        <Image
+          src={recipe.image}
+          alt={recipe.title}
+          width={CARD_DIMENSIONS.width}
+          height={CARD_DIMENSIONS.height}
+          className={`h-full w-full object-cover transition-opacity duration-300 ${isMainCard ? 'opacity-100' : 'opacity-0'}`}
+          loading="lazy"
+          placeholder="blur"
+          blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+        />
+      </div>
     );
   }
+);
 
-  return <div className="h-full w-full" style={getBackgroundColor(index)} />;
-};
+RecipeImage.displayName = 'RecipeImage';

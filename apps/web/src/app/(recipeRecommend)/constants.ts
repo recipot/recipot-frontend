@@ -16,6 +16,21 @@ export const SWIPER_CONFIG = {
   // 터치/스와이프 설정
   allowTouchMove: true,
   grabCursor: true,
+
+  // 성능 최적화 설정
+  lazy: true,
+  preloadImages: false,
+  watchSlidesProgress: true,
+  watchSlidesVisibility: true,
+
+  // 애니메이션 최적화
+  allowSlideNext: true,
+  allowSlidePrev: true,
+  resistanceRatio: 0.85,
+  simulateTouch: true,
+  speed: 300,
+  touchAngle: 45,
+  touchRatio: 1,
 };
 
 // Swiper 스타일 상수

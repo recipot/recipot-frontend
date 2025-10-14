@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { ChefHat, Clock } from 'lucide-react';
 
 import type { Recipe } from '@/types/recipe.types';
@@ -7,7 +7,7 @@ interface RecipeMetaInfoProps {
   recipe: Recipe;
 }
 
-export const RecipeMetaInfo = ({ recipe }: RecipeMetaInfoProps) => (
+export const RecipeMetaInfo = memo(({ recipe }: RecipeMetaInfoProps) => (
   <div className="absolute top-[20px] left-[20px] h-[32px] w-[270px]">
     <div className="flex gap-2">
       <div className="flex h-[32px] items-center gap-1 rounded-[15px] bg-black/30 px-3">
@@ -20,6 +20,6 @@ export const RecipeMetaInfo = ({ recipe }: RecipeMetaInfoProps) => (
       </div>
     </div>
   </div>
-);
+));
 
-
+RecipeMetaInfo.displayName = 'RecipeMetaInfo';
