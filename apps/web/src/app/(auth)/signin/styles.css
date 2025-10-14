@@ -12,12 +12,14 @@
 }
 
 /* 외부 페이지네이션 컨테이너 스타일 */
-.intro-pagination {
-  @apply flex items-center justify-center;
-}
 .intro-pagination .swiper-pagination-bullet {
-  @apply h-2 w-2 bg-neutral-200 opacity-100;
+  width: 8px;
+  height: 8px;
+  background-color: #e5e7eb; /* neutral-200 */
+  opacity: 1;
+  margin: 0 4px;
+  border-radius: 50%;
 }
 .intro-pagination .swiper-pagination-bullet-active {
-  @apply bg-neutral-900;
+  background-color: #111827; /* neutral-900 */
 }

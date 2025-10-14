@@ -3,9 +3,12 @@
 import 'swiper/css';
 import 'swiper/css/pagination';
 
+import { useEffect, useMemo, useRef } from 'react';
 import Image from 'next/image';
 import { Autoplay, Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
+
+import type { Swiper as SwiperType } from 'swiper';
 
 const SWIPER_MODULES = [Pagination, Autoplay];
 const SWIPER_AUTOPLAY = { delay: 3500, disableOnInteraction: false };
@@ -34,15 +37,56 @@ export function IntroSlider({
   intro,
   onSlideChange,
 }: Omit<IntroSliderProps, 'current'>) {
+  const swiperRef = useRef<SwiperType | null>(null);
+  const paginationRef = useRef<HTMLDivElement>(null);
+
+  // 페이지네이션 인라인 스타일
+  const paginationStyle = useMemo(
+    () => ({
+      alignItems: 'center',
+      bottom: '36px',
+      display: 'flex',
+      justifyContent: 'center',
+      left: '0',
+      position: 'absolute' as const,
+      right: '0',
+      top: 'auto',
+      transform: 'none',
+      width: '100%',
+      zIndex: 50,
+    }),
+    []
+  );
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (swiperRef.current && paginationRef.current) {
+        // Swiper 페이지네이션 강제 업데이트
+        try {
+          swiperRef.current.pagination.init();
+          swiperRef.current.pagination.render();
+          swiperRef.current.pagination.update();
+        } catch (error) {
+          console.warn('Pagination update failed:', error);
+        }
+      }
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div className="relative h-screen pb-[calc(128px+env(safe-area-inset-bottom))]">
-      <div className="h-full">
+      <div className="relative h-full">
         <Swiper
           pagination={SWIPER_PAGINATION}
           modules={SWIPER_MODULES}
           className="intro-swiper h-full"
           autoplay={SWIPER_AUTOPLAY}
           onSlideChange={onSlideChange}
+          onSwiper={swiper => {
+            swiperRef.current = swiper;
+          }}
         >
           {intro.map(item => (
             <SwiperSlide
@@ -75,7 +119,11 @@ export function IntroSlider({
             </SwiperSlide>
           ))}
         </Swiper>
-        <div className="intro-pagination absolute bottom-[160px] left-1/2 z-50 flex w-full -translate-x-1/2 justify-center" />
+        <div
+          ref={paginationRef}
+          className="intro-pagination"
+          style={paginationStyle}
+        />
       </div>
     </div>
   );

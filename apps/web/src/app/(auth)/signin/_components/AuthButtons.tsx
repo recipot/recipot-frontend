@@ -17,13 +17,13 @@ export function AuthButtons({
     const isFirstSlide = activeIndex === 0;
     const baseColor = isFirstSlide ? '#3D2A58' : '#FFEFC7';
     return {
-      background: `linear-gradient(to bottom, transparent 0%, ${baseColor} 30%, ${baseColor} 100%)`,
+      background: `linear-gradient(to bottom, transparent 0%, ${baseColor} 10%, ${baseColor} 100%)`,
     };
   }, [activeIndex]);
 
   return (
     <div
-      className="fixed bottom-0 left-1/2 z-50 flex w-full -translate-x-1/2 flex-col items-center gap-3 px-6 pt-[100px] pb-[calc(10px+env(safe-area-inset-bottom))]"
+      className="fixed bottom-0 left-1/2 z-50 flex w-full -translate-x-1/2 flex-col items-center gap-3 px-6 pt-[36px] pb-[calc(10px+env(safe-area-inset-bottom))]"
       style={containerStyle}
     >
       <Button
