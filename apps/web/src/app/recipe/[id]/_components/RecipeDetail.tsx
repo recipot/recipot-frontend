@@ -131,7 +131,7 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
 
   return (
     <div className="flex min-h-screen w-full justify-center bg-gray-50">
-      <div className="w-[390px] bg-gray-50">
+      <div className="w-[390px] bg-gray-100">
         <RecipeHeader recipe={recipeData} />
 
         <TabNavigation
