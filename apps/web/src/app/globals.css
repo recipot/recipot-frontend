@@ -46,7 +46,7 @@
     /* Primary */
     --brand-primary: 87 54% 39%; /* #68982D */
     --brand-primary-pressed: 87 54% 30%; /* #537A24 */
-    --brand-sub-green: #66a80f;
+    --brand-sub-green: 86, 84%, 36%; /* #66A80F */
 
     /* Secondary */
     --secondary-soft-green: 87, 45%, 84%; /* #D7E8C2 */

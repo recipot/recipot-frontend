@@ -42,7 +42,7 @@ export default function UserProfile({ user }: UserProfileProps) {
           className="gap-1 bg-gray-100 px-2 py-[0.1875rem] active:bg-[#E9ECEF]"
           onClick={handleNavigateToSettings}
         >
-          <SettingsIcon size={18} color="var(--gray-600)" />
+          <SettingsIcon size={18} />
           <span className="text-14sb text-gray-600">설정</span>
         </Button>
       </div>
