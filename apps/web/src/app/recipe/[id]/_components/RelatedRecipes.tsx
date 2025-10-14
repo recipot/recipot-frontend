@@ -27,7 +27,7 @@ export function RelatedRecipes({ relatedRecipes }: RelatedRecipesProps) {
                   alt={card.title}
                   width={780}
                   height={891}
-                  className="object-conver"
+                  className="object-cover"
                 />
               </div>
               <div className="absolute right-0 bottom-0 left-0 p-3">
