@@ -24,6 +24,9 @@ export interface Recipe {
   title: string;
   description: string;
   isSaved: boolean;
+  healthPoints?: {
+    content: string;
+  }[];
 }
 
 export interface CookedRecipe extends Recipe {

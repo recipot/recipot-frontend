@@ -68,3 +68,9 @@ export interface RecipeDetailProps {
 }
 
 export type TabId = 'ingredients' | 'cookware' | 'steps';
+
+export interface ApiResponse {
+  success: boolean;
+  data: Recipe;
+  message: string;
+}

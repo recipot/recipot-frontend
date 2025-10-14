@@ -14,7 +14,7 @@ import RecipeHeader from './RecipeHeader';
 import StepSection from './StepSection';
 import TabNavigation from './TabNavigation';
 
-import type { TabId } from '../types/recipe.types';
+import type { ApiResponse, TabId } from '../types/recipe.types';
 
 export function RecipeDetail({ recipeId }: { recipeId: string }) {
   const ingredientsRef = useRef<HTMLDivElement>(null);
@@ -33,10 +33,13 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
 
   useEffect(() => {
     const getAccessToken = async () => {
-      const { data } = await axios.post('http://3.34.40.123/v1/auth/debug', {
-        role: 'U01001',
-        userId: '1',
-      });
+      const { data } = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/auth/debug`,
+        {
+          role: 'U01001',
+          userId: '1',
+        }
+      );
       // console.log(data.data.accessToken, 'getToken');
       setToken(data.data.accessToken);
     };
@@ -45,14 +48,19 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
 
   const { data: recipeResponse, isLoading } = useQuery({
     enabled: !!token, // 토큰이 있을 때만 쿼리 실행
-    queryFn: () =>
-      axios.get(`http://3.34.40.123/v1/recipes/${recipeId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
+    queryFn: async () => {
+      const response = await axios.get<ApiResponse>(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/recipes/${recipeId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      return response.data;
+    },
     queryKey: ['recipe', recipeId],
   });
 
-  const recipeData = recipeResponse?.data.data;
+  const recipeData = recipeResponse?.data;
 
   const { activeSection: activeTab, setActiveSection } =
     useIntersectionScrollSpy({
@@ -143,7 +151,7 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
         <div className="px-4 pb-24">
           <div className="bg-secondary-light-green border-secondary-soft-green my-4 rounded-2xl border-[1px] px-5 py-4">
             <p className="text-15sb text-primary-pressed">
-              {recipeData?.description}
+              {recipeData?.healthPoints.map(point => point.content)}
             </p>
           </div>
 
