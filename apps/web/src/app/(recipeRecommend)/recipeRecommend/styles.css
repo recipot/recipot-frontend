@@ -1,0 +1,41 @@
+/* Swiper Cards Effect 스타일 */
+.recipe-swiper {
+  padding: 0;
+  /* 하드웨어 가속 활성화 */
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+.recipe-swiper .swiper-slide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: center center;
+  /* 하드웨어 가속 활성화 */
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+.recipe-swiper .swiper-slide-shadow {
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.1) 0%,
+    rgba(0, 0, 0, 0.05) 100%
+  );
+}
+
+.recipe-pagination .swiper-pagination-bullet {
+  width: 8px;
+  height: 8px;
+  background: #adb5bd;
+  opacity: 1;
+  transition: all 0.3s ease;
+  border-radius: 50%;
+  margin: 0 4px;
+}
+
+.recipe-pagination .swiper-pagination-bullet-active {
+  background: #212529;
+}
