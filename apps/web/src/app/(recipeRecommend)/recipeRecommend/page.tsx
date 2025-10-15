@@ -115,7 +115,7 @@ export default function RecipeRecommend() {
     // TODO : 추후 감정 상태에 따라 그래디언트 적용 필요
     <>
       <RecipeHeader onRefresh={handleRefresh} />
-      <div className="flex h-screen flex-col items-center justify-center overflow-hidden pt-14">
+      <div className="recipe-recommend-main flex flex-col items-center justify-center overflow-hidden pt-14">
         {/* Header - 고정 높이 */}
 
         {/* Swiper Cards Effect - 남은 공간 차지 */}

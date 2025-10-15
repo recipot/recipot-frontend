@@ -49,6 +49,19 @@
   background: #212529;
 }
 
+/* 사파리 모바일 하단 바 대응 */
+@supports (height: 100dvh) {
+  .recipe-recommend-main {
+    height: 100dvh;
+  }
+}
+
+@supports not (height: 100dvh) {
+  .recipe-recommend-main {
+    height: 100vh;
+  }
+}
+
 /* 작은 화면 너비 대응 (375px 이하) - 카드를 270px로 설정 */
 @media (max-width: 374px) {
   .recipe-card-wrapper {
