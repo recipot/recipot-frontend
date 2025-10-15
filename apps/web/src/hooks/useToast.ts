@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 interface UseToastReturn {
   isVisible: boolean;
@@ -11,12 +11,18 @@ export const useToast = (): UseToastReturn => {
   const [isVisible, setIsVisible] = useState(false);
   const [message, setMessage] = useState('');
 
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const showToast = (toastMessage: string, duration = 3000) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
     setMessage(toastMessage);
     setIsVisible(true);
 
     // 자동으로 토스트 숨기기
-    setTimeout(() => {
+    timeoutRef.current = setTimeout(() => {
       setIsVisible(false);
     }, duration);
   };
