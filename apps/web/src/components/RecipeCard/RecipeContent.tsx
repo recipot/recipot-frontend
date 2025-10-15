@@ -20,10 +20,10 @@ export const RecipeContent = memo(({ recipe }: RecipeContentProps) => (
       </p>
       <h2 className="text-24 line-clamp-2 text-white">
         {formatRecipeTitle(recipe.title).map((line, i, array) => (
-          <span key={i}>
+          <React.Fragment key={i}>
             {line}
             {i < array.length - 1 && <br />}
-          </span>
+          </React.Fragment>
         ))}
       </h2>
     </div>

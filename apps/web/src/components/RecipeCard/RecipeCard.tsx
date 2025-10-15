@@ -45,7 +45,7 @@ export const RecipeCard = memo(
     return (
       <div className="relative">
         <div
-          className="relative z-10 overflow-hidden rounded-[32px] bg-white"
+          className="relative z-10 h-[410px] w-[310px] overflow-hidden rounded-[32px] bg-white"
           onClick={handleCardClick}
           onKeyDown={handleKeyDown}
           role="button"
