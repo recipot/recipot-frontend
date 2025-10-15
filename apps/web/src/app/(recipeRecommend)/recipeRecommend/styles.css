@@ -62,7 +62,8 @@
   }
 }
 
-/* 작은 화면 너비 대응 (375px 이하) - 카드를 270px로 설정 */
+/* 작은 화면 너비 대응 (374px 이하) - 카드를 270px로 설정 */
+/* TODO : 추후 리팩토링 시 대안 확인 필요 */
 @media (max-width: 374px) {
   .recipe-card-wrapper {
     max-width: 270px !important;
