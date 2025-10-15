@@ -161,8 +161,8 @@ export default function RecipeRecommend() {
         </div>
 
         {/* 전역 토스트 */}
-        <Toast message={message} isVisible={isVisible} icon={toastIcon} />
       </div>
+      <Toast message={message} isVisible={isVisible} icon={toastIcon} />
     </>
   );
 }
