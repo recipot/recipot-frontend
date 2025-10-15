@@ -50,7 +50,7 @@ export const buttonVariants = cva(
           'bg-gray-800 text-white hover:bg-gray-700 active:bg-gray-900',
         // 음식 아이템 선택 버튼들
         foodItem:
-          'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 active:bg-gray-100',
+          'bg-white border border-gray-200 text-gray-700 active:bg-gray-100',
         foodItemSelected:
           'bg-green-100 border border-green-300 text-green-800 hover:bg-green-200 active:bg-green-300',
         // 리셋 버튼
