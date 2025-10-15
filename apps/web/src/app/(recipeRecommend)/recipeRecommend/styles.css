@@ -77,11 +77,6 @@
 
 /* 작은 화면 높이 대응 (670px 이하) */
 @media (max-height: 600px) {
-  /* 컨테이너 패딩 줄이기 */
-  .recipe-recommend-container {
-    padding-bottom: 1rem; /* pb-6 → pb-4 */
-  }
-
   /* 헤더 그룹 간격 줄이기 */
   .recipe-header-group {
     margin-bottom: 0.5rem; /* mb-5 → mb-2 */
