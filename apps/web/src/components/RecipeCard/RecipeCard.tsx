@@ -2,7 +2,6 @@ import React, { memo, useCallback } from 'react';
 
 import type { Recipe } from '@/types/recipe.types';
 
-import { CARD_STYLES } from './constants';
 import { RecipeActions } from './RecipeActions';
 import { RecipeContent } from './RecipeContent';
 import { RecipeImage } from './RecipeImage';
@@ -28,11 +27,30 @@ export const RecipeCard = memo(
       onToggleLike(index, recipe.id);
     }, [onToggleLike, index, recipe.id]);
 
+    const handleCardClick = useCallback(() => {
+      // 레시피 상세 URL로 이동 (외부 링크 또는 API 엔드포인트)
+      window.open(`/recipe/${recipe.id}`, '_blank');
+    }, [recipe.id]);
+
+    const handleKeyDown = useCallback(
+      (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleCardClick();
+        }
+      },
+      [handleCardClick]
+    );
+
     return (
-      <div className="relative" style={CARD_STYLES.container}>
+      <div className="relative">
         <div
           className="relative z-10 overflow-hidden rounded-[32px] bg-white"
-          style={CARD_STYLES.card}
+          onClick={handleCardClick}
+          onKeyDown={handleKeyDown}
+          role="button"
+          tabIndex={0}
+          aria-label={`${recipe.title} 레시피 상세 보기`}
         >
           {/* 이미지 영역 */}
           <RecipeImage index={index} isMainCard={isMainCard} recipe={recipe} />
