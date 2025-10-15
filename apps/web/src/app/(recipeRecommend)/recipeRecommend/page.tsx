@@ -113,19 +113,23 @@ export default function RecipeRecommend() {
 
   return (
     // TODO : 추후 감정 상태에 따라 그래디언트 적용 필요
-    <div className="mt-[54px] min-h-screen">
-      {/* Header */}
+    <div className="flex h-screen flex-col overflow-hidden">
+      {/* Header - 고정 높이 */}
       <RecipeHeader onRefresh={handleRefresh} />
-      {/* Tags */}
-      <RecipeTags selectedIngredients={selectedIngredients} />
 
-      {/* Title */}
-      <RecipeTitle />
+      {/* Swiper Cards Effect - 남은 공간 차지 */}
+      <div className="flex flex-1 flex-col items-center justify-center overflow-hidden px-4 pb-6">
+        <div className="mb-5">
+          {/* Tags - 고정 높이 */}
+          <RecipeTags selectedIngredients={selectedIngredients} />
 
-      {/* Swiper Cards Effect */}
-      <div className="mt-10 px-4">
-        <div className="flex justify-center">
-          <div className="relative h-[460px] w-[344px]">
+          {/* Title - 고정 높이 */}
+          <RecipeTitle />
+        </div>
+
+        <div className="flex w-full items-center justify-center">
+          {/* 반응형 컨테이너 - 최소 310px 유지 */}
+          <div className="relative h-full w-full max-w-[310px] min-w-[310px] sm:max-w-[344px] md:max-w-[380px] lg:max-w-[400px]">
             <Swiper
               modules={SWIPER_MODULES}
               {...SWIPER_CONFIG}
@@ -151,8 +155,8 @@ export default function RecipeRecommend() {
           </div>
         </div>
 
-        {/* Page Indicator */}
-        <div className="recipe-pagination mt-4 flex justify-center gap-1.5 sm:mt-6 sm:gap-2" />
+        {/* Page Indicator - 하단 고정 */}
+        <div className="recipe-pagination mt-4 flex justify-center gap-1.5" />
       </div>
 
       {/* 전역 토스트 */}

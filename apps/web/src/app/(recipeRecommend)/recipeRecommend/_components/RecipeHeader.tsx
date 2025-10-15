@@ -11,18 +11,20 @@ const RecipeHeader = ({ onRefresh }: RecipeHeaderProps) => {
   const router = useRouter();
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="mx-auto flex max-w-sm items-center justify-between sm:max-w-md md:max-w-lg">
-        <BackIcon
-          onClick={() => router.back()}
-          className="cursor-pointer transition-opacity hover:opacity-70"
-        />
+    <div className="flex h-14 items-center justify-between bg-white px-3 py-2">
+      <button
+        className="flex size-10 items-center justify-center"
+        onClick={() => router.back()}
+      >
+        <BackIcon size={24} />
+      </button>
 
-        <RefreshIcon
-          onClick={onRefresh}
-          className="cursor-pointer transition-opacity hover:opacity-70"
-        />
-      </div>
+      <button
+        className="flex size-10 items-center justify-center"
+        onClick={onRefresh}
+      >
+        <RefreshIcon size={24} />
+      </button>
     </div>
   );
 };

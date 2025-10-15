@@ -2,7 +2,7 @@ import React, { memo, useCallback } from 'react';
 
 import type { Recipe } from '@/types/recipe.types';
 
-import { CARD_STYLES } from './constants';
+import { CARD_STYLES, GRADIENT_OVERLAY_STYLE } from './constants';
 import { RecipeActions } from './RecipeActions';
 import { RecipeContent } from './RecipeContent';
 import { RecipeImage } from './RecipeImage';
@@ -31,19 +31,38 @@ export const RecipeCard = memo(
     return (
       <div className="relative" style={CARD_STYLES.container}>
         <div
-          className="relative z-10 overflow-hidden rounded-[32px] bg-white"
+          className="relative z-10 flex flex-col overflow-hidden rounded-[32px] bg-white"
           style={CARD_STYLES.card}
         >
-          {/* 이미지 영역 */}
+          {/* 배경 이미지 */}
           <RecipeImage index={index} isMainCard={isMainCard} recipe={recipe} />
 
           {/* 메인 카드 전용 요소들 - 항상 렌더링하되 CSS로 표시/숨김 처리 */}
           <div
-            className={`transition-opacity duration-300 ${isMainCard ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
+            className={`absolute inset-0 flex flex-col transition-opacity duration-300 ${isMainCard ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
           >
-            <RecipeMetaInfo recipe={recipe} />
-            <RecipeContent recipe={recipe} />
-            <RecipeActions isLiked={isLiked} onToggleLike={handleToggleLike} />
+            {/* 하단 그라데이션 오버레이 */}
+            <div
+              className="pointer-events-none absolute inset-x-0 bottom-0 h-[60%]"
+              style={GRADIENT_OVERLAY_STYLE}
+            />
+
+            {/* 상단 메타 정보 */}
+            <div className="relative z-10 p-5">
+              <RecipeMetaInfo recipe={recipe} />
+            </div>
+
+            {/* 중간 빈 공간 */}
+            <div className="flex-1" />
+
+            {/* 하단 컨텐츠 영역 */}
+            <div className="relative z-10">
+              <RecipeContent recipe={recipe} />
+              <RecipeActions
+                isLiked={isLiked}
+                onToggleLike={handleToggleLike}
+              />
+            </div>
           </div>
         </div>
       </div>

@@ -18,6 +18,15 @@
   perspective: 1000px;
 }
 
+/* 반응형 카드 크기 조정 */
+.recipe-swiper .swiper-slide > div {
+  width: 100%;
+  max-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .recipe-swiper .swiper-slide-shadow {
   background: linear-gradient(
     135deg,
@@ -33,7 +42,7 @@
   opacity: 1;
   transition: all 0.3s ease;
   border-radius: 50%;
-  margin: 0 4px;
+  /* margin: 0 4px; */
 }
 
 .recipe-pagination .swiper-pagination-bullet-active {

@@ -4,7 +4,7 @@ export const SWIPER_MODULES = [EffectCards, Pagination];
 
 export const SWIPER_CONFIG = {
   cardsEffect: {
-    perSlideOffset: 12,
+    perSlideOffset: 7,
     perSlideRotate: 3,
     rotate: true,
     slideShadows: false,
