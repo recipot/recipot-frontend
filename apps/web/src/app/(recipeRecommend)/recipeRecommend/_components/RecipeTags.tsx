@@ -6,7 +6,7 @@ const RecipeTags = ({
   selectedIngredients: string[];
 }) => {
   return (
-    <div className="mt-5 mb-[16px] px-4">
+    <div className="recipe-tags mb-4 px-4">
       <div className="flex items-center justify-center gap-[6px]">
         {selectedIngredients.map(ingredient => (
           <div
