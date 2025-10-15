@@ -145,7 +145,7 @@ export function ReviewBottomSheet({
                     {...register('comment')}
                     placeholder="내용을 입력해 주세요"
                     className="min-h-[100px] w-full"
-                    maxLength={500}
+                    maxLength={200}
                   />
                 </div>
               </div>
