@@ -15,7 +15,7 @@ export function PageHeader({ title }: PageHeaderProps) {
   return (
     <div className="flex items-center gap-4 py-4">
       <button onClick={handleBackClick} aria-label="뒤로가기">
-        <BackIcon size={24} color="var(--gray-900)" />
+        <BackIcon size={24} color="hsl(var(--gray-900))" />
       </button>
       <h1 className="text-18sb">{title}</h1>
     </div>
