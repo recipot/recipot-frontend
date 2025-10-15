@@ -11,7 +11,7 @@ const RecipeHeader = ({ onRefresh }: RecipeHeaderProps) => {
   const router = useRouter();
 
   return (
-    <div className="flex h-14 items-center justify-between bg-white px-3 py-2">
+    <div className="fixed top-0 right-0 left-0 z-10 flex h-14 items-center justify-between bg-white px-3 py-2">
       <button
         className="flex size-10 items-center justify-center"
         onClick={() => router.back()}

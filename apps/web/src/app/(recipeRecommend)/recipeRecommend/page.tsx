@@ -113,54 +113,56 @@ export default function RecipeRecommend() {
 
   return (
     // TODO : 추후 감정 상태에 따라 그래디언트 적용 필요
-    <div className="flex h-screen flex-col overflow-hidden">
-      {/* Header - 고정 높이 */}
+    <>
       <RecipeHeader onRefresh={handleRefresh} />
+      <div className="flex h-screen flex-col items-center justify-center overflow-hidden pt-14">
+        {/* Header - 고정 높이 */}
 
-      {/* Swiper Cards Effect - 남은 공간 차지 */}
-      <div className="flex flex-1 flex-col items-center justify-center overflow-hidden px-4 pb-6">
-        <div className="mb-5">
-          {/* Tags - 고정 높이 */}
-          <RecipeTags selectedIngredients={selectedIngredients} />
+        {/* Swiper Cards Effect - 남은 공간 차지 */}
+        <div className="px-6 pt-5 pb-6">
+          <div className="recipe-header-group mb-5">
+            {/* Tags - 고정 높이 */}
+            <RecipeTags selectedIngredients={selectedIngredients} />
 
-          {/* Title - 고정 높이 */}
-          <RecipeTitle />
-        </div>
+            {/* Title - 고정 높이 */}
+            <RecipeTitle />
+          </div>
 
-        <div className="flex w-full items-center justify-center">
-          {/* 반응형 컨테이너 - 최소 310px 유지 */}
-          <div className="relative h-full w-full max-w-[310px] min-w-[310px] sm:max-w-[344px] md:max-w-[380px] lg:max-w-[400px]">
-            <Swiper
-              modules={SWIPER_MODULES}
-              {...SWIPER_CONFIG}
-              className="recipe-swiper h-full w-full"
-              style={swiperStyles}
-              onSlideChange={swiper => setActiveIndex(swiper.activeIndex)}
-            >
-              {recipes.map((recipe, index) => (
-                <SwiperSlide
-                  key={recipe.id}
-                  className="flex items-center justify-center"
-                >
-                  <RecipeCard
-                    recipe={recipe}
-                    index={index}
-                    isLiked={likedRecipes[index] ?? false}
-                    onToggleLike={handleToggleLike}
-                    isMainCard={index === activeIndex}
-                  />
-                </SwiperSlide>
-              ))}
-            </Swiper>
+          <div className="flex h-full w-full flex-col items-center">
+            {/* 반응형 컨테이너 - 화면에 맞춰 축소 */}
+            <div className="recipe-card-wrapper relative w-full max-w-[310px]">
+              <Swiper
+                modules={SWIPER_MODULES}
+                {...SWIPER_CONFIG}
+                className="recipe-swiper h-full w-full"
+                style={swiperStyles}
+                onSlideChange={swiper => setActiveIndex(swiper.activeIndex)}
+              >
+                {recipes.map((recipe, index) => (
+                  <SwiperSlide
+                    key={recipe.id}
+                    className="flex items-center justify-center"
+                  >
+                    <RecipeCard
+                      recipe={recipe}
+                      index={index}
+                      isLiked={likedRecipes[index] ?? false}
+                      onToggleLike={handleToggleLike}
+                      isMainCard={index === activeIndex}
+                    />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            </div>
+
+            {/* Page Indicator - 카드 바로 아래 */}
+            <div className="recipe-pagination mt-4 flex justify-center gap-1.5" />
           </div>
         </div>
 
-        {/* Page Indicator - 하단 고정 */}
-        <div className="recipe-pagination mt-4 flex justify-center gap-1.5" />
+        {/* 전역 토스트 */}
+        <Toast message={message} isVisible={isVisible} icon={toastIcon} />
       </div>
-
-      {/* 전역 토스트 */}
-      <Toast message={message} isVisible={isVisible} icon={toastIcon} />
-    </div>
+    </>
   );
 }

@@ -29,7 +29,7 @@ export const RecipeCard = memo(
     }, [onToggleLike, index, recipe.id]);
 
     return (
-      <div className="relative" style={CARD_STYLES.container}>
+      <div style={CARD_STYLES.container}>
         <div
           className="relative z-10 flex flex-col overflow-hidden rounded-[32px] bg-white"
           style={CARD_STYLES.card}
@@ -47,21 +47,20 @@ export const RecipeCard = memo(
               style={GRADIENT_OVERLAY_STYLE}
             />
 
-            {/* 상단 메타 정보 */}
-            <div className="relative z-10 p-5">
-              <RecipeMetaInfo recipe={recipe} />
-            </div>
+            <div className="flex size-full flex-col justify-between">
+              {/* 상단 메타 정보 */}
+              <div className="recipe-card-meta flex w-full py-5 pl-5">
+                <RecipeMetaInfo recipe={recipe} />
+              </div>
 
-            {/* 중간 빈 공간 */}
-            <div className="flex-1" />
-
-            {/* 하단 컨텐츠 영역 */}
-            <div className="relative z-10">
-              <RecipeContent recipe={recipe} />
-              <RecipeActions
-                isLiked={isLiked}
-                onToggleLike={handleToggleLike}
-              />
+              {/* 하단 컨텐츠 영역 */}
+              <div className="z-10">
+                <RecipeContent recipe={recipe} />
+                <RecipeActions
+                  isLiked={isLiked}
+                  onToggleLike={handleToggleLike}
+                />
+              </div>
             </div>
           </div>
         </div>

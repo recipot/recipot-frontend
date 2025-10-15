@@ -17,7 +17,7 @@ export const RecipeActions = ({
   // }, [onToggleLike]);
 
   return (
-    <div className="px-5 pb-3">
+    <div className="px-5 pb-6">
       <div className="flex gap-2">
         <Button
           variant="ghost"

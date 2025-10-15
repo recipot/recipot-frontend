@@ -15,14 +15,12 @@ export const CARD_STYLES = {
     aspectRatio: '310 / 460',
     height: 'auto',
     maxHeight: '100%',
-    minWidth: '310px',
     width: '100%',
   },
   container: {
     aspectRatio: '310 / 460',
     height: 'auto',
     maxHeight: '100%',
-    minWidth: '310px',
     width: '100%',
   },
 };

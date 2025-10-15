@@ -11,11 +11,15 @@ export const RecipeMetaInfo = memo(({ recipe }: RecipeMetaInfoProps) => (
   <div className="flex gap-2">
     <div className="flex h-[32px] items-center gap-1 px-3">
       <Clock className="h-[18px] w-[18px] text-white" />
-      <span className="text-17 text-white">{recipe.time}</span>
+      <span className="text-17 whitespace-nowrap text-white">
+        {recipe.time}
+      </span>
     </div>
     <div className="flex h-[32px] items-center gap-1 px-3">
       <ChefHat className="h-[18px] w-[18px] text-white" />
-      <span className="text-17 text-white">{recipe.cookware}</span>
+      <span className="text-17 whitespace-nowrap text-white">
+        {recipe.cookware}
+      </span>
     </div>
   </div>
 ));
