@@ -22,10 +22,7 @@ export const SWIPER_CONFIG = {
   grabCursor: true,
 
   // 성능 최적화 설정
-  lazy: true,
-  preloadImages: false,
   watchSlidesProgress: true,
-  watchSlidesVisibility: true,
 
   // 애니메이션 최적화
   allowSlideNext: true,
