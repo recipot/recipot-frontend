@@ -148,7 +148,7 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
         const tokenData =
           provider === 'google'
             ? await authService.getTokenFromGoogleCallback(code)
-            : await authService.getTokenFromGoogleCallback(code);
+            : await authService.completeKakaoLogin(code);
 
         console.log(`${provider} 토큰 응답:`, tokenData);
 

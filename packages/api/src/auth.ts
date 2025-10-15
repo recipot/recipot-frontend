@@ -250,6 +250,60 @@ export const authService = {
     }
   },
 
+  // 카카오 콜백에서 userId 받기
+  async getKakaoCallback(code: string): Promise<{
+    userId: number;
+  }> {
+    try {
+      console.log('카카오 콜백 처리 시작:', { code });
+
+      const response = await authApi.get(
+        `/v1/login/kakao/callback?code=${code}`
+      );
+
+      console.log('카카오 콜백 응답:', response.data);
+
+      // 백엔드 응답: { status: 200, data: { userId: 3 } }
+      if (response.data.status === 200 && response.data.data?.userId) {
+        return {
+          userId: response.data.data.userId,
+        };
+      } else {
+        throw new Error('카카오 콜백 응답 형식이 올바르지 않습니다.');
+      }
+    } catch (error) {
+      console.error('카카오 콜백 처리 실패:', error);
+      throw new Error('카카오 로그인 처리에 실패했습니다.', {
+        cause: error,
+      });
+    }
+  },
+
+  // 카카오 로그인 완료 (콜백에서 userId를 받아 토큰으로 변환)
+  async completeKakaoLogin(code: string): Promise<{
+    accessToken: string;
+    refreshToken: string;
+    expiresIn: number;
+    user: UserInfo;
+  }> {
+    try {
+      // 1. 카카오 콜백으로 userId 받기
+      const { userId } = await this.getKakaoCallback(code);
+      console.log('카카오 로그인 userId:', userId);
+
+      // 2. userId로 토큰 정보 받기
+      const tokenData = await this.getTokenByUserId(userId);
+      console.log('토큰 발급 완료:', tokenData);
+
+      return tokenData;
+    } catch (error) {
+      console.error('카카오 로그인 완료 처리 실패:', error);
+      throw new Error('카카오 로그인 완료 처리에 실패했습니다.', {
+        cause: error,
+      });
+    }
+  },
+
   // 백엔드에서 JWT 토큰 검증
   async verifyToken(token?: string) {
     try {

@@ -47,7 +47,7 @@ export function AuthProvider({ children }: { children: any }) {
       if (savedToken) {
         try {
           const userData = await authService.verifyToken(savedToken);
-          setUser(userData.data as UserInfo);
+          setUser(userData?.data as UserInfo);
           setToken(savedToken);
           if (savedRefreshToken) {
             setRefreshToken(savedRefreshToken);
