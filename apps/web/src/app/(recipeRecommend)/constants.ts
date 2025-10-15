@@ -10,6 +10,10 @@ export const SWIPER_CONFIG = {
     slideShadows: false,
   },
   effect: 'cards' as const,
+  pagination: {
+    clickable: true,
+    el: '.recipe-pagination',
+  },
   slidesPerView: 1,
   spaceBetween: 0,
 
