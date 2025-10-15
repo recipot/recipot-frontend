@@ -1,3 +1,7 @@
+'use client';
+
+import { useState } from 'react';
+
 import { PageHeader } from '@/app/mypage/_components/PageHeader';
 import type {
   CookedRecipe,
@@ -6,6 +10,7 @@ import type {
 } from '@/types/MyPage.types';
 
 import DietaryRestrictions from './DietaryRestrictions';
+import DietaryRestrictionsSheet from './DietaryRestrictionsSheet';
 import InfoLinks from './InfoLinks';
 import MyRecipesLink from './MyRecipesLink';
 import QuickLinks from './QuickLinks';
@@ -22,6 +27,11 @@ export function MyPagePresenter({
   restrictions,
   user,
 }: MyPagePresenterProps) {
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+
+  const handleOpenSheet = () => setIsSheetOpen(true);
+  const handleCloseSheet = () => setIsSheetOpen(false);
+
   return (
     <div>
       <div className="px-5">
@@ -31,7 +41,10 @@ export function MyPagePresenter({
         <UserProfile user={user} />
         <QuickLinks />
         <MyRecipesLink cookedRecipes={cookedRecipes} />
-        <DietaryRestrictions restrictions={restrictions} />
+        <DietaryRestrictions
+          restrictions={restrictions}
+          onOpenSheet={handleOpenSheet}
+        />
       </main>
 
       <footer>
@@ -40,6 +53,11 @@ export function MyPagePresenter({
           <InfoLinks />
         </div>
       </footer>
+
+      <DietaryRestrictionsSheet
+        isOpen={isSheetOpen}
+        onClose={handleCloseSheet}
+      />
     </div>
   );
 }
