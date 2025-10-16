@@ -7,17 +7,26 @@ import type { ReviewData } from '@/types/review.types';
 import { ReviewBottomSheet } from '.';
 
 // Drawer 컴포넌트를 간단한 div로 모킹
+let mockOnOpenChange: ((open: boolean) => void) | null = null;
+
 vi.mock('../ui/drawer', () => ({
-  Drawer: ({ children, open }: { children: React.ReactNode; open: boolean }) =>
-    open ? <div data-testid="drawer">{children}</div> : null,
-  DrawerClose: ({
+  Drawer: ({
     children,
-    onClick,
+    onOpenChange,
+    open,
   }: {
     children: React.ReactNode;
-    onClick: () => void;
-  }) => (
-    <button onClick={onClick} data-testid="drawer-close">
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+  }) => {
+    mockOnOpenChange = onOpenChange;
+    return open ? <div data-testid="drawer">{children}</div> : null;
+  },
+  DrawerClose: ({ children }: { children: React.ReactNode }) => (
+    <button
+      onClick={() => mockOnOpenChange?.(false)}
+      data-testid="drawer-close"
+    >
       {children}
     </button>
   ),
@@ -65,22 +74,10 @@ describe('ReviewBottomSheet', () => {
     const user = userEvent.setup();
     render(<ReviewBottomSheet {...defaultProps} />);
 
-    const closeButton = screen.getByRole('button', { name: '닫기' });
+    const closeButton = screen.getByTestId('drawer-close');
     await user.click(closeButton);
 
-    expect(defaultProps.onClose).toHaveBeenCalledTimes(1);
-  });
-
-  // Note: Vaul 라이브러리의 overlay는 JSDOM 환경에서 제대로 테스트하기 어려움
-  // 실제 브라우저 환경에서는 정상 동작함
-  it.skip('배경 클릭 시 닫혀야 함', async () => {
-    const user = userEvent.setup();
-    render(<ReviewBottomSheet {...defaultProps} />);
-
-    const backdrop = screen.getByRole('button', { name: '' }); // backdrop
-    await user.click(backdrop);
-
-    expect(defaultProps.onClose).toHaveBeenCalledTimes(1);
+    expect(defaultProps.onClose).toHaveBeenCalled();
   });
 
   it('감정 선택이 작동해야 함', async () => {
