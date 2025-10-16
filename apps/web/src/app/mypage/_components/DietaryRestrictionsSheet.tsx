@@ -33,12 +33,19 @@ export default function DietaryRestrictionsSheet({
   onClose,
   onSave,
 }: DietaryRestrictionsSheetProps) {
-  const { handleItemToggle, resetItems, selectedItems } =
+  const { handleItemToggle, resetItems, resetToInitial, selectedItems } =
     useAllergyCheck(initialSelectedItems);
 
   const [activeCategory, setActiveCategory] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const gnbRef = useRef<HTMLDivElement>(null);
+
+  // 시트가 열릴 때마다 초기값으로 리셋
+  useEffect(() => {
+    if (isOpen) {
+      resetToInitial();
+    }
+  }, [isOpen, resetToInitial]);
 
   // 스크롤 스파이를 위한 섹션 ID 생성
   const sectionIds = categories.map((_, index) => `allergy-section-${index}`);
