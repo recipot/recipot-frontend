@@ -24,12 +24,14 @@ interface DietaryRestrictionsSheetProps {
   initialSelectedItems?: number[];
   isOpen: boolean;
   onClose: () => void;
+  onSave?: (selectedItems: number[]) => void;
 }
 
 export default function DietaryRestrictionsSheet({
   initialSelectedItems = [],
   isOpen,
   onClose,
+  onSave,
 }: DietaryRestrictionsSheetProps) {
   const { handleItemToggle, resetItems, selectedItems } =
     useAllergyCheck(initialSelectedItems);
@@ -160,8 +162,8 @@ export default function DietaryRestrictionsSheet({
   };
 
   const handleSubmit = (data: z.infer<typeof AllergyFormSchema>) => {
-    // TODO: API 연동 시 data.items 사용
-    void data;
+    // TODO: API 연동
+    onSave?.(data.items);
     onClose();
   };
 

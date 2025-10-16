@@ -32,6 +32,15 @@ export function MyPagePresenter({
   const handleOpenSheet = () => setIsSheetOpen(true);
   const handleCloseSheet = () => setIsSheetOpen(false);
 
+  // restrictions의 id를 초기 선택 항목으로 변환
+  const initialSelectedItems = restrictions.map(item => item.id);
+
+  const handleSave = (selectedItems: number[]) => {
+    // TODO: API 연동하여 서버에 저장
+    console.info('선택된 못먹는 음식 ID:', selectedItems);
+    // 서버 응답 후 restrictions 상태를 업데이트해야 함
+  };
+
   return (
     <div>
       <div className="px-5">
@@ -55,8 +64,10 @@ export function MyPagePresenter({
       </footer>
 
       <DietaryRestrictionsSheet
+        initialSelectedItems={initialSelectedItems}
         isOpen={isSheetOpen}
         onClose={handleCloseSheet}
+        onSave={handleSave}
       />
     </div>
   );
