@@ -92,16 +92,25 @@ export default function RefrigeratorStep() {
       const result = await onboardingAPI.submitComplete(completeData);
 
       if (result.success) {
-        // 5. 성공 시 데이터 정리
-        onboardingStorage.clearData();
+        // 5. 온보딩 완료 처리 - clearData 전에 Zustand 스토어에 모든 데이터 저장
+        // 알레르기 데이터 저장
+        setStepData(1, {
+          allergies: completeData.allergies,
+          selectedItems: completeData.allergies,
+        });
+        markStepCompleted(1);
 
-        // 6. 온보딩 완료 처리
+        // 냉장고 데이터 저장
         const refrigeratorData = {
           selectedFoods: selectedFoodIds,
         };
         setStepData(3, refrigeratorData);
         markStepCompleted(3);
+
         completeOnboarding();
+
+        // 6. localStorage 데이터 정리 (Zustand는 유지됨)
+        onboardingStorage.clearData();
 
         console.info('✅ 온보딩 완료!', {
           allergies: completeData.allergies,
