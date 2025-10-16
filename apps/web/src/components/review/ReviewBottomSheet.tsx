@@ -144,7 +144,7 @@ export function ReviewBottomSheet({
                   <Textarea
                     {...register('comment')}
                     placeholder="내용을 입력해 주세요"
-                    className="min-h-[100px] w-full"
+                    className="text-17 min-h-[100px] w-full text-ellipsis text-gray-600"
                     maxLength={200}
                   />
                 </div>
@@ -154,10 +154,10 @@ export function ReviewBottomSheet({
               <Button
                 type="submit"
                 disabled={!isFormValid}
-                className="py-4"
+                className="px-8 py-[15px]"
                 size="full"
               >
-                <p className="text-17sb">후기 등록하기</p>
+                후기 등록하기
               </Button>
             </div>
           </div>
