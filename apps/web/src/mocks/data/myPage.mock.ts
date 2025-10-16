@@ -108,11 +108,13 @@ export const mockUser = {
 };
 
 // 못 먹는 음식 mock
+// Allergy.constants의 ID와 매핑된 못먹는 음식 목록
+// 어패류: 1-7, 육류/계란: 8-13, 견과류: 14-18, 곡류: 19-21, 유제품: 22-25, 기타: 26-31
 export const mockRestrictions = [
-  { id: 1, name: '게' },
-  { id: 2, name: '능이' },
-  { id: 3, name: '느타리' },
-  { id: 4, name: '복숭아' },
-  { id: 5, name: '새우' },
-  { id: 6, name: '고등어' },
+  { id: 2, name: '고등어' }, // 어패류
+  { id: 5, name: '굴' }, // 어패류
+  { id: 11, name: '계란' }, // 육류/계란
+  { id: 14, name: '땅콩' }, // 견과류
+  { id: 29, name: '복숭아' }, // 기타
+  { id: 22, name: '우유' }, // 유제품
 ];

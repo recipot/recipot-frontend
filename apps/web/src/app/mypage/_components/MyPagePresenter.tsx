@@ -1,4 +1,9 @@
+'use client';
+
+import { useState } from 'react';
+
 import { PageHeader } from '@/app/mypage/_components/PageHeader';
+import { useOnboardingStore } from '@/stores/onboardingStore';
 import type {
   CookedRecipe,
   DietaryRestriction,
@@ -6,6 +11,7 @@ import type {
 } from '@/types/MyPage.types';
 
 import DietaryRestrictions from './DietaryRestrictions';
+import DietaryRestrictionsSheet from './DietaryRestrictionsSheet';
 import InfoLinks from './InfoLinks';
 import MyRecipesLink from './MyRecipesLink';
 import QuickLinks from './QuickLinks';
@@ -22,6 +28,29 @@ export function MyPagePresenter({
   restrictions,
   user,
 }: MyPagePresenterProps) {
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const setStepData = useOnboardingStore(state => state.setStepData);
+
+  const handleOpenSheet = () => setIsSheetOpen(true);
+  const handleCloseSheet = () => setIsSheetOpen(false);
+
+  // restrictions의 id를 초기 선택 항목으로 변환
+  const initialSelectedItems = restrictions.map(item => item.id);
+
+  const handleSave = (selectedItems: number[]) => {
+    // TODO: API 연동하여 서버에 저장
+    console.info('선택된 못먹는 음식 ID:', selectedItems);
+
+    // 온보딩 스토어 업데이트 (로컬 상태 관리)
+    setStepData(1, {
+      allergies: selectedItems,
+      selectedItems,
+    });
+
+    console.info('✅ 못먹는 음식이 업데이트되었습니다.');
+    // 서버 응답 후 restrictions 상태를 업데이트해야 함
+  };
+
   return (
     <div>
       <div className="px-5">
@@ -31,7 +60,10 @@ export function MyPagePresenter({
         <UserProfile user={user} />
         <QuickLinks />
         <MyRecipesLink cookedRecipes={cookedRecipes} />
-        <DietaryRestrictions restrictions={restrictions} />
+        <DietaryRestrictions
+          restrictions={restrictions}
+          onOpenSheet={handleOpenSheet}
+        />
       </main>
 
       <footer>
@@ -40,6 +72,13 @@ export function MyPagePresenter({
           <InfoLinks />
         </div>
       </footer>
+
+      <DietaryRestrictionsSheet
+        initialSelectedItems={initialSelectedItems}
+        isOpen={isSheetOpen}
+        onClose={handleCloseSheet}
+        onSave={handleSave}
+      />
     </div>
   );
 }

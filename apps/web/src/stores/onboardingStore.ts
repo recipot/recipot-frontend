@@ -1,6 +1,7 @@
 'use client';
 
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 import type { OnboardingStepDataMap } from '@/app/onboarding/_types';
 
@@ -70,92 +71,98 @@ const initialState: OnboardingState = {
  * - 단계별 데이터 저장
  * - 온보딩 완료 처리
  * - 단계 이동 및 검증
+ * - localStorage에 자동 저장 (persist)
  */
-export const useOnboardingStore = create<OnboardingState & OnboardingActions>(
-  (set, get) => ({
-    // 초기 상태
-    ...initialState,
+export const useOnboardingStore = create<OnboardingState & OnboardingActions>()(
+  persist(
+    (set, get) => ({
+      // 초기 상태
+      ...initialState,
 
-    // 액션들
-    canGoToNextStep: () => {
-      const { currentStep } = get();
-      return currentStep < TOTAL_STEPS;
-    },
+      // 액션들
+      canGoToNextStep: () => {
+        const { currentStep } = get();
+        return currentStep < TOTAL_STEPS;
+      },
 
-    canGoToPreviousStep: () => {
-      const { currentStep } = get();
-      return currentStep > 1;
-    },
+      canGoToPreviousStep: () => {
+        const { currentStep } = get();
+        return currentStep > 1;
+      },
 
-    clearRefreshFlag: () => {
-      set({ isRefreshed: false });
-    },
+      clearRefreshFlag: () => {
+        set({ isRefreshed: false });
+      },
 
-    completeOnboarding: () => {
-      // AuthContext의 setUser를 사용하기 위해 훅을 여기서 직접 사용할 수 없으므로
-      // 이 부분은 컴포넌트에서 처리하도록 변경해야 합니다.
-      console.info('온보딩이 완료되었습니다.');
-    },
+      completeOnboarding: () => {
+        // AuthContext의 setUser를 사용하기 위해 훅을 여기서 직접 사용할 수 없으므로
+        // 이 부분은 컴포넌트에서 처리하도록 변경해야 합니다.
+        console.info('온보딩이 완료되었습니다.');
+      },
 
-    goToNextStep: () => {
-      const { currentStep } = get();
-      if (currentStep < TOTAL_STEPS) {
-        set({ currentStep: currentStep + 1 });
-      }
-    },
+      goToNextStep: () => {
+        const { currentStep } = get();
+        if (currentStep < TOTAL_STEPS) {
+          set({ currentStep: currentStep + 1 });
+        }
+      },
 
-    goToPreviousStep: () => {
-      const { currentStep } = get();
-      if (currentStep > 1) {
-        set({ currentStep: currentStep - 1 });
-      }
-    },
+      goToPreviousStep: () => {
+        const { currentStep } = get();
+        if (currentStep > 1) {
+          set({ currentStep: currentStep - 1 });
+        }
+      },
 
-    isStepCompleted: (step: number) => {
-      const { completedSteps } = get();
-      return completedSteps.includes(step);
-    },
+      isStepCompleted: (step: number) => {
+        const { completedSteps } = get();
+        return completedSteps.includes(step);
+      },
 
-    markStepCompleted: (step: number) => {
-      set(state => ({
-        completedSteps: [...new Set([...state.completedSteps, step])],
-      }));
-    },
+      markStepCompleted: (step: number) => {
+        set(state => ({
+          completedSteps: [...new Set([...state.completedSteps, step])],
+        }));
+      },
 
-    resetCurrentStep: () => {
-      const { currentStep } = get();
-      set(state => {
-        const newStepData = { ...state.stepData };
-        delete newStepData[currentStep as keyof OnboardingStepDataMap];
-        return {
-          isRefreshed: true, // 새로고침 플래그 설정
-          stepData: newStepData,
-        };
-      });
-    },
+      resetCurrentStep: () => {
+        const { currentStep } = get();
+        set(state => {
+          const newStepData = { ...state.stepData };
+          delete newStepData[currentStep as keyof OnboardingStepDataMap];
+          return {
+            isRefreshed: true, // 새로고침 플래그 설정
+            stepData: newStepData,
+          };
+        });
+      },
 
-    resetStore: () => {
-      set(initialState);
-    },
+      resetStore: () => {
+        set(initialState);
+      },
 
-    setCurrentStep: (step: number) => {
-      if (step >= 1 && step <= TOTAL_STEPS) {
-        set({ currentStep: step });
-      }
-    },
+      setCurrentStep: (step: number) => {
+        if (step >= 1 && step <= TOTAL_STEPS) {
+          set({ currentStep: step });
+        }
+      },
 
-    setStepData: <T extends keyof OnboardingStepDataMap>(
-      step: T,
-      data: OnboardingStepDataMap[T]
-    ) => {
-      set(state => ({
-        stepData: {
-          ...state.stepData,
-          [step]: data,
-        },
-      }));
-    },
-  })
+      setStepData: <T extends keyof OnboardingStepDataMap>(
+        step: T,
+        data: OnboardingStepDataMap[T]
+      ) => {
+        set(state => ({
+          stepData: {
+            ...state.stepData,
+            [step]: data,
+          },
+        }));
+      },
+    }),
+    {
+      name: 'onboarding-storage', // localStorage 키 이름
+    }
+  )
 );
 
 /**

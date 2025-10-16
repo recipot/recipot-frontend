@@ -26,11 +26,11 @@ export default function CookStateStep() {
 
   // 새로고침 버튼을 눌렀을 때만 로컬 상태 초기화
   useEffect(() => {
-    if (isRefreshed && stepData && Object.keys(stepData).length === 0) {
+    if (isRefreshed) {
       setSelectedMood(null);
       clearRefreshFlag(); // 플래그 리셋
     }
-  }, [stepData, isRefreshed, clearRefreshFlag]);
+  }, [isRefreshed, clearRefreshFlag]);
 
   const handleMoodChange = (mood: MoodType | null) => {
     setSelectedMood(mood);
