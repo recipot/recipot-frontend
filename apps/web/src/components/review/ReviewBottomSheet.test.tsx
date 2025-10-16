@@ -75,7 +75,7 @@ describe('ReviewBottomSheet', () => {
     const user = userEvent.setup();
     render(<ReviewBottomSheet {...defaultProps} />);
 
-    const submitButton = screen.getByText('후기 등록하기');
+    const submitButton = screen.getByRole('button', { name: /후기 등록하기/i });
     expect(submitButton).toBeDisabled();
 
     // 맛 선택
@@ -101,7 +101,7 @@ describe('ReviewBottomSheet', () => {
     expect(commentInput).toHaveValue('정말 맛있었어요!');
   });
 
-  // TODO : 백엔드 확인 필요
+  // TODO: 백엔드 확인 필요
   // it('완전한 폼 제출이 작동해야 함', async () => {
   //   const user = userEvent.setup();
   //   render(<ReviewBottomSheet {...defaultProps} />);
@@ -111,14 +111,14 @@ describe('ReviewBottomSheet', () => {
   //   await user.click(screen.getByText('쉬워요'));
   //   await user.click(screen.getByText('간단해요'));
 
-  //   // 댓글 입력
-  //   await user.type(
-  //     screen.getByPlaceholderText('내용을 입력해 주세요'),
-  //     '정말 맛있었어요!'
-  //   );
+  //   // 댓글 입력 - fireEvent 사용 (react-hook-form과 호환)
+  //   const commentInput = screen.getByPlaceholderText('내용을 입력해 주세요');
+  //   fireEvent.change(commentInput, {
+  //     target: { value: '정말 맛있었어요!' },
+  //   });
 
   //   // 제출
-  //   const submitButton = screen.getByText('후기 등록하기');
+  //   const submitButton = screen.getByRole('button', { name: /후기 등록하기/i });
   //   await user.click(submitButton);
 
   //   expect(defaultProps.onSubmit).toHaveBeenCalledWith({
