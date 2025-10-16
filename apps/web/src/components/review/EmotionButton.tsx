@@ -20,8 +20,8 @@ export function EmotionButton({
       className={cn(
         'w-full rounded-[10px] border p-3',
         isSelected
-          ? 'bg-secondary-light-green border-secondary-soft-green text-primary border'
-          : 'border border-neutral-300 bg-white text-gray-500'
+          ? 'bg-secondary-light-green border-secondary-soft-green text-primary'
+          : 'border-neutral-300 bg-white text-gray-500'
       )}
     >
       <p className="text-15sb xs:text-13sb xs:text-nowrap">{label}</p>
