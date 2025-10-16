@@ -17,9 +17,16 @@ export function MyPageContainer() {
 
   // 온보딩 데이터를 DietaryRestriction 형식으로 변환
   const restrictions = useMemo(() => {
-    if (allergyStepData?.allergies && allergyStepData.allergies.length > 0) {
-      // 온보딩에서 선택한 알레르기 ID를 이름으로 변환
+    // 온보딩 데이터가 있으면 해당 데이터 사용 (빈 배열도 포함)
+    if (allergyStepData?.allergies !== undefined) {
       const selectedIds = allergyStepData.allergies;
+
+      // 빈 배열이면 빈 배열 반환 (못먹는 음식이 없음)
+      if (selectedIds.length === 0) {
+        return [];
+      }
+
+      // 알레르기 ID를 이름으로 변환
       const allItems = categories.flatMap(category => category.items);
 
       return selectedIds
@@ -30,7 +37,7 @@ export function MyPageContainer() {
         .filter((item): item is { id: number; name: string } => item !== null);
     }
 
-    // 온보딩 데이터가 없으면 mock 데이터 사용
+    // 온보딩을 아직 하지 않았을 때만 mock 데이터 사용
     return mockRestrictions;
   }, [allergyStepData]);
 

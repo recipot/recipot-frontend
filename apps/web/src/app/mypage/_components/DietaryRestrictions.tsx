@@ -56,8 +56,8 @@ export default function DietaryRestrictions({
           className="flex h-[4.313rem] items-center gap-1 rounded-[0.875rem] bg-gray-100 py-[1.563rem] active:bg-gray-200"
           onClick={onOpenSheet}
         >
-          <AddIcon size={18} color="text-gray-600" />
-          <span className="text-16 text-gray-600">못먹는 음식이 있나요?</span>
+          <AddIcon size={18} />
+          <p className="text-16 text-gray-600">못먹는 음식이 있나요?</p>
         </Button>
       )}
     </div>

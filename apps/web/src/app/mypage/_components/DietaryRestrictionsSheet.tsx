@@ -189,7 +189,7 @@ export default function DietaryRestrictionsSheet({
             </DrawerClose>
           </div>
 
-          <DrawerTitle className="text-20sb mb-4 px-6 text-gray-900">
+          <DrawerTitle className="!text-22sb mb-4 px-6 text-gray-900">
             못먹는 음식 설정
           </DrawerTitle>
 
@@ -207,7 +207,7 @@ export default function DietaryRestrictionsSheet({
               />
             </div>
 
-            <div className="px-6">
+            <div className="px-6 pt-5">
               <AllergyCheckContainer
                 formId="dietary-restrictions-form"
                 onSubmit={handleSubmit}
@@ -232,7 +232,6 @@ export default function DietaryRestrictionsSheet({
               className="text-17sb bg-primary h-14 flex-1 text-white"
               type="submit"
               size="full"
-              disabled={selectedItems.length === 0}
             >
               못먹는 음식 선택 완료
             </Button>
