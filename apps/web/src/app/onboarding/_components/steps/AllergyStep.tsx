@@ -2,7 +2,11 @@
 
 import { useEffect, useState } from 'react';
 
-import { AllergyCheckContainer, useAllergyCheck } from '@/components/Allergy';
+import {
+  AllergyCheckContainer,
+  AllergyNavigationTabs,
+  useAllergyCheck,
+} from '@/components/Allergy';
 import { categories } from '@/components/Allergy/Allergy.constants';
 import { Button } from '@/components/common/Button';
 import { useScrollSpy } from '@/hooks';
@@ -10,12 +14,7 @@ import { useOnboardingStore } from '@/stores/onboardingStore';
 
 import { ONBOARDING_CONSTANTS, SCROLLBAR_HIDE_STYLE } from '../../_constants';
 import { useOnboardingActions, useOnboardingStep } from '../../_hooks';
-import {
-  getNavigationButtonClass,
-  getNavigationItemClass,
-  getSubmitButtonText,
-  onboardingStyles,
-} from '../../_utils';
+import { getSubmitButtonText, onboardingStyles } from '../../_utils';
 
 import type { AllergyStepData } from '../../_types';
 
@@ -47,26 +46,23 @@ export default function AllergyStep() {
     }
   }, [stepData, isRefreshed, resetItems, clearRefreshFlag]);
 
-  // 스크롤 상태 추적
-  const [hasScrolled, setHasScrolled] = useState(false);
-
   // ScrollSpy 훅 사용
   const sectionIds = ALLERGY_SECTIONS.map(section => section.id);
   const { activeSection, gnbRef } = useScrollSpy(sectionIds, {
     offset: ONBOARDING_CONSTANTS.SCROLL_SPY_OFFSET,
   });
 
-  // 스크롤 감지
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > ONBOARDING_CONSTANTS.SCROLL_THRESHOLD) {
-        setHasScrolled(true);
-      }
-    };
+  const [activeIndex, setActiveIndex] = useState(0);
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  // 활성 섹션에 따라 인덱스 업데이트
+  useEffect(() => {
+    if (activeSection) {
+      const index = sectionIds.findIndex(id => id === activeSection);
+      if (index !== -1) {
+        setActiveIndex(index);
+      }
+    }
+  }, [activeSection, sectionIds]);
 
   const handleSubmit = async (data: { items: number[] }) => {
     try {
@@ -81,9 +77,12 @@ export default function AllergyStep() {
     }
   };
 
-  // 섹션으로 스크롤하는 함수 (URL 해시 변경 없이)
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
+  // 섹션으로 스크롤하는 함수
+  const handleTabClick = (index: number) => {
+    const section = ALLERGY_SECTIONS.at(index);
+    if (!section) return;
+
+    const element = document.getElementById(section.id);
     if (element) {
       const navigationOffset = 130;
 
@@ -102,31 +101,17 @@ export default function AllergyStep() {
     <div className={onboardingStyles.container}>
       {/* 네비게이션 바 */}
       <div className={onboardingStyles.navigation.wrapper}>
-        <ul
-          ref={gnbRef}
+        <div
           className={onboardingStyles.navigation.list}
           style={SCROLLBAR_HIDE_STYLE}
         >
-          {ALLERGY_SECTIONS.map((section, index) => (
-            <li
-              key={section.id}
-              data-section-id={section.id}
-              className={getNavigationItemClass(index, ALLERGY_SECTIONS.length)}
-            >
-              <button
-                type="button"
-                onClick={() => scrollToSection(section.id)}
-                className={getNavigationButtonClass(
-                  activeSection === section.id,
-                  hasScrolled
-                )}
-                aria-label={`${section.label} 섹션으로 이동`}
-              >
-                {section.label}
-              </button>
-            </li>
-          ))}
-        </ul>
+          <AllergyNavigationTabs
+            activeIndex={activeIndex}
+            gnbRef={gnbRef}
+            onTabClick={handleTabClick}
+            variant="default"
+          />
+        </div>
       </div>
 
       {/* 메인 콘텐츠 */}

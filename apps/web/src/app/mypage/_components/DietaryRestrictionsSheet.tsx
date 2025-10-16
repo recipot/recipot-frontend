@@ -1,7 +1,14 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
+import {
+  AllergyCheckContainer,
+  AllergyNavigationTabs,
+  useAllergyCheck,
+} from '@/components/Allergy';
+import type { AllergyFormSchema } from '@/components/Allergy/Allergy.constants';
+import { categories } from '@/components/Allergy/Allergy.constants';
 import { Button } from '@/components/common/Button';
 import { CloseIcon, RefreshIcon } from '@/components/Icons';
 import {
@@ -10,58 +17,151 @@ import {
   DrawerContent,
   DrawerTitle,
 } from '@/components/ui/drawer';
-import { useScrollGradient } from '@/hooks/useScrollGradient';
 
-// TODO: api 연동 후 삭제
-const DIETARY_CATEGORIES = [
-  { key: 'seafood', name: '해산물류' },
-  { key: 'meat_dairy', name: '육류 및 유제품' },
-  { key: 'nuts_grains', name: '견과류 및 곡류' },
-  { key: 'fish', name: '견과류 및 곡류' },
-  { key: 'shell', name: '견과류 및 곡류' },
-];
-
-// TODO: api 연동 후 삭제
-const DIETARY_ITEMS = {
-  fish: ['어류', '게', '새우', '오징어', '조개류'],
-  meat_dairy: ['돼지', '닭', '소', '유제품'],
-  nuts_grains: ['땅콩', '호두', '잣'],
-  seafood: ['어류', '게', '새우', '오징어', '조개류'],
-  shell: ['어류', '게', '새우', '오징어', '조개류'],
-};
+import type { z } from 'zod';
 
 interface DietaryRestrictionsSheetProps {
+  initialSelectedItems?: number[];
   isOpen: boolean;
   onClose: () => void;
 }
 
 export default function DietaryRestrictionsSheet({
+  initialSelectedItems = [],
   isOpen,
   onClose,
 }: DietaryRestrictionsSheetProps) {
-  const [activeCategory, setActiveCategory] = useState(
-    DIETARY_CATEGORIES[0].key
-  );
+  const { handleItemToggle, resetItems, selectedItems } =
+    useAllergyCheck(initialSelectedItems);
 
-  const [selectedRestrictions, setSelectedRestrictions] = useState<string[]>(
-    []
-  );
+  const [activeCategory, setActiveCategory] = useState(0);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const gnbRef = useRef<HTMLDivElement>(null);
 
-  const { scrollRef, showGradient } = useScrollGradient([selectedRestrictions]);
+  // 스크롤 스파이를 위한 섹션 ID 생성
+  const sectionIds = categories.map((_, index) => `allergy-section-${index}`);
 
-  const handleSelect = (item: string) => {
-    setSelectedRestrictions(prev =>
-      prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]
+  // Drawer 내부 스크롤 감지
+  useEffect(() => {
+    const scrollContainer = scrollContainerRef.current;
+    if (!scrollContainer) return;
+
+    const handleScroll = () => {
+      let currentActiveSectionId: string | null = null;
+      const offset = 150;
+
+      // 스크롤 컨테이너 하단에 도달했는지 확인
+      const isAtBottom =
+        scrollContainer.scrollHeight - scrollContainer.scrollTop <=
+        scrollContainer.clientHeight + 2;
+
+      if (isAtBottom) {
+        currentActiveSectionId = sectionIds[sectionIds.length - 1];
+      } else {
+        for (const id of sectionIds) {
+          const element = document.getElementById(id);
+          if (element) {
+            const rect = element.getBoundingClientRect();
+            const containerRect = scrollContainer.getBoundingClientRect();
+            const relativeTop = rect.top - containerRect.top;
+
+            if (relativeTop <= offset) {
+              currentActiveSectionId = id;
+            }
+          }
+        }
+      }
+
+      if (currentActiveSectionId) {
+        const activeSectionIndex = sectionIds.findIndex(
+          id => id === currentActiveSectionId
+        );
+        if (activeSectionIndex !== -1) {
+          setActiveCategory(activeSectionIndex);
+        }
+      }
+    };
+
+    scrollContainer.addEventListener('scroll', handleScroll, {
+      passive: true,
+    });
+    handleScroll(); // 초기 실행
+
+    return () => scrollContainer.removeEventListener('scroll', handleScroll);
+  }, [sectionIds]);
+
+  // 활성 탭 자동 중앙 정렬
+  useEffect(() => {
+    if (!gnbRef.current) return;
+
+    const activeButton = gnbRef.current.querySelector<HTMLButtonElement>(
+      `[data-section-id="allergy-section-${activeCategory}"]`
     );
+
+    if (activeButton) {
+      activeButton.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'center',
+      });
+    }
+  }, [activeCategory]);
+
+  const handleTabClick = (index: number) => {
+    setActiveCategory(index);
+
+    // requestAnimationFrame으로 다음 프레임에 스크롤 실행
+    requestAnimationFrame(() => {
+      const section = document.getElementById(`allergy-section-${index}`);
+      const scrollContainer = scrollContainerRef.current;
+
+      if (section && scrollContainer) {
+        const navigationOffset = 80;
+
+        const elementPosition = section.getBoundingClientRect().top;
+        const containerPosition = scrollContainer.getBoundingClientRect().top;
+        const targetPosition =
+          elementPosition -
+          containerPosition +
+          scrollContainer.scrollTop -
+          navigationOffset;
+
+        // 부드러운 스크롤 애니메이션
+        const startPosition = scrollContainer.scrollTop;
+        const distance = targetPosition - startPosition;
+        const duration = 300; // 300ms
+        let startTime: number | null = null;
+
+        const animation = (currentTime: number) => {
+          startTime ??= currentTime;
+          const timeElapsed = currentTime - startTime;
+          const progress = Math.min(timeElapsed / duration, 1);
+
+          // easeInOutCubic
+          const ease =
+            progress < 0.5
+              ? 4 * progress * progress * progress
+              : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+
+          scrollContainer.scrollTop = startPosition + distance * ease;
+
+          if (progress < 1) {
+            requestAnimationFrame(animation);
+          }
+        };
+
+        requestAnimationFrame(animation);
+      }
+    });
   };
 
   const handleReset = () => {
-    setSelectedRestrictions([]);
-    console.log('선택 초기화');
+    resetItems();
   };
 
-  const handleComplete = () => {
-    console.log('못 먹는 음식 선택 완료:', selectedRestrictions);
+  const handleSubmit = (data: z.infer<typeof AllergyFormSchema>) => {
+    // TODO: API 연동 시 data.items 사용
+    void data;
     onClose();
   };
 
@@ -80,71 +180,35 @@ export default function DietaryRestrictionsSheet({
             </DrawerClose>
           </div>
 
-          <DrawerTitle className="text-20sb mb-[2rem] px-6 text-gray-900">
+          <DrawerTitle className="text-20sb mb-4 px-6 text-gray-900">
             못먹는 음식 설정
           </DrawerTitle>
 
           <div
-            ref={scrollRef}
-            className="flex-grow overflow-y-auto px-[1.875rem] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            ref={scrollContainerRef}
+            data-scroll-container
+            className="flex-grow overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
-            <div className="no-scrollbar flex gap-2 overflow-x-auto pb-9">
-              {DIETARY_CATEGORIES.map(category => (
-                <button
-                  key={category.key}
-                  onClick={() => setActiveCategory(category.key)}
-                  className={`text-15sb h-10 flex-shrink-0 rounded-full px-4 py-[0.5313rem] transition-colors ${
-                    activeCategory === category.key
-                      ? 'bg-gray-900 text-white'
-                      : 'bg-gray-100 text-gray-600'
-                  }`}
-                >
-                  {category.name}
-                </button>
-              ))}
+            <div className="sticky top-0 z-50 bg-white py-4">
+              <AllergyNavigationTabs
+                activeIndex={activeCategory}
+                gnbRef={gnbRef}
+                onTabClick={handleTabClick}
+                variant="drawer"
+              />
             </div>
 
-            <div className="space-y-8">
-              {DIETARY_CATEGORIES.map(category => (
-                <div key={category.key}>
-                  <h3 className="text-17sb mb-3 text-gray-900">
-                    {category.name}
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {DIETARY_ITEMS[
-                      category.key as keyof typeof DIETARY_ITEMS
-                    ]?.map(item => (
-                      <Button
-                        key={item}
-                        onClick={() => handleSelect(item)}
-                        variant="foodItem"
-                        shape="square"
-                        className={`text-15sb h-10 flex-grow basis-[calc(33.33%-0.5rem)] rounded-[0.625rem] border border-gray-300 px-3 py-[1.125rem] ${
-                          selectedRestrictions.includes(item)
-                            ? 'bg-[#F6FFEC] text-[#68982D]'
-                            : ''
-                        } `}
-                      >
-                        {item}
-                      </Button>
-                    ))}
-                    <div className="basis-[calc(33.33%-0.5rem)]" />
-                    <div className="basis-[calc(33.33%-0.5rem)]" />
-                  </div>
-                </div>
-              ))}
+            <div className="px-6">
+              <AllergyCheckContainer
+                formId="dietary-restrictions-form"
+                onSubmit={handleSubmit}
+                selectedItems={selectedItems}
+                onItemToggle={handleItemToggle}
+              />
             </div>
-
-            <div className="pb-10" />
           </div>
-          <div
-            className={`pointer-events-none absolute bottom-[5.375rem] h-6 w-full transition-opacity duration-300 ${
-              showGradient
-                ? 'bg-gradient-to-t from-white/90 to-transparent opacity-100'
-                : 'opacity-0'
-            } `}
-          />
-          <div className="sticky bottom-0 flex flex-shrink-0 items-center gap-3 bg-white px-6 pb-[2.125rem] transition-shadow duration-200">
+
+          <div className="sticky bottom-0 flex flex-shrink-0 items-center gap-3 bg-white px-6 pt-4 pb-[2.125rem] transition-shadow duration-200">
             <Button
               variant="reset"
               className="flex h-14 w-14 items-center justify-center bg-gray-600 p-0 hover:bg-gray-400"
@@ -154,11 +218,12 @@ export default function DietaryRestrictionsSheet({
             </Button>
 
             <Button
+              form="dietary-restrictions-form"
               shape="round"
               className="text-17sb bg-primary h-14 flex-1 text-white"
-              onClick={handleComplete}
+              type="submit"
               size="full"
-              disabled={selectedRestrictions.length === 0}
+              disabled={selectedItems.length === 0}
             >
               못먹는 음식 선택 완료
             </Button>
