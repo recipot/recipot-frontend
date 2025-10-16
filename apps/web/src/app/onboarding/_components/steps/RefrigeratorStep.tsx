@@ -7,25 +7,11 @@ import { useRouter } from 'next/navigation';
 import { onboardingAPI } from '@/api/onboardingAPI';
 import { Button } from '@/components/common/Button';
 import { IngredientsSearch } from '@/components/IngredientsSearch';
-import { useOnboardingStore } from '@/stores/onboardingStore';
 import { useSelectedFoodsStore } from '@/stores/selectedFoodsStore';
 
 import { ONBOARDING_CONSTANTS } from '../../_constants';
 import { useOnboardingActions } from '../../_hooks';
 import { getSubmitButtonText, onboardingStorage } from '../../_utils';
-
-/**
- * stepData가 빈 객체인지 안전하게 확인하는 헬퍼 함수
- * @param stepData - 확인할 스텝 데이터
- * @returns stepData가 존재하고 빈 객체인 경우 true
- */
-const isStepDataEmpty = (stepData: unknown): boolean => {
-  return (
-    stepData != null &&
-    typeof stepData === 'object' &&
-    Object.keys(stepData).length === 0
-  );
-};
 
 export default function RefrigeratorStep() {
   const { setUser, user } = useAuth();
@@ -34,8 +20,6 @@ export default function RefrigeratorStep() {
   const { clearRefreshFlag, isRefreshed, markStepCompleted, setStepData } =
     useOnboardingActions();
 
-  // 저장된 데이터 불러오기
-  const stepData = useOnboardingStore(state => state.stepData[3]);
   const clearAllFoods = useSelectedFoodsStore(state => state.clearAllFoods);
 
   const [selectedCount, setSelectedCount] = useState(0);
@@ -43,13 +27,12 @@ export default function RefrigeratorStep() {
 
   // 새로고침 버튼을 눌렀을 때만 선택된 재료들 초기화
   useEffect(() => {
-    if (isRefreshed && isStepDataEmpty(stepData)) {
+    if (isRefreshed) {
       clearAllFoods();
       setSelectedCount(0);
       clearRefreshFlag();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stepData, isRefreshed]);
+  }, [isRefreshed, clearAllFoods, clearRefreshFlag]);
 
   // 온보딩 완료 처리
   const completeOnboarding = () => {

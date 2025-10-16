@@ -40,11 +40,11 @@ export default function AllergyStep() {
 
   // 새로고침 버튼을 눌렀을 때만 로컬 상태 초기화
   useEffect(() => {
-    if (isRefreshed && stepData && Object.keys(stepData).length === 0) {
+    if (isRefreshed) {
       resetItems();
       clearRefreshFlag(); // 플래그 리셋
     }
-  }, [stepData, isRefreshed, resetItems, clearRefreshFlag]);
+  }, [isRefreshed, resetItems, clearRefreshFlag]);
 
   // ScrollSpy 훅 사용
   const sectionIds = ALLERGY_SECTIONS.map(section => section.id);
