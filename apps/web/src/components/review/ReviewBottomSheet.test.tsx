@@ -6,6 +6,26 @@ import type { ReviewData } from '@/types/review.types';
 
 import { ReviewBottomSheet } from '.';
 
+// Drawer 컴포넌트를 간단한 div로 모킹
+vi.mock('../ui/drawer', () => ({
+  Drawer: ({ children, open }: { children: React.ReactNode; open: boolean }) =>
+    open ? <div data-testid="drawer">{children}</div> : null,
+  DrawerClose: ({
+    children,
+    onClick,
+  }: {
+    children: React.ReactNode;
+    onClick: () => void;
+  }) => (
+    <button onClick={onClick} data-testid="drawer-close">
+      {children}
+    </button>
+  ),
+  DrawerContent: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="drawer-content">{children}</div>
+  ),
+}));
+
 const mockReviewData: ReviewData = {
   completionCount: 2,
   recipeId: 'recipe-1',
