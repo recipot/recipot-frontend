@@ -33,6 +33,7 @@ const shouldAddAuthHeader = (url?: string): boolean => {
   // 인증이 필요하지 않은 엔드포인트
   const noAuthPatterns = [
     '/v1/login/', // 모든 로그인 관련 엔드포인트
+    '/v1/auth/info/', // 사용자 ID로 토큰 조회 (토큰 발급 전)
     '/v1/health', // 헬스체크
   ];
 
@@ -45,7 +46,16 @@ const shouldAddAuthHeader = (url?: string): boolean => {
 
 // Axios 인스턴스 생성
 const createAuthApiInstance = (): AxiosInstance => {
+  // 환경 확인 (NEXT_PUBLIC_APP_ENV 사용)
+  const APP_ENV = process.env.NEXT_PUBLIC_APP_ENV || 'production';
+  const isDev = APP_ENV === 'development';
   const baseURL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+  console.info(`🌍 앱 환경: ${APP_ENV}`);
+  console.info(`🔗 백엔드 URL: ${baseURL}`);
+  console.info(
+    `🔐 인증 방식: ${isDev ? 'LocalStorage + Authorization 헤더' : 'httpOnly 쿠키'}`
+  );
 
   const instance = axios.create({
     baseURL,
@@ -53,22 +63,35 @@ const createAuthApiInstance = (): AxiosInstance => {
     headers: {
       'Content-Type': 'application/json',
     },
+    // 개발(localhost + dev.hankkibuteo.com): LocalStorage (false)
+    // 프로덕션(www.hankkibuteo.com): httpOnly 쿠키 (true)
+    withCredentials: !isDev,
   });
 
   // 요청 인터셉터
   instance.interceptors.request.use(
     config => {
-      // 자동 토큰 추가
-      const token = getStoredToken();
-      if (token && shouldAddAuthHeader(config.url)) {
-        config.headers.Authorization = `Bearer ${token}`;
+      const url = config.url ?? '';
+
+      // 개발 환경: LocalStorage에서 토큰 읽어서 Authorization 헤더 추가
+      // 프로덕션: httpOnly 쿠키 사용 (헤더 추가 안 함)
+      if (isDev && shouldAddAuthHeader(url)) {
+        const token = getStoredToken();
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
       }
 
       // 요청 로깅 (개발 환경에서만)
-      if (process.env.NODE_ENV === 'development') {
-        console.log(
-          `[API Request] ${config.method?.toUpperCase()} ${config.url}`,
-          token ? '(with auth)' : '(no auth)'
+      if (isDev) {
+        const authHeader = config.headers.Authorization;
+        const authInfo =
+          authHeader && typeof authHeader === 'string'
+            ? `(Authorization: ${authHeader.substring(0, 20)}...)`
+            : '(인증 없음)';
+        console.info(
+          `[API Request] ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`,
+          authInfo
         );
       }
       return config;
@@ -181,25 +204,36 @@ export const authService = {
   // 사용자 ID로 토큰 정보 조회 (백엔드 방식)
   async getTokenByUserId(userId: number) {
     try {
-      console.log('사용자 토큰 정보 조회 시작:', {
+      console.info('🔍 [getTokenByUserId] 사용자 토큰 정보 조회 시작:', {
         userId,
         timestamp: new Date().toISOString(),
       });
 
       const response = await authApi.get(`/v1/auth/info/${userId}`);
-      console.log('토큰 정보 조회 응답:', response.data);
+      console.info('📦 [getTokenByUserId] 백엔드 응답:', response.data);
 
       if (response.data.status === 200 && response.data.data) {
         const data = response.data.data;
+
+        console.info('✅ [getTokenByUserId] 토큰 수신 성공');
+        console.info(
+          `🔑 [getTokenByUserId] Access Token: ${data.accessToken.substring(0, 30)}...`
+        );
+        console.info(
+          `🔑 [getTokenByUserId] Refresh Token: ${data.refreshToken.substring(0, 30)}...`
+        );
 
         // 토큰 저장
         setStoredToken(data.accessToken);
         if (data.refreshToken) {
           localStorage.setItem('refreshToken', data.refreshToken);
         }
+        console.info('💾 [getTokenByUserId] 토큰 LocalStorage에 저장 완료');
 
         // 사용자 정보 조회
+        console.info('👤 [getTokenByUserId] 사용자 정보 조회 시작...');
         const userInfo = await this.getUserInfo();
+        console.info('👤 [getTokenByUserId] 사용자 정보 조회 성공:', userInfo);
 
         return {
           accessToken: data.accessToken,
@@ -208,10 +242,22 @@ export const authService = {
           user: userInfo,
         };
       } else {
+        console.error(
+          '❌ [getTokenByUserId] 토큰 정보 응답 형식 오류:',
+          response.data
+        );
         throw new Error('토큰 정보 응답 형식이 올바르지 않습니다.');
       }
     } catch (error) {
-      console.error('토큰 정보 조회 실패:');
+      console.error('❌ [getTokenByUserId] 토큰 정보 조회 실패:', error);
+      if (error instanceof Error && 'response' in error) {
+        const axiosError = error as any;
+        console.error('📝 [getTokenByUserId] 에러 상세:', {
+          status: axiosError.response?.status,
+          data: axiosError.response?.data,
+          message: axiosError.message,
+        });
+      }
       throw new Error('토큰 정보 조회에 실패했습니다.', { cause: error });
     }
   },
@@ -354,11 +400,17 @@ export const authService = {
   // 사용자 정보 조회 (현재 로그인된 사용자)
   async getUserInfo(): Promise<UserInfo> {
     try {
-      const response = await authApi.get('/v1/user/profile/me');
-      console.log('사용자 정보 조회 응답:', response.data);
+      const response = await authApi.get('/v1/users/profile/me');
+      console.info('✅ 사용자 정보 조회 응답:', response.data);
+
+      // 백엔드 응답 형식: { status: 200, data: { id, email, name } }
+      if (response.data.status === 200 && response.data.data) {
+        return response.data.data;
+      }
+
       return response.data;
     } catch (error) {
-      console.error('사용자 정보 조회 에러:', error);
+      console.error('❌ 사용자 정보 조회 에러:', error);
       throw new Error('사용자 정보 조회에 실패했습니다.');
     }
   },

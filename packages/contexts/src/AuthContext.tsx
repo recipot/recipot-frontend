@@ -36,27 +36,38 @@ export function AuthProvider({ children }: { children: any }) {
   useEffect(() => {
     const initializeAuth = async () => {
       // 개발 환경에서는 MSW가 준비될 때까지 대기
-      if (process.env.NODE_ENV === 'development' && !mswReady) {
+      const APP_ENV = process.env.NEXT_PUBLIC_APP_ENV || 'production';
+      const isDev = APP_ENV === 'development';
+
+      if (isDev && !mswReady) {
         return; // MSW가 준비되지 않았으면 대기
       }
 
-      // 페이지 로드 시 저장된 토큰 확인
-      const savedToken = localStorage.getItem('authToken');
-      const savedRefreshToken = localStorage.getItem('refreshToken');
+      console.info('🔄 인증 상태 초기화 중...');
 
-      if (savedToken) {
+      // LocalStorage에서 토큰 확인
+      const storedToken = localStorage.getItem('authToken');
+      const storedRefreshToken = localStorage.getItem('refreshToken');
+
+      if (storedToken) {
+        console.info('✅ LocalStorage에서 토큰 발견');
+        setToken(storedToken);
+        setRefreshToken(storedRefreshToken);
+
         try {
-          const userData = await authService.verifyToken(savedToken);
-          setUser(userData?.data as UserInfo);
-          setToken(savedToken);
-          if (savedRefreshToken) {
-            setRefreshToken(savedRefreshToken);
-          }
+          // 토큰으로 사용자 정보 조회
+          const userInfo = await authService.getUserInfo();
+          console.info('✅ 사용자 정보 조회 성공:', userInfo);
+          setUser(userInfo);
         } catch (error) {
-          console.error('토큰 검증 실패:', error);
+          console.error('❌ 토큰이 유효하지 않음, 로그아웃 처리');
           localStorage.removeItem('authToken');
           localStorage.removeItem('refreshToken');
+          setToken(null);
+          setRefreshToken(null);
         }
+      } else {
+        console.info('ℹ️ 저장된 토큰 없음 (로그인 필요)');
       }
 
       setLoading(false);
@@ -90,26 +101,60 @@ export function AuthProvider({ children }: { children: any }) {
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    console.info('🔄 로그아웃 처리 중...');
+
+    // LocalStorage에서 토큰 제거
     localStorage.removeItem('authToken');
     localStorage.removeItem('refreshToken');
+
+    // 프론트엔드 상태 초기화
     setUser(null);
     setToken(null);
     setRefreshToken(null);
+
+    // 백엔드 로그아웃 API 호출 (선택사항)
+    try {
+      await authService.logout();
+      console.info('✅ 로그아웃 성공');
+    } catch (error) {
+      console.error('로그아웃 API 실패 (무시):', error);
+      // LocalStorage는 이미 삭제되었으므로 에러 무시
+    }
   };
 
   // 토큰 자동 갱신
   const refreshAuth = async () => {
-    if (refreshToken) {
-      try {
-        const newTokenData = await authService.refreshToken(refreshToken);
-        setToken(newTokenData.accessToken);
-        setRefreshToken(newTokenData.refreshToken);
-        localStorage.setItem('authToken', newTokenData.accessToken);
+    const currentRefreshToken =
+      refreshToken ?? localStorage.getItem('refreshToken');
+
+    if (!currentRefreshToken) {
+      console.error('❌ refresh token 없음');
+      logout();
+      return;
+    }
+
+    try {
+      console.info('🔄 토큰 갱신 중...');
+      const newTokenData = await authService.refreshToken(currentRefreshToken);
+
+      // 새 토큰 저장
+      localStorage.setItem('authToken', newTokenData.accessToken);
+      if (newTokenData.refreshToken) {
         localStorage.setItem('refreshToken', newTokenData.refreshToken);
-      } catch (error) {
-        logout();
       }
+
+      setToken(newTokenData.accessToken);
+      setRefreshToken(newTokenData.refreshToken ?? currentRefreshToken);
+
+      console.info('✅ 토큰 갱신 성공');
+
+      // 사용자 정보 다시 조회
+      const userInfo = await authService.getUserInfo();
+      setUser(userInfo);
+    } catch (error) {
+      console.error('❌ 토큰 갱신 실패:', error);
+      logout();
     }
   };
 
