@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { X } from 'lucide-react';
 import Image from 'next/image';
 
 import type {
@@ -12,7 +11,7 @@ import type {
 } from '@/types/review.types';
 
 import { Button } from '../common/Button';
-import { Drawer, DrawerClose, DrawerContent } from '../ui/drawer';
+import { Drawer, DrawerContent } from '../ui/drawer';
 import { Textarea } from '../ui/textarea';
 import { EmotionSection } from './EmotionSection';
 import { CloseIcon } from '../Icons';
