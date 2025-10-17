@@ -15,6 +15,7 @@ import { Button } from '../common/Button';
 import { Drawer, DrawerClose, DrawerContent } from '../ui/drawer';
 import { Textarea } from '../ui/textarea';
 import { EmotionSection } from './EmotionSection';
+import { CloseIcon } from '../Icons';
 
 const EMOTION_OPTIONS = {
   difficulty: [
@@ -76,13 +77,13 @@ export function ReviewBottomSheet({
           <div className="overflow-y-auto px-4 pb-6">
             {/* 헤더 - 상단에 고정 */}
             <div className="sticky top-0 z-10 -mx-4 flex justify-end bg-white px-4 py-3">
-              <DrawerClose
+              <button
                 type="button"
-                className="rounded-full p-1.5 transition-colors hover:bg-gray-100"
+                onClick={onClose}
+                className="rounded-full p-1.5"
               >
-                <X className="h-5 w-5 text-gray-600" />
-                <span className="sr-only">닫기</span>
-              </DrawerClose>
+                <CloseIcon size={24} />
+              </button>
             </div>
 
             {/* 컨텐츠 영역 */}
