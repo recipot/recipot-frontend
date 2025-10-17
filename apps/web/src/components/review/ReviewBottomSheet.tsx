@@ -78,9 +78,9 @@ export function ReviewBottomSheet({
     <Drawer open={isOpen}>
       <DrawerContent className="mx-auto w-full max-w-[430px]">
         <form onSubmit={handleSubmit(onFormSubmit)}>
-          <div className="overflow-y-auto px-4 pb-6">
+          <div className="rounded-t-2xl px-4 pb-6">
             {/* 헤더 - 상단에 고정 */}
-            <div className="sticky top-0 z-10 -mx-4 flex justify-end bg-white px-4 py-3">
+            <div className="sticky top-0 z-10 -mx-4 flex justify-end bg-white px-4">
               <button
                 type="button"
                 onClick={handleClose}
