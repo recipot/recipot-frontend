@@ -16,7 +16,7 @@ const RecipeSearchLoadingPage = ({
         alt="레시피 검색 중 캐릭터"
         width={138}
         height={138}
-        className="mb-8 h-[8.625rem] w-[8.625rem] rounded-[100px] object-cover"
+        className="mb-8 rounded-[100px] object-cover"
       />
       <p className="text-18sb text-center text-white">
         {userName}님의 <br />
