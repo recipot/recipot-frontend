@@ -3,7 +3,7 @@
 import { ReviewBottomSheet } from '@/components/review';
 import React, { useState } from 'react';
 
-const page = () => {
+const Home = () => {
   const [isOpen, setIsOpen] = useState(true);
 
   return (
@@ -22,4 +22,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Home;
