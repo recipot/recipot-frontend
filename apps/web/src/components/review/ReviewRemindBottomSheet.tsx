@@ -12,8 +12,9 @@ export function ReviewRemindBottomSheet() {
 
   const [isOpen, setIsOpen] = useState(true);
 
-  const handleRecipeClick = () => {
-    router.push('/mypage/recipes/cooked');
+  const handleRecipeClick = (recipeId: number) => {
+    // TODO : URL 수정 여부 확인 필요
+    router.push(`/mypage/recipes/cooked/${recipeId}`);
   };
 
   const recipes: ReviewRecipeData[] = [
@@ -84,7 +85,7 @@ export function ReviewRemindBottomSheet() {
                 {recipes.map(recipe => (
                   <ReviewRecipeCard
                     key={recipe.id}
-                    onClick={handleRecipeClick}
+                    onClick={() => handleRecipeClick(recipe.id)}
                     recipe={recipe}
                   />
                 ))}
