@@ -27,7 +27,7 @@ export function ReviewRecipeCard({ onClick, recipe }: ReviewRecipeCardProps) {
       onClick={onClick}
     >
       <article className="flex w-full items-center">
-        <div className="mr-4 flex h-[72px] w-[72px] shrink-0 items-center justify-center overflow-hidden rounded-[18px] bg-[#edf0f7]">
+        <div className="mr-4 flex h-[4.5rem] w-[4.5rem] overflow-hidden rounded-[18px]">
           <Image
             src={recipe.imageUrl}
             alt={recipe.alt}

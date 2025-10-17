@@ -48,7 +48,7 @@ export function ReviewRemindBottomSheet() {
   return (
     <Drawer open={isOpen} onOpenChange={handleClose}>
       <DrawerContent className="mx-auto w-full max-w-[430px]">
-        <form>
+        <div>
           <div className="overflow-y-auto px-6 pb-6">
             {/* 헤더 - 상단에 고정 */}
             <header className="sticky top-0 z-10 -mx-4 flex justify-end bg-white px-4">
@@ -56,7 +56,6 @@ export function ReviewRemindBottomSheet() {
                 type="button"
                 className="rounded-full p-1.5"
                 aria-label="리뷰 리마인드 바텀시트 닫기"
-                onClick={handleClose}
               >
                 <CloseIcon size={24} color="#626A7A" />
                 <span className="sr-only">닫기</span>
@@ -92,7 +91,7 @@ export function ReviewRemindBottomSheet() {
               </section>
             </main>
           </div>
-        </form>
+        </div>
       </DrawerContent>
     </Drawer>
   );
