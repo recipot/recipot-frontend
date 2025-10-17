@@ -3,9 +3,11 @@ import { AddIcon } from '@/components/Icons';
 import type { DietaryRestriction } from '@/types/MyPage.types';
 
 export default function DietaryRestrictions({
+  onOpenSheet,
   restrictions,
 }: {
   restrictions: DietaryRestriction[];
+  onOpenSheet: () => void;
 }) {
   const hasRestrictions = restrictions.length > 0;
 
@@ -34,12 +36,13 @@ export default function DietaryRestrictions({
             <div className="flex flex-col items-center gap-[0.875rem]">
               <Button
                 shape="round"
-                className="bg-primary-sub flex h-12 w-12 items-center justify-center p-0"
+                className="bg-primary-subGreen flex h-12 w-12 items-center justify-center p-0"
                 size="md"
+                onClick={onOpenSheet}
               >
                 <AddIcon size={22} color="white" />
               </Button>
-              <span className="text-16 text-primary-sub leading-[100%]">
+              <span className="text-16 text-primary-subGreen leading-[100%]">
                 변경
               </span>
             </div>
@@ -51,9 +54,10 @@ export default function DietaryRestrictions({
         <Button
           shape="square"
           className="flex h-[4.313rem] items-center gap-1 rounded-[0.875rem] bg-gray-100 py-[1.563rem] active:bg-gray-200"
+          onClick={onOpenSheet}
         >
-          <AddIcon size={18} color="text-gray-600" />
-          <span className="text-16 text-gray-600">못먹는 음식이 있나요?</span>
+          <AddIcon size={18} />
+          <p className="text-16 text-gray-600">못먹는 음식이 있나요?</p>
         </Button>
       )}
     </div>

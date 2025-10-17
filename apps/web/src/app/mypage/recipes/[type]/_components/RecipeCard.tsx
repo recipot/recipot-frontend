@@ -17,7 +17,7 @@ export default function RecipeCard({ onToggleSave, recipe }: RecipeCardProps) {
       <div className="flex min-w-0 flex-grow flex-col justify-between gap-1">
         <div className="flex items-center">
           <h3 className="text-17sb text-gray-900">{recipe.title}</h3>
-          <ArrowIcon size={18} color="var(--gray-900)" />
+          <ArrowIcon size={18} color="hsl(var(--gray-900))" />
         </div>
         <p className="text-14 truncate text-gray-600">
           {recipe.healthPoints?.map(point => point.content)}
@@ -27,7 +27,7 @@ export default function RecipeCard({ onToggleSave, recipe }: RecipeCardProps) {
         <HeartIcon
           size={20}
           active={recipe.isSaved}
-          color="var(--brand-primary)"
+          color="hsl(var(--brand-primary))"
         />
       </button>
     </div>
