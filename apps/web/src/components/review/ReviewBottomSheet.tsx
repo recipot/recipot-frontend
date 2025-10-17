@@ -64,13 +64,18 @@ export function ReviewBottomSheet({
     onSubmit(data);
   };
 
+  // 닫기 기능을 컴포넌트 내부에서만 제어
+  const handleClose = () => {
+    onClose();
+  };
+
   const isFormValid =
     watchedEmotions.taste &&
     watchedEmotions.difficulty &&
     watchedEmotions.experience;
 
   return (
-    <Drawer open={isOpen} onOpenChange={onClose}>
+    <Drawer open={isOpen}>
       <DrawerContent className="mx-auto w-full max-w-[430px]">
         <form onSubmit={handleSubmit(onFormSubmit)}>
           <div className="overflow-y-auto px-4 pb-6">
@@ -78,7 +83,7 @@ export function ReviewBottomSheet({
             <div className="sticky top-0 z-10 -mx-4 flex justify-end bg-white px-4 py-3">
               <button
                 type="button"
-                onClick={onClose}
+                onClick={handleClose}
                 className="rounded-full p-1.5"
               >
                 <CloseIcon size={24} />
