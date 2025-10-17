@@ -74,8 +74,14 @@ describe('ReviewBottomSheet', () => {
     const user = userEvent.setup();
     render(<ReviewBottomSheet {...defaultProps} />);
 
-    const closeButton = screen.getByTestId('drawer-close');
-    await user.click(closeButton);
+    const headerButtons = screen.getAllByRole('button');
+    const closeButton = headerButtons.find(
+      button =>
+        button.querySelector('svg') && button.className.includes('rounded-full')
+    );
+
+    expect(closeButton).toBeDefined();
+    await user.click(closeButton!);
 
     expect(defaultProps.onClose).toHaveBeenCalled();
   });
