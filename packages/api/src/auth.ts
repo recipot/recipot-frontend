@@ -44,6 +44,18 @@ const shouldAddAuthHeader = (url?: string): boolean => {
   return true;
 };
 
+// 안전한 내부 경로로 리다이렉트
+const safeRedirect = (path: string): void => {
+  if (typeof window === 'undefined') return;
+
+  // 상대 경로만 허용 (외부 URL 차단)
+  if (path.startsWith('/') && !path.startsWith('//')) {
+    window.location.href = path;
+  } else {
+    console.error('안전하지 않은 리다이렉트 시도:', path);
+  }
+};
+
 const createAuthApiInstance = (): AxiosInstance => {
   const APP_ENV = process.env.NEXT_PUBLIC_APP_ENV || 'production';
   const isDev = APP_ENV === 'development';
@@ -113,7 +125,7 @@ const createAuthApiInstance = (): AxiosInstance => {
 
         if (typeof window !== 'undefined') {
           if (!window.location.pathname.includes('/signin')) {
-            window.location.href = '/signin';
+            safeRedirect('/signin');
           }
         }
       }
@@ -298,12 +310,12 @@ export const authService = {
     }
   },
 
-  async checkTokenExpiration(): Promise<{
+  async checkTokenExpiration(token: string): Promise<{
     isExpired: boolean;
     expiresAt: string;
   }> {
     try {
-      const response = await authApi.get('/v1/auth/expiration/{token}');
+      const response = await authApi.get(`/v1/auth/expiration/${token}`);
       return response.data;
     } catch (error) {
       console.error('토큰 만료 확인 실패:', error);
