@@ -290,12 +290,11 @@ class OnboardingStorage {
    */
   debugInfo(): void {
     const data = this.getAllData();
-    console.group('🔍 OnboardingStorage Debug Info');
-    console.log('전체 데이터:', data);
-    console.log('완료 여부:', this.isOnboardingComplete());
-    console.log('유효성:', this.isDataValid());
-    console.log('진행 상황:', this.restoreProgress());
-    console.groupEnd();
+    console.info('🔍 OnboardingStorage Debug Info');
+    console.info('전체 데이터:', data);
+    console.info('완료 여부:', this.isOnboardingComplete());
+    console.info('유효성:', this.isDataValid());
+    console.info('진행 상황:', this.restoreProgress());
   }
 }
 
