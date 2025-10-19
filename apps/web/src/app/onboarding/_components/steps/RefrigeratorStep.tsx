@@ -34,12 +34,11 @@ export default function RefrigeratorStep() {
     }
   }, [isRefreshed, clearAllFoods, clearRefreshFlag]);
 
-  // 온보딩 완료 처리
+  // TODO: 온보딩 완료 처리 : 온보딩 플래그 추가 시 작업 필요함
   const completeOnboarding = () => {
     if (user) {
       setUser({
         ...user,
-        isOnboardingCompleted: true,
       });
     }
   };
