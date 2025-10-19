@@ -4,7 +4,7 @@ import { Button } from '@/components/common/Button';
 import { CookIcon, HeartIcon } from '@/components/Icons';
 
 interface RecipeActionsProps {
-  isLiked: boolean;
+  isLiked?: boolean;
   onToggleLike: () => void;
 }
 

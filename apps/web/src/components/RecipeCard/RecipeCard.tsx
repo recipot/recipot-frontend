@@ -11,7 +11,7 @@ import { RecipeMetaInfo } from './RecipeMetaInfo';
 interface RecipeCardProps {
   recipe: Recipe;
   index: number;
-  isLiked: boolean;
+  isLiked?: boolean;
   onToggleLike: (index: number, recipeId: number) => void;
   isMainCard?: boolean;
 }
@@ -28,20 +28,10 @@ export const RecipeCard = memo(
       onToggleLike(index, recipe.id);
     }, [onToggleLike, index, recipe.id]);
 
-    const handleCardClick = useCallback(() => {
-      // 레시피 상세 URL로 이동 (외부 링크 또는 API 엔드포인트)
-      window.open(`/recipe/${recipe.id}`, '_blank');
-    }, [recipe.id]);
-
-    const handleKeyDown = useCallback(
-      (e: React.KeyboardEvent) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          handleCardClick();
-        }
-      },
-      [handleCardClick]
-    );
+    // const handleCardClick = useCallback(() => {
+    //   // 레시피 상세 URL로 이동 (외부 링크 또는 API 엔드포인트)
+    //   window.open(`/recipe/${recipe.id}`, '_blank');
+    // }, [recipe.id]);
 
     return (
       <div style={CARD_STYLES.container}>
