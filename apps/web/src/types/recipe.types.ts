@@ -18,3 +18,15 @@ export interface RecipeLikeResponse {
   liked: boolean;
   message: string;
 }
+
+export interface Condition {
+  id: number;
+  name: string;
+}
+
+export interface ConditionsResponse {
+  status: number;
+  data: {
+    conditions: Condition[];
+  };
+}
