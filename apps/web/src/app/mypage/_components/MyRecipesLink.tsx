@@ -1,13 +1,13 @@
 import Link from 'next/link';
 
+import type { CompletedRecipe } from '@/api/mypageAPI';
 import { Button } from '@/components/common/Button';
 import { ArrowIcon, CookIcon } from '@/components/Icons';
-import type { CookedRecipe } from '@/types/MyPage.types';
 
 export default function MyRecipesLink({
   cookedRecipes,
 }: {
-  cookedRecipes: CookedRecipe[];
+  cookedRecipes: CompletedRecipe[];
 }) {
   return (
     <Link href="/mypage/recipes/cooked">
@@ -23,7 +23,7 @@ export default function MyRecipesLink({
         </div>
         <div className="flex items-center gap-1">
           <span className="text-28 text-[#66A80F]">{cookedRecipes.length}</span>
-          <ArrowIcon size={18} color="var(--brand-primary)" />
+          <ArrowIcon size={18} color="hsl(var(--brand-primary))" />
         </div>
       </Button>
     </Link>

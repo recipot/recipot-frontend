@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { PageHeader } from '@/app/mypage/_components/PageHeader';
 import CookedRecipeList from '@/app/mypage/recipes/[type]/_components/CookedRecipeList';
 import DefaultRecipeList from '@/app/mypage/recipes/[type]/_components/DefaultRecipeList';
+import { useCompletedRecipes } from '@/hooks/useCompletedRecipes';
 import {
   mockCookedRecipes,
   mockDefaultRecipes,
@@ -38,18 +39,21 @@ const PAGE_CONFIG = {
 export default function RecipeListPage({ type }: { type: PageType }) {
   const config = PAGE_CONFIG[type];
 
-  const [cookedRecipes, setCookedRecipes] = useState(mockCookedRecipes);
+  // 완료한 요리 데이터
+  const { data: completedRecipesData, isLoading } = useCompletedRecipes({
+    limit: 100,
+    page: 1,
+  });
+
   const [defaultRecipes, setDefaultRecipes] = useState(mockDefaultRecipes);
+
+  // API 데이터 우선 사용, 없으면 mock 데이터
+  const cookedRecipes = completedRecipesData?.items ?? mockCookedRecipes;
 
   const handleToggleSave = (recipeId: number) => {
     if (type === 'cooked') {
-      setCookedRecipes(prev =>
-        prev.map(recipe =>
-          recipe.id === recipeId
-            ? { ...recipe, isSaved: !recipe.isSaved }
-            : recipe
-        )
-      );
+      // TODO: API 연동 필요 - 보관 토글 API 호출
+      console.log('보관 토글:', recipeId);
     } else {
       setDefaultRecipes(prev =>
         prev.map(recipe =>
@@ -60,6 +64,20 @@ export default function RecipeListPage({ type }: { type: PageType }) {
       );
     }
   };
+
+  // 로딩 처리
+  if (type === 'cooked' && isLoading) {
+    return (
+      <div>
+        <div className="px-5">
+          <PageHeader title={config.title} />
+        </div>
+        <main className="px-5">
+          <div className="py-20 text-center text-gray-500">로딩 중...</div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div>

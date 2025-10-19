@@ -1,6 +1,7 @@
+import type { CompletedRecipe } from '@/api/mypageAPI';
 import { Button } from '@/components/common/Button';
 import { useScrollGradient } from '@/hooks/useScrollGradient';
-import type { CookedRecipe, CookedRecipeListProps } from '@/types/MyPage.types';
+import type { CookedRecipeListProps } from '@/types/MyPage.types';
 
 import RecipeCard from './RecipeCard';
 
@@ -18,8 +19,8 @@ export default function CookedRecipeList({
       </div>
     );
   }
-
-  const recipesByDate = recipes.reduce<Record<string, CookedRecipe[]>>(
+  console.log('recipes: ', recipes);
+  const recipesByDate = recipes.reduce<Record<string, CompletedRecipe[]>>(
     (acc, recipe) => {
       const date = recipe.cookedDate;
       if (!acc[date]) {

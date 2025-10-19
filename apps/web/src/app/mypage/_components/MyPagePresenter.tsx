@@ -2,13 +2,10 @@
 
 import { useState } from 'react';
 
+import type { CompletedRecipe } from '@/api/mypageAPI';
 import { PageHeader } from '@/app/mypage/_components/PageHeader';
 import { useOnboardingStore } from '@/stores/onboardingStore';
-import type {
-  CookedRecipe,
-  DietaryRestriction,
-  User,
-} from '@/types/MyPage.types';
+import type { DietaryRestriction, User } from '@/types/MyPage.types';
 
 import DietaryRestrictions from './DietaryRestrictions';
 import DietaryRestrictionsSheet from './DietaryRestrictionsSheet';
@@ -20,7 +17,7 @@ import UserProfile from './UserProfile';
 interface MyPagePresenterProps {
   user: User | null;
   restrictions: DietaryRestriction[];
-  cookedRecipes: CookedRecipe[];
+  cookedRecipes: CompletedRecipe[];
 }
 
 export function MyPagePresenter({

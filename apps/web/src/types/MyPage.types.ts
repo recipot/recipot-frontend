@@ -1,3 +1,5 @@
+import type { CompletedRecipe } from '@/api/mypageAPI';
+
 export interface PageHeaderProps {
   title: string;
 }
@@ -46,7 +48,7 @@ export interface DefaultRecipeListProps {
 }
 
 export interface CookedRecipeListProps {
-  recipes: CookedRecipe[];
+  recipes: CompletedRecipe[];
   config: configType;
   onToggleSave: (recipeId: number) => void;
 }
