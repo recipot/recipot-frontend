@@ -1,17 +1,34 @@
 'use client';
 
 import { useState } from 'react';
+import { useAuth } from '@recipot/contexts';
+import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/common/Button/Button';
 import { Modal } from '@/components/common/Modal/Modal';
 
+const LOGOUT_DESCRIPTION =
+  '정말로 로그아웃 하시겠습니까?\n로그아웃 후, 서비스 이용 시 재로그인이 필요합니다.';
+
 export default function LogoutButton() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { logout } = useAuth();
+  const router = useRouter();
 
-  const handleLogout = () => {
-    // TODO: 로그아웃 로직 구현
-    console.log('로그아웃 처리');
-    setIsModalOpen(false);
+  const handleLogout = async () => {
+    try {
+      setIsLoading(true);
+      await logout();
+      setIsModalOpen(false);
+      router.push('/signin');
+    } catch (error) {
+      console.error('로그아웃 처리 중 오류:', error);
+      // 에러가 발생해도 로그인 페이지로 이동
+      router.push('/signin');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -28,25 +45,21 @@ export default function LogoutButton() {
       <Modal
         open={isModalOpen}
         onOpenChange={setIsModalOpen}
-        description={
-          <span className="block text-left">
-            정말로 로그아웃 하시겠습니까?
-            <br />
-            로그아웃 후, 서비스 이용 시 재로그인이 필요합니다.
-          </span>
-        }
+        description={LOGOUT_DESCRIPTION}
       >
         <div className="flex items-center justify-end gap-[0.375rem]">
           <Button
             onClick={handleLogout}
-            className="text-14 h-[2.125rem] border border-[#747474] bg-white px-[0.9375rem] py-3 text-black"
+            disabled={isLoading}
+            className="text-14 h-[2.125rem] border border-[#747474] bg-white px-[0.9375rem] py-3 text-black disabled:opacity-50"
             shape="square"
           >
-            로그아웃
+            {isLoading ? '로그아웃 중...' : '로그아웃'}
           </Button>
           <Button
             onClick={() => setIsModalOpen(false)}
-            className="text-14b h-[2.125rem] bg-[#747474] px-4 py-3 text-white"
+            disabled={isLoading}
+            className="text-14b h-[2.125rem] bg-[#747474] px-4 py-3 text-white disabled:opacity-50"
             shape="square"
           >
             닫기
