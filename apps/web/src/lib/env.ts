@@ -5,7 +5,7 @@
  * NEXT_PUBLIC_APP_ENV를 사용하여 실제 환경을 판단
  */
 
-export const APP_ENV = process.env.NEXT_PUBLIC_APP_ENV || 'production';
+export const APP_ENV = process.env.NEXT_PUBLIC_APP_ENV ?? 'production';
 
 /**
  * 개발 환경 여부 (localhost + dev.hankkibuteo.com)
