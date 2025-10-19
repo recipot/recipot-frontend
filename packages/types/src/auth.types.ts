@@ -6,9 +6,14 @@ export interface AuthResponse<T = unknown> {
 }
 
 export interface UserInfo {
-  id: string;
-  name: string;
+  id: number;
   email: string;
+  nickname: string;
+  profileImageUrl: string;
+  recipeCompleteCount: number;
+  isFirstEntry: boolean;
+  role: 'general' | 'admin';
+  platform: 'kakao' | 'google';
 }
 
 export interface TokenResponse {

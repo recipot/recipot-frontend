@@ -322,18 +322,6 @@ export const authService = {
       throw new Error('토큰 만료 확인에 실패했습니다.');
     }
   },
-
-  async logout(): Promise<AuthResponse> {
-    try {
-      const response = await authApi.post<AuthResponse>('/v1/auth/logout', {});
-      removeStoredToken();
-      return response.data;
-    } catch (error) {
-      removeStoredToken();
-      console.error('로그아웃 실패:', error);
-      throw new Error('로그아웃에 실패했습니다.');
-    }
-  },
 };
 
 // 토큰 관리 유틸리티 함수들을 외부에서 사용할 수 있도록 export

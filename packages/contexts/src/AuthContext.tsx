@@ -113,14 +113,7 @@ export function AuthProvider({ children }: { children: any }) {
     setToken(null);
     setRefreshToken(null);
 
-    // 백엔드 로그아웃 API 호출 (선택사항)
-    try {
-      await authService.logout();
-      console.info('✅ 로그아웃 성공');
-    } catch (error) {
-      console.error('로그아웃 API 실패 (무시):', error);
-      // LocalStorage는 이미 삭제되었으므로 에러 무시
-    }
+    console.info('✅ 로그아웃 성공');
   };
 
   // 토큰 자동 갱신

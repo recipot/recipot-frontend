@@ -41,8 +41,13 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
   const setupUser = useCallback(
     (user: UserInfo) => {
       setUser(user);
-      // TODO: 추후 온보딩 구분 플래그에 따른 라다이렉트 조건 분기 필요
-      router.push('/');
+
+      // isFirstEntry가 true이면 온보딩이 필요한 사용자
+      if (user.isFirstEntry) {
+        router.push('/onboarding');
+      } else {
+        router.push('/');
+      }
     },
     [setUser, router]
   );
