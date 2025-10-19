@@ -5,17 +5,21 @@ import { AuthProvider, MswProvider } from '@recipot/contexts';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
+import { isDevelopment, logEnvironment } from '@/lib/env';
+
 import type { ReactNode } from 'react';
 
 export default function Providers({ children }: { children: ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
-  const [mswReady, setMswReady] = useState(
-    process.env.NODE_ENV !== 'development'
-  );
+  const [mswReady, setMswReady] = useState(!isDevelopment);
 
-  // 개발 환경에서만 MSW 워커 시작
+  // 개발 환경에서만 MSW 워커 시작 (localhost + dev.hankkibuteo.com)
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
+    // 환경 정보 로깅
+    logEnvironment();
+
+    if (isDevelopment) {
+      console.info('🔧 개발 환경: MSW 초기화 중...');
       import('@/mocks/browser')
         .then(({ startMswWorker }) => {
           return startMswWorker();
@@ -28,6 +32,8 @@ export default function Providers({ children }: { children: ReactNode }) {
           console.error('MSW 초기화 실패:', error);
           setMswReady(true); // 에러가 있어도 앱은 계속 실행
         });
+    } else {
+      console.info('🌐 프로덕션 환경: MSW 비활성화');
     }
   }, []);
 
@@ -48,9 +54,7 @@ export default function Providers({ children }: { children: ReactNode }) {
       <MswProvider mswReady={mswReady}>
         <AuthProvider>{children}</AuthProvider>
       </MswProvider>
-      {process.env.NODE_ENV === 'development' ? (
-        <ReactQueryDevtools initialIsOpen={false} />
-      ) : null}
+      {isDevelopment ? <ReactQueryDevtools initialIsOpen={false} /> : null}
     </QueryClientProvider>
   );
 }
