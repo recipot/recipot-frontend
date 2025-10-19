@@ -185,7 +185,10 @@ export const authService = {
         console.log('카카오 OAuth URL (백엔드 리다이렉트):', kakaoUrl);
 
         // 백엔드 주소로 리다이렉트되는 것이 정상
-        if (kakaoUrl.includes('redirect_uri=http%3A%2F%2F3.34.40.123')) {
+        if (
+          kakaoUrl.includes('redirect_uri=http%3A%2F%2Fapi.hankkibuteo.com') ||
+          kakaoUrl.includes('redirect_uri=https%3A%2F%2Fapi.hankkibuteo.com')
+        ) {
           console.log('✅ 백엔드 리다이렉트 방식으로 설정됨');
         }
 
