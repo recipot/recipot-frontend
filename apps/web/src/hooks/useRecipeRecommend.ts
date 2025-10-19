@@ -1,12 +1,10 @@
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 import type { RecipeRecommendResponse } from '@/types/recipe.types';
 
 // TODO : 추후 타입 정의 변경 필요
 interface RecipeRecommendReturn {
-  likedRecipes: boolean[];
-  toggleLike: (index: number, recipeId: number) => Promise<void>;
   selectedIngredients: string[];
   updateSelectedIngredients: (ingredients: string[]) => Promise<void>;
 }
@@ -21,16 +19,6 @@ export const fetchRecipeRecommend =
     }
     return response.json();
   };
-
-const toggleRecipeLike = async (recipeId: number, isLiked: boolean) => {
-  // TODO : API 나오면 수정 필요
-  const response = await fetch(`/api/recipe-recommend/${recipeId}/like`, {
-    method: isLiked ? 'DELETE' : 'POST',
-  });
-  if (!response.ok) {
-    throw new Error('좋아요 상태 변경에 실패했습니다.');
-  }
-};
 
 // 선택된 재료 관련 API 함수들
 const fetchSelectedIngredients = async (): Promise<{
@@ -59,8 +47,6 @@ const updateSelectedIngredients = async (selectedIngredients: string[]) => {
 };
 
 export const useRecipeRecommend = (): RecipeRecommendReturn => {
-  const [likedRecipes, setLikedRecipes] = useState<boolean[]>([]);
-
   // 선택된 재료 목록 조회
   const { data: selectedIngredientsData, refetch: refetchSelectedIngredients } =
     useQuery({
@@ -77,52 +63,6 @@ export const useRecipeRecommend = (): RecipeRecommendReturn => {
     },
   });
 
-  // 좋아요 토글 뮤테이션
-  // TODO : API 나오면 수정 필요
-  const likeMutation = useMutation({
-    mutationFn: ({
-      isLiked,
-      recipeId,
-    }: {
-      recipeId: number;
-      isLiked: boolean;
-      index: number;
-    }) => toggleRecipeLike(recipeId, isLiked),
-    onSuccess: (_, { index, isLiked }) => {
-      setLikedRecipes(prev => {
-        // 배열이 비어있으면 새로 생성
-        if (prev.length === 0) {
-          const newLikes = new Array(index + 1).fill(false);
-          newLikes[index] = !isLiked;
-          return newLikes;
-        }
-
-        // 배열이 있으면 업데이트
-        const newLikes = [...prev];
-        if (index >= 0 && index < newLikes.length) {
-          newLikes[index] = !isLiked;
-        }
-        return newLikes;
-      });
-    },
-  });
-
-  const toggleLike = useCallback(
-    async (index: number, recipeId: number) => {
-      if (index < 0) return;
-
-      // 배열이 비어있으면 false로 처리
-      const isCurrentlyLiked = likedRecipes[index] ?? false;
-
-      await likeMutation.mutateAsync({
-        index,
-        isLiked: isCurrentlyLiked,
-        recipeId,
-      });
-    },
-    [likedRecipes, likeMutation]
-  );
-
   const handleUpdateSelectedIngredients = useCallback(
     async (ingredients: string[]) => {
       await updateIngredientsMutation.mutateAsync(ingredients);
@@ -131,9 +71,7 @@ export const useRecipeRecommend = (): RecipeRecommendReturn => {
   );
 
   return {
-    likedRecipes,
     selectedIngredients: selectedIngredientsData?.selectedIngredients ?? [],
-    toggleLike,
     updateSelectedIngredients: handleUpdateSelectedIngredients,
   };
 };
