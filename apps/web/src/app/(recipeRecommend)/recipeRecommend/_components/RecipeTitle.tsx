@@ -1,17 +1,46 @@
 import React from 'react';
 
-// TODO : 추후 title로 동적 할당 필요
+import type { Condition } from '@/types/recipe.types';
 
-const RecipeTitle = ({
-  title = '요리할 여유가 그저 그래요',
-}: {
-  title?: string;
-}) => {
+interface RecipeTitleProps {
+  condition?: Condition | null | undefined;
+}
+
+const RecipeTitle = ({ condition }: RecipeTitleProps) => {
+  const getTitleByCondition = (
+    condition: Condition | null | undefined
+  ): string => {
+    if (!condition) {
+      return '요리할 여유가 그저 그래요'; // 기본값
+    }
+
+    // 조건 이름에 따른 title 반환
+    return condition.name;
+  };
+
+  // 조건에 따른 이모지 매핑 (유니코드 사용)
+  const getEmojiByCondition = (condition: Condition | null | undefined) => {
+    if (!condition) {
+      return '\u{1F611}';
+    }
+
+    switch (condition.name) {
+      case '힘들어':
+        return '\u{1F623}';
+      case '그럭저럭':
+        return '\u{1F611}';
+      case '충분해':
+        return '\u{1F60A}';
+    }
+  };
+
+  const title = getTitleByCondition(condition);
+  const emoji = getEmojiByCondition(condition);
+
   return (
     <div className="flex w-full items-center justify-center self-stretch">
-      {/* TODO : 감정에 따른 감정 상태 표현 변경 필요 */}
       <h2 className="text-22 mr-[2px]">{title}</h2>
-      <div className="text-24 flex h-6 w-6 items-center">😑</div>
+      <div className="text-24 flex h-6 w-6 items-center">{emoji}</div>
     </div>
   );
 };

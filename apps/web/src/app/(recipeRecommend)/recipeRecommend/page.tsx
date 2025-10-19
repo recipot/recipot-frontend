@@ -6,6 +6,8 @@ import './styles.css';
 
 import React, { useCallback, useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
+import { tokenUtils } from 'packages/api/src/auth';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
 import { Button } from '@/components/common/Button';
@@ -16,6 +18,8 @@ import {
   useRecipeRecommend,
 } from '@/hooks/useRecipeRecommend';
 import { useToast } from '@/hooks/useToast';
+import { useCookStateStepData } from '@/stores/onboardingStore';
+import type { Condition, ConditionsResponse } from '@/types/recipe.types';
 
 import RecipeHeader from './_components/RecipeHeader';
 import RecipeTags from './_components/RecipeTags';
@@ -50,7 +54,14 @@ const ErrorState = ({
 
 export default function RecipeRecommend() {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [currentCondition, setCurrentCondition] = useState<Condition | null>(
+    null
+  );
   const { isVisible, message, showToast } = useToast();
+
+  // 온보딩에서 저장된 사용자의 기분 상태 가져오기
+  const cookStateData = useCookStateStepData();
+  const userSelectedMood = cookStateData?.mood;
 
   // TanStack Query로 레시피 데이터 조회
   const { data, error, isError, isLoading, refetch } = useQuery({
@@ -59,26 +70,74 @@ export default function RecipeRecommend() {
     staleTime: 5 * 60 * 1000, // 5분
   });
 
-  const { likedRecipes, selectedIngredients, toggleLike } =
-    useRecipeRecommend();
+  const { selectedIngredients } = useRecipeRecommend();
+
+  const token = tokenUtils.getToken();
 
   // 토스트 상태 관리
   const [toastIcon, setToastIcon] = useState<'heart' | 'recipe'>('recipe');
 
-  // 하트 아이콘 클릭 시 토스트 표시를 위한 래퍼 함수
-  const handleToggleLike = useCallback(
-    (index: number, recipeId: number) => {
-      const isCurrentlyLiked = likedRecipes[index] ?? false;
-      toggleLike(index, recipeId);
+  // 사용자 기분 상태에 따른 조건 매핑
+  const getConditionByMood = (
+    mood: string | undefined,
+    conditions: Condition[]
+  ): Condition | null => {
+    if (!mood || conditions.length === 0) return null;
 
-      // 좋아요 상태가 변경될 때 토스트 표시
-      if (!isCurrentlyLiked) {
-        setToastIcon('heart');
-        showToast('레시피가 저장되었어요');
+    // 기분 상태에 따른 조건 매핑
+    const moodToConditionMap: Record<string, string> = {
+      bad: '힘들어',
+      good: '충분해',
+      neutral: '그럭저럭',
+    };
+
+    const targetConditionName = moodToConditionMap[mood];
+    if (!targetConditionName) return null;
+
+    // 조건 목록에서 해당하는 조건 찾기
+    return (
+      conditions.find(condition => condition.name === targetConditionName) ??
+      null
+    );
+  };
+
+  useEffect(() => {
+    const getCondition = async () => {
+      try {
+        const { data } = await axios.get<ConditionsResponse>(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/conditions`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        // 사용자가 선택한 기분 상태에 따라 조건 설정
+        const userCondition = getConditionByMood(
+          userSelectedMood,
+          data.data.conditions
+        );
+        setCurrentCondition(userCondition);
+      } catch (error) {
+        console.error('조건 조회 실패:', error);
       }
-    },
-    [likedRecipes, toggleLike, showToast]
-  );
+    };
+    getCondition();
+  }, [token, userSelectedMood]);
+
+  // 하트 아이콘 클릭 시 토스트 표시를 위한 래퍼 함수
+  const handleToggleLike = async () => {
+    const res = await axios.post(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/users/bookmarks`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    console.log(res, 'res');
+  };
 
   // 새로고침 버튼 클릭 시 토스트 표시를 위한 래퍼 함수
   const handleRefresh = useCallback(() => {
@@ -125,7 +184,7 @@ export default function RecipeRecommend() {
             <RecipeTags selectedIngredients={selectedIngredients} />
 
             {/* Title - 고정 높이 */}
-            <RecipeTitle />
+            <RecipeTitle condition={currentCondition} />
           </div>
 
           <div className="flex h-full w-full flex-col items-center">
@@ -146,7 +205,6 @@ export default function RecipeRecommend() {
                     <RecipeCard
                       recipe={recipe}
                       index={index}
-                      isLiked={likedRecipes[index] ?? false}
                       onToggleLike={handleToggleLike}
                       isMainCard={index === activeIndex}
                     />
