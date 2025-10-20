@@ -79,7 +79,7 @@ export const allergyCheckHandlers = [
   }),
 
   // 못 먹는 재료 저장 (새로운 API)
-  http.post('/v1/ingredients/restricted', async ({ request }) => {
+  http.post('/v1/users/ingredients/unavailable', async ({ request }) => {
     const { ingredientIds } = (await request.json()) as {
       ingredientIds: number[];
     };
@@ -99,35 +99,6 @@ export const allergyCheckHandlers = [
           savedIngredientIds: ingredientIds,
         },
         status: 200,
-      },
-      { status: 200 }
-    );
-  }),
-
-  // 기존 API (하위 호환성 유지)
-  http.post('/api/allergy', async ({ request }) => {
-    const { categories } = (await request.json()) as { categories: number[] };
-
-    if (!Array.isArray(categories)) {
-      return HttpResponse.json(
-        { error: '잘못된 데이터 형식입니다.' },
-        { status: 400 }
-      );
-    }
-
-    await delay(600);
-    return HttpResponse.json(
-      {
-        analysis: {
-          animalCount: categories.filter(id => [6, 7, 8, 9, 10].includes(id))
-            .length,
-          seafoodCount: categories.filter(id => [1, 2, 3, 4, 5].includes(id))
-            .length,
-          totalSelected: categories.length,
-        },
-        message: '못 먹는 음식 item POST 완료',
-        selectedItems: categories,
-        success: true,
       },
       { status: 200 }
     );
