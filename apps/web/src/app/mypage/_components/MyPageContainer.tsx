@@ -30,12 +30,7 @@ export function MyPageContainer() {
       }
 
       // 알레르기 ID를 이름으로 변환
-      const allItems = categories.flatMap(category =>
-        category.items.map(item => ({
-          id: item.id,
-          label: item.label,
-        }))
-      );
+      const allItems = categories.flatMap(category => category.items);
 
       return selectedIds
         .map((id: number) => {
