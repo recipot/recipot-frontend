@@ -16,8 +16,7 @@ export const MEASUREMENT_TABS: MeasurementTab[] = [
     label: '가루류',
   },
   {
-    activeIcon: <WaterIcon active color="#111827" />,
-    icon: <WaterIcon active color="#6B7280" />,
+    icon: <WaterIcon color="#6B7280" />,
     id: 'liquid',
     label: '액체류',
   },
@@ -27,8 +26,8 @@ export const MEASUREMENT_TABS: MeasurementTab[] = [
     label: '다진양념류',
   },
   {
-    activeIcon: <WaterIcon active color="#111827" />,
-    icon: <WaterIcon active color="#6B7280" />,
+    activeIcon: <WaterIcon color="#111827" />,
+    icon: <WaterIcon color="#6B7280" />,
     id: 'sauce',
     label: '장류',
   },
