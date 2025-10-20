@@ -5,6 +5,8 @@ import { AuthProvider, MswProvider } from '@recipot/contexts';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
+import { isDevelopment } from '@/lib/env';
+
 import type { ReactNode } from 'react';
 
 export default function Providers({ children }: { children: ReactNode }) {
@@ -54,9 +56,7 @@ export default function Providers({ children }: { children: ReactNode }) {
       <MswProvider mswReady={mswReady}>
         <AuthProvider>{children}</AuthProvider>
       </MswProvider>
-      {process.env.NODE_ENV === 'development' ? (
-        <ReactQueryDevtools initialIsOpen={false} />
-      ) : null}
+      {isDevelopment ? <ReactQueryDevtools initialIsOpen={false} /> : null}
     </QueryClientProvider>
   );
 }
