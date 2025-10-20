@@ -6,9 +6,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useFoodList } from '@/hooks/useFoodList';
 import { useSubmitSelectedFoods } from '@/hooks/useSubmitSelectedFoods';
 import { useSelectedFoodsStore } from '@/stores/selectedFoodsStore';
-import type { Food } from '@/types/food.types';
 
 import FoodAdd from './IngredientsSearch';
+
+import type { Food } from '@recipot/api';
 
 // Mock hooks
 vi.mock('@/hooks/useFoodList');

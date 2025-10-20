@@ -1,6 +1,5 @@
+import { foodAPI } from '@recipot/api';
 import { useQuery } from '@tanstack/react-query';
-
-import { foodAPI } from '@/api/foodAPI';
 
 export const FOOD_LIST_QUERY_KEY = ['food-list'] as const;
 

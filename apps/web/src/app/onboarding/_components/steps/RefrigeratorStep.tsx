@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { onboardingAPI } from '@recipot/api';
 import { useAuth } from '@recipot/contexts';
 import { useRouter } from 'next/navigation';
 
-import { onboardingAPI } from '@/api/onboardingAPI';
 import { Button } from '@/components/common/Button';
 import { IngredientsSearch } from '@/components/IngredientsSearch';
 import { useSelectedFoodsStore } from '@/stores/selectedFoodsStore';

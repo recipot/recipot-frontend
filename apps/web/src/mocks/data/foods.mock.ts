@@ -1,4 +1,4 @@
-import type { Food } from '@/types/food.types';
+import type { Food } from '@recipot/api';
 
 /**
  * Mock 재료 데이터 (백엔드 API 응답 형식)

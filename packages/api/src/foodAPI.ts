@@ -1,6 +1,6 @@
-import { createApiInstance } from '@recipot/api';
+import type { Food, FoodListApiResponse } from './types';
 
-import type { Food, FoodListApiResponse } from '@/types/food.types';
+import { createApiInstance } from './createApiInstance';
 
 export interface SubmitSelectedFoodsRequest {
   selectedFoodIds: number[];

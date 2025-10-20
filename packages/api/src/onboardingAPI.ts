@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import type { CompleteOnboardingData } from '@/app/onboarding/_utils/onboardingStorage';
+import type { CompleteOnboardingData } from './types';
 
 interface ApiRequest {
   call: Promise<unknown>;

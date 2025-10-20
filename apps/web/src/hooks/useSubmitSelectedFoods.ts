@@ -1,6 +1,5 @@
+import { foodAPI } from '@recipot/api';
 import { useMutation } from '@tanstack/react-query';
-
-import { foodAPI } from '@/api/foodAPI';
 
 export const useSubmitSelectedFoods = () => {
   return useMutation({
