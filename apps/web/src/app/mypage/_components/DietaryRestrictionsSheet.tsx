@@ -35,7 +35,7 @@ export default function DietaryRestrictionsSheet({
   onSave,
 }: DietaryRestrictionsSheetProps) {
   // 백엔드에서 재료 데이터 페칭
-  const { categories, error, initialSelectedIds, isLoading } = useAllergyData();
+  const { categories, error, isLoading } = useAllergyData();
 
   const { handleItemToggle, resetItems, resetToInitial, selectedItems } =
     useAllergyCheck(initialSelectedItems);

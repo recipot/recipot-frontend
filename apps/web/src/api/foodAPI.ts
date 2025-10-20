@@ -43,7 +43,7 @@ const createFoodApiInstance = (): AxiosInstance => {
   instance.interceptors.request.use(
     config => {
       if (process.env.NODE_ENV === 'development') {
-        console.log(
+        console.info(
           `[Food API Request] ${config.method?.toUpperCase()} ${config.url}`
         );
       }
@@ -59,7 +59,7 @@ const createFoodApiInstance = (): AxiosInstance => {
   instance.interceptors.response.use(
     response => {
       if (process.env.NODE_ENV === 'development') {
-        console.log(
+        console.info(
           `[Food API Response] ${response.status} ${response.config.url}`
         );
       }
