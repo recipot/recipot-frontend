@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
+import { tokenUtils } from 'packages/api/src/auth';
 
 import { Button } from '@/components/common/Button';
 import { CookIcon } from '@/components/Icons';
@@ -10,7 +11,7 @@ import { useScrollSpy } from '@/hooks/useScrollSpy';
 
 import CookwareSection from './CookwareSection';
 import IngredientsSection from './IngredientsSection';
-import RecipeHeader from './RecipeHeader';
+import RecipeDetailHeader from './RecipeDetailHeader';
 import StepSection from './StepSection';
 import TabNavigation from './TabNavigation';
 
@@ -21,22 +22,7 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
 
   const [error] = useState<string | null>(null);
 
-  const [token, setToken] = useState<string | null>(null);
-
-  useEffect(() => {
-    const getAccessToken = async () => {
-      const { data } = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/auth/debug`,
-        {
-          role: 'U01001',
-          userId: '1',
-        }
-      );
-      // console.log(data.data.accessToken, 'getToken');
-      setToken(data.data.accessToken);
-    };
-    getAccessToken();
-  }, []);
+  const token = tokenUtils.getToken();
 
   const { data: recipeResponse, isLoading } = useQuery({
     enabled: !!token, // 토큰이 있을 때만 쿼리 실행
@@ -160,7 +146,7 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
   return (
     <div className="flex min-h-screen w-full justify-center bg-gray-50">
       <div className="w-[390px] bg-gray-100">
-        <RecipeHeader recipe={recipeData} />
+        <RecipeDetailHeader recipe={recipeData} />
 
         <TabNavigation
           activeTab={activeTab}
