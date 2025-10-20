@@ -15,8 +15,8 @@ export function SeasoningList({ seasonings }: SeasoningListProps) {
 
   return (
     <div className="w-full space-y-0 rounded-xl bg-gray-50 px-4 py-5">
-      {seasonings?.map((seasoning, index) => (
-        <div className="flex items-center py-3" key={index}>
+      {seasonings?.map(seasoning => (
+        <div className="flex items-center py-3" key={seasoning.id}>
           <div className="flex min-w-0 flex-shrink-0 items-center">
             <PowderIcon />
             <span className="text-15sb max-w-[120px] truncate text-gray-700">

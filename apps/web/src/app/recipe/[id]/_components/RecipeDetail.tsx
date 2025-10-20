@@ -20,11 +20,14 @@ import type { ApiResponse, TabId } from '../types/recipe.types';
 export function RecipeDetail({ recipeId }: { recipeId: string }) {
   const tabContainerRef = useRef<HTMLDivElement>(null);
 
-  const [error] = useState<string | null>(null);
-
   const token = tokenUtils.getToken();
 
-  const { data: recipeResponse, isLoading } = useQuery({
+  const {
+    data: recipeResponse,
+    error,
+    isError,
+    isLoading,
+  } = useQuery({
     enabled: !!token, // 토큰이 있을 때만 쿼리 실행
     queryFn: async () => {
       const response = await axios.get<ApiResponse>(
@@ -87,11 +90,11 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
     );
   }
 
-  if (error) {
+  if (isError) {
     return (
       <div className="flex min-h-screen w-full items-center justify-center bg-gray-50">
         <div className="text-center">
-          <p className="mb-4 text-red-600">{error}</p>
+          <p className="mb-4 text-red-600">{error?.message}</p>
           <Button
             variant="default"
             onClick={() => window.location.reload()}
