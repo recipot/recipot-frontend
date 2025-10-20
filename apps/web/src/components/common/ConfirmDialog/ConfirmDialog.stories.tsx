@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { ConfirmDialog } from './ConfirmDialog';
 
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 const meta = {
   component: ConfirmDialog,
