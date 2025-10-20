@@ -8,7 +8,7 @@ interface StepSectionProps {
 
 export function StepSection({ steps }: StepSectionProps) {
   return (
-    <div id="steps" className="mt-6 rounded-2xl bg-white p-6">
+    <div id="steps" className="mt-6 h-[44rem] rounded-2xl bg-white p-6">
       <h3 className="text-17sb mb-4 text-gray-900">요리순서</h3>
       <div className="space-y-6">
         {steps?.map(step => (

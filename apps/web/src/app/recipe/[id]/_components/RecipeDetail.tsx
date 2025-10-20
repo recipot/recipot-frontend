@@ -43,53 +43,25 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
   // 섹션 ID 배열 생성
   const sectionIds = useMemo(() => ['ingredients', 'cookware', 'steps'], []);
 
-  const { gnbRef } = useScrollSpy(sectionIds, {
+  const { activeSection, gnbRef } = useScrollSpy(sectionIds, {
     offset: 80, // 탭 높이 + 여유공간
   });
 
-  const [activeTab, setActiveTab] = useState<TabId>('ingredients');
-
-  // 커스텀 스크롤 감지 로직
+  const [isInitialState, setIsInitialState] = useState(true);
   useEffect(() => {
     const handleScroll = () => {
-      const tabHeight = tabContainerRef.current?.offsetHeight ?? 80;
-      const viewportCenter = window.innerHeight / 2;
-
-      // 페이지 끝에 도달했을 때 마지막 섹션 활성화
-      const isAtBottom =
-        window.innerHeight + window.scrollY >= document.body.offsetHeight - 2;
-
-      if (isAtBottom) {
-        setActiveTab(sectionIds[sectionIds.length - 1] as TabId);
-        return;
+      if (isInitialState) {
+        setIsInitialState(false);
       }
-
-      let closestSection = 'ingredients';
-      let minDistance = Infinity;
-
-      sectionIds.forEach(sectionId => {
-        const element = document.getElementById(sectionId);
-        if (element) {
-          const rect = element.getBoundingClientRect();
-          const sectionMiddle = rect.top + rect.height / 2;
-          const distance = Math.abs(sectionMiddle - viewportCenter);
-
-          if (distance < minDistance && rect.bottom > tabHeight) {
-            minDistance = distance;
-            closestSection = sectionId;
-          }
-        }
-      });
-
-      setActiveTab(closestSection as TabId);
     };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
+    window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [sectionIds]);
+  }, [isInitialState]);
 
   const handleTabClick = (tabId: TabId, e: React.MouseEvent) => {
+    if (isInitialState) {
+      setIsInitialState(false);
+    }
     e.preventDefault();
 
     const targetElement = document.getElementById(tabId);
@@ -149,7 +121,7 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
         <RecipeDetailHeader recipe={recipeData} />
 
         <TabNavigation
-          activeTab={activeTab}
+          activeTab={isInitialState ? 'ingredients' : (activeSection as TabId)}
           gnbRef={gnbRef}
           onTabClick={handleTabClick}
           tabContainerRef={tabContainerRef}
