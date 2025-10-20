@@ -14,7 +14,9 @@ export const generateRandomDate = (daysFromNow: number = 7) => {
 export const generateMockUser = (overrides: any = {}) => {
   return {
     avatar: `https://picsum.photos/100/100?random=${Math.floor(Math.random() * 1000)}`,
-    cookingLevel: ['beginner', 'intermediate', 'advanced'][Math.floor(Math.random() * 3)],
+    cookingLevel: ['beginner', 'intermediate', 'advanced'][
+      Math.floor(Math.random() * 3)
+    ],
     email: `test${Date.now()}@example.com`,
     id: generateId('user_'),
     joinDate: generateRandomDate(-30), // 30일 전부터
@@ -26,10 +28,19 @@ export const generateMockUser = (overrides: any = {}) => {
 
 // 랜덤 재료 데이터 생성
 export const generateMockIngredient = (overrides: any = {}) => {
-  const names = ['김치', '돼지고기', '두부', '양파', '마늘', '대파', '당근', '감자'];
+  const names = [
+    '김치',
+    '돼지고기',
+    '두부',
+    '양파',
+    '마늘',
+    '대파',
+    '당근',
+    '감자',
+  ];
   const categories = ['채소류', '육류', '콩류', '곡류'];
   const units = ['g', 'kg', '개', '컵', 'ml'];
-  
+
   return {
     category: categories[Math.floor(Math.random() * categories.length)],
     expiryDate: generateRandomDate(14), // 2주 내
@@ -43,17 +54,23 @@ export const generateMockIngredient = (overrides: any = {}) => {
 };
 
 // 응답 지연 시뮬레이션 (네트워크 상황별)
-export const getNetworkDelay = (type: 'fast' | 'normal' | 'slow' = 'normal') => {
+export const getNetworkDelay = (
+  type: 'fast' | 'normal' | 'slow' = 'normal'
+) => {
   const delays = {
-    fast: Math.random() * 200 + 100,    // 100-300ms
-    normal: Math.random() * 500 + 300,  // 300-800ms  
-    slow: Math.random() * 2000 + 1000,  // 1-3초
+    fast: Math.random() * 200 + 100, // 100-300ms
+    normal: Math.random() * 500 + 300, // 300-800ms
+    slow: Math.random() * 2000 + 1000, // 1-3초
   };
   return Math.floor(delays[type]);
 };
 
 // 에러 응답 생성기
-export const createErrorResponse = (message: string, code?: string, status: number = 400) => {
+export const createErrorResponse = (
+  message: string,
+  code?: string,
+  status: number = 400
+) => {
   return {
     code: code || 'BAD_REQUEST',
     error: message,
@@ -82,11 +99,15 @@ export const validateMockData = (data: any, requiredFields: string[]) => {
 };
 
 // 페이지네이션 헬퍼
-export const paginateData = (data: any[], page: number = 1, limit: number = 10) => {
+export const paginateData = (
+  data: any[],
+  page: number = 1,
+  limit: number = 10
+) => {
   const startIndex = (page - 1) * limit;
   const endIndex = startIndex + limit;
   const paginatedData = data.slice(startIndex, endIndex);
-  
+
   return {
     data: paginatedData,
     pagination: {
@@ -101,11 +122,15 @@ export const paginateData = (data: any[], page: number = 1, limit: number = 10) 
 };
 
 // 검색 헬퍼
-export const searchData = (data: any[], query: string, searchFields: string[]) => {
+export const searchData = (
+  data: any[],
+  query: string,
+  searchFields: string[]
+) => {
   if (!query) return data;
-  
+
   return data.filter(item =>
-    searchFields.some(field => 
+    searchFields.some(field =>
       item[field]?.toString().toLowerCase().includes(query.toLowerCase())
     )
   );

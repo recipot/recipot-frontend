@@ -1,9 +1,9 @@
 name: CI
 on:
   push:
-    branches: [ main ]
+    branches: [dev]
   pull_request:
-    branches: [ main ]
+    branches: [dev]
 
 jobs:
   build-test:
@@ -19,7 +19,7 @@ jobs:
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
+      - run: pnpm format
       - run: pnpm test
       - run: pnpm lint
       - run: pnpm typecheck
-

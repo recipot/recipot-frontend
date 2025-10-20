@@ -27,7 +27,9 @@ export default [
       // MSW 관련 파일 제외
       'src/mocks/**',
       // 기타 제외할 파일들
-      '**/*.config.{js,ts,mjs}',
+      '**/*.config.{js,ts,mjs,cjs}',
+      // .config 폴더 전체 제외
+      '.config/**',
       'public/**',
     ],
   },
@@ -49,7 +51,7 @@ export default [
         ecmaFeatures: { jsx: true },
         ecmaVersion: 2022,
         sourceType: 'module',
-        project: true,
+        project: '../tsconfig.json',
       },
       globals: {
         ...globals.browser,
@@ -118,7 +120,7 @@ export default [
       'security/detect-unsafe-regex': 'error',
 
       // Import management - Clean and organized imports
-      'import/no-relative-parent-imports': 'warn',
+      'import/no-relative-parent-imports': 'off',
       'import/no-duplicates': 'error',
       'import/no-unresolved': 'error',
       'import/order': [
@@ -153,9 +155,7 @@ export default [
             ['^react', '^@?\\w'],
             // Internal packages
             ['^(@|components)(/.*|$)'],
-            // Parent imports
-            ['^\\.\\.(?!/?$)', '^\\.\\./?$'],
-            // Other relative imports
+            // Other relative imports (parent imports 제거됨)
             ['^\\./(?=.*/)(?!/?$)', '^\\.(?!/?$)', '^\\./?$'],
             // Type imports
             ['^.+\\u0000$'],

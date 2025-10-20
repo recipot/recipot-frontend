@@ -7,7 +7,11 @@
     },
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "dist/**"]
+      "outputs": [".next/**", "dist/**", "build/**"]
+    },
+    "build#mobile": {
+      "cache": false,
+      "outputs": []
     },
     "start": {
       "cache": false
@@ -15,7 +19,15 @@
     "lint": {
       "outputs": []
     },
+    "lint#mobile": {
+      "cache": false,
+      "outputs": []
+    },
     "typecheck": {
+      "outputs": []
+    },
+    "typecheck#mobile": {
+      "cache": false,
       "outputs": []
     },
     "test": {
