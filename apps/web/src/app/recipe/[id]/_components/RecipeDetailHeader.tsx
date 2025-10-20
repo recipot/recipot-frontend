@@ -1,6 +1,7 @@
 import React, { useMemo, useRef, useState } from 'react';
 import axios from 'axios';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { tokenUtils } from 'packages/api/src/auth';
 
 import {
@@ -19,6 +20,7 @@ interface RecipeHeaderProps {
 }
 
 export function RecipeDetailHeader({ recipe }: RecipeHeaderProps) {
+  const router = useRouter();
   const token = tokenUtils.getToken();
 
   const [isLiked, setIsLiked] = useState(false);
@@ -42,14 +44,6 @@ export function RecipeDetailHeader({ recipe }: RecipeHeaderProps) {
   }, [recipe]);
 
   const handleToggleLike = async (recipeId: number) => {
-    console.log('🔍 handleToggleLike 시작:', {
-      backendUrl: process.env.NEXT_PUBLIC_BACKEND_URL,
-      isLiked,
-      isLikedRef: isLikedRef.current,
-      recipeId,
-      token: token ? '존재함' : '없음',
-    });
-
     if (!token) {
       console.warn('❌ 로그인이 필요합니다.');
       return;
@@ -65,39 +59,21 @@ export function RecipeDetailHeader({ recipe }: RecipeHeaderProps) {
     isLikedRef.current = newIsLiked;
     setIsLiked(newIsLiked);
 
-    console.log('📊 상태 변경:', {
-      newIsLiked,
-      previousIsLiked,
-      willExecute: previousIsLiked ? 'DELETE' : 'POST',
-    });
-
     try {
       if (previousIsLiked) {
         // 북마크 해제
         const deleteUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/users/recipes/bookmarks/${recipeId}`;
-        console.log('🗑️ DELETE 요청 시작:', deleteUrl);
-        console.log('🗑️ DELETE 요청 상세:', {
-          headers: { Authorization: `Bearer ${token}` },
-          url: deleteUrl,
-        });
 
-        const res = await axios.delete(deleteUrl, {
+        await axios.delete(deleteUrl, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-        console.log('✅ DELETE 성공:', res);
       } else {
         // 북마크 추가
         const postUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/users/recipes/bookmarks`;
-        console.log('➕ POST 요청 시작:', postUrl);
-        console.log('➕ POST 요청 상세:', {
-          body: { recipeId },
-          headers: { Authorization: `Bearer ${token}` },
-          url: postUrl,
-        });
 
-        const res = await axios.post(
+        await axios.post(
           postUrl,
           {
             recipeId,
@@ -108,16 +84,10 @@ export function RecipeDetailHeader({ recipe }: RecipeHeaderProps) {
             },
           }
         );
-        console.log('✅ POST 성공:', res);
       }
     } catch (error: unknown) {
       console.error('❌ 북마크 처리 중 오류:', error);
-      console.error('❌ 오류 상세:', {
-        error,
-        newIsLiked,
-        previousIsLiked,
-        recipeId,
-      });
+
       // 에러 발생 시 이전 상태로 롤백
       isLikedRef.current = previousIsLiked;
       setIsLiked(previousIsLiked);
@@ -134,7 +104,12 @@ export function RecipeDetailHeader({ recipe }: RecipeHeaderProps) {
       <div className="bg-white">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center">
-            <BackIcon size={24} color="#212529" />
+            <BackIcon
+              size={24}
+              color="#212529"
+              onClick={() => router.back()}
+              className="cursor-pointer"
+            />
           </div>
           <div className="flex items-center space-x-2">
             <WebShareButton
