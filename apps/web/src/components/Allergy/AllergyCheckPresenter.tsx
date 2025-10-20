@@ -1,6 +1,7 @@
 'use client';
 
-import { categories } from './Allergy.constants';
+import type { AllergyCategory } from '@/types/allergy.types';
+
 import AllergyCheckItem from './AllergyCheckItem';
 
 // 동적 높이 스타일 (뷰포트 높이 기반)
@@ -11,18 +12,21 @@ const dynamicHeightStyle = {
 
 /**
  * AllergyCheckPresenter
- * @param selectedItems - number[]
- * @param onItemToggle - (itemId: number) => void
- * @param onSubmit - (e: React.FormEvent) => void
+ * @param categories - 카테고리별 알레르기 항목 배열
+ * @param selectedItems - 선택된 항목 ID 배열
+ * @param onItemToggle - 항목 토글 함수
+ * @param onSubmit - 폼 제출 함수
  * @param formId - form의 고유 ID (외부 버튼에서 사용)
  * @returns AllergyCheckPresenter component
  */
 export default function AllergyCheckPresenter({
+  categories,
   formId,
   onItemToggle,
   onSubmit,
   selectedItems,
 }: {
+  categories: AllergyCategory[];
   selectedItems: number[];
   onItemToggle: (itemId: number) => void;
   onSubmit: (e: React.FormEvent) => void;

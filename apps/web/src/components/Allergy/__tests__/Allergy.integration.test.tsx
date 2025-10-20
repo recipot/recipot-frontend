@@ -4,6 +4,8 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
+import type { AllergyCategory } from '@/types/allergy.types';
+
 import AllergyCheckContainer from '../AllergyCheckContainer';
 
 import type * as TanStackQuery from '@tanstack/react-query';
@@ -17,6 +19,18 @@ vi.mock('@tanstack/react-query', async importOriginal => {
 });
 
 const queryClient = new QueryClient();
+
+// Mock categories
+const mockCategories: AllergyCategory[] = [
+  {
+    items: [
+      { id: 1, label: '참치' },
+      { id: 2, label: '고등어' },
+    ],
+    title: '어패류',
+    type: 'seafood',
+  },
+];
 
 const TestWrapper = ({
   formId,
@@ -35,6 +49,7 @@ const TestWrapper = ({
 
   return (
     <AllergyCheckContainer
+      categories={mockCategories}
       formId={formId}
       onSubmit={onSubmit}
       selectedItems={selectedItems}

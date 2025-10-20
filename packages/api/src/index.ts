@@ -1,2 +1,5 @@
 export { authService } from './auth';
-export { allergyPost } from './allergyAPI';
+export {
+  fetchRestrictedIngredients,
+  updateRestrictedIngredients,
+} from './allergyAPI';

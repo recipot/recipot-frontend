@@ -1,14 +1,15 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import {
   AllergyCheckContainer,
   AllergyNavigationTabs,
   useAllergyCheck,
+  useAllergyData,
 } from '@/components/Allergy';
 import type { AllergyFormSchema } from '@/components/Allergy/Allergy.constants';
-import { categories } from '@/components/Allergy/Allergy.constants';
+import { CATEGORY_METADATA } from '@/components/Allergy/Allergy.constants';
 import { Button } from '@/components/common/Button';
 import { CloseIcon, RefreshIcon } from '@/components/Icons';
 import {
@@ -33,6 +34,9 @@ export default function DietaryRestrictionsSheet({
   onClose,
   onSave,
 }: DietaryRestrictionsSheetProps) {
+  // 백엔드에서 재료 데이터 페칭
+  const { categories, error, initialSelectedIds, isLoading } = useAllergyData();
+
   const { handleItemToggle, resetItems, resetToInitial, selectedItems } =
     useAllergyCheck(initialSelectedItems);
 
@@ -48,7 +52,13 @@ export default function DietaryRestrictionsSheet({
   }, [isOpen, resetToInitial]);
 
   // 스크롤 스파이를 위한 섹션 ID 생성
-  const sectionIds = categories.map((_, index) => `allergy-section-${index}`);
+  const sectionIds = useMemo(
+    () =>
+      CATEGORY_METADATA.map(
+        (_: unknown, index: number) => `allergy-section-${index}`
+      ),
+    []
+  );
 
   // Drawer 내부 스크롤 감지
   useEffect(() => {
@@ -208,12 +218,27 @@ export default function DietaryRestrictionsSheet({
             </div>
 
             <div className="px-6 pt-5">
-              <AllergyCheckContainer
-                formId="dietary-restrictions-form"
-                onSubmit={handleSubmit}
-                selectedItems={selectedItems}
-                onItemToggle={handleItemToggle}
-              />
+              {isLoading ? (
+                <div className="flex justify-center py-10">
+                  <div className="text-gray-600">
+                    재료 목록을 불러오는 중...
+                  </div>
+                </div>
+              ) : error ? (
+                <div className="flex justify-center py-10">
+                  <div className="text-red-600">
+                    재료 목록을 불러오는데 실패했습니다.
+                  </div>
+                </div>
+              ) : (
+                <AllergyCheckContainer
+                  categories={categories}
+                  formId="dietary-restrictions-form"
+                  onSubmit={handleSubmit}
+                  selectedItems={selectedItems}
+                  onItemToggle={handleItemToggle}
+                />
+              )}
             </div>
           </div>
 
