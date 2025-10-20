@@ -14,7 +14,12 @@ const meta = {
 } satisfies Meta<typeof ConfirmDialog>;
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+
+// open과 onOpenChange를 제외한 나머지 props만 args로 받음
+type StoryArgs = Partial<
+  Omit<React.ComponentProps<typeof ConfirmDialog>, 'open' | 'onOpenChange'>
+>;
+type Story = StoryObj<{ args: StoryArgs }>;
 
 /**
  * 기본 확인 다이얼로그
@@ -84,8 +89,8 @@ export const Delete: Story = {
     confirmText: '삭제',
     confirmVariant: 'destructive',
     description: '이 작업은 되돌릴 수 없습니다. 정말로 삭제하시겠습니까?',
-    onCancel: () => console.log('취소됨'),
-    onConfirm: () => console.log('삭제됨'),
+    onCancel: () => console.info('취소됨'),
+    onConfirm: () => console.info('삭제됨'),
     title: '삭제 확인',
   },
   render: function Render(args) {
@@ -112,8 +117,8 @@ export const Logout: Story = {
     cancelText: '취소',
     confirmText: '로그아웃',
     description: '로그아웃 하시겠습니까?',
-    onCancel: () => console.log('취소됨'),
-    onConfirm: () => console.log('로그아웃됨'),
+    onCancel: () => console.info('취소됨'),
+    onConfirm: () => console.info('로그아웃됨'),
     title: '로그아웃',
   },
   render: function Render(args) {
