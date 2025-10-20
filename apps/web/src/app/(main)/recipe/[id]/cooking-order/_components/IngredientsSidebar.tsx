@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+
 import { Button } from '@/components/common/Button';
 import { ArrowIcon } from '@/components/Icons';
 import type { Recipe, RecipeIngredient } from '@/types/recipe.types';
@@ -15,6 +17,12 @@ export function IngredientsSidebar({
   onClose,
   recipe,
 }: IngredientsSidebarProps) {
+  const [isGuideOpen, setIsGuideOpen] = useState(false);
+
+  const handleToggle = () => {
+    setIsGuideOpen(!isGuideOpen);
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -58,7 +66,6 @@ export function IngredientsSidebar({
                       {` `}
                       {ingredient.unit}
                     </span>
-                    {/* <span className="text-xs text-gray-500">가진재료</span> */}
                   </div>
                 ))}
             </div>
@@ -125,24 +132,30 @@ export function IngredientsSidebar({
                 양념류
               </span>
             </div>
-            <div className="space-y-1">
-              <div className="flex items-center justify-between border-b border-gray-200 py-2">
-                <span className="text-sm text-gray-600">소금</span>
-                <span className="text-sm text-gray-600">1꼬집</span>
-              </div>
-              <div className="flex items-center justify-between border-b border-gray-200 py-2">
-                <span className="text-sm text-gray-600">간장</span>
-                <span className="text-sm text-gray-600">1스푼</span>
-              </div>
-              <div className="flex items-center justify-between py-2">
-                <span className="text-sm text-gray-600">고추장</span>
-                <span className="text-sm text-gray-600">1스푼</span>
-              </div>
-            </div>
             <div className="mt-5 flex items-center justify-between px-3 py-1.5 transition-colors">
               <div className="text-15sb text-gray-600">계량가이드</div>
-              <ArrowIcon size={20} />
+              <ArrowIcon
+                size={20}
+                className={`transition-transform duration-200 ${isGuideOpen ? 'rotate-90' : 'rotate-0'}`}
+                onClick={handleToggle}
+              />
             </div>
+            {isGuideOpen && (
+              <div className="space-y-1">
+                <div className="flex items-center justify-between border-b border-gray-200 py-2">
+                  <span className="text-sm text-gray-600">소금</span>
+                  <span className="text-sm text-gray-600">1꼬집</span>
+                </div>
+                <div className="flex items-center justify-between border-b border-gray-200 py-2">
+                  <span className="text-sm text-gray-600">간장</span>
+                  <span className="text-sm text-gray-600">1스푼</span>
+                </div>
+                <div className="flex items-center justify-between py-2">
+                  <span className="text-sm text-gray-600">고추장</span>
+                  <span className="text-sm text-gray-600">1스푼</span>
+                </div>
+              </div>
+            )}
           </div>
 
           <Button

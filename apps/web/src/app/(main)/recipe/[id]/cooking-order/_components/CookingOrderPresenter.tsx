@@ -12,6 +12,9 @@ import CookingOrderHeader from './CookingOrderHeader';
 import { IngredientsSidebar } from './IngredientsSidebar';
 import WarningModal from './WarningModal';
 
+// 모달 타입 정의
+type ModalType = 'ingredients' | 'warning' | null;
+
 interface CookingOrderPresenterProps {
   recipeId: string;
 }
@@ -21,8 +24,8 @@ export default function CookingOrderPresenter({
 }: CookingOrderPresenterProps) {
   const { completeStep, error, isLoading, recipe } = useCookingOrder(recipeId);
 
-  const [showIngredientsModal, setShowIngredientsModal] = useState(false);
-  const [showWarningModal, setShowWarningModal] = useState(false);
+  // 모달 상태 통합 관리
+  const [activeModal, setActiveModal] = useState<ModalType>(null);
 
   const router = useRouter();
 
@@ -33,6 +36,10 @@ export default function CookingOrderPresenter({
     isFirstStep,
     isLastStep,
   } = useCookingOrderNavigation(recipe);
+
+  // 모달 핸들러 통합
+  const openModal = (modalType: ModalType) => setActiveModal(modalType);
+  const closeModal = () => setActiveModal(null);
 
   const completeStepHandler = (stepNumber: number) => {
     completeStep(stepNumber);
@@ -48,7 +55,7 @@ export default function CookingOrderPresenter({
   };
 
   const handleBack = () => {
-    setShowWarningModal(true);
+    openModal('warning');
   };
 
   const handleConfirmExit = ({ recipeId }: { recipeId: string }) => {
@@ -95,7 +102,7 @@ export default function CookingOrderPresenter({
       <CookingOrderHeader
         recipe={recipe}
         onBack={handleBack}
-        onShowIngredients={() => setShowIngredientsModal(true)}
+        onShowIngredients={() => openModal('ingredients')}
       />
 
       <CookingOrderContent recipe={recipe} currentStep={currentStep} />
@@ -109,14 +116,14 @@ export default function CookingOrderPresenter({
       />
 
       <IngredientsSidebar
-        isOpen={showIngredientsModal}
-        onClose={() => setShowIngredientsModal(false)}
+        isOpen={activeModal === 'ingredients'}
+        onClose={closeModal}
         recipe={recipe}
       />
 
       <WarningModal
-        isOpen={showWarningModal}
-        onClose={() => setShowWarningModal(false)}
+        isOpen={activeModal === 'warning'}
+        onClose={closeModal}
         onConfirm={() => handleConfirmExit({ recipeId })}
       />
     </div>
