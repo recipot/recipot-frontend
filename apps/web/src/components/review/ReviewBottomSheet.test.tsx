@@ -33,6 +33,9 @@ vi.mock('../ui/drawer', () => ({
   DrawerContent: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="drawer-content">{children}</div>
   ),
+  DrawerTitle: ({ children }: { children: React.ReactNode }) => (
+    <h2 data-testid="drawer-title">{children}</h2>
+  ),
 }));
 
 const mockReviewData: ReviewData = {

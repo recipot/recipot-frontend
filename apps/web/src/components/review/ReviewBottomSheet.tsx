@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import Image from 'next/image';
 
 import type {
@@ -11,10 +12,10 @@ import type {
 } from '@/types/review.types';
 
 import { Button } from '../common/Button';
-import { Drawer, DrawerContent } from '../ui/drawer';
+import { CloseIcon } from '../Icons';
+import { Drawer, DrawerContent, DrawerTitle } from '../ui/drawer';
 import { Textarea } from '../ui/textarea';
 import { EmotionSection } from './EmotionSection';
-import { CloseIcon } from '../Icons';
 
 const EMOTION_OPTIONS = {
   difficulty: [
@@ -78,6 +79,9 @@ export function ReviewBottomSheet({
     <Drawer open={isOpen}>
       <DrawerContent className="mx-auto w-full max-w-[430px]">
         <form onSubmit={handleSubmit(onFormSubmit)}>
+          <VisuallyHidden asChild>
+            <DrawerTitle>후기 등록하기</DrawerTitle>
+          </VisuallyHidden>
           <div className="rounded-t-2xl px-4 pb-6">
             {/* 헤더 - 상단에 고정 */}
             <div className="sticky top-0 z-10 -mx-4 flex justify-end bg-white px-4">
