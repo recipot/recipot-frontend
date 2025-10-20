@@ -10,7 +10,7 @@ import {
   mapIngredientsToCategories,
 } from '@/utils/allergyMapper';
 
-import { CATEGORY_METADATA } from './Allergy.constants';
+import { CATEGORY_METADATA } from '../constants/constants';
 
 /**
  * 알레르기 재료 데이터를 페칭하고 UI 형태로 변환하는 훅

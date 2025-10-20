@@ -2,7 +2,7 @@
 
 import type { CategoryMetadata } from '@/types/allergy.types';
 
-import { CATEGORY_METADATA } from './Allergy.constants';
+import { CATEGORY_METADATA } from '../constants/constants';
 
 import type { RefObject } from 'react';
 

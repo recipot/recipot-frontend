@@ -4,7 +4,7 @@ import type { AllergyCategory } from '@/types/allergy.types';
 
 import AllergyCheckPresenter from './AllergyCheckPresenter';
 
-import type { AllergyFormSchema } from './Allergy.constants';
+import type { AllergyFormSchema } from '../constants/constants';
 import type { z } from 'zod';
 
 /**
