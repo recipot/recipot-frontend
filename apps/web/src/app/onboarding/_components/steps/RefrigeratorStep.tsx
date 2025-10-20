@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { onboardingAPI } from '@recipot/api';
+import { onboarding } from '@recipot/api';
 import { useAuth } from '@recipot/contexts';
 import { useRouter } from 'next/navigation';
 
@@ -63,7 +63,7 @@ export default function RefrigeratorStep() {
       }
 
       // 3. 데이터 유효성 검증
-      const validation = onboardingAPI.validateOnboardingData(completeData);
+      const validation = onboarding.validateOnboardingData(completeData);
       if (!validation.isValid) {
         throw new Error(`입력 데이터 오류: ${validation.errors.join(', ')}`);
       }
@@ -71,7 +71,7 @@ export default function RefrigeratorStep() {
       console.info('🚀 통합 온보딩 데이터 전송 시작:', completeData);
 
       // 4. 통합 API 호출
-      const result = await onboardingAPI.submitComplete(completeData);
+      const result = await onboarding.submitComplete(completeData);
 
       if (result.success) {
         // 5. 온보딩 완료 처리 - clearData 전에 Zustand 스토어에 모든 데이터 저장

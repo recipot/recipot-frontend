@@ -2,21 +2,18 @@
 export { authService } from './auth';
 
 // Allergy API
-export {
-  fetchRestrictedIngredients,
-  updateRestrictedIngredients,
-} from './allergyAPI';
+export { allergy } from './allergy';
 
 // Food API
-export { foodAPI } from './foodAPI';
+export { food } from './food';
 export type {
   SubmitSelectedFoodsRequest,
   SubmitSelectedFoodsResponse,
-} from './foodAPI';
+} from './food';
 
 // Onboarding API
-export { onboardingAPI } from './onboardingAPI';
-export type { OnboardingCompleteResponse } from './onboardingAPI';
+export { onboarding } from './onboarding';
+export type { OnboardingCompleteResponse } from './onboarding';
 
 // API Instance Creator
 export { createApiInstance } from './createApiInstance';

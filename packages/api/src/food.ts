@@ -18,7 +18,10 @@ export interface SubmitSelectedFoodsResponse {
 // API 인스턴스
 const foodApi = createApiInstance({ apiName: 'Food' });
 
-export const foodAPI = {
+/**
+ * 재료(Food) 관련 API
+ */
+export const food = {
   /**
    * 전체 재료 목록 조회
    * @returns 재료 목록 배열

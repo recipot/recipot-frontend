@@ -21,9 +21,9 @@ export interface OnboardingCompleteResponse {
 }
 
 /**
- * 온보딩 관련 API 함수들
+ * 온보딩 관련 API
  */
-export const onboardingAPI = {
+export const onboarding = {
   /**
    * 통합 온보딩 완료 처리
    * 기존 개별 API들을 순차적으로 호출하여 모든 데이터를 전송
