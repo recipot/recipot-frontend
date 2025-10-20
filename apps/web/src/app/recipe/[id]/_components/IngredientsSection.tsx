@@ -5,7 +5,10 @@ import axios from 'axios';
 import { tokenUtils } from 'packages/api/src/auth';
 
 import IngredientGroup from './IngredientGroup';
-import { MEASUREMENT_TABS } from './IngredientsSection.constants';
+import {
+  MEASUREMENT_GUIDE_LABELS,
+  MEASUREMENT_TABS,
+} from './IngredientsSection.constants';
 import MeasurementGuideContent from './MeasurementGuideContent';
 import MeasurementGuideToggle from './MeasurementGuideToggle';
 import { MeasurementTab } from './MeasurementTab';
@@ -39,13 +42,6 @@ export function IngredientsSection({
   const token = tokenUtils.getToken();
 
   // 탭 ID와 API 카테고리명 매핑
-  const categoryMapping: Record<string, string> = {
-    liquid: '액체류',
-    minced: '다진양념류',
-    other: '그외',
-    powder: '가루류',
-    sauce: '장,젓갈류',
-  };
 
   // 측정 가이드 데이터 fetch
   useEffect(() => {
@@ -120,7 +116,7 @@ export function IngredientsSection({
                   <MeasurementGuideContent
                     activeTab={activeTab}
                     measurementData={measurementData}
-                    categoryMapping={categoryMapping}
+                    categoryMapping={MEASUREMENT_GUIDE_LABELS}
                   />
                 )}
               </div>
