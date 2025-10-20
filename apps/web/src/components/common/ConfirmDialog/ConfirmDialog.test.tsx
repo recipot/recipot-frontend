@@ -103,8 +103,14 @@ describe('ConfirmDialog', () => {
       />
     );
 
-    expect(screen.getByText('첫 번째 줄')).toBeInTheDocument();
-    expect(screen.getByText('두 번째 줄')).toBeInTheDocument();
+    // br 태그로 나눠진 텍스트를 찾기 위해 더 유연한 매처 사용
+    const description = screen.getByText((content, element) => {
+      return (
+        element?.tagName === 'P' &&
+        element?.textContent === '첫 번째 줄두 번째 줄'
+      );
+    });
+    expect(description).toBeInTheDocument();
   });
 
   it('disableOverlayClick prop이 Modal에 전달된다', () => {
