@@ -2,10 +2,9 @@
 
 import { memo } from 'react';
 
+import { Button } from '@/components/common/Button';
 import { cn } from '@/lib/utils';
 import type { AllergyCheckItem } from '@/types/allergy.types';
-
-import { Button } from '../common/Button';
 
 /**
  * AllergyCheckItem
