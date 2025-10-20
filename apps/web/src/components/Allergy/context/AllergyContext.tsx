@@ -58,11 +58,14 @@ export function AllergyProvider({
   // 백엔드에서 재료 데이터 페칭
   const { categories, error, initialSelectedIds, isLoading } = useAllergyData();
 
-  // 초기값 결정 (props > 백엔드 초기값 > 빈 배열)
-  const initialItems =
-    initialSelectedItems.length > 0
-      ? initialSelectedItems
-      : (initialSelectedIds ?? []);
+  // 초기값 결정 (props > 백엔드 초기값 > 빈 배열) - 메모이제이션으로 무한 렌더링 방지
+  const initialItems = useMemo(
+    () =>
+      initialSelectedItems.length > 0
+        ? initialSelectedItems
+        : (initialSelectedIds ?? []),
+    [initialSelectedItems, initialSelectedIds]
+  );
 
   const { handleItemToggle, resetItems, selectedItems } =
     useAllergyCheck(initialItems);

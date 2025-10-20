@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 /**
  * useAllergyCheck
@@ -11,11 +11,30 @@ import { useCallback, useRef, useState } from 'react';
 export default function useAllergyCheck(initialItems: number[] = []) {
   const [selectedItems, setSelectedItems] = useState<number[]>(initialItems);
   const initialItemsRef = useRef(initialItems);
+  const prevInitialItemsRef = useRef<number[]>(initialItems);
+  const hasUserInteractedRef = useRef(false);
 
-  // initialItems가 변경되면 ref 업데이트
+  // initialItems가 변경되었을 때만 상태 업데이트 (단, 사용자가 인터랙션하기 전에만)
+  useEffect(() => {
+    // 사용자가 이미 항목을 선택/해제했다면 initialItems 변경을 무시
+    if (hasUserInteractedRef.current) return;
+
+    const prevItems = prevInitialItemsRef.current;
+    const prevItemsStr = JSON.stringify([...prevItems].sort());
+    const currentItemsStr = JSON.stringify([...initialItems].sort());
+
+    // 이전 값과 현재 값이 다를 때만 업데이트 (순서 무관)
+    if (prevItemsStr !== currentItemsStr) {
+      setSelectedItems(initialItems);
+      prevInitialItemsRef.current = initialItems;
+    }
+  }, [initialItems]);
+
+  // initialItems ref는 항상 최신 값으로 유지
   initialItemsRef.current = initialItems;
 
   const handleItemToggle = useCallback((itemId: number) => {
+    hasUserInteractedRef.current = true;
     setSelectedItems(prev => {
       if (prev.includes(itemId)) {
         return prev.filter(id => id !== itemId);
@@ -26,10 +45,12 @@ export default function useAllergyCheck(initialItems: number[] = []) {
   }, []);
 
   const resetItems = useCallback(() => {
+    hasUserInteractedRef.current = false;
     setSelectedItems([]);
   }, []);
 
   const resetToInitial = useCallback(() => {
+    hasUserInteractedRef.current = false;
     setSelectedItems(initialItemsRef.current);
   }, []);
 

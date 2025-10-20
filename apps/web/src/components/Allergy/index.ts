@@ -7,12 +7,6 @@ import AllergyResetButton from './compound/ResetButton';
 import AllergyRoot from './compound/Root';
 import AllergySubmitButton from './compound/SubmitButton';
 
-// Legacy Components (하위 호환성)
-export { default as AllergyCheck } from './legacy/AllergyCheckContainer';
-export { default as AllergyCheckContainer } from './legacy/AllergyCheckContainer';
-export { default as AllergyCheckPresenter } from './legacy/AllergyCheckPresenter';
-export { default as AllergyNavigationTabs } from './legacy/AllergyNavigationTabs';
-
 // Hooks
 export { default as useAllergyCheck } from './hooks/useAllergyCheck';
 export { default as useAllergyData } from './hooks/useAllergyData';
