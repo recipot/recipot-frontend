@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { useRouter } from 'next/navigation';
 
 import { CloseIcon } from '../Icons';
-import { Drawer, DrawerClose, DrawerContent } from '../ui/drawer';
+import { Drawer, DrawerClose, DrawerContent, DrawerTitle } from '../ui/drawer';
 import { ReviewRecipeCard, type ReviewRecipeData } from './ReviewRecipeCard';
 
 export function ReviewRemindBottomSheet() {
@@ -48,6 +49,9 @@ export function ReviewRemindBottomSheet() {
   return (
     <Drawer open={isOpen} onOpenChange={handleClose}>
       <DrawerContent className="mx-auto w-full max-w-[430px]">
+        <VisuallyHidden asChild>
+          <DrawerTitle>어제 드신 메뉴 어떠셨나요?</DrawerTitle>
+        </VisuallyHidden>
         <div>
           <div className="overflow-y-auto px-6 pb-6">
             {/* 헤더 - 상단에 고정 */}
