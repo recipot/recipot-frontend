@@ -54,9 +54,7 @@ export default function DietaryRestrictionsSheet({
   // 스크롤 스파이를 위한 섹션 ID 생성
   const sectionIds = useMemo(
     () =>
-      CATEGORY_METADATA.map(
-        (_: unknown, index: number) => `allergy-section-${index}`
-      ),
+      CATEGORY_METADATA.map((_, index: number) => `allergy-section-${index}`),
     []
   );
 
