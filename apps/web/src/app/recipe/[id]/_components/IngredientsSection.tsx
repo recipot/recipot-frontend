@@ -1,6 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { tokenUtils } from 'packages/api/src/auth';
 
 import IngredientGroup from './IngredientGroup';
 import { MEASUREMENT_TABS } from './IngredientsSection.constants';
@@ -10,6 +12,16 @@ import { MeasurementTab } from './MeasurementTab';
 import SeasoningList from './SeasoningList';
 
 import type { IngredientsGroup, Seasoning } from '../types/recipe.types';
+
+interface MeasurementItem {
+  standard: string;
+  imageUrl: string;
+  description: string;
+}
+
+interface MeasurementData {
+  [key: string]: MeasurementItem[];
+}
 
 interface IngredientsSectionProps {
   ingredients: IngredientsGroup;
@@ -22,6 +34,42 @@ export function IngredientsSection({
 }: IngredientsSectionProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<string | null>(null);
+  const [measurementData, setMeasurementData] = useState<MeasurementData>({});
+
+  const token = tokenUtils.getToken();
+
+  // 탭 ID와 API 카테고리명 매핑
+  const categoryMapping: Record<string, string> = {
+    liquid: '액체류',
+    minced: '다진양념류',
+    other: '그외',
+    powder: '가루류',
+    sauce: '장,젓갈류',
+  };
+
+  // 측정 가이드 데이터 fetch
+  useEffect(() => {
+    const fetchMeasurementGuide = async () => {
+      if (!token) return;
+
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/measurement-guides`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        if (response.data?.data?.data) {
+          setMeasurementData(response.data.data.data);
+        }
+      } catch (error) {
+        console.error('측정 가이드 데이터 fetch 실패:', error);
+      }
+    };
+
+    fetchMeasurementGuide();
+  }, [token]);
 
   const handleToggle = () => {
     setIsOpen(prev => !prev);
@@ -57,7 +105,7 @@ export function IngredientsSection({
 
             {isOpen && (
               <div className="rounded-xl border-[1px] border-dashed">
-                <div className="no-scrollbar flex w-full flex-nowrap items-center justify-center space-x-4 self-stretch overflow-x-auto px-4 pt-3 pb-4">
+                <div className="no-scrollbar flex w-full flex-nowrap items-center justify-center space-x-4 self-stretch overflow-x-auto px-4 pt-3 pb-5">
                   {MEASUREMENT_TABS.map(tab => (
                     <MeasurementTab
                       key={tab.id}
@@ -69,7 +117,11 @@ export function IngredientsSection({
                 </div>
 
                 {isOpen && activeTab && (
-                  <MeasurementGuideContent activeTab={activeTab} />
+                  <MeasurementGuideContent
+                    activeTab={activeTab}
+                    measurementData={measurementData}
+                    categoryMapping={categoryMapping}
+                  />
                 )}
               </div>
             )}

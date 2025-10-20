@@ -13,14 +13,14 @@ export function MeasurementTab({
   onClick,
   tab,
 }: MeasurementTabProps) {
-  const handleClick = () => {
-    onClick(tab.id);
+  const handleClick = (tabId: string) => {
+    onClick(tabId);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      handleClick();
+      handleClick(tab.id);
     }
   };
 
@@ -33,7 +33,7 @@ export function MeasurementTab({
       className={`flex h-[34px] w-fit cursor-pointer items-center justify-center gap-1 px-2 ${
         isActive ? 'border-b-2 border-solid border-black' : ''
       }`}
-      onClick={handleClick}
+      onClick={() => handleClick(tab.id)}
       onKeyDown={handleKeyDown}
     >
       <div className="order-0 flex-none flex-grow-0">{iconToShow}</div>
