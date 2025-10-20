@@ -1,5 +1,6 @@
 'use client';
 
+import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import { useCurrentStep } from '@/stores/onboardingStore';
 
 import StepIndicator from './_components/StepIndicator';
@@ -34,35 +35,23 @@ function OnboardingContent() {
   return (
     <>
       {/* 데이터 복구 다이얼로그 */}
-      {/* TODO: 추후 공통 모달로 변경 */}
-      {showRestoreDialog && (
-        <div className={onboardingStyles.dialog.overlay}>
-          <div className={onboardingStyles.dialog.content}>
-            <h3 className={onboardingStyles.dialog.title}>
-              이전 온보딩 데이터 발견
-            </h3>
-            <p className={onboardingStyles.dialog.description}>
-              이전에 진행하던 온보딩이 있습니다.
-              <br />
-              이어서 진행하시겠습니까?
-            </p>
-            <div className={onboardingStyles.dialog.buttonGroup}>
-              <button
-                onClick={handleRestoreCancel}
-                className={onboardingStyles.dialog.cancelButton}
-              >
-                새로 시작
-              </button>
-              <button
-                onClick={handleRestoreConfirm}
-                className={onboardingStyles.dialog.confirmButton}
-              >
-                이어서 진행
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmDialog
+        open={showRestoreDialog}
+        onOpenChange={() => {}}
+        title="이전 온보딩 데이터 발견"
+        description={
+          <>
+            이전에 진행하던 온보딩이 있습니다.
+            <br />
+            이어서 진행하시겠습니까?
+          </>
+        }
+        cancelText="새로 시작"
+        confirmText="이어서 진행"
+        onCancel={handleRestoreCancel}
+        onConfirm={handleRestoreConfirm}
+        disableOverlayClick
+      />
 
       <StepIndicator />
 
