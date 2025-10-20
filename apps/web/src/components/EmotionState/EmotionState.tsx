@@ -46,15 +46,9 @@ const EmotionState: React.FC<EmotionStateProps> = ({
 
   // 배경 그라디언트 클래스 반환
   const getBackgroundGradient = (mood: MoodType | null) => {
-    // 초기 상태일 때만 랜덤 그래디언트 적용
+    // 초기 상태일 때 기본 그래디언트 적용
     if (mood === null) {
-      const gradients = [
-        'emotion-gradient-bad',
-        'emotion-gradient-good',
-        'emotion-gradient-neutral',
-      ];
-      const randomIndex = Math.floor(Math.random() * gradients.length);
-      return gradients[randomIndex];
+      return 'emotion-gradient-default';
     }
 
     // 선택된 감정에 따른 그래디언트
@@ -75,7 +69,7 @@ const EmotionState: React.FC<EmotionStateProps> = ({
   return (
     <div
       className={cn(
-        'flex h-[95vh] w-full items-center justify-center overflow-hidden',
+        'flex h-full w-full items-center justify-center overflow-hidden',
         className,
         getBackgroundGradient(selectedMood)
       )}
