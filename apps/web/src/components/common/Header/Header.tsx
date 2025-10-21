@@ -1,3 +1,5 @@
+import { HEADER_HEIGHT_CLASS } from './constants';
+
 import type { ReactNode } from 'react';
 
 interface HeaderProps {
@@ -16,7 +18,7 @@ interface HeaderProps {
 export function Header({ children, className = '' }: HeaderProps) {
   return (
     <header
-      className={`fixed top-0 right-0 left-0 z-10 flex h-14 items-center justify-between bg-white px-3 py-2 ${className}`}
+      className={`fixed top-0 right-0 left-0 z-10 flex ${HEADER_HEIGHT_CLASS} items-center justify-between bg-white px-3 py-2 ${className}`}
     >
       {children}
     </header>
