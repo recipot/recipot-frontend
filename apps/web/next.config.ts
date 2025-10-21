@@ -28,10 +28,6 @@ const nextConfig: NextConfig = {
   },
   images: {
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'example.com',
-      },
       // 임시 hostname
       {
         protocol: 'https',
