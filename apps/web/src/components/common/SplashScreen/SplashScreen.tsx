@@ -7,10 +7,12 @@ import {
   SPLASH_DISPLAY_DURATION,
   SPLASH_TOTAL_DURATION,
 } from '@/constants/splash';
+import { useSplash } from '@/contexts/SplashContext';
 
 export default function SplashScreen() {
   const [isVisible, setIsVisible] = useState(true);
   const [shouldRender, setShouldRender] = useState(true);
+  const { markAsCompleted } = useSplash();
 
   useEffect(() => {
     // 페이드아웃 시작
@@ -18,16 +20,17 @@ export default function SplashScreen() {
       setIsVisible(false);
     }, SPLASH_DISPLAY_DURATION);
 
-    // DOM에서 완전히 제거
+    // DOM에서 완전히 제거 및 완료 상태 업데이트
     const removeTimer = setTimeout(() => {
       setShouldRender(false);
+      markAsCompleted();
     }, SPLASH_TOTAL_DURATION);
 
     return () => {
       clearTimeout(fadeOutTimer);
       clearTimeout(removeTimer);
     };
-  }, []);
+  }, [markAsCompleted]);
 
   if (!shouldRender) {
     return null;

@@ -2,8 +2,6 @@ import './globals.css';
 
 import localFont from 'next/font/local';
 
-import { SplashScreen } from '@/components/common/SplashScreen';
-
 import Providers from './providers';
 
 import type { Metadata } from 'next';
@@ -28,7 +26,6 @@ export default function RootLayout({
   return (
     <html lang="ko" className={`${pretendard.variable} antialiased`}>
       <body>
-        <SplashScreen />
         <Providers>{children}</Providers>
       </body>
     </html>
