@@ -42,6 +42,7 @@ interface RecipeCardProps {
 }
 
 export default function RecipeCard({ onToggleSave, recipe }: RecipeCardProps) {
+  console.log('레시피 카드:', recipe);
   return (
     <div className="flex items-center gap-3 rounded-2xl bg-white py-3 pr-5 pl-3">
       <div className="relative h-[3.75rem] w-[3.75rem] flex-shrink-0">

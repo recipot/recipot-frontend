@@ -38,3 +38,29 @@ export const recipesAPI = {
     return response.data.data;
   },
 };
+
+export const storedAPI = {
+  // 보관한 레시피 목록 조회
+  getStoredRecipes: async (
+    params: GetCompletedRecipesParams = { limit: 10, page: 1 }
+  ): Promise<CompletedRecipesResponse['data']> => {
+    const response = await axiosInstance.get<CompletedRecipesResponse>(
+      '/users/recipes/bookmarks',
+      { params }
+    );
+    return response.data.data;
+  },
+};
+
+export const recentAPI = {
+  // 보관한 레시피 목록 조회
+  getRecentRecipes: async (
+    params: GetCompletedRecipesParams = { limit: 10, page: 1 }
+  ): Promise<CompletedRecipesResponse['data']> => {
+    const response = await axiosInstance.get<CompletedRecipesResponse>(
+      '/users/recipes/recent',
+      { params }
+    );
+    return response.data.data;
+  },
+};

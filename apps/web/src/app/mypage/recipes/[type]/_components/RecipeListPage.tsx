@@ -6,6 +6,8 @@ import { PageHeader } from '@/app/mypage/_components/PageHeader';
 import CookedRecipeList from '@/app/mypage/recipes/[type]/_components/CookedRecipeList';
 import DefaultRecipeList from '@/app/mypage/recipes/[type]/_components/DefaultRecipeList';
 import { useCompletedRecipes } from '@/hooks/useCompletedRecipes';
+import { useRecentRecipes } from '@/hooks/useRecentRecipes';
+import { useStoredRecipes } from '@/hooks/useStoredRecipes';
 import {
   mockCookedRecipes,
   mockDefaultRecipes,
@@ -14,7 +16,7 @@ import type { PageType } from '@/types/MyPage.types';
 
 const PAGE_CONFIG = {
   cooked: {
-    noneBackImage: '',
+    noneBackImage: '/mypage/none-refrigrator-green.png',
     overLayColor: '#F4FCE3',
     themeColor: '#F4FCE3',
     title: '내가 만든 요리',
@@ -45,11 +47,26 @@ export default function RecipeListPage({ type }: { type: PageType }) {
     page: 1,
   });
 
+  const { data: storedRecipesData, isLoading: isStoredLoading } =
+    useStoredRecipes({
+      limit: 100,
+      page: 1,
+    });
+
+  const { data: recentRecipesData, isLoading: isRecentLoading } =
+    useRecentRecipes({
+      limit: 100,
+      page: 1,
+    });
+
   const [defaultRecipes, setDefaultRecipes] = useState(mockDefaultRecipes);
 
   // API 데이터 우선 사용, 없으면 mock 데이터
   const cookedRecipes = completedRecipesData?.items ?? mockCookedRecipes;
+  const storedRecipes = storedRecipesData?.items ?? mockDefaultRecipes;
+  const recentRecipes = recentRecipesData?.items ?? mockDefaultRecipes;
 
+  const defaultRecipe = type === 'saved' ? storedRecipes : recentRecipes;
   const handleToggleSave = (recipeId: number) => {
     if (type === 'cooked') {
       // TODO: API 연동 필요 - 보관 토글 API 호출
@@ -66,7 +83,7 @@ export default function RecipeListPage({ type }: { type: PageType }) {
   };
 
   // 로딩 처리
-  if (type === 'cooked' && isLoading) {
+  if (isLoading || isStoredLoading || isRecentLoading) {
     return (
       <div>
         <div className="px-5">
@@ -94,7 +111,7 @@ export default function RecipeListPage({ type }: { type: PageType }) {
         ) : (
           <DefaultRecipeList
             config={config}
-            recipes={defaultRecipes}
+            recipes={defaultRecipe}
             onToggleSave={handleToggleSave}
           />
         )}

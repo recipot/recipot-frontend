@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // axios 인스턴스 생성
 export const axiosInstance = axios.create({
-  baseURL: 'http://3.34.40.123/v1', //TODO: 환경변수 관리
+  baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
   timeout: 10000,
 });
 
@@ -11,7 +11,7 @@ axiosInstance.interceptors.request.use(
   config => {
     // const token = localStorage.getItem('authToken');
     const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwicm9sZSI6IlUwMTAwMSIsInR5cGUiOiJhY2Nlc3MiLCJpYXQiOjE3NjA2MjIyNzAsImV4cCI6MTc2MDYyNTg3MH0.EZOIInJTO9sLXFjEUIn8zO5e3PUeHk27I-IRkhOtvVs';
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwicm9sZSI6IlUwMTAwMSIsInR5cGUiOiJhY2Nlc3MiLCJpYXQiOjE3NjEwNTQxMjYsImV4cCI6MTc2MTA1NzcyNn0.xaExj26nHKtF7MQytOiBb8xqxSq0Mxpr8ktYhZBqj-U';
 
     if (token) config.headers.Authorization = `Bearer ${token}`;
 

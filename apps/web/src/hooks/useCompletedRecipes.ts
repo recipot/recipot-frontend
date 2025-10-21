@@ -10,6 +10,7 @@ export const useCompletedRecipes = (params?: GetCompletedRecipesParams) => {
     gcTime: 1000 * 60 * 30, // TODO: 캐시 판단
     queryFn: () => recipesAPI.getCompletedRecipes(params),
     queryKey: [...COMPLETED_RECIPES_QUERY_KEY, params],
+    // staleTime: 0,
     staleTime: 1000 * 60 * 5,
   });
 };

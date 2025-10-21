@@ -41,7 +41,7 @@ export type configType = {
 };
 
 export interface DefaultRecipeListProps {
-  recipes: Recipe[];
+  recipes: CompletedRecipe[];
   config: configType;
   onToggleSave: (recipeId: number) => void;
 }

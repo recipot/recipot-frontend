@@ -12,7 +12,7 @@ export default function DefaultRecipeList({
   recipes,
 }: DefaultRecipeListProps) {
   const { scrollRef, showGradient } = useScrollGradient([recipes]);
-
+  console.log('콘솔 :', recipes);
   if (recipes.length === 0) {
     return (
       <div className="relative">
