@@ -15,7 +15,7 @@ interface HeaderActionProps {
  * @param className - 추가 스타일
  */
 export function HeaderAction({
-  ariaLabel,
+  ariaLabel = '액션 버튼',
   children,
   className = '',
   onClick,
