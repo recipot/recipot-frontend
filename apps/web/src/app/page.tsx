@@ -1,9 +1,9 @@
-import RecipeRecommend from './(recipeRecommend)/recipeRecommend/page';
+import { ReviewRemindBottomSheet } from '@/components/review/ReviewRemindBottomSheet';
 
 export default function Home() {
   return (
     <div>
-      <RecipeRecommend />
+      <ReviewRemindBottomSheet />
     </div>
   );
 }
