@@ -32,13 +32,15 @@ interface LoadingPageProps {
 const LoadingPage = ({ children }: LoadingPageProps) => {
   return (
     <div className="flex h-screen w-screen flex-col items-center justify-center bg-[#00000099]">
-      <Image
-        src={LoadingBob}
-        alt="로딩 중"
-        width={138}
-        height={138}
-        className="mb-8 rounded-[100px] object-cover"
-      />
+      <div className="mb-8 size-[138px] overflow-hidden rounded-full">
+        <Image
+          src={LoadingBob}
+          alt="로딩 중"
+          width={138}
+          height={138}
+          className="size-full object-cover"
+        />
+      </div>
       <p className="text-18sb text-center text-white">
         {children ?? '열심히 요리 중...'}
       </p>
