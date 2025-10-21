@@ -206,42 +206,50 @@ export function WeeklySurveyBottomSheet() {
                       ))}
                     </div>
                   </section>
-                  <section className="mt-6">
-                    <h2 className="text-18sb mb-6 text-gray-800">
-                      어떤 점이 개선되었나요?(다중선택)
-                    </h2>
+                  {/* 개선됐어요가 선택되었을 때만 다중선택 영역 표시 */}
+                  {watchedHealthChange === '개선됐어요' && (
+                    <section className="mt-6">
+                      <h2 className="text-18sb mb-6 text-gray-800">
+                        어떤 점이 개선되었나요?(다중선택)
+                      </h2>
 
-                    {HEALTH_IMPROVEMENT_OPTIONS.map(option => (
-                      <div
-                        key={option}
-                        className="flex cursor-pointer items-center gap-3 py-[10px]"
-                        onClick={() => handleOptionToggle(option)}
-                      >
-                        <CheckboxIcon
-                          isSelected={watchedImprovements.includes(option)}
+                      {HEALTH_IMPROVEMENT_OPTIONS.map(option => (
+                        <div
+                          key={option}
+                          className="flex cursor-pointer items-center gap-3 py-[10px]"
+                          onClick={() => handleOptionToggle(option)}
+                        >
+                          <CheckboxIcon
+                            isSelected={watchedImprovements.includes(option)}
+                          />
+                          <span className="text-base text-[#000000]/96">
+                            {option}
+                          </span>
+                        </div>
+                      ))}
+
+                      <div className="relative">
+                        <textarea
+                          {...register('additionalFeedback')}
+                          value={watchedAdditionalFeedback}
+                          placeholder="구체적으로 느낀 변화를 적어주세요!"
+                          className="text-17 w-full rounded-xl border border-gray-300 bg-white p-4 text-gray-600 placeholder:text-gray-400 focus:border-[#68982d] focus:outline-none"
+                          rows={3}
                         />
-                        <span className="text-base text-[#000000]/96">
-                          {option}
-                        </span>
+
+                        <div className="textarea-gradient-overlay pointer-events-none absolute right-0 bottom-0 left-0 h-6 rounded-b-xl" />
                       </div>
-                    ))}
-
-                    <div className="relative">
-                      <textarea
-                        {...register('additionalFeedback')}
-                        value={watchedAdditionalFeedback}
-                        placeholder="구체적으로 느낀 변화를 적어주세요!"
-                        className="text-17 w-full rounded-xl border border-gray-300 bg-white p-4 text-gray-600 placeholder:text-gray-400 focus:border-[#68982d] focus:outline-none"
-                        rows={3}
-                      />
-
-                      <div className="textarea-gradient-overlay pointer-events-none absolute right-0 bottom-0 left-0 h-6 rounded-b-xl" />
-                    </div>
-                  </section>
+                    </section>
+                  )}
                 </div>
               </div>
             </main>
           </div>
+
+          {/* 선택 전 또는 개선됐어요가 아닌 경우에만 표시되는 여백 */}
+          {(!watchedHealthChange || watchedHealthChange !== '개선됐어요') && (
+            <div className="h-[257px]" />
+          )}
 
           {/* 설문완료 버튼 - 하단 고정 */}
           <div className="sticky bottom-0 bg-white px-[30px] pt-0 pb-[34px]">
@@ -249,7 +257,8 @@ export function WeeklySurveyBottomSheet() {
               type="submit"
               disabled={
                 !watchedHealthChange ||
-                watchedImprovements.length === 0 ||
+                (watchedHealthChange === '개선됐어요' &&
+                  watchedImprovements.length === 0) ||
                 isSubmitting
               }
               className="text-17sb w-full rounded-full bg-[#68982d] py-4 text-white hover:bg-[#5a7a26] disabled:bg-gray-300 disabled:text-gray-500"
