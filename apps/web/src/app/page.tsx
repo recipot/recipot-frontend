@@ -1,7 +1,10 @@
-import { WeeklySurveyBottomSheet } from '@/components/review/WeeklySurveyBottomSheet';
+'use client';
+
+import { ReviewRemindBottomSheet } from '@/components/review/ReviewRemindBottomSheet';
+import { useSplash } from '@/contexts/SplashContext';
 
 export default function Home() {
-  // TODO : 유저 상세 조회 API 적용
-  // return <ReviewRemindBottomSheet />;
-  return <WeeklySurveyBottomSheet />;
+  const { isCompleted } = useSplash();
+
+  return <div>{isCompleted && <ReviewRemindBottomSheet />}</div>;
 }
