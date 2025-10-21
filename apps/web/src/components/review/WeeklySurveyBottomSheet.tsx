@@ -228,7 +228,7 @@ export function WeeklySurveyBottomSheet() {
                         </div>
                       ))}
 
-                      <div className="relative">
+                      <div className="textarea-container">
                         <textarea
                           {...register('additionalFeedback')}
                           value={watchedAdditionalFeedback}
@@ -236,8 +236,6 @@ export function WeeklySurveyBottomSheet() {
                           className="text-17 w-full rounded-xl border border-gray-300 bg-white p-4 text-gray-600 placeholder:text-gray-400 focus:border-[#68982d] focus:outline-none"
                           rows={3}
                         />
-
-                        <div className="textarea-gradient-overlay pointer-events-none absolute right-0 bottom-0 left-0 h-6 rounded-b-xl" />
                       </div>
                     </section>
                   )}
