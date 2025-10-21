@@ -3,20 +3,25 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 
+import {
+  SPLASH_DISPLAY_DURATION,
+  SPLASH_TOTAL_DURATION,
+} from '@/constants/splash';
+
 export default function SplashScreen() {
   const [isVisible, setIsVisible] = useState(true);
   const [shouldRender, setShouldRender] = useState(true);
 
   useEffect(() => {
-    // 2.5초 후 페이드아웃 시작
+    // 페이드아웃 시작
     const fadeOutTimer = setTimeout(() => {
       setIsVisible(false);
-    }, 2500);
+    }, SPLASH_DISPLAY_DURATION);
 
-    // 3초 후 DOM에서 완전히 제거
+    // DOM에서 완전히 제거
     const removeTimer = setTimeout(() => {
       setShouldRender(false);
-    }, 3000);
+    }, SPLASH_TOTAL_DURATION);
 
     return () => {
       clearTimeout(fadeOutTimer);

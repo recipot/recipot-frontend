@@ -117,15 +117,6 @@ module.exports = {
         24: ['1.5rem', { lineHeight: '140%', fontWeight: '600' }], // text-24
         28: ['1.75rem', { lineHeight: '100%', fontWeight: '700' }], // text-28
       },
-      keyframes: {
-        'loading-bar': {
-          '0%': { transform: 'translateX(-100%)' },
-          '100%': { transform: 'translateX(100%)' },
-        },
-      },
-      animation: {
-        'loading-bar': 'loading-bar 1.5s ease-in-out infinite',
-      },
     },
   },
   plugins: [require('tailwindcss-animate')],
