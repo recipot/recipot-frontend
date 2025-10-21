@@ -19,8 +19,13 @@ export default function AllergyContent({
   className = '',
   onSubmit,
 }: AllergyContentProps) {
-  const { categories, formId, handleItemToggle, selectedItems } =
-    useAllergyContext();
+  const {
+    categories,
+    formId,
+    handleCategoryToggle,
+    handleItemToggle,
+    selectedItems,
+  } = useAllergyContext();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,6 +40,7 @@ export default function AllergyContent({
         categories={categories}
         formId={formId}
         selectedItems={selectedItems}
+        onCategoryToggle={handleCategoryToggle}
         onItemToggle={handleItemToggle}
         onSubmit={handleSubmit}
       />

@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 /**
  * useAllergyCheck
  * @param initialItems - 초기 선택된 항목들
- * @returns handleItemToggle: (itemId: number) => void, selectedItems: number[], resetItems: () => void, resetToInitial: () => void
+ * @returns handleItemToggle: (itemId: number) => void, handleCategoryToggle: (categoryItemIds: number[]) => void, selectedItems: number[], resetItems: () => void, resetToInitial: () => void
  * @description 알레르기 항목 선택 핸들러와 선택된 항목 목록, 초기화 함수를 반환합니다.
  */
 export default function useAllergyCheck(initialItems: number[] = []) {
@@ -44,6 +44,28 @@ export default function useAllergyCheck(initialItems: number[] = []) {
     });
   }, []);
 
+  const handleCategoryToggle = useCallback((categoryItemIds: number[]) => {
+    hasUserInteractedRef.current = true;
+    setSelectedItems(prev => {
+      // 카테고리의 모든 아이템이 선택되어 있는지 확인
+      const allSelected = categoryItemIds.every(id => prev.includes(id));
+
+      if (allSelected) {
+        // 모두 선택되어 있으면 전체 해제
+        return prev.filter(id => !categoryItemIds.includes(id));
+      } else {
+        // 하나라도 선택 안 되어 있으면 전체 선택
+        const newItems = [...prev];
+        categoryItemIds.forEach(id => {
+          if (!newItems.includes(id)) {
+            newItems.push(id);
+          }
+        });
+        return newItems;
+      }
+    });
+  }, []);
+
   const resetItems = useCallback(() => {
     hasUserInteractedRef.current = false;
     setSelectedItems([]);
@@ -54,5 +76,11 @@ export default function useAllergyCheck(initialItems: number[] = []) {
     setSelectedItems(initialItemsRef.current);
   }, []);
 
-  return { handleItemToggle, resetItems, resetToInitial, selectedItems };
+  return {
+    handleCategoryToggle,
+    handleItemToggle,
+    resetItems,
+    resetToInitial,
+    selectedItems,
+  };
 }

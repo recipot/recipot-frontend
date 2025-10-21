@@ -16,6 +16,7 @@ interface AllergyContextValue {
   error: Error | null;
   formId: string;
   gnbRef: RefObject<HTMLElement> | undefined;
+  handleCategoryToggle: (categoryItemIds: number[]) => void;
   handleItemToggle: (id: number) => void;
   handleTabClick: (index: number) => void;
   isLoading: boolean;
@@ -67,7 +68,7 @@ export function AllergyProvider({
     [initialSelectedItems, initialSelectedIds]
   );
 
-  const { handleItemToggle, resetItems, selectedItems } =
+  const { handleCategoryToggle, handleItemToggle, resetItems, selectedItems } =
     useAllergyCheck(initialItems);
 
   // 스크롤 설정 (기본값 + 커스텀 설정 병합)
@@ -165,6 +166,7 @@ export function AllergyProvider({
     error,
     formId,
     gnbRef,
+    handleCategoryToggle,
     handleItemToggle,
     handleTabClick,
     isLoading,
