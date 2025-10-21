@@ -34,12 +34,32 @@ export default function RefrigeratorStep() {
     }
   }, [isRefreshed, clearAllFoods, clearRefreshFlag]);
 
-  // TODO: 온보딩 완료 처리 : 온보딩 플래그 추가 시 작업 필요함
-  const completeOnboarding = () => {
-    if (user) {
-      setUser({
-        ...user,
-      });
+  // 온보딩 완료 처리 : isFirstEntry 플래그 업데이트
+  const completeOnboarding = async () => {
+    if (user?.isFirstEntry) {
+      try {
+        // TODO: 백엔드 API 구현 대기 중
+        // PATCH /v1/users/profile 엔드포인트로 isFirstEntry를 false로 업데이트
+        // 백엔드에서 API가 준비되면 주석을 해제하세요
+        // const updatedUser = await authService.updateProfile({
+        //   isFirstEntry: false,
+        // });
+        // setUser(updatedUser);
+
+        // 임시: 클라이언트 상태만 업데이트
+        setUser({
+          ...user,
+          isFirstEntry: false,
+        });
+        console.info('✅ 온보딩 완료: isFirstEntry 플래그 업데이트');
+      } catch (error) {
+        console.error('❌ isFirstEntry 업데이트 실패:', error);
+        // 실패해도 온보딩은 완료된 것으로 처리 (UX 우선)
+        setUser({
+          ...user,
+          isFirstEntry: false,
+        });
+      }
     }
   };
 
@@ -89,7 +109,7 @@ export default function RefrigeratorStep() {
         setStepData(3, refrigeratorData);
         markStepCompleted(3);
 
-        completeOnboarding();
+        await completeOnboarding();
 
         // 6. localStorage 데이터 정리 (Zustand는 유지됨)
         onboardingStorage.clearData();

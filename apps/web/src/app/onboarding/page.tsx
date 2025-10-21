@@ -1,5 +1,9 @@
 'use client';
 
+import { useEffect } from 'react';
+import { useAuth } from '@recipot/contexts';
+import { useRouter } from 'next/navigation';
+
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import { useCurrentStep } from '@/stores/onboardingStore';
 
@@ -12,12 +16,39 @@ import { useOnboardingRestore } from './_hooks';
 import { onboardingStyles } from './_utils';
 
 function OnboardingContent() {
+  const { loading, user } = useAuth();
+  const router = useRouter();
   const currentStep = useCurrentStep();
   const currentStepData = STEP_CONFIG[currentStep - 1];
+
+  // 온보딩 페이지 접근 제어
+  useEffect(() => {
+    if (loading) {
+      return;
+    }
+
+    // 비로그인 사용자 → 로그인 페이지로 이동
+    if (!user) {
+      console.info('🔒 비로그인 사용자, 로그인 페이지로 이동');
+      router.push('/signin');
+      return;
+    }
+
+    // 이미 온보딩 완료한 사용자 → 메인 페이지로 이동
+    if (!user.isFirstEntry) {
+      console.info('✅ 이미 온보딩 완료, 메인 페이지로 이동');
+      router.push('/');
+    }
+  }, [loading, user, router]);
 
   // 데이터 복구 로직
   const { handleRestoreCancel, handleRestoreConfirm, showRestoreDialog } =
     useOnboardingRestore();
+
+  // 로딩 중이거나 리다이렉트 대상인 경우 빈 화면 표시
+  if (loading || !user?.isFirstEntry) {
+    return null;
+  }
 
   const renderCurrentStep = () => {
     switch (currentStep) {

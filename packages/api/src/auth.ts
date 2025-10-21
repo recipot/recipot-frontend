@@ -322,6 +322,25 @@ export const authService = {
       throw new Error('토큰 만료 확인에 실패했습니다.');
     }
   },
+
+  // TODO: 백엔드 API 구현 대기 중
+  // 현재는 클라이언트에서만 호출하고 백엔드 연동은 추후 진행 예정
+  async updateProfile(
+    updates: Partial<Pick<UserInfo, 'nickname' | 'isFirstEntry'>>
+  ): Promise<UserInfo> {
+    try {
+      const response = await authApi.patch('/v1/users/profile', updates);
+
+      if (response.data.status === 200 && response.data.data) {
+        return response.data.data;
+      }
+
+      return response.data;
+    } catch (error) {
+      console.error('프로필 업데이트 에러:', error);
+      throw new Error('프로필 업데이트에 실패했습니다.');
+    }
+  },
 };
 
 // 토큰 관리 유틸리티 함수들을 외부에서 사용할 수 있도록 export
