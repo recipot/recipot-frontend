@@ -43,58 +43,24 @@ export function RecipeDetailHeader({ recipe }: RecipeHeaderProps) {
     };
   }, [recipe]);
 
-  const handleToggleLike = async (recipeId: number) => {
-    if (!token) {
-      console.warn('❌ 로그인이 필요합니다.');
-      return;
-    }
-
-    setIsLoading(true);
-
-    // useRef를 사용하여 현재 상태를 정확히 추적
-    const previousIsLiked = isLikedRef.current;
-    const newIsLiked = !previousIsLiked;
-
-    // ref와 state 모두 업데이트
-    isLikedRef.current = newIsLiked;
-    setIsLiked(newIsLiked);
+  const handleToggleBookmark = async (recipeId: number) => {
+    const bookmarkURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/users/recipes/bookmarks`;
+    const method = isLiked ? 'delete' : 'post';
 
     try {
-      if (previousIsLiked) {
-        // 북마크 해제
-        const deleteUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/users/recipes/bookmarks/${recipeId}`;
+      // DELETE 요청일 때만 recipeId를 URL에 포함
+      const url =
+        method === 'delete' ? `${bookmarkURL}/${recipeId}` : bookmarkURL;
 
-        await axios.delete(deleteUrl, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-      } else {
-        // 북마크 추가
-        const postUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/users/recipes/bookmarks`;
-
-        await axios.post(
-          postUrl,
-          {
-            recipeId,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-      }
+      await axios[method](url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
     } catch (error: unknown) {
-      console.error('❌ 북마크 처리 중 오류:', error);
-
-      // 에러 발생 시 이전 상태로 롤백
-      isLikedRef.current = previousIsLiked;
-      setIsLiked(previousIsLiked);
-      // 사용자에게 알림 (선택사항)
-      alert('북마크 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
-    } finally {
-      setIsLoading(false);
+      if (error instanceof Error) {
+        throw new Error(error.message ?? '북마크 처리 중 오류가 발생했습니다.');
+      }
     }
   };
 
@@ -121,7 +87,7 @@ export function RecipeDetailHeader({ recipe }: RecipeHeaderProps) {
               <ShareIcon className="h-6 w-6" color="#212529" />
             </WebShareButton>
             <HeartIcon
-              onClick={() => handleToggleLike(recipe.id)}
+              onClick={() => handleToggleBookmark(recipe.id)}
               className={`h-6 w-6 stroke-2 transition-colors duration-200 ${
                 isLoading
                   ? 'cursor-not-allowed opacity-50'
