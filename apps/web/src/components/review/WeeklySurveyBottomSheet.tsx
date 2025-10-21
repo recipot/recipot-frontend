@@ -1,6 +1,8 @@
 'use client';
 import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+import { tokenUtils } from 'packages/api/src/auth';
 
 import { Button } from '../common/Button';
 import CheckboxIcon from '../common/CheckboxIcon';
@@ -21,33 +23,120 @@ const HEALTH_CHANGE_OPTIONS = [
   '개선됐어요',
 ] as const;
 
+type SurveyFormData = {
+  healthChange: string;
+  improvements: string[];
+  additionalFeedback: string;
+};
+
+// API 요청 타입 (실제 API 스펙에 맞게 수정)
+type HealthSurveyRequest = {
+  issueCode: string; // H01: 건강 변화 선택
+  effectCodes: string[]; // H02: 개선 사항들
+  additionalNote: string; // 추가 피드백
+};
+
+// API 응답 타입
+type HealthSurveyResponse = {
+  success: boolean;
+  message: string;
+};
+
 export function WeeklySurveyBottomSheet() {
+  const token = tokenUtils.getToken();
   const [isOpen, setIsOpen] = useState(true);
-  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
-  const [selectedHealthChange, setSelectedHealthChange] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { handleSubmit, register, setValue, watch } = useForm<SurveyFormData>({
+    defaultValues: {
+      additionalFeedback: '',
+      healthChange: '',
+      improvements: [],
+    },
+  });
+
+  const watchedValues = watch([
+    'healthChange',
+    'improvements',
+    'additionalFeedback',
+  ]);
+  const [watchedHealthChange, watchedImprovements, watchedAdditionalFeedback] =
+    watchedValues;
 
   const handleOptionToggle = (option: string) => {
-    setSelectedOptions(prev =>
-      prev.includes(option)
-        ? prev.filter(item => item !== option)
-        : [...prev, option]
-    );
+    const newImprovements = watchedImprovements.includes(option)
+      ? watchedImprovements.filter(item => item !== option)
+      : [...watchedImprovements, option];
+    setValue('improvements', newImprovements);
   };
 
   const handleHealthChangeSelect = (option: string) => {
-    setSelectedHealthChange(option);
+    setValue('healthChange', option);
   };
 
   const handleClose = () => {
     setIsOpen(false);
   };
 
-  const handleSubmit = () => {
-    // 설문 완료 로직
-    console.log('건강 변화:', selectedHealthChange);
-    console.log('선택된 옵션들:', selectedOptions);
-    // TODO: API 호출 또는 다른 완료 처리
-    handleClose();
+  // API 호출 함수 (실제 API 엔드포인트에 맞게 수정)
+  const submitHealthSurvey = async (
+    data: HealthSurveyRequest
+  ): Promise<HealthSurveyResponse> => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/health-survey`,
+        {
+          body: JSON.stringify(data),
+          headers: {
+            // TODO: 인증 토큰이 필요한 경우 추가
+            Authorization: `Bearer ${token}`,
+          },
+          method: 'POST',
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.message ?? `HTTP error! status: ${response.status}`
+        );
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Health Survey API Error:', error);
+      throw error;
+    }
+  };
+
+  const onSubmit = async (data: SurveyFormData) => {
+    setIsSubmitting(true);
+
+    try {
+      // form 데이터를 API 형식으로 변환
+      // TODO : 데이터 수정 필요
+      const apiData: HealthSurveyRequest = {
+        additionalNote: data.additionalFeedback || '', // 추가 피드백 (빈 문자열로 기본값 설정)
+        effectCodes: data.improvements, // H02: 개선 사항들
+        issueCode: data.healthChange, // H01: 건강 변화 선택
+      };
+
+      // API 호출
+      const result = await submitHealthSurvey(apiData);
+
+      if (result.success) {
+        // 성공 시 바텀시트 닫기
+        handleClose();
+      } else {
+        console.error('설문 제출 실패:', result.message);
+        // TODO: 에러 토스트 표시
+      }
+    } catch (error) {
+      console.error('설문 제출 중 오류 발생:', error);
+      // TODO: 에러 토스트 표시
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -56,8 +145,8 @@ export function WeeklySurveyBottomSheet() {
         <VisuallyHidden asChild>
           <DrawerTitle>어제 드신 메뉴 어떠셨나요?</DrawerTitle>
         </VisuallyHidden>
-        <div>
-          <div className="overflow-y-auto px-6 pb-6">
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="overflow-y-auto px-6">
             {/* 헤더 - 상단에 고정 */}
             <header className="sticky top-0 z-10 -mx-4 flex justify-end bg-white px-4">
               <DrawerClose
@@ -104,9 +193,10 @@ export function WeeklySurveyBottomSheet() {
                           key={option}
                           variant="outline"
                           size="full"
+                          type="button"
                           onClick={() => handleHealthChangeSelect(option)}
                           className={`text-15sb rounded-[10px] border p-3 ${
-                            selectedHealthChange === option
+                            watchedHealthChange === option
                               ? 'border-secondary-soft-green bg-secondary-light-green text-primary'
                               : 'border-gray-300 text-gray-600'
                           }`}
@@ -128,13 +218,25 @@ export function WeeklySurveyBottomSheet() {
                         onClick={() => handleOptionToggle(option)}
                       >
                         <CheckboxIcon
-                          isSelected={selectedOptions.includes(option)}
+                          isSelected={watchedImprovements.includes(option)}
                         />
                         <span className="text-base text-[#000000]/96">
                           {option}
                         </span>
                       </div>
                     ))}
+
+                    <div className="relative">
+                      <textarea
+                        {...register('additionalFeedback')}
+                        value={watchedAdditionalFeedback}
+                        placeholder="구체적으로 느낀 변화를 적어주세요!"
+                        className="text-17 w-full rounded-xl border border-gray-300 bg-white p-4 text-gray-600 placeholder:text-gray-400 focus:border-[#68982d] focus:outline-none"
+                        rows={3}
+                      />
+
+                      <div className="textarea-gradient-overlay pointer-events-none absolute right-0 bottom-0 left-0 h-6 rounded-b-xl" />
+                    </div>
                   </section>
                 </div>
               </div>
@@ -142,16 +244,20 @@ export function WeeklySurveyBottomSheet() {
           </div>
 
           {/* 설문완료 버튼 - 하단 고정 */}
-          <div className="sticky bottom-0 bg-white px-6 pt-4 pb-6">
+          <div className="sticky bottom-0 bg-white px-[30px] pt-0 pb-[34px]">
             <Button
-              disabled={!selectedHealthChange || selectedOptions.length === 0}
-              onClick={handleSubmit}
+              type="submit"
+              disabled={
+                !watchedHealthChange ||
+                watchedImprovements.length === 0 ||
+                isSubmitting
+              }
               className="text-17sb w-full rounded-full bg-[#68982d] py-4 text-white hover:bg-[#5a7a26] disabled:bg-gray-300 disabled:text-gray-500"
             >
-              설문완료
+              {isSubmitting ? '제출 중...' : '설문완료'}
             </Button>
           </div>
-        </div>
+        </form>
       </DrawerContent>
     </Drawer>
   );
