@@ -2,7 +2,8 @@
 
 import { useRouter } from 'next/navigation';
 
-import { BackIcon, RefreshIcon } from '@/components/Icons';
+import { Header } from '@/components/common/Header';
+import { RefreshIcon } from '@/components/Icons';
 import { useOnboardingStore } from '@/stores/onboardingStore';
 
 function OnboardingHeader() {
@@ -30,24 +31,12 @@ function OnboardingHeader() {
   };
 
   return (
-    <header className="fixed top-0 right-0 left-0 z-10 flex h-14 items-center justify-between bg-white px-3 py-2">
-      {currentStep > 1 ? (
-        <button
-          className="flex size-10 items-center justify-center"
-          onClick={handleBackClick}
-        >
-          <BackIcon size={24} />
-        </button>
-      ) : (
-        <div className="size-10" />
-      )}
-      <button
-        className="flex size-10 items-center justify-center"
-        onClick={handleRefreshClick}
-      >
+    <Header>
+      <Header.Back show={currentStep > 1} onClick={handleBackClick} />
+      <Header.Action onClick={handleRefreshClick} ariaLabel="새로고침">
         <RefreshIcon size={24} />
-      </button>
-    </header>
+      </Header.Action>
+    </Header>
   );
 }
 
@@ -59,6 +48,7 @@ export default function OnboardingLayout({
   return (
     <>
       <OnboardingHeader />
+      <Header.Spacer />
       <div>{children}</div>
     </>
   );
