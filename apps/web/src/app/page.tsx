@@ -1,10 +1,10 @@
 'use client';
 
-import { ReviewRemindBottomSheet } from '@/components/review/ReviewRemindBottomSheet';
+import { WeeklySurveyBottomSheet } from '@/components/review/WeeklySurveyBottomSheet';
 import { useSplash } from '@/contexts/SplashContext';
 
 export default function Home() {
   const { isCompleted } = useSplash();
 
-  return <div>{isCompleted && <ReviewRemindBottomSheet />}</div>;
+  return <div>{isCompleted && <WeeklySurveyBottomSheet />}</div>;
 }
