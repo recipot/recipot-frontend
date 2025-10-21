@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 interface HeaderActionProps {
   children: ReactNode;
   onClick?: () => void;
-  ariaLabel?: string;
+  ariaLabel: NonNullable<React.ComponentProps<'button'>['aria-label']>;
   className?: string;
 }
 
