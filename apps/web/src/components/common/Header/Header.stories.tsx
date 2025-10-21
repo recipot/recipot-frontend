@@ -2,7 +2,7 @@ import { RefreshIcon } from '@/components/Icons';
 
 import { Header } from './index';
 
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 const meta = {
   argTypes: {},
@@ -14,7 +14,7 @@ const meta = {
 } satisfies Meta<typeof Header>;
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<typeof Header>;
 
 /**
  * 온보딩 페이지에서 사용하는 헤더 패턴
