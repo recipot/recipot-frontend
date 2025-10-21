@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { onboarding } from '@recipot/api';
+import { condition, onboarding } from '@recipot/api';
 import { useAuth } from '@recipot/contexts';
 import { useRouter } from 'next/navigation';
 
@@ -11,7 +11,11 @@ import { useSelectedFoodsStore } from '@/stores/selectedFoodsStore';
 
 import { ONBOARDING_CONSTANTS } from '../../_constants';
 import { useOnboardingActions } from '../../_hooks';
-import { getSubmitButtonText, onboardingStorage } from '../../_utils';
+import {
+  getSubmitButtonText,
+  moodToConditionId,
+  onboardingStorage,
+} from '../../_utils';
 
 export default function RefrigeratorStep() {
   const { setUser, user } = useAuth();
@@ -94,7 +98,25 @@ export default function RefrigeratorStep() {
       const result = await onboarding.submitComplete(completeData);
 
       if (result.success) {
-        // 5. 온보딩 완료 처리 - clearData 전에 Zustand 스토어에 모든 데이터 저장
+        // 5. 일일 컨디션 저장
+        try {
+          const conditionId = moodToConditionId(
+            completeData.mood as 'bad' | 'neutral' | 'good'
+          );
+          await condition.saveDailyCondition({
+            conditionId,
+            isRecommendationStarted: true,
+          });
+          console.info('✅ 일일 컨디션 저장 성공:', {
+            conditionId,
+            mood: completeData.mood,
+          });
+        } catch (conditionError) {
+          // 컨디션 저장 실패는 로그만 남기고 온보딩 진행 계속
+          console.error('⚠️ 일일 컨디션 저장 실패:', conditionError);
+        }
+
+        // 6. 온보딩 완료 처리 - clearData 전에 Zustand 스토어에 모든 데이터 저장
         // 알레르기 데이터 저장
         setStepData(1, {
           allergies: completeData.allergies,
@@ -111,7 +133,7 @@ export default function RefrigeratorStep() {
 
         await completeOnboarding();
 
-        // 6. localStorage 데이터 정리 (Zustand는 유지됨)
+        // 7. localStorage 데이터 정리 (Zustand는 유지됨)
         onboardingStorage.clearData();
 
         console.info('✅ 온보딩 완료!', {
