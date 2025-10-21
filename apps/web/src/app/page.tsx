@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useAuth } from '@recipot/contexts';
 import { useRouter } from 'next/navigation';
 
+import { LoadingPage } from '@/components/common/Loading';
 import { ReviewRemindBottomSheet } from '@/components/review/ReviewRemindBottomSheet';
 
 export default function Home() {
@@ -30,11 +31,7 @@ export default function Home() {
 
   // 로딩 중일 때 표시할 화면
   if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-lg">로딩 중...</div>
-      </div>
-    );
+    return <LoadingPage />;
   }
 
   // 비로그인 또는 온보딩 미완료인 경우 빈 화면 표시 (리다이렉트 진행 중)
