@@ -11,6 +11,7 @@ import { tokenUtils } from 'packages/api/src/auth';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
 import { Button } from '@/components/common/Button';
+import { Header } from '@/components/common/Header';
 import { Toast } from '@/components/common/Toast';
 import { RecipeCard } from '@/components/RecipeCard';
 import {
@@ -174,9 +175,8 @@ export default function RecipeRecommend() {
     // TODO : 추후 감정 상태에 따라 그래디언트 적용 필요
     <>
       <RecipeHeader onRefresh={handleRefresh} />
-      <div className="recipe-recommend-main flex flex-col items-center justify-center overflow-hidden pt-14">
-        {/* Header - 고정 높이 */}
-
+      <Header.Spacer />
+      <div className="recipe-recommend-main flex flex-col items-center justify-center overflow-hidden">
         {/* Swiper Cards Effect - 남은 공간 차지 */}
         <div className="px-6 pt-5 pb-6">
           <div className="recipe-header-group mb-5">
