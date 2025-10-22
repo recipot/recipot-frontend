@@ -29,12 +29,21 @@ const isValidMockRefreshToken = (token: string): boolean => {
 
 // 토큰에서 사용자 제공자 식별
 const getUserFromToken = (token: string): UserInfo => {
+  console.log('getUserFromToken - 토큰:', token);
+
   if (token.includes('google')) {
-    return mockUsers.find(u => u.provider === 'google') || mockUsers[1];
+    const googleUser =
+      mockUsers.find(u => u.platform === 'google') || mockUsers[1];
+    console.log('getUserFromToken - 구글 사용자:', googleUser);
+    return googleUser;
   } else if (token.includes('kakao')) {
-    return mockUsers.find(u => u.provider === 'kakao') || mockUsers[0];
+    const kakaoUser =
+      mockUsers.find(u => u.platform === 'kakao') || mockUsers[0];
+    console.log('getUserFromToken - 카카오 사용자:', kakaoUser);
+    return kakaoUser;
   }
   // 기본값은 카카오 사용자
+  console.log('getUserFromToken - 기본 사용자:', mockUsers[0]);
   return mockUsers[0];
 };
 
@@ -78,7 +87,7 @@ export const authHandlers = [
 
     await delay(1000);
 
-    const user = mockUsers.find(u => u.provider === 'kakao') || mockUsers[0];
+    const user = mockUsers.find(u => u.platform === 'kakao') || mockUsers[0];
     const tokenData: TokenResponse = {
       accessToken: `kakao_mock_token_${Date.now()}`,
       refreshToken: `kakao_mock_refresh_${Date.now()}`,
@@ -131,9 +140,14 @@ export const authHandlers = [
     await delay(1000);
 
     const user =
-      mockUsers.find(u => u.provider === 'google') ||
+      mockUsers.find(u => u.platform === 'google') ||
       mockUsers[1] ||
       mockUsers[0];
+    console.log('구글 로그인 콜백 - 반환할 사용자:', user);
+    console.log(
+      '구글 로그인 콜백 - 온보딩 완료 상태 (isFirstEntry):',
+      user.isFirstEntry
+    );
     const tokenData: TokenResponse = {
       accessToken: `google_mock_token_${Date.now()}`,
       refreshToken: `google_mock_refresh_${Date.now()}`,
@@ -178,6 +192,11 @@ export const authHandlers = [
 
     await delay(300);
     const user = getUserFromToken(token);
+    console.log('토큰 검증 - 반환할 사용자:', user);
+    console.log(
+      '토큰 검증 - 온보딩 완료 상태 (isFirstEntry):',
+      user.isFirstEntry
+    );
     const successResponse: AuthResponse = {
       success: true,
       data: user,
@@ -210,12 +229,15 @@ export const authHandlers = [
   }),
 
   // 현재 사용자 정보 조회
-  http.get('/v1/user/profile/me', async ({ request }) => {
+  http.get('/v1/users/profile/me', async ({ request }) => {
     const authHeader = request.headers.get('Authorization');
 
     if (!authHeader?.startsWith('Bearer ')) {
       return HttpResponse.json(
-        { error: '인증이 필요합니다.' },
+        {
+          status: 401,
+          error: '인증이 필요합니다.',
+        },
         { status: 401 }
       );
     }
@@ -224,7 +246,10 @@ export const authHandlers = [
 
     if (!isValidMockToken(token)) {
       return HttpResponse.json(
-        { error: '유효하지 않은 토큰입니다.' },
+        {
+          status: 401,
+          error: '유효하지 않은 토큰입니다.',
+        },
         { status: 401 }
       );
     }
@@ -233,7 +258,13 @@ export const authHandlers = [
     const user = getUserFromToken(token);
 
     await delay(300);
-    return HttpResponse.json(user, { status: 200 });
+    return HttpResponse.json(
+      {
+        status: 200,
+        data: user,
+      },
+      { status: 200 }
+    );
   }),
 
   // 로그아웃
