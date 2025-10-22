@@ -102,7 +102,7 @@ const EmotionState: React.FC<EmotionStateProps> = ({
         ))}
       </div>
 
-      <Image src={getEmotionImage(selectedMood)} alt="emotion" />
+      <Image src={getEmotionImage(selectedMood)} alt="emotion" quality={100} />
     </div>
   );
 };
