@@ -6,11 +6,12 @@ import { useRouter } from 'next/navigation';
 
 import { LoadingPage } from '@/components/common/Loading';
 import { ReviewRemindBottomSheet } from '@/components/review/ReviewRemindBottomSheet';
+import { useSplash } from '@/contexts/SplashContext';
 
 export default function Home() {
   const { loading, user } = useAuth();
   const router = useRouter();
-
+  const { isCompleted } = useSplash();
   useEffect(() => {
     // 로딩 중에는 체크하지 않음
     if (loading) {
@@ -40,9 +41,5 @@ export default function Home() {
   }
 
   // 정상적으로 로그인하고 온보딩 완료한 사용자만 표시
-  return (
-    <div>
-      <ReviewRemindBottomSheet />
-    </div>
-  );
+  return <div>{isCompleted && <ReviewRemindBottomSheet />}</div>;
 }

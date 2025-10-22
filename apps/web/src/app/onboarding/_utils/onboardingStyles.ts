@@ -24,7 +24,7 @@ export const onboardingStyles = {
   stepHeader: {
     description: 'text-18 text-gray-600',
     title: 'text-24 mb-1 whitespace-pre-line',
-    wrapper: 'mt-10 mb-4 text-center pt-[60px]',
+    wrapper: 'mt-10 mb-4 text-center',
   },
 
   submitButton: {

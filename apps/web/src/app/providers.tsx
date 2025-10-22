@@ -5,6 +5,8 @@ import { AuthProvider, MswProvider } from '@recipot/contexts';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
+import { SplashScreen } from '@/components/common/SplashScreen';
+import { SplashProvider } from '@/contexts/SplashContext';
 import { isDevelopment } from '@/lib/env';
 
 import type { ReactNode } from 'react';
@@ -52,11 +54,14 @@ export default function Providers({ children }: { children: ReactNode }) {
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <MswProvider mswReady={mswReady}>
-        <AuthProvider>{children}</AuthProvider>
-      </MswProvider>
-      {isDevelopment ? <ReactQueryDevtools initialIsOpen={false} /> : null}
-    </QueryClientProvider>
+    <SplashProvider>
+      <SplashScreen />
+      <QueryClientProvider client={queryClient}>
+        <MswProvider mswReady={mswReady}>
+          <AuthProvider>{children}</AuthProvider>
+        </MswProvider>
+        {isDevelopment ? <ReactQueryDevtools initialIsOpen={false} /> : null}
+      </QueryClientProvider>
+    </SplashProvider>
   );
 }
