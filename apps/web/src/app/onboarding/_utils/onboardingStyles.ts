@@ -10,19 +10,6 @@ export const onboardingStyles = {
     wrapper: 'p-6',
   },
 
-  dialog: {
-    buttonGroup: 'flex gap-3',
-    cancelButton:
-      'flex-1 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50',
-    confirmButton:
-      'flex-1 rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800',
-    content: 'mx-4 max-w-md rounded-lg bg-white p-6 shadow-xl',
-    description: 'mb-6 text-sm text-gray-600',
-    overlay:
-      'fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50',
-    title: 'mb-4 text-lg font-semibold text-gray-900',
-  },
-
   navigation: {
     button: {
       active: 'bg-black text-white',

@@ -1,7 +1,9 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 
-import type { Food, SelectedFoodsStore } from '@/types/food.types';
+import type { SelectedFoodsStore } from '@/types/food.types';
+
+import type { Food } from '@recipot/api';
 
 export const useSelectedFoodsStore = create<SelectedFoodsStore>()(
   devtools(
