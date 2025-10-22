@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 
 import { MyPagePresenter } from '@/app/mypage/_components/MyPagePresenter';
-import { categories } from '@/components/Allergy/Allergy.constants';
+import { useAllergyData } from '@/components/Allergy';
 import {
   mockCookedRecipes,
   mockRestrictions,
@@ -14,6 +14,9 @@ import { useAllergyStepData } from '@/stores/onboardingStore';
 export function MyPageContainer() {
   // 온보딩에서 저장된 알레르기 데이터 가져오기
   const allergyStepData = useAllergyStepData();
+
+  // 백엔드에서 재료 데이터 가져오기
+  const { categories } = useAllergyData();
 
   // 온보딩 데이터를 DietaryRestriction 형식으로 변환
   const restrictions = useMemo(() => {
@@ -30,7 +33,7 @@ export function MyPageContainer() {
       const allItems = categories.flatMap(category => category.items);
 
       return selectedIds
-        .map(id => {
+        .map((id: number) => {
           const item = allItems.find(item => item.id === id);
           return item ? { id: item.id, name: item.label } : null;
         })
@@ -39,7 +42,7 @@ export function MyPageContainer() {
 
     // 온보딩을 아직 하지 않았을 때만 mock 데이터 사용
     return mockRestrictions;
-  }, [allergyStepData]);
+  }, [allergyStepData, categories]);
 
   return (
     <MyPagePresenter

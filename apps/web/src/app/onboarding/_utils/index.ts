@@ -1,3 +1,4 @@
+export { conditionIdToMood, moodToConditionId } from './conditionMapper';
 export type {
   CompleteOnboardingData,
   OnboardingData,

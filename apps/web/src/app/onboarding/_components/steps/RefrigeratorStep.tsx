@@ -1,17 +1,21 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { condition, onboarding } from '@recipot/api';
 import { useAuth } from '@recipot/contexts';
 import { useRouter } from 'next/navigation';
 
-import { onboardingAPI } from '@/api/onboardingAPI';
 import { Button } from '@/components/common/Button';
 import { IngredientsSearch } from '@/components/IngredientsSearch';
 import { useSelectedFoodsStore } from '@/stores/selectedFoodsStore';
 
 import { ONBOARDING_CONSTANTS } from '../../_constants';
 import { useOnboardingActions } from '../../_hooks';
-import { getSubmitButtonText, onboardingStorage } from '../../_utils';
+import {
+  getSubmitButtonText,
+  moodToConditionId,
+  onboardingStorage,
+} from '../../_utils';
 
 export default function RefrigeratorStep() {
   const { setUser, user } = useAuth();
@@ -34,12 +38,32 @@ export default function RefrigeratorStep() {
     }
   }, [isRefreshed, clearAllFoods, clearRefreshFlag]);
 
-  // TODO: 온보딩 완료 처리 : 온보딩 플래그 추가 시 작업 필요함
-  const completeOnboarding = () => {
-    if (user) {
-      setUser({
-        ...user,
-      });
+  // 온보딩 완료 처리 : isFirstEntry 플래그 업데이트
+  const completeOnboarding = async () => {
+    if (user?.isFirstEntry) {
+      try {
+        // TODO: 백엔드 API 구현 대기 중
+        // PATCH /v1/users/profile 엔드포인트로 isFirstEntry를 false로 업데이트
+        // 백엔드에서 API가 준비되면 주석을 해제하세요
+        // const updatedUser = await authService.updateProfile({
+        //   isFirstEntry: false,
+        // });
+        // setUser(updatedUser);
+
+        // 임시: 클라이언트 상태만 업데이트
+        setUser({
+          ...user,
+          isFirstEntry: false,
+        });
+        console.info('✅ 온보딩 완료: isFirstEntry 플래그 업데이트');
+      } catch (error) {
+        console.error('❌ isFirstEntry 업데이트 실패:', error);
+        // 실패해도 온보딩은 완료된 것으로 처리 (UX 우선)
+        setUser({
+          ...user,
+          isFirstEntry: false,
+        });
+      }
     }
   };
 
@@ -63,7 +87,7 @@ export default function RefrigeratorStep() {
       }
 
       // 3. 데이터 유효성 검증
-      const validation = onboardingAPI.validateOnboardingData(completeData);
+      const validation = onboarding.validateOnboardingData(completeData);
       if (!validation.isValid) {
         throw new Error(`입력 데이터 오류: ${validation.errors.join(', ')}`);
       }
@@ -71,10 +95,28 @@ export default function RefrigeratorStep() {
       console.info('🚀 통합 온보딩 데이터 전송 시작:', completeData);
 
       // 4. 통합 API 호출
-      const result = await onboardingAPI.submitComplete(completeData);
+      const result = await onboarding.submitComplete(completeData);
 
       if (result.success) {
-        // 5. 온보딩 완료 처리 - clearData 전에 Zustand 스토어에 모든 데이터 저장
+        // 5. 일일 컨디션 저장
+        try {
+          const conditionId = moodToConditionId(
+            completeData.mood as 'bad' | 'neutral' | 'good'
+          );
+          await condition.saveDailyCondition({
+            conditionId,
+            isRecommendationStarted: true,
+          });
+          console.info('✅ 일일 컨디션 저장 성공:', {
+            conditionId,
+            mood: completeData.mood,
+          });
+        } catch (conditionError) {
+          // 컨디션 저장 실패는 로그만 남기고 온보딩 진행 계속
+          console.error('⚠️ 일일 컨디션 저장 실패:', conditionError);
+        }
+
+        // 6. 온보딩 완료 처리 - clearData 전에 Zustand 스토어에 모든 데이터 저장
         // 알레르기 데이터 저장
         setStepData(1, {
           allergies: completeData.allergies,
@@ -89,9 +131,9 @@ export default function RefrigeratorStep() {
         setStepData(3, refrigeratorData);
         markStepCompleted(3);
 
-        completeOnboarding();
+        await completeOnboarding();
 
-        // 6. localStorage 데이터 정리 (Zustand는 유지됨)
+        // 7. localStorage 데이터 정리 (Zustand는 유지됨)
         onboardingStorage.clearData();
 
         console.info('✅ 온보딩 완료!', {
