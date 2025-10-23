@@ -27,6 +27,21 @@ export interface RecipeLikeResponse {
   message: string;
 }
 
+export interface MeasurementGuideItem {
+  standard: string;
+  imageUrl: string;
+  description: string;
+}
+
+export interface MeasurementGuideResponse {
+  status: number;
+  data: {
+    data: {
+      [category: string]: MeasurementGuideItem[];
+    };
+  };
+}
+
 // API 인스턴스
 const recipeApi = createApiInstance({ apiName: 'Recipe' });
 
@@ -261,5 +276,24 @@ export const recipe = {
     await tokenizedApi.post(
       `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/users/recipes/${recipeId}/complete`
     );
+  },
+
+  /**
+   * 계량 가이드 조회 API
+   * @returns 계량 가이드 데이터
+   */
+  getMeasurementGuides: async (): Promise<MeasurementGuideResponse> => {
+    // 임시 토큰 발급
+    const tokenData = await debugAuth.generateDebugToken({
+      role: 'user',
+      userId: 1,
+    });
+
+    // 토큰을 사용하여 API 호출
+    const tokenizedApi = createTokenizedApiInstance(tokenData.accessToken);
+    const response = await tokenizedApi.get<MeasurementGuideResponse>(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/measurement-guides`
+    );
+    return response.data;
   },
 };

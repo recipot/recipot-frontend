@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import Image from 'next/image';
 
 import { Button } from '@/components/common/Button';
-import { ArrowIcon } from '@/components/Icons';
+import { MeasurementGuide } from '@/components/MeasurementGuide';
 import type { Recipe, RecipeIngredient } from '@/types/recipe.types';
 
 interface IngredientsSidebarProps {
@@ -17,30 +17,27 @@ export function IngredientsSidebar({
   onClose,
   recipe,
 }: IngredientsSidebarProps) {
-  const [isGuideOpen, setIsGuideOpen] = useState(false);
-
-  const handleToggle = () => {
-    setIsGuideOpen(!isGuideOpen);
-  };
-
   if (!isOpen) return null;
 
   return (
     <div
       className="fixed inset-0 z-50 flex justify-end bg-black/60"
-      onClick={onClose}
-      onKeyDown={e => {
-        if (e.key === 'Escape') {
-          onClose();
-        }
-      }}
-      tabIndex={0}
-      role="button"
-      aria-label="사이드바 닫기"
+      role="dialog"
+      aria-modal="true"
+      aria-label="재료 목록 사이드바"
     >
+      <button
+        className="absolute inset-0 h-full w-full"
+        onClick={onClose}
+        onKeyDown={e => {
+          if (e.key === 'Escape') {
+            onClose();
+          }
+        }}
+        aria-label="사이드바 닫기"
+      />
       <div
-        className="h-full w-64 bg-white"
-        role="dialog"
+        className="relative z-10 h-full w-64 bg-white"
         aria-label="재료 목록"
       >
         <div className="h-full w-full overflow-y-auto p-6 px-6 pt-18 pb-5">
@@ -132,35 +129,40 @@ export function IngredientsSidebar({
 
           {/* 양념류 */}
           <div className="mb-6">
-            <div className="mb-3 flex items-center justify-between">
-              <span className="text-sm font-semibold text-gray-900">
-                양념류
-              </span>
+            <div className="mb-3">
+              <span className="text-14sb text-gray-900">양념류</span>
             </div>
-            <div className="mt-5 flex items-center justify-between px-3 py-1.5 transition-colors">
-              <div className="text-15sb text-gray-600">계량가이드</div>
-              <ArrowIcon
-                size={20}
-                className={`transition-transform duration-200 ${isGuideOpen ? 'rotate-90' : 'rotate-0'}`}
-                onClick={handleToggle}
-              />
+            <div className="space-y-2 rounded-lg bg-gray-50 p-3">
+              {recipe.data.seasonings.map(seasoning => (
+                <div key={seasoning.id} className="flex items-center gap-3">
+                  <Image
+                    src={`/seasonings/${seasoning.name}.png`}
+                    alt={seasoning.name}
+                    width={40}
+                    height={40}
+                    className="h-10 w-10 object-contain"
+                    onError={e => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                    }}
+                  />
+                  <div className="flex flex-1 items-center justify-between">
+                    <span className="text-15sb mr-2 text-gray-900">
+                      {seasoning.name}
+                    </span>
+                    <div className="mx-[18px] h-1 flex-1 border-b border-dashed border-gray-200" />
+                    <span className="text-15 ml-2 text-gray-700">
+                      {seasoning.amount}
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
-            {isGuideOpen && (
-              <div className="space-y-1">
-                <div className="flex items-center justify-between border-b border-gray-200 py-2">
-                  <span className="text-sm text-gray-600">소금</span>
-                  <span className="text-sm text-gray-600">1꼬집</span>
-                </div>
-                <div className="flex items-center justify-between border-b border-gray-200 py-2">
-                  <span className="text-sm text-gray-600">간장</span>
-                  <span className="text-sm text-gray-600">1스푼</span>
-                </div>
-                <div className="flex items-center justify-between py-2">
-                  <span className="text-sm text-gray-600">고추장</span>
-                  <span className="text-sm text-gray-600">1스푼</span>
-                </div>
-              </div>
-            )}
+
+            {/* 계량 가이드 */}
+            <div className="mt-5">
+              <MeasurementGuide />
+            </div>
           </div>
 
           <Button
