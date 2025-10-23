@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { storedAPI } from 'packages/api/src/mypageAPI';
 
-import type { CompletedRecipesResponse } from '@/api/mypageAPI';
-import { storedAPI } from '@/api/mypageAPI';
+import type { CompletedRecipesResponse } from 'packages/api/src/mypageAPI';
 
 export const STORED_RECIPES_QUERY_KEY = ['stored-recipes'] as const;
 
@@ -34,7 +34,6 @@ export const useDeleteStoredRecipe = () => {
         }
       );
 
-      // 백그라운드에서 최신 데이터 refetch
       queryClient.invalidateQueries({
         queryKey: STORED_RECIPES_QUERY_KEY,
         refetchType: 'active', // 현재 활성화된 쿼리만 refetch

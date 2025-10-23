@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
+import { recentAPI } from 'packages/api/src/mypageAPI';
 
-import type { GetCompletedRecipesParams } from '@/api/mypageAPI';
-import { recentAPI } from '@/api/mypageAPI';
+import type { GetCompletedRecipesParams } from 'packages/api/src/mypageAPI';
 
 export const COMPLETED_RECIPES_QUERY_KEY = ['recent-recipes'] as const;
 
