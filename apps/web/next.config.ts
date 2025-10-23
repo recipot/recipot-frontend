@@ -12,6 +12,9 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
     ],
+    domains: [
+      'appcook-bucket-cook-admin-ap-northeast-2.s3.ap-northeast-2.amazonaws.com',
+    ],
   },
 
   // 개발 환경에서 백엔드 프록시 설정

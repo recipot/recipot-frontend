@@ -10,9 +10,11 @@ export default function DefaultRecipeList({
   config,
   onToggleSave,
   recipes,
+  type,
 }: DefaultRecipeListProps) {
   const { scrollRef, showGradient } = useScrollGradient([recipes]);
-  console.log('콘솔 :', recipes);
+  const isSavedRecipeList = type === 'saved';
+
   if (recipes.length === 0) {
     return (
       <div className="relative">
@@ -69,7 +71,14 @@ export default function DefaultRecipeList({
         <ul className="flex flex-col gap-[0.875rem] pb-3">
           {recipes.map(recipe => (
             <li key={recipe.id}>
-              <RecipeCard recipe={recipe} onToggleSave={onToggleSave} />
+              <RecipeCard
+                recipe={recipe}
+                onToggleSave={recipeId => {
+                  // 필요한 경우 추가 로직
+                  console.log('Recipe toggled:', recipeId);
+                }}
+                isSavedRecipe={isSavedRecipeList}
+              />
             </li>
           ))}
         </ul>

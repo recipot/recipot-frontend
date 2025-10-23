@@ -44,6 +44,7 @@ export interface DefaultRecipeListProps {
   recipes: CompletedRecipe[];
   config: configType;
   onToggleSave: (recipeId: number) => void;
+  type: string;
 }
 
 export interface CookedRecipeListProps {

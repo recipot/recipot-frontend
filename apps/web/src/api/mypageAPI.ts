@@ -50,10 +50,15 @@ export const storedAPI = {
     );
     return response.data.data;
   },
+
+  // 보관한 레시피 삭제 (북마크 해제)
+  deleteStoredRecipe: async (recipeId: number): Promise<void> => {
+    await axiosInstance.delete(`/users/recipes/bookmarks/${recipeId}`);
+  },
 };
 
 export const recentAPI = {
-  // 보관한 레시피 목록 조회
+  // 최근 본 레시피 목록 조회
   getRecentRecipes: async (
     params: GetCompletedRecipesParams = { limit: 10, page: 1 }
   ): Promise<CompletedRecipesResponse['data']> => {

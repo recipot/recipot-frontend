@@ -113,6 +113,7 @@ export default function RecipeListPage({ type }: { type: PageType }) {
             config={config}
             recipes={defaultRecipe}
             onToggleSave={handleToggleSave}
+            type={type}
           />
         )}
       </main>
