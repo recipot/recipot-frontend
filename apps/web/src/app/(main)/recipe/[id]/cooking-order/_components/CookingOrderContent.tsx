@@ -14,16 +14,16 @@ export default function CookingOrderContent({
   currentStep,
   recipe,
 }: CookingOrderContentProps) {
-  const currentStepData = recipe.steps[currentStep - 1];
+  const currentStepData = recipe.data.steps[currentStep - 1];
 
   return (
     <div className="px-4 py-6">
       {/* 이미지 */}
       <div className="mb-4 aspect-video overflow-hidden rounded-lg bg-gray-100">
-        {recipe.images[currentStep - 1].imageUrl ? (
+        {recipe.data?.images?.[currentStep - 1]?.imageUrl ? (
           <Image
-            src={recipe.images[currentStep - 1].imageUrl}
-            alt={recipe.title}
+            src={recipe.data?.images[currentStep - 1].imageUrl}
+            alt={recipe.data?.title}
             width={400}
             height={225}
             className="h-full w-full object-cover"
@@ -43,8 +43,8 @@ export default function CookingOrderContent({
       <div className="mb-6">
         {/* 원형 인디케이터 */}
         <div className="mb-2 flex w-[390px] items-center justify-center px-6">
-          {recipe.steps.map((step, index: number) => (
-            <div key={index} className="mt-[147px] flex items-center">
+          {recipe.data.steps.map((step, index: number) => (
+            <div key={index} className="mt-[147px] flex flex-row items-center">
               <div
                 className={`flex h-4 w-4 items-center justify-center rounded-full border-2 ${
                   index < currentStep - 1
@@ -61,7 +61,7 @@ export default function CookingOrderContent({
                   <div className="bg-primary h-2 w-2 rounded-full" />
                 )}
               </div>
-              {index < recipe.steps.length - 1 && (
+              {index < recipe.data.steps.length - 1 && (
                 <div className="mr-[2px] ml-[2px] h-0.5 w-12 bg-gray-300" />
               )}
             </div>
@@ -70,7 +70,7 @@ export default function CookingOrderContent({
 
         {/* 순서 라벨 */}
         <div className="flex justify-center">
-          {recipe.steps.map((step, index: number) => (
+          {recipe.data.steps.map((step, index: number) => (
             <div
               key={index}
               className={`flex h-5 w-16 items-start justify-center ${

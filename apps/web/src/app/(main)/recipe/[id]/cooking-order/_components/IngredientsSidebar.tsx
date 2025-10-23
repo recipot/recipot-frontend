@@ -29,10 +29,19 @@ export function IngredientsSidebar({
     <div
       className="fixed inset-0 z-50 flex justify-end bg-black/60"
       onClick={onClose}
+      onKeyDown={e => {
+        if (e.key === 'Escape') {
+          onClose();
+        }
+      }}
+      tabIndex={0}
+      role="button"
+      aria-label="사이드바 닫기"
     >
-      <section
+      <div
         className="h-full w-64 bg-white"
-        onClick={e => e.stopPropagation()}
+        role="dialog"
+        aria-label="재료 목록"
       >
         <div className="h-full w-full overflow-y-auto p-6 px-6 pt-18 pb-5">
           {/* 헤더 */}
@@ -49,19 +58,21 @@ export function IngredientsSidebar({
               <p className="text-14sb text-gray-900">보유</p>
             </div>
             <div className="flex flex-wrap gap-2">
-              {recipe.ingredients.owned.map((ingredient: RecipeIngredient) => (
-                <div
-                  key={ingredient.id}
-                  className="w-fit rounded-md border border-green-200 bg-green-50 px-3 py-2"
-                >
-                  <span className="text-15b mr-[5px] text-green-700">
-                    {ingredient.name}
-                  </span>
-                  <span className="text-15 text-green-600">
-                    {ingredient.amount}
-                  </span>
-                </div>
-              ))}
+              {recipe.data.ingredients.owned.map(
+                (ingredient: RecipeIngredient) => (
+                  <div
+                    key={ingredient.id}
+                    className="w-fit rounded-md border border-green-200 bg-green-50 px-3 py-2"
+                  >
+                    <span className="text-15b mr-[5px] text-green-700">
+                      {ingredient.name}
+                    </span>
+                    <span className="text-15 text-green-600">
+                      {ingredient.amount}
+                    </span>
+                  </div>
+                )
+              )}
             </div>
           </div>
 
@@ -71,7 +82,7 @@ export function IngredientsSidebar({
               <p className="text-14sb text-gray-900">미보유</p>
             </div>
             <div className="flex flex-wrap gap-2">
-              {recipe.ingredients.notOwned.map(
+              {recipe.data.ingredients.notOwned.map(
                 (ingredient: RecipeIngredient) => (
                   <div
                     key={ingredient.id}
@@ -100,7 +111,7 @@ export function IngredientsSidebar({
               <p className="text-14sb text-gray-900">대체불가</p>
             </div>
             <div className="flex flex-wrap gap-2">
-              {recipe.ingredients.alternativeUnavailable.map(
+              {recipe.data.ingredients.alternativeUnavailable.map(
                 (ingredient: RecipeIngredient) => (
                   <div
                     key={ingredient.id}
@@ -159,7 +170,7 @@ export function IngredientsSidebar({
             확인
           </Button>
         </div>
-      </section>
+      </div>
     </div>
   );
 }

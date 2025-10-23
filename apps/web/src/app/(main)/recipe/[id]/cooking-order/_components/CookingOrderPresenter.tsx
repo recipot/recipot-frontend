@@ -23,7 +23,6 @@ export default function CookingOrderPresenter({
   recipeId,
 }: CookingOrderPresenterProps) {
   const { completeStep, error, isLoading, recipe } = useCookingOrder(recipeId);
-  console.log(recipe, 'cooking Order Presenter');
 
   // 모달 상태 통합 관리
   const [activeModal, setActiveModal] = useState<ModalType>(null);

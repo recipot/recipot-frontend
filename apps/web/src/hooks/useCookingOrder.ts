@@ -46,8 +46,8 @@ export function useCookingOrder(recipeId: string): UseCookingOrderReturn {
   };
 
   const getProgressPercentage = (): number => {
-    if (!recipe) return 0;
-    return Math.round((completedSteps.size / recipe.steps.length) * 100);
+    if (!recipe?.data.steps || recipe.data.steps.length === 0) return 0;
+    return Math.round((completedSteps.size / recipe.data.steps.length) * 100);
   };
 
   return {

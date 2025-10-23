@@ -5,8 +5,11 @@ import type { Recipe } from '@/types/recipe.types';
 export function useCookingOrderNavigation(recipe: Recipe | null) {
   const [currentStep, setCurrentStep] = useState(1);
 
+  // recipe와 steps가 존재하는지 안전하게 확인
+  const stepsLength = recipe?.data?.steps?.length ?? 0;
+
   const handleNextStep = () => {
-    if (recipe && currentStep < recipe.steps.length) {
+    if (recipe && stepsLength > 0 && currentStep < stepsLength) {
       setCurrentStep(prev => prev + 1);
     }
   };
@@ -22,7 +25,7 @@ export function useCookingOrderNavigation(recipe: Recipe | null) {
   };
 
   const isFirstStep = currentStep === 1;
-  const isLastStep = recipe ? currentStep === recipe.steps.length : false;
+  const isLastStep = stepsLength > 0 ? currentStep === stepsLength : false;
 
   return {
     currentStep,

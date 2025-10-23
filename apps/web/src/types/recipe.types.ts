@@ -1,31 +1,33 @@
 export interface Recipe {
-  description: string;
-  duration: number;
-  healthPoints: {
-    content: string;
-  }[];
-  images: {
+  data: {
+    description: string;
+    duration: number;
+    healthPoints: {
+      content: string;
+    }[];
+    images: {
+      id: number;
+      imageUrl: string;
+    }[];
     id: number;
-    imageUrl: string;
-  }[];
-  id: number;
-  title: string;
-  tools: {
-    id: number;
-    imageUrl: string;
-    name: string;
-  }[];
-  seasonings: {
-    amount: string;
-    id: number;
-    name: string;
-  }[];
-  isBookmarked: boolean;
-  ingredients: RecipeIngredients;
-  steps: {
-    orderNum: number;
-    summary: string;
-  }[];
+    title: string;
+    tools: {
+      id: number;
+      imageUrl: string;
+      name: string;
+    }[];
+    seasonings: {
+      amount: string;
+      id: number;
+      name: string;
+    }[];
+    isBookmarked: boolean;
+    ingredients: RecipeIngredients;
+    steps: {
+      orderNum: number;
+      summary: string;
+    }[];
+  };
 }
 
 export interface RecipeIngredient {
