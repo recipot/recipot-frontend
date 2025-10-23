@@ -1,4 +1,4 @@
-import { axiosInstance } from '@/api/index';
+import { createApiInstance } from './createApiInstance';
 
 export interface CompletedRecipe {
   id: number;
@@ -26,12 +26,14 @@ export interface GetCompletedRecipesParams {
   limit?: number;
 }
 
+const mypageApi = createApiInstance({ apiName: 'Mypage' });
+
 export const recipesAPI = {
   // 완료한 요리 목록 조회
   getCompletedRecipes: async (
     params: GetCompletedRecipesParams = { limit: 10, page: 1 }
   ): Promise<CompletedRecipesResponse['data']> => {
-    const response = await axiosInstance.get<CompletedRecipesResponse>(
+    const response = await mypageApi.get<CompletedRecipesResponse>(
       '/users/recipes/completed',
       { params }
     );
@@ -44,7 +46,7 @@ export const storedAPI = {
   getStoredRecipes: async (
     params: GetCompletedRecipesParams = { limit: 10, page: 1 }
   ): Promise<CompletedRecipesResponse['data']> => {
-    const response = await axiosInstance.get<CompletedRecipesResponse>(
+    const response = await mypageApi.get<CompletedRecipesResponse>(
       '/users/recipes/bookmarks',
       { params }
     );
@@ -53,7 +55,7 @@ export const storedAPI = {
 
   // 보관한 레시피 삭제 (북마크 해제)
   deleteStoredRecipe: async (recipeId: number): Promise<void> => {
-    await axiosInstance.delete(`/users/recipes/bookmarks/${recipeId}`);
+    await mypageApi.delete(`/users/recipes/bookmarks/${recipeId}`);
   },
 };
 
@@ -62,7 +64,7 @@ export const recentAPI = {
   getRecentRecipes: async (
     params: GetCompletedRecipesParams = { limit: 10, page: 1 }
   ): Promise<CompletedRecipesResponse['data']> => {
-    const response = await axiosInstance.get<CompletedRecipesResponse>(
+    const response = await mypageApi.get<CompletedRecipesResponse>(
       '/users/recipes/recent',
       { params }
     );
