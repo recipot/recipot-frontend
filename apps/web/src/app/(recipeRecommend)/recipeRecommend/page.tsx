@@ -97,7 +97,7 @@ export default function RecipeRecommend() {
       const preloadImages = recipes.slice(activeIndex, activeIndex + 3);
       preloadImages.forEach(recipe => {
         const img = new Image();
-        img.src = recipe.images[0].imageUrl;
+        img.src = recipe.data.images[0].imageUrl;
       });
     }
   }, [activeIndex, recipes]);
@@ -140,7 +140,7 @@ export default function RecipeRecommend() {
               >
                 {recipes.map((recipe, index) => (
                   <SwiperSlide
-                    key={recipe.id}
+                    key={recipe.data.id}
                     className="flex items-center justify-center"
                   >
                     <RecipeCard

@@ -17,8 +17,8 @@ export const RecipeImage = memo(
     return (
       <div className="absolute inset-0" style={getBackgroundColor(index)}>
         <Image
-          src={recipe.images[0].imageUrl}
-          alt={recipe.title}
+          src={recipe.data.images[0].imageUrl}
+          alt={recipe.data.title}
           width={CARD_DIMENSIONS.width}
           height={CARD_DIMENSIONS.height}
           className={`h-full w-full object-cover transition-opacity duration-300 ${isMainCard ? 'opacity-100' : 'opacity-0'}`}
