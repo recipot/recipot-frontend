@@ -26,6 +26,9 @@ export type {
 export { createApiInstance } from './createApiInstance';
 export type { CreateApiInstanceOptions } from './createApiInstance';
 
+// Debug API
+export { debugAuth } from './debug';
+
 // Types
 export type {
   Food,
