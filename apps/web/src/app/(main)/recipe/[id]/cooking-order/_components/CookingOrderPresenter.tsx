@@ -22,7 +22,8 @@ interface CookingOrderPresenterProps {
 export default function CookingOrderPresenter({
   recipeId,
 }: CookingOrderPresenterProps) {
-  const { completeStep, error, isLoading, recipe } = useCookingOrder(recipeId);
+  const { completeCooking, completeStep, error, isLoading, recipe } =
+    useCookingOrder(recipeId);
 
   // 모달 상태 통합 관리
   const [activeModal, setActiveModal] = useState<ModalType>(null);
@@ -41,17 +42,9 @@ export default function CookingOrderPresenter({
   const openModal = (modalType: ModalType) => setActiveModal(modalType);
   const closeModal = () => setActiveModal(null);
 
-  const completeStepHandler = (stepNumber: number) => {
-    completeStep(stepNumber);
-  };
-
-  const handleStepComplete = () => {
-    completeStepHandler(currentStep);
-    if (isLastStep) {
-      // 바텀시트 띄우기
-    } else {
-      handleNextStep();
-    }
+  const handleCookingComplete = async () => {
+    completeStep(currentStep);
+    await completeCooking();
   };
 
   const handleBack = () => {
@@ -112,7 +105,7 @@ export default function CookingOrderPresenter({
         isLastStep={isLastStep}
         onPrevStep={handlePrevStep}
         onNextStep={handleNextStep}
-        onStepComplete={handleStepComplete}
+        onStepComplete={handleCookingComplete}
       />
 
       <IngredientsSidebar

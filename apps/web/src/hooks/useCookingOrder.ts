@@ -10,6 +10,7 @@ interface UseCookingOrderReturn {
   completeStep: (stepNumber: number) => void;
   isStepCompleted: (stepNumber: number) => boolean;
   getProgressPercentage: () => number;
+  completeCooking: () => Promise<void>;
 }
 
 export function useCookingOrder(recipeId: string): UseCookingOrderReturn {
@@ -24,11 +25,14 @@ export function useCookingOrder(recipeId: string): UseCookingOrderReturn {
         setIsLoading(true);
         setError(null);
 
+        // 요리 시작 API 호출
+        await recipeAPI.startCooking(recipeId);
+
         const fetchedRecipe = await recipeAPI.getRecipe(recipeId);
         setRecipe(fetchedRecipe);
       } catch (err) {
-        setError('레시피를 불러오는 중 오류가 발생했습니다.');
         console.error('Recipe fetch error:', err);
+        setError('레시피를 불러오는 중 오류가 발생했습니다.');
       } finally {
         setIsLoading(false);
       }
@@ -50,7 +54,16 @@ export function useCookingOrder(recipeId: string): UseCookingOrderReturn {
     return Math.round((completedSteps.size / recipe.data.steps.length) * 100);
   };
 
+  const completeCooking = async () => {
+    try {
+      await recipeAPI.completeCooking(recipeId);
+    } catch (err) {
+      console.error('Complete cooking error:', err);
+    }
+  };
+
   return {
+    completeCooking,
     completeStep,
     error,
     getProgressPercentage,
