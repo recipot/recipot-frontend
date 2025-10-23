@@ -20,16 +20,20 @@ import type { ApiResponse, TabId } from '../types/recipe.types';
 export function RecipeDetail({ recipeId }: { recipeId: string }) {
   const tabContainerRef = useRef<HTMLDivElement>(null);
   const [token, setToken] = useState<string | null>(null);
+
+  // 개발 환경에서만 디버그 토큰 생성
   useEffect(() => {
-    const getToken = async () => {
+    const getDebugToken = async () => {
       const res = await debugAuth.generateDebugToken({
         role: 'user',
         userId: 1,
       });
       setToken(res.accessToken);
     };
-    getToken();
+    getDebugToken();
   }, []);
+
+  // 인증된 사용자는 실제 토큰, 비인증 사용자는 디버그 토큰 사용
 
   const {
     data: recipeResponse,
@@ -37,7 +41,7 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
     isError,
     isLoading,
   } = useQuery({
-    enabled: !!token, // 토큰이 있을 때만 쿼리 실행
+    enabled: !!token, // 토큰이 있고 인증 로딩이 완료되었을 때만 쿼리 실행
     queryFn: async () => {
       const response = await axios.get<ApiResponse>(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/recipes/${recipeId}`,

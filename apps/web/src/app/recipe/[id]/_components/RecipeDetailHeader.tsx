@@ -5,6 +5,8 @@ import axios from 'axios';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
+import { Button } from '@/components/common/Button';
+import { Modal } from '@/components/common/Modal/Modal';
 import {
   BackIcon,
   CardTimeIcon,
@@ -27,6 +29,7 @@ export function RecipeDetailHeader({ recipe }: RecipeHeaderProps) {
 
   const [isLiked, setIsLiked] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   useEffect(() => {
     const getToken = async () => {
@@ -71,6 +74,10 @@ export function RecipeDetailHeader({ recipe }: RecipeHeaderProps) {
   }, [recipe]);
 
   const handleToggleBookmark = async (recipeId: number) => {
+    if (token === null) {
+      setShowLoginModal(true);
+      return;
+    }
     if (isLoading) return;
 
     setIsLoading(true);
@@ -102,6 +109,18 @@ export function RecipeDetailHeader({ recipe }: RecipeHeaderProps) {
 
   return (
     <>
+      {/* Login Modal */}
+      <Modal
+        open={showLoginModal}
+        onOpenChange={setShowLoginModal}
+        title="로그인이 필요합니다."
+        description="로그인하면 북마크 기능을 사용할 수 있어요."
+      >
+        <Button variant="default" onClick={() => router.push('/signin')}>
+          로그인
+        </Button>
+      </Modal>
+
       {/* Header */}
       <div className="bg-white">
         <div className="flex items-center justify-between px-4 py-3">
