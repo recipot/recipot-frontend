@@ -3,7 +3,7 @@
 import Image from 'next/image';
 
 import { CookOrderIcon } from '@/components/Icons';
-import type { CookingStep, Recipe } from '@/types/recipe.types';
+import type { Recipe } from '@/types/recipe.types';
 
 interface CookingOrderContentProps {
   recipe: Recipe;
@@ -15,7 +15,6 @@ export default function CookingOrderContent({
   recipe,
 }: CookingOrderContentProps) {
   const currentStepData = recipe.steps[currentStep - 1];
-  console.log(currentStepData, 'currentStepData');
 
   return (
     <div className="px-4 py-6">
@@ -44,7 +43,7 @@ export default function CookingOrderContent({
       <div className="mb-6">
         {/* 원형 인디케이터 */}
         <div className="mb-2 flex w-[390px] items-center justify-center px-6">
-          {recipe.steps.map((_: CookingStep, index: number) => (
+          {recipe.steps.map((step, index: number) => (
             <div key={index} className="mt-[147px] flex items-center">
               <div
                 className={`flex h-4 w-4 items-center justify-center rounded-full border-2 ${
@@ -71,7 +70,7 @@ export default function CookingOrderContent({
 
         {/* 순서 라벨 */}
         <div className="flex justify-center">
-          {recipe.steps.map((_: CookingStep, index: number) => (
+          {recipe.steps.map((step, index: number) => (
             <div
               key={index}
               className={`flex h-5 w-16 items-start justify-center ${
