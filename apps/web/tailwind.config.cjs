@@ -105,6 +105,7 @@ module.exports = {
         '14b': ['0.875rem', { lineHeight: '150%', fontWeight: '700' }], // text-14b
         15: ['0.9375rem', { lineHeight: '150%' }], // text-15
         '15sb': ['0.9375rem', { lineHeight: '150%', fontWeight: '600' }], // text-15sb
+        '15b': ['0.9375rem', { lineHeight: '150%', fontWeight: '700' }], // text-15b
         16: ['1rem', { lineHeight: '150%' }], // text-16
         '16sb': ['1rem', { lineHeight: '150%', fontWeight: '600' }], // text-16sb
         17: ['1.0625rem', { lineHeight: '140%' }], // text-17
