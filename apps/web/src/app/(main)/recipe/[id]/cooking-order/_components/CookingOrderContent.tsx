@@ -44,7 +44,10 @@ export default function CookingOrderContent({
         {/* 원형 인디케이터 */}
         <div className="mb-2 flex w-[390px] items-center justify-center px-6">
           {recipe.data.steps.map((step, index: number) => (
-            <div key={index} className="mt-[147px] flex flex-row items-center">
+            <div
+              key={step.orderNum}
+              className="mt-[147px] flex flex-row items-center"
+            >
               <div
                 className={`flex h-4 w-4 items-center justify-center rounded-full border-2 ${
                   index < currentStep - 1

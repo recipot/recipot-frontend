@@ -24,9 +24,9 @@ export function MeasurementGuideContent({
 
   return (
     <div className="no-scrollbar flex w-full flex-nowrap gap-[20px] self-stretch overflow-x-auto rounded-xl px-4 pb-5">
-      {items.map((item, index) => (
+      {items.map(item => (
         <div
-          key={index}
+          key={item.standard}
           className="flex flex-shrink-0 flex-col items-center justify-center"
         >
           <div className="flex h-[125px] w-[125px] items-center justify-center overflow-hidden rounded-lg bg-gray-100">
