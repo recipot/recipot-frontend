@@ -71,7 +71,6 @@ export function MeasurementGuide({
       const response: MeasurementGuideResponse =
         await recipe.getMeasurementGuides();
       const apiData = response.data.data;
-      console.info(apiData, 'apiData');
 
       setMeasurementData(apiData);
       const apiCategories = Object.keys(apiData);
