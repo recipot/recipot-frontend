@@ -6,7 +6,7 @@ export function useCookingOrderNavigation(recipe: Recipe | null) {
   const [currentStep, setCurrentStep] = useState(1);
 
   const handleNextStep = () => {
-    if (recipe && currentStep < recipe.cookingSteps.length) {
+    if (recipe && currentStep < recipe.steps.length) {
       setCurrentStep(prev => prev + 1);
     }
   };
@@ -22,9 +22,7 @@ export function useCookingOrderNavigation(recipe: Recipe | null) {
   };
 
   const isFirstStep = currentStep === 1;
-  const isLastStep = recipe
-    ? currentStep === recipe.cookingSteps.length
-    : false;
+  const isLastStep = recipe ? currentStep === recipe.steps.length : false;
 
   return {
     currentStep,

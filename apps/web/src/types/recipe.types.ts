@@ -1,33 +1,44 @@
 export interface Recipe {
+  description: string;
+  duration: number;
+  healthPoints: {
+    content: string;
+  }[];
+  images: {
+    id: number;
+    imageUrl: string;
+  }[];
   id: number;
   title: string;
-  description: string;
-  imageUrl?: string;
-  difficulty: 'easy' | 'medium' | 'hard';
-  servings: number;
-  cookingTime: number; // minutes
-  ingredients: RecipeIngredient[];
-  cookingSteps: CookingStep[];
+  tools: {
+    id: number;
+    imageUrl: string;
+    name: string;
+  }[];
+  seasonings: {
+    amount: string;
+    id: number;
+    name: string;
+  }[];
+  isBookmarked: boolean;
+  ingredients: RecipeIngredients;
+  steps: {
+    orderNum: number;
+    summary: string;
+  }[];
 }
 
 export interface RecipeIngredient {
-  id: number;
-  name: string;
   amount: string;
-  unit: string;
-  category?: string;
-  status?: 'owned' | 'substitutable' | 'unavailable'; // 보유, 대체가능, 대체불가
-  alternatives?: string[]; // 대체 가능한 재료 목록
+  id: number;
+  isAlternative: boolean;
+  name: string;
 }
 
-export interface CookingStep {
-  id: number;
-  stepNumber: number;
-  title: string;
-  description: string;
-  imageUrl?: string;
-  estimatedTime?: number;
-  tips?: string;
+export interface RecipeIngredients {
+  owned: RecipeIngredient[];
+  notOwned: RecipeIngredient[];
+  alternativeUnavailable: RecipeIngredient[];
 }
 
 export interface RecipeRecommendResponse {

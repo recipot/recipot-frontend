@@ -37,8 +37,6 @@ export function useCookingOrder(recipeId: string): UseCookingOrderReturn {
     fetchRecipe();
   }, [recipeId]);
 
-  console.log(recipe, 'recipe order');
-
   const completeStep = (stepNumber: number) => {
     setCompletedSteps(prev => new Set([...prev, stepNumber]));
   };

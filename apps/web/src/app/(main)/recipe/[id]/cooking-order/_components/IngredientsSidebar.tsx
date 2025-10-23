@@ -26,12 +26,11 @@ export function IngredientsSidebar({
   if (!isOpen) return null;
 
   return (
-    <button
+    <div
       className="fixed inset-0 z-50 flex justify-end bg-black/60"
       onClick={onClose}
-      type="button"
     >
-      <button
+      <section
         className="h-full w-64 bg-white"
         onClick={e => e.stopPropagation()}
         type="button"
@@ -51,35 +50,30 @@ export function IngredientsSidebar({
               <p className="text-14sb text-gray-900">보유</p>
             </div>
             <div className="flex flex-wrap gap-2">
-              {recipe.ingredients
-                .slice(0, 3)
-                .map((ingredient: RecipeIngredient) => (
-                  <div
-                    key={ingredient.id}
-                    className="border-secondary-soft-green bg-secondary-light-green w-fit items-center rounded-md border px-3 py-[3px]"
-                  >
-                    <span className="text-15b mr-[5px] text-[#53880A] opacity-80">
-                      {ingredient.name}
-                    </span>
-                    <span className="text-15 text-[#53880A] opacity-80">
-                      {ingredient.amount}
-                      {` `}
-                      {ingredient.unit}
-                    </span>
-                  </div>
-                ))}
+              {recipe.ingredients.owned.map((ingredient: RecipeIngredient) => (
+                <div
+                  key={ingredient.id}
+                  className="w-fit rounded-md border border-green-200 bg-green-50 px-3 py-2"
+                >
+                  <span className="text-15b mr-[5px] text-green-700">
+                    {ingredient.name}
+                  </span>
+                  <span className="text-15 text-green-600">
+                    {ingredient.amount}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* 대체가능 재료 */}
+          {/* 미보유 재료 */}
           <div className="mb-6">
             <div className="mb-3 flex items-center justify-between">
-              <p className="text-14sb text-gray-900">대체가능</p>
+              <p className="text-14sb text-gray-900">미보유</p>
             </div>
             <div className="flex flex-wrap gap-2">
-              {recipe.ingredients
-                .slice(3, 5)
-                .map((ingredient: RecipeIngredient) => (
+              {recipe.ingredients.notOwned.map(
+                (ingredient: RecipeIngredient) => (
                   <div
                     key={ingredient.id}
                     className="w-fit rounded-md border border-orange-200 bg-orange-50 px-3 py-2"
@@ -89,12 +83,15 @@ export function IngredientsSidebar({
                     </span>
                     <span className="text-15 text-[#F88014] opacity-80">
                       {ingredient.amount}
-                      {` `}
-                      {ingredient.unit}
                     </span>
-                    <span className="ml-1 text-xs text-gray-500">생략가능</span>
+                    {ingredient.isAlternative && (
+                      <span className="ml-1 text-xs text-gray-500">
+                        대체가능
+                      </span>
+                    )}
                   </div>
-                ))}
+                )
+              )}
             </div>
           </div>
 
@@ -104,24 +101,22 @@ export function IngredientsSidebar({
               <p className="text-14sb text-gray-900">대체불가</p>
             </div>
             <div className="flex flex-wrap gap-2">
-              {recipe.ingredients
-                .slice(5)
-                .map((ingredient: RecipeIngredient) => (
+              {recipe.ingredients.alternativeUnavailable.map(
+                (ingredient: RecipeIngredient) => (
                   <div
                     key={ingredient.id}
-                    className="w-fit rounded-md border border-orange-200 bg-orange-50 px-3 py-2"
+                    className="w-fit rounded-md border border-red-200 bg-red-50 px-3 py-2"
                   >
-                    <span className="text-15b mr-[5px] text-[#F88014] opacity-80">
+                    <span className="text-15b mr-[5px] text-red-700">
                       {ingredient.name}
                     </span>
-                    <span className="text-15 text-[#F88014] opacity-80">
+                    <span className="text-15 text-red-600">
                       {ingredient.amount}
-                      {` `}
-                      {ingredient.unit}
                     </span>
-                    <span className="ml-1 text-xs text-gray-500">생략가능</span>
+                    <span className="ml-1 text-xs text-gray-500">필수</span>
                   </div>
-                ))}
+                )
+              )}
             </div>
           </div>
 
@@ -165,7 +160,7 @@ export function IngredientsSidebar({
             확인
           </Button>
         </div>
-      </button>
-    </button>
+      </section>
+    </div>
   );
 }
