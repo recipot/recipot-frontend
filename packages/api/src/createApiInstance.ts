@@ -22,11 +22,6 @@ export interface CreateApiInstanceOptions {
    * 추가 헤더
    */
   headers?: Record<string, string>;
-
-  /**
-   * 인증 토큰 (선택적) - 삭제 예정
-   */
-  token?: string;
 }
 
 /**
@@ -52,7 +47,6 @@ export const createApiInstance = (
     baseURL: customBaseURL,
     headers = {},
     timeout = 10000,
-    token,
   } = options;
 
   // 개발 환경에서는 Mock 서버를 사용하기 위해 baseURL을 비워둡니다
@@ -71,7 +65,6 @@ export const createApiInstance = (
     baseURL,
     headers: {
       'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
       ...headers,
     },
     timeout,
