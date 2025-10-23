@@ -7,15 +7,21 @@ interface RecipeTitleProps {
 }
 
 const RecipeTitle = ({ condition }: RecipeTitleProps) => {
-  const getTitleByCondition = (
-    condition: Condition | null | undefined
-  ): string => {
+  const getTitleByCondition = (condition: Condition | null | undefined) => {
     if (!condition) {
       return '요리할 여유가 그저 그래요'; // 기본값
     }
 
-    // 조건 이름에 따른 title 반환
-    return condition.name;
+    switch (condition.name) {
+      case '힘들어':
+        return '요리할 여유가 거의...없어요';
+      case '충분해':
+        return '요리할 여유가 충분해요!';
+      case '그럭저럭':
+        return '요리할 여유가 그저 그래요';
+      default:
+        return '요리할 여유가 그저 그래요';
+    }
   };
 
   // 조건에 따른 이모지 매핑 (유니코드 사용)
