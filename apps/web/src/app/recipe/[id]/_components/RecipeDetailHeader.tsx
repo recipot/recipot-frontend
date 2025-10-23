@@ -39,20 +39,35 @@ export function RecipeDetailHeader({ recipe }: RecipeHeaderProps) {
     getToken();
   }, []);
 
-  const handleShareSuccess = () => {
-    // console.log('공유가 완료되었습니다.');
-  };
-
-  const handleShareError = (error: Error) => {
-    console.error('공유 중 오류가 발생했습니다:', error);
-  };
-
   const shareData = useMemo(() => {
     return {
       text: recipe.description,
       title: recipe.title,
-      url: typeof window !== 'undefined' ? window.location.href : '',
+      url: `https://dev.hankkibuteo.com/recipe/${recipe.id}`,
     };
+  }, [recipe]);
+
+  const kakaoShareData = useMemo(() => {
+    const recipeImageUrl = recipe.images?.[0]?.imageUrl;
+
+    // 이미지 URL이 절대 URL인지 확인
+    const getImageUrl = (url: string | undefined): string => {
+      if (!url) return '/recipeImage.png';
+
+      // 이미 절대 URL인 경우 그대로 사용
+      if (url.startsWith('http://') || url.startsWith('https://')) {
+        return url;
+      }
+
+      // 상대 경로인 경우 백엔드 URL과 결합
+      const backendUrl =
+        process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8080';
+      return `${backendUrl}${url.startsWith('/') ? url : `/${url}`}`;
+    };
+
+    const imageUrl = getImageUrl(recipeImageUrl);
+
+    return { imageUrl };
   }, [recipe]);
 
   const handleToggleBookmark = async (recipeId: number) => {
@@ -101,8 +116,8 @@ export function RecipeDetailHeader({ recipe }: RecipeHeaderProps) {
           <div className="flex items-center space-x-2">
             <WebShareButton
               shareData={shareData}
-              onShareSuccess={handleShareSuccess}
-              onShareError={handleShareError}
+              kakaoShareData={kakaoShareData}
+              enableKakao
               className="p-2"
             >
               <ShareIcon className="h-6 w-6" color="#212529" />

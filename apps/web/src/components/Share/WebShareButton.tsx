@@ -2,31 +2,38 @@
 
 import React, { useEffect, useState } from 'react';
 
+import { initKakao, isKakaoSDKLoaded, shareKakao } from '@/lib/kakao';
+
 interface ShareData {
   title?: string;
   text?: string;
   url?: string;
 }
 
+interface KakaoShareData {
+  imageUrl?: string;
+}
+
 interface WebShareButtonProps {
   shareData: ShareData;
   children?: React.ReactNode;
   className?: string;
-  onShareSuccess?: () => void;
-  onShareError?: (error: Error) => void;
   fallbackText?: string;
+  enableKakao?: boolean;
+  kakaoShareData?: KakaoShareData;
 }
 
 const WebShareButton: React.FC<WebShareButtonProps> = ({
   children,
+  enableKakao = false,
   fallbackText = '공유하기',
-  onShareError,
-  onShareSuccess,
+  kakaoShareData,
   shareData,
 }) => {
   const [isSharing, setIsSharing] = useState(false);
   const [isSupported, setIsSupported] = useState(false);
   const [isAndroid, setIsAndroid] = useState(false);
+  const [kakaoSDKReady, setKakaoSDKReady] = useState(false);
 
   // 클라이언트에서만 브라우저 정보 확인
   useEffect(() => {
@@ -36,26 +43,76 @@ const WebShareButton: React.FC<WebShareButtonProps> = ({
     }
   }, []);
 
+  // 카카오 SDK 초기화 - 재시도 로직 추가
+  useEffect(() => {
+    if (enableKakao && typeof window !== 'undefined') {
+      let retryCount = 0;
+      const maxRetries = 30; // 최대 3초 대기
+
+      const checkKakaoSDK = () => {
+        if (isKakaoSDKLoaded()) {
+          const initialized = initKakao();
+          if (initialized) {
+            setKakaoSDKReady(true);
+          }
+        } else if (retryCount < maxRetries) {
+          retryCount++;
+          setTimeout(checkKakaoSDK, 100);
+        }
+      };
+
+      checkKakaoSDK();
+    }
+  }, [enableKakao]);
+
   const isWebShareSupported = () => {
     return isSupported;
   };
 
-  const handleWebShare = async () => {
-    if (!isWebShareSupported()) {
-      // Web Share API가 지원되지 않는 경우 폴백
-      handleFallbackShare();
-      return;
+  const handleKakaoShare = async () => {
+    if (!kakaoShareData || !shareData.title || !shareData.url) {
+      throw new Error('카카오 공유에 필요한 데이터가 부족합니다.');
     }
 
+    const kakaoData = {
+      description: shareData.text ?? '한끼부터 - 당신의 레시피 추천 서비스',
+      imageUrl: kakaoShareData.imageUrl ?? '/recipeImage.png',
+      title: shareData.title,
+      url: shareData.url,
+    };
+
+    await shareKakao(kakaoData);
+  };
+
+  const handleWebShare = async () => {
     setIsSharing(true);
 
     try {
-      await navigator.share(shareData);
-      onShareSuccess?.();
+      // 1. 카카오 공유가 활성화되고 준비된 경우 우선 실행
+      if (enableKakao && kakaoSDKReady) {
+        try {
+          await handleKakaoShare();
+          return;
+        } catch (kakaoError) {
+          console.warn(
+            '[WebShareButton] 카카오 공유 실패, Web Share API로 폴백:',
+            kakaoError
+          );
+          // 카카오 공유 실패 시 Web Share API로 폴백
+        }
+      }
+
+      // 2. Web Share API 지원 확인
+      if (isWebShareSupported()) {
+        await navigator.share(shareData);
+        return;
+      }
+
+      // 3. 폴백: 클립보드 복사
+      handleFallbackShare();
     } catch (error) {
       if (error instanceof Error && error.name !== 'AbortError') {
         console.error('공유 중 오류 발생:', error);
-        onShareError?.(error);
       }
     } finally {
       setIsSharing(false);
@@ -79,14 +136,11 @@ const WebShareButton: React.FC<WebShareButtonProps> = ({
           } else {
             alert('링크가 클립보드에 복사되었습니다.');
           }
-          onShareSuccess?.();
         })
         .catch(error => {
           console.error('클립보드 복사 실패:', error);
           if (error instanceof Error) {
-            onShareError?.(error);
-          } else {
-            onShareError?.(new Error(String(error)));
+            console.error('클립보드 복사 실패:', error);
           }
         });
     } else {
