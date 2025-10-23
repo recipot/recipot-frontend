@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
+import { recipe as recipeAPI } from '@recipot/api';
 
-import { recipeAPI } from '@/api/recipeAPI';
 import type { Recipe } from '@/types/recipe.types';
 
 interface UseCookingOrderReturn {
@@ -47,7 +47,7 @@ export function useCookingOrder(recipeId: string): UseCookingOrderReturn {
 
   const getProgressPercentage = (): number => {
     if (!recipe) return 0;
-    return Math.round((completedSteps.size / recipe.cookingSteps.length) * 100);
+    return Math.round((completedSteps.size / recipe.steps.length) * 100);
   };
 
   return {

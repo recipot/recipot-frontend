@@ -26,6 +26,15 @@ export type {
 export { createApiInstance } from './createApiInstance';
 export type { CreateApiInstanceOptions } from './createApiInstance';
 
+// Recipe API
+export { recipe } from './recipeAPI';
+export type {
+  RecipeIngredient,
+  RecipeIngredients,
+  RecipeRecommendResponse,
+  RecipeLikeResponse,
+} from './recipeAPI';
+
 // Debug API
 export { debugAuth } from './debug';
 
