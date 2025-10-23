@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { debugAuth } from '@recipot/api';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import { tokenUtils } from 'packages/api/src/auth';
 
 import { Button } from '@/components/common/Button';
 import { CookIcon } from '@/components/Icons';
@@ -19,8 +19,17 @@ import type { ApiResponse, TabId } from '../types/recipe.types';
 
 export function RecipeDetail({ recipeId }: { recipeId: string }) {
   const tabContainerRef = useRef<HTMLDivElement>(null);
-
-  const token = tokenUtils.getToken();
+  const [token, setToken] = useState<string | null>(null);
+  useEffect(() => {
+    const getToken = async () => {
+      const res = await debugAuth.generateDebugToken({
+        role: 'user',
+        userId: 1,
+      });
+      setToken(res.accessToken);
+    };
+    getToken();
+  }, []);
 
   const {
     data: recipeResponse,

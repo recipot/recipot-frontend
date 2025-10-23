@@ -1,8 +1,9 @@
-import React, { useMemo, useRef, useState } from 'react';
+'use client';
+import React, { useEffect, useMemo, useState } from 'react';
+import { debugAuth } from '@recipot/api';
 import axios from 'axios';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { tokenUtils } from 'packages/api/src/auth';
 
 import {
   BackIcon,
@@ -21,11 +22,22 @@ interface RecipeHeaderProps {
 
 export function RecipeDetailHeader({ recipe }: RecipeHeaderProps) {
   const router = useRouter();
-  const token = tokenUtils.getToken();
+  // const token = tokenUtils.getToken();
+  const [token, setToken] = useState<string | null>(null);
 
   const [isLiked, setIsLiked] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const isLikedRef = useRef(false);
+
+  useEffect(() => {
+    const getToken = async () => {
+      const res = await debugAuth.generateDebugToken({
+        role: 'user',
+        userId: 1,
+      });
+      setToken(res.accessToken);
+    };
+    getToken();
+  }, []);
 
   const handleShareSuccess = () => {
     // console.log('공유가 완료되었습니다.');
@@ -44,23 +56,32 @@ export function RecipeDetailHeader({ recipe }: RecipeHeaderProps) {
   }, [recipe]);
 
   const handleToggleBookmark = async (recipeId: number) => {
+    if (isLoading) return;
+
+    setIsLoading(true);
     const bookmarkURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/users/recipes/bookmarks`;
-    const method = isLiked ? 'delete' : 'post';
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
 
     try {
-      // DELETE 요청일 때만 recipeId를 URL에 포함
-      const url =
-        method === 'delete' ? `${bookmarkURL}/${recipeId}` : bookmarkURL;
-
-      await axios[method](url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      if (isLiked) {
+        // DELETE 요청
+        await axios.delete(`${bookmarkURL}/${recipeId}`, config);
+        setIsLiked(false);
+      } else {
+        // POST 요청
+        await axios.post(bookmarkURL, { recipeId }, config);
+        setIsLiked(true);
+      }
     } catch (error: unknown) {
       if (error instanceof Error) {
         throw new Error(error.message ?? '북마크 처리 중 오류가 발생했습니다.');
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -92,8 +113,8 @@ export function RecipeDetailHeader({ recipe }: RecipeHeaderProps) {
                 isLoading
                   ? 'cursor-not-allowed opacity-50'
                   : 'cursor-pointer hover:scale-110'
-              } ${isLiked ? 'fill-red-500 text-red-500' : 'text-gray-600'}`}
-              color={isLiked ? '#ef4444' : '#212529'}
+              } ${isLiked ? 'fill-black' : 'text-gray-600'}`}
+              color={isLiked ? '#fffff' : '#212529'}
             />
           </div>
         </div>
