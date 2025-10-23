@@ -6,9 +6,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useFoodList } from '@/hooks/useFoodList';
 import { useSubmitSelectedFoods } from '@/hooks/useSubmitSelectedFoods';
 import { useSelectedFoodsStore } from '@/stores/selectedFoodsStore';
-import type { Food } from '@/types/food.types';
 
 import FoodAdd from './IngredientsSearch';
+
+import type { Food } from '@recipot/api';
 
 // Mock hooks
 vi.mock('@/hooks/useFoodList');
@@ -55,13 +56,55 @@ vi.mock('@/components/common/Button', () => ({
 
 // Mock data
 const mockFoods: Food[] = [
-  { category: 'vegetable', id: 1, name: '감자' },
-  { category: 'vegetable', id: 2, name: '고구마' },
-  { category: 'vegetable', id: 3, name: '당근' },
-  { category: 'meat', id: 4, name: '닭고기' },
-  { category: 'vegetable', id: 5, name: '가지' },
-  { category: 'seafood', id: 6, name: '갈치' },
-  { category: 'sauce', id: 7, name: '간장' },
+  {
+    categoryId: 1,
+    categoryName: '채소류',
+    id: 1,
+    isUserRestricted: false,
+    name: '감자',
+  },
+  {
+    categoryId: 1,
+    categoryName: '채소류',
+    id: 2,
+    isUserRestricted: false,
+    name: '고구마',
+  },
+  {
+    categoryId: 1,
+    categoryName: '채소류',
+    id: 3,
+    isUserRestricted: false,
+    name: '당근',
+  },
+  {
+    categoryId: 5,
+    categoryName: '육류',
+    id: 4,
+    isUserRestricted: false,
+    name: '닭고기',
+  },
+  {
+    categoryId: 1,
+    categoryName: '채소류',
+    id: 5,
+    isUserRestricted: false,
+    name: '가지',
+  },
+  {
+    categoryId: 3,
+    categoryName: '해산물류',
+    id: 6,
+    isUserRestricted: false,
+    name: '갈치',
+  },
+  {
+    categoryId: 2,
+    categoryName: '양념/소스',
+    id: 7,
+    isUserRestricted: false,
+    name: '간장',
+  },
 ];
 
 const mockUseFoodList = vi.mocked(useFoodList);

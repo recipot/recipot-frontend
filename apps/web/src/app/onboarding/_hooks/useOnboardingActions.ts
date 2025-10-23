@@ -10,6 +10,7 @@ export function useOnboardingActions() {
   const markStepCompleted = useOnboardingStore(
     state => state.markStepCompleted
   );
+  const resetStore = useOnboardingStore(state => state.resetStore);
   const setCurrentStep = useOnboardingStore(state => state.setCurrentStep);
   const setStepData = useOnboardingStore(state => state.setStepData);
 
@@ -25,6 +26,7 @@ export function useOnboardingActions() {
 
     // 데이터 관리 액션
     markStepCompleted,
+    resetStore,
     setStepData,
 
     // 새로고침 관련

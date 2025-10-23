@@ -12,10 +12,11 @@ import { SearchInput } from '@/components/common/SearchInput';
 import { useFoodList } from '@/hooks/useFoodList';
 import { cn } from '@/lib/utils';
 import { useSelectedFoodsStore } from '@/stores/selectedFoodsStore';
-import type { Food } from '@/types/food.types';
 import { filterByKoreanSearch } from '@/utils/koreanSearch';
 
 import { Button } from '../common/Button';
+
+import type { Food } from '@recipot/api';
 
 export interface IngredientsSearchRef {
   submitSelectedFoods: () => void;
