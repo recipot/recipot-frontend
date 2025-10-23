@@ -33,7 +33,6 @@ export function IngredientsSidebar({
       <section
         className="h-full w-64 bg-white"
         onClick={e => e.stopPropagation()}
-        type="button"
       >
         <div className="h-full w-full overflow-y-auto p-6 px-6 pt-18 pb-5">
           {/* 헤더 */}
