@@ -1,6 +1,6 @@
 import type { Recipe } from '@/types/recipe.types';
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000';
+const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:3000';
 
 export interface GetRecipeResponse {
   success: boolean;
@@ -19,7 +19,7 @@ export const recipeAPI = {
    * 특정 레시피 조회
    */
   async getRecipe(recipeId: string): Promise<Recipe> {
-    const response = await fetch(`${BASE_URL}/api/recipes/${recipeId}`);
+    const response = await fetch(`${BASE_URL}/v1/recipes/${recipeId}`);
 
     if (!response.ok) {
       throw new Error('레시피를 불러오는데 실패했습니다.');
@@ -33,7 +33,7 @@ export const recipeAPI = {
    * 레시피 목록 조회
    */
   async getRecipes(): Promise<Recipe[]> {
-    const response = await fetch(`${BASE_URL}/api/recipes`);
+    const response = await fetch(`${BASE_URL}/v1/recipes`);
 
     if (!response.ok) {
       throw new Error('레시피 목록을 불러오는데 실패했습니다.');
@@ -47,7 +47,7 @@ export const recipeAPI = {
    * 재료 기반 레시피 추천
    */
   async getRecommendedRecipes(ingredientIds: number[]): Promise<Recipe[]> {
-    const response = await fetch(`${BASE_URL}/api/recipes/recommend`, {
+    const response = await fetch(`${BASE_URL}/v1/recipes/recommend`, {
       body: JSON.stringify({ ingredientIds }),
       headers: {
         'Content-Type': 'application/json',
