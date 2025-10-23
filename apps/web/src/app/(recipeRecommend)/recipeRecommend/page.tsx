@@ -97,7 +97,7 @@ export default function RecipeRecommend() {
       const preloadImages = recipes.slice(activeIndex, activeIndex + 3);
       preloadImages.forEach(recipe => {
         const img = new Image();
-        img.src = recipe.image;
+        img.src = recipe.images[0].imageUrl;
       });
     }
   }, [activeIndex, recipes]);
