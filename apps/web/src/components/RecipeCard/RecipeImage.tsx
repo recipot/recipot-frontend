@@ -17,7 +17,7 @@ export const RecipeImage = memo(
     return (
       <div className="absolute inset-0" style={getBackgroundColor(index)}>
         <Image
-          src={recipe.image}
+          src={recipe.images[0].imageUrl}
           alt={recipe.title}
           width={CARD_DIMENSIONS.width}
           height={CARD_DIMENSIONS.height}
