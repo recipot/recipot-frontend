@@ -82,7 +82,7 @@ export const useAuthStore = create<AuthState>()(
       initializeAuth: async () => {
         set({ loading: true });
 
-        const { token, verifyAndRefreshToken } = get();
+        const { token, user } = get();
 
         if (!token) {
           console.info('ℹ️ 저장된 토큰 없음 (로그인 필요)');
@@ -91,20 +91,30 @@ export const useAuthStore = create<AuthState>()(
         }
 
         console.info('🔄 인증 상태 초기화 중...');
+        console.info('📦 저장된 상태:', {
+          hasToken: !!token,
+          hasUser: !!user,
+          userId: user?.id
+        });
 
-        // 토큰 검증 및 갱신
-        const isValid = await verifyAndRefreshToken();
+        // 사용자 정보가 이미 있으면 검증 스킵 (persist에서 복원됨)
+        if (user) {
+          console.info('✅ 사용자 정보가 이미 있음, 검증 스킵');
+          set({ loading: false });
+          return;
+        }
 
-        if (isValid) {
-          try {
-            // 사용자 정보 조회
-            const userInfo = await authService.getUserInfo();
-            console.info('✅ 사용자 정보 조회 성공:', userInfo);
-            set({ user: userInfo });
-          } catch (error) {
-            console.error('❌ 사용자 정보 조회 실패:', error);
-            get().logout();
-          }
+        // 사용자 정보가 없으면 API로 조회
+        try {
+          console.info('🔍 사용자 정보 조회 중...');
+          const userInfo = await authService.getUserInfo();
+          console.info('✅ 사용자 정보 조회 성공:', userInfo);
+          set({ user: userInfo });
+        } catch (error) {
+          console.error('❌ 사용자 정보 조회 실패:', error);
+          // 실패해도 바로 logout하지 않음 (토큰은 유지)
+          // 실제 API 호출 시 401이 나면 axios interceptor가 처리
+          console.warn('⚠️ 사용자 정보 조회 실패했지만 토큰은 유지합니다');
         }
 
         set({ loading: false });

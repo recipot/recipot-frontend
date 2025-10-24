@@ -13,7 +13,6 @@ export type {
 
 // Onboarding API
 export { onboarding } from './onboarding';
-export type { OnboardingCompleteResponse } from './onboarding';
 
 // Condition API
 export { condition } from './condition';

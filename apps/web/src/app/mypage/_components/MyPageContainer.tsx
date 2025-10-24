@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import { useAuth } from '@recipot/contexts';
 
 import { MyPagePresenter } from '@/app/mypage/_components/MyPagePresenter';
 import { useAllergyData } from '@/components/Allergy';
@@ -12,6 +13,9 @@ import {
 import { useAllergyStepData } from '@/stores/onboardingStore';
 
 export function MyPageContainer() {
+  // 인증된 유저 정보 가져오기
+  const { user } = useAuth();
+
   // 온보딩에서 저장된 알레르기 데이터 가져오기
   const allergyStepData = useAllergyStepData();
 
@@ -46,7 +50,7 @@ export function MyPageContainer() {
 
   return (
     <MyPagePresenter
-      user={mockUser}
+      user={user ?? mockUser}
       restrictions={restrictions}
       cookedRecipes={mockCookedRecipes}
     />

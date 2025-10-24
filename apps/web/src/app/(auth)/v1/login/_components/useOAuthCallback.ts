@@ -30,22 +30,63 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
 
   const saveTokens = useCallback(
     (accessToken: string, refreshToken: string) => {
-      localStorage.setItem('authToken', accessToken);
-      localStorage.setItem('refreshToken', refreshToken);
+      console.info('💾 토큰 저장 중...', {
+        hasAccessToken: !!accessToken,
+        hasRefreshToken: !!refreshToken
+      });
+
+      // authStore에 저장 (Zustand persist가 자동으로 localStorage에 저장)
       setToken(accessToken);
       setRefreshToken(refreshToken);
+
+      // Zustand persist가 비동기적으로 작동하므로
+      // axios interceptor가 즉시 사용할 수 있도록 localStorage에도 직접 저장
+      if (typeof window !== 'undefined') {
+        const authStorage = {
+          state: {
+            token: accessToken,
+            refreshToken: refreshToken,
+            user: null, // user는 나중에 저장됨
+          },
+          version: 0,
+        };
+        localStorage.setItem('auth-storage', JSON.stringify(authStorage));
+        console.info('✅ localStorage 직접 저장 완료');
+      }
     },
     [setToken, setRefreshToken]
   );
 
   const setupUser = useCallback(
     (user: UserInfo) => {
+      console.info('👤 사용자 정보 설정 중...', {
+        userId: user.id,
+        isFirstEntry: user.isFirstEntry
+      });
+
       setUser(user);
+
+      // localStorage의 user 정보도 업데이트
+      if (typeof window !== 'undefined') {
+        const authStorage = localStorage.getItem('auth-storage');
+        if (authStorage) {
+          try {
+            const parsed = JSON.parse(authStorage);
+            parsed.state.user = user;
+            localStorage.setItem('auth-storage', JSON.stringify(parsed));
+            console.info('✅ localStorage user 업데이트 완료');
+          } catch (error) {
+            console.error('localStorage user 업데이트 실패:', error);
+          }
+        }
+      }
 
       // isFirstEntry가 true이면 온보딩이 필요한 사용자
       if (user.isFirstEntry) {
+        console.info('🎯 온보딩 페이지로 이동');
         router.push('/onboarding');
       } else {
+        console.info('🎯 메인 페이지로 이동');
         router.push('/');
       }
     },

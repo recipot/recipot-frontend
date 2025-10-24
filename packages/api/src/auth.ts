@@ -1,64 +1,48 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
-import {
-  AuthResponse,
-  UserInfo,
-  TokenResponse,
-} from '../../types/src/auth.types';
+import { UserInfo, TokenResponse } from '../../types/src/auth.types';
 
-// 토큰 관리 유틸리티 함수들 (Zustand persist 구조 지원)
+// 토큰 관리 유틸리티 함수들
+// 주의: 이 함수들은 authStore persist와 동기화되어야 합니다
 const getStoredToken = (): string | null => {
   if (typeof window !== 'undefined') {
-    // Zustand persist에서 토큰 읽기
+    // Zustand persist에서 토큰 읽기 (auth-storage)
     const authStorage = localStorage.getItem('auth-storage');
     if (authStorage) {
       try {
         const parsed = JSON.parse(authStorage);
-        return parsed.state?.token || null;
+        if (parsed.state?.token) {
+          return parsed.state.token;
+        }
       } catch (error) {
         console.error('토큰 파싱 실패:', error);
       }
     }
-
-    // 레거시 지원 (기존 authToken)
-    return localStorage.getItem('authToken');
   }
   return null;
 };
 
 const getStoredRefreshToken = (): string | null => {
   if (typeof window !== 'undefined') {
-    // Zustand persist에서 리프레시 토큰 읽기
+    // Zustand persist에서 리프레시 토큰 읽기 (auth-storage)
     const authStorage = localStorage.getItem('auth-storage');
     if (authStorage) {
       try {
         const parsed = JSON.parse(authStorage);
-        return parsed.state?.refreshToken || null;
+        if (parsed.state?.refreshToken) {
+          return parsed.state.refreshToken;
+        }
       } catch (error) {
         console.error('리프레시 토큰 파싱 실패:', error);
       }
     }
-
-    // 레거시 지원 (기존 refreshToken)
-    return localStorage.getItem('refreshToken');
   }
   return null;
 };
 
-const setStoredToken = (token: string): void => {
-  if (typeof window !== 'undefined') {
-    // Zustand store를 통해 토큰 설정 (authStore에서 처리)
-    // 레거시 호환성을 위해 직접 설정도 유지
-    localStorage.setItem('authToken', token);
-  }
-};
-
-const removeStoredToken = (): void => {
+const clearStoredTokens = (): void => {
   if (typeof window !== 'undefined') {
     // Zustand persist 저장소 제거
     localStorage.removeItem('auth-storage');
-    // 레거시 토큰도 제거
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('refreshToken');
   }
 };
 
@@ -93,8 +77,6 @@ const safeRedirect = (path: string): void => {
 };
 
 const createAuthApiInstance = (): AxiosInstance => {
-  const APP_ENV = process.env.NEXT_PUBLIC_APP_ENV || 'production';
-  const isDev = APP_ENV === 'development';
   const baseURL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   const instance = axios.create({
@@ -143,7 +125,7 @@ const createAuthApiInstance = (): AxiosInstance => {
           console.error(
             '❌ Refresh token이 유효하지 않습니다. 로그인이 필요합니다.'
           );
-          removeStoredToken();
+          clearStoredTokens();
 
           if (typeof window !== 'undefined') {
             if (!window.location.pathname.includes('/signin')) {
@@ -182,15 +164,17 @@ const createAuthApiInstance = (): AxiosInstance => {
               response.data.data?.accessToken
             ) {
               const newToken = response.data.data.accessToken;
-              setStoredToken(newToken);
+              // 주의: 토큰 갱신 시 authStore도 업데이트해야 하지만,
+              // 순환 참조를 피하기 위해 여기서는 요청만 재시도
+              // authStore의 verifyAndRefreshToken이 상태를 동기화함
               error.config.headers.Authorization = `Bearer ${newToken}`;
-              console.info('✅ 토큰 갱신 성공');
+              console.info('✅ 토큰 갱신 성공 (authStore 동기화 필요)');
               return instance.request(error.config);
             }
           } catch (refreshError) {
             console.error('❌ 토큰 갱신 실패:', refreshError);
             // refresh 실패 시 토큰 제거하고 로그인 페이지로
-            removeStoredToken();
+            clearStoredTokens();
 
             if (typeof window !== 'undefined') {
               if (!window.location.pathname.includes('/signin')) {
@@ -203,7 +187,7 @@ const createAuthApiInstance = (): AxiosInstance => {
 
         // refreshToken이 없거나 이미 재시도한 경우
         console.warn('⚠️ Refresh token이 없거나 이미 재시도했습니다.');
-        removeStoredToken();
+        clearStoredTokens();
 
         if (typeof window !== 'undefined') {
           if (!window.location.pathname.includes('/signin')) {
@@ -247,11 +231,21 @@ export const authService = {
       if (response.data.status === 200 && response.data.data) {
         const data = response.data.data;
 
-        setStoredToken(data.accessToken);
-        if (data.refreshToken) {
-          localStorage.setItem('refreshToken', data.refreshToken);
+        // 임시로 토큰을 localStorage에 저장 (getUserInfo가 읽을 수 있도록)
+        // 실제 authStore 저장은 호출자가 담당
+        if (typeof window !== 'undefined') {
+          const tempStorage = {
+            state: {
+              token: data.accessToken,
+              refreshToken: data.refreshToken,
+              user: null,
+            },
+            version: 0,
+          };
+          localStorage.setItem('auth-storage', JSON.stringify(tempStorage));
         }
 
+        // 사용자 정보 조회 (위에서 저장한 토큰으로 인증)
         const userInfo = await this.getUserInfo();
 
         return {
@@ -339,8 +333,17 @@ export const authService = {
 
   async verifyToken(token?: string) {
     try {
-      if (token) {
-        setStoredToken(token);
+      // 토큰이 제공되면 임시로 저장 (axios interceptor가 사용할 수 있도록)
+      if (token && typeof window !== 'undefined') {
+        const tempStorage = {
+          state: {
+            token,
+            refreshToken: null,
+            user: null,
+          },
+          version: 0,
+        };
+        localStorage.setItem('auth-storage', JSON.stringify(tempStorage));
       }
 
       const response = await authApi.post('/v1/auth/verify', {});
@@ -451,29 +454,22 @@ export const authService = {
       if (response.data.status === 200 && response.data.data) {
         const data = response.data.data;
 
-        // 토큰을 Zustand 형식으로 저장 (auth-storage)
-        const authStorage = {
-          state: {
-            token: data.accessToken,
-            refreshToken: data.refreshToken,
-            user: null, // 사용자 정보는 아직 조회 전
-          },
-          version: 0,
-        };
-        localStorage.setItem('auth-storage', JSON.stringify(authStorage));
-
-        // 레거시 호환성 유지
-        setStoredToken(data.accessToken);
-        if (data.refreshToken) {
-          localStorage.setItem('refreshToken', data.refreshToken);
+        // 임시로 토큰을 localStorage에 저장 (getUserInfo가 읽을 수 있도록)
+        // 실제 authStore 저장은 호출자가 담당
+        if (typeof window !== 'undefined') {
+          const tempStorage = {
+            state: {
+              token: data.accessToken,
+              refreshToken: data.refreshToken,
+              user: null,
+            },
+            version: 0,
+          };
+          localStorage.setItem('auth-storage', JSON.stringify(tempStorage));
         }
 
-        // 사용자 정보 조회
+        // 사용자 정보 조회 (위에서 저장한 토큰으로 인증)
         const userInfo = await this.getUserInfo();
-
-        // 사용자 정보를 포함하여 다시 저장
-        authStorage.state.user = userInfo;
-        localStorage.setItem('auth-storage', JSON.stringify(authStorage));
 
         console.info('✅ [개발모드] 디버그 토큰 발급 성공');
 
@@ -496,6 +492,6 @@ export const authService = {
 // 토큰 관리 유틸리티 함수들을 외부에서 사용할 수 있도록 export
 export const tokenUtils = {
   getToken: getStoredToken,
-  setToken: setStoredToken,
-  removeToken: removeStoredToken,
+  getRefreshToken: getStoredRefreshToken,
+  clearTokens: clearStoredTokens,
 };
