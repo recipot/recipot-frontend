@@ -25,7 +25,7 @@ export const RecipeActions = ({
         <Button
           variant="ghost"
           size="icon"
-          className="rounded-full border border-white bg-transparent hover:bg-transparent focus:bg-transparent focus:outline-none"
+          className="rounded-full border border-white bg-transparent hover:bg-transparent hover:text-white focus:bg-transparent focus:outline-none active:bg-transparent"
           onClick={onToggleLike}
         >
           <HeartIcon className="h-5 w-5" color="#ffffff" active={isLiked} />
