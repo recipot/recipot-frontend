@@ -95,14 +95,16 @@ export function MeasurementGuide({
     }
   }, [isOpen, categories.length, fetchMeasurementGuides]);
 
-  // prop으로 전달된 데이터가 있으면 사용
   useEffect(() => {
     if (propMeasurementData) {
       setMeasurementData(propMeasurementData);
       const propCategories = Object.keys(propMeasurementData);
       setCategories(propCategories);
-      if (!activeTab && propCategories.length > 0) {
-        setActiveTab(propCategories[0]);
+      // activeTab이 없거나, 현재 activeTab이 새로운 카테고리 목록에 없는 경우 업데이트
+      if (!activeTab || (activeTab && !propCategories.includes(activeTab))) {
+        if (propCategories.length > 0) {
+          setActiveTab(propCategories[0]);
+        }
       }
     }
   }, [propMeasurementData, activeTab]);

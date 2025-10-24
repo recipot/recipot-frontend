@@ -44,10 +44,10 @@ export function MeasurementGuideContent({
           </div>
           <div className="mt-3">
             <div className="text-14sb mb-2 text-center text-gray-700">
-              {item.description || '상세 설명'}
+              {item.standard}
             </div>
             <div className="flex w-full items-center justify-center rounded-lg bg-gray-100 px-2 py-[2px]">
-              <p className="text-13">{item.standard}</p>
+              <p className="text-13">{item.description || '상세 설명'}</p>
             </div>
           </div>
         </div>
