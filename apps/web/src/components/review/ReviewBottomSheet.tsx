@@ -17,7 +17,6 @@ import type {
 import { Button } from '../common/Button';
 import { CloseIcon } from '../Icons';
 import { Drawer, DrawerContent, DrawerTitle } from '../ui/drawer';
-import { Textarea } from '../ui/textarea';
 import { EmotionSection } from './EmotionSection';
 
 // API에서 받은 데이터를 사용하므로 하드코딩된 옵션 제거
@@ -284,7 +283,7 @@ export function ReviewBottomSheet({ isOpen, onClose }: ReviewBottomSheetProps) {
             </div>
 
             {/* 컨텐츠 영역 */}
-            <div className="space-y-6">
+            <div>
               {/* 로딩 및 에러 상태 표시 */}
               {isLoading && (
                 <div className="flex items-center justify-center py-4">
@@ -328,7 +327,7 @@ export function ReviewBottomSheet({ isOpen, onClose }: ReviewBottomSheetProps) {
 
               {/* 감정 선택 섹션 */}
               {reviewData && (
-                <div className="">
+                <div>
                   <EmotionSection
                     title="요리의 맛은 어땠나요?"
                     options={reviewData.tasteOptions}
@@ -368,14 +367,14 @@ export function ReviewBottomSheet({ isOpen, onClose }: ReviewBottomSheetProps) {
               )}
 
               {/* 코멘트 입력 */}
-              <div className="mb-[13px]">
+              <div className="textarea-container mb-[13px]">
                 <p className="text-18sb mb-2 text-gray-900">
                   기타 의견이 있어요!
                 </p>
-                <Textarea
+                <textarea
                   {...register('content')}
                   placeholder="내용을 입력해 주세요"
-                  className="text-17 min-h-[100px] w-full text-ellipsis text-gray-600"
+                  className="text-17 w-full rounded-xl border border-gray-300 bg-white p-4 text-gray-900 placeholder:text-gray-400 focus:border-[#68982d] focus:outline-none"
                   maxLength={200}
                 />
               </div>
