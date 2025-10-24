@@ -53,19 +53,13 @@ export function RecipeDetailHeader({ recipe }: RecipeHeaderProps) {
   const kakaoShareData = useMemo(() => {
     const recipeImageUrl = recipe.images?.[0]?.imageUrl;
 
-    // 이미지 URL이 절대 URL인지 확인
-    const getImageUrl = (url: string | undefined): string => {
+    const getImageUrl = (url: string | undefined) => {
       if (!url) return '/recipeImage.png';
 
       // 이미 절대 URL인 경우 그대로 사용
       if (url.startsWith('http://') || url.startsWith('https://')) {
         return url;
       }
-
-      // 상대 경로인 경우 백엔드 URL과 결합
-      const backendUrl =
-        process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8080';
-      return `${backendUrl}${url.startsWith('/') ? url : `/${url}`}`;
     };
 
     const imageUrl = getImageUrl(recipeImageUrl);
