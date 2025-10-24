@@ -33,6 +33,7 @@ const shouldAddAuthHeader = (url?: string): boolean => {
   // 인증이 필요하지 않은 엔드포인트
   const noAuthPatterns = [
     '/v1/login/', // 모든 로그인 관련 엔드포인트
+    '/v1/auth/debug', // 개발 환경 디버그 토큰 발급
     '/v1/health', // 헬스체크
   ];
 
@@ -340,6 +341,53 @@ export const authService = {
     } catch (error) {
       console.error('프로필 업데이트 에러:', error);
       throw new Error('프로필 업데이트에 실패했습니다.');
+    }
+  },
+
+  // 개발 환경용 디버그 토큰 발급
+  async getDebugToken(
+    userId: number,
+    role: string = 'U01001'
+  ): Promise<{
+    accessToken: string;
+    refreshToken: string;
+    expiresIn: number;
+    user: UserInfo;
+  }> {
+    try {
+      console.info('🔧 [개발모드] 디버그 토큰 발급 중...', { userId, role });
+
+      const response = await authApi.post('/v1/auth/debug', {
+        userId,
+        role,
+      });
+
+      if (response.data.status === 200 && response.data.data) {
+        const data = response.data.data;
+
+        // 토큰 저장
+        setStoredToken(data.accessToken);
+        if (data.refreshToken) {
+          localStorage.setItem('refreshToken', data.refreshToken);
+        }
+
+        // 사용자 정보 조회
+        const userInfo = await this.getUserInfo();
+
+        console.info('✅ [개발모드] 디버그 토큰 발급 성공');
+
+        return {
+          accessToken: data.accessToken,
+          refreshToken: data.refreshToken,
+          expiresIn: data.expiresIn ?? 3600,
+          user: userInfo,
+        };
+      } else {
+        throw new Error('디버그 토큰 응답 형식이 올바르지 않습니다.');
+      }
+    } catch (error) {
+      console.error('❌ [개발모드] 디버그 토큰 발급 실패:', error);
+      throw new Error('디버그 토큰 발급에 실패했습니다.', { cause: error });
     }
   },
 };
