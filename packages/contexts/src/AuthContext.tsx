@@ -1,9 +1,8 @@
-import { createContext, useContext, useEffect, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, ReactNode } from 'react';
 import { UserInfo } from '../../types/src/auth.types';
 import { useMsw } from './MswContext';
 import { useAuthStore } from './authStore';
 
-// AuthContext 타입 정의 (Zustand store를 그대로 사용)
 interface AuthContextType {
   user: UserInfo | null;
   token: string | null;
@@ -12,7 +11,7 @@ interface AuthContextType {
   login: () => Promise<void>;
   googleLogin: () => Promise<void>;
   logout: () => void;
-  refreshAuth: () => Promise<void>;
+  refreshAuth: () => Promise<boolean>;
   setUser: (user: UserInfo | null) => void;
   setToken: (token: string | null) => void;
   setRefreshToken: (token: string | null) => void;
@@ -20,29 +19,21 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: any }) {
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export function AuthProvider({ children }: AuthProviderProps) {
   const { mswReady } = useMsw();
   const authStore = useAuthStore();
+  const isLocal = process.env.NEXT_PUBLIC_APP_ENV === 'local';
 
   useEffect(() => {
-    const initAuth = async () => {
-      // 개발 환경에서는 MSW가 준비될 때까지 대기
-      const APP_ENV = process.env.NEXT_PUBLIC_APP_ENV ?? 'production';
-      const isLocal = APP_ENV === 'local';
+    if (isLocal && !mswReady) return;
 
-      if (isLocal && !mswReady) {
-        return; // MSW가 준비되지 않았으면 대기
-      }
+    useAuthStore.getState().initializeAuth();
+  }, [mswReady, isLocal]);
 
-      // Zustand store의 초기화 로직 실행 (한 번만)
-      await useAuthStore.getState().initializeAuth();
-    };
-
-    initAuth();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mswReady]); // authStore 제거 (Zustand store는 고정 참조)
-
-  // AuthContext는 Zustand store를 래핑만 함
   const contextValue: AuthContextType = {
     user: authStore.user,
     token: authStore.token,
@@ -51,23 +42,19 @@ export function AuthProvider({ children }: { children: any }) {
     login: authStore.login,
     googleLogin: authStore.googleLogin,
     logout: authStore.logout,
-    refreshAuth: async () => {
-      await authStore.verifyAndRefreshToken();
-    },
+    refreshAuth: authStore.verifyAndRefreshToken,
     setUser: authStore.setUser,
     setToken: authStore.setToken,
     setRefreshToken: authStore.setRefreshToken,
   };
 
-  return (
-    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
 }
 
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth는 AuthProvider 내부에서 사용되어야 합니다.');
+  if (!context) {
+    throw new Error('useAuth must be used within AuthProvider');
   }
   return context;
 };
