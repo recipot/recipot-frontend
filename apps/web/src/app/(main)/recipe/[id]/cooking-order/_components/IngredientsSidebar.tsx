@@ -1,7 +1,5 @@
 'use client';
 
-import Image from 'next/image';
-
 import { Button } from '@/components/common/Button';
 import { MeasurementGuide } from '@/components/MeasurementGuide';
 import type { Recipe, RecipeIngredient } from '@/types/recipe.types';
@@ -135,13 +133,7 @@ export function IngredientsSidebar({
             <div className="space-y-2 rounded-lg bg-gray-50 p-3">
               {recipe.data.seasonings.map(seasoning => (
                 <div key={seasoning.id} className="flex items-center gap-3">
-                  <Image
-                    src={`/seasonings/${seasoning.name}.png`}
-                    alt={seasoning.name}
-                    width={40}
-                    height={40}
-                    className="h-10 w-10 object-contain"
-                  />
+                  {/* TODO : 아이콘 추가 필요 */}
                   <div className="flex flex-1 items-center justify-between">
                     <span className="text-15sb mr-2 text-gray-900">
                       {seasoning.name}
