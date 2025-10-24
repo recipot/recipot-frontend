@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { PageHeader } from '@/app/mypage/_components/PageHeader';
 import CookedRecipeList from '@/app/mypage/recipes/[type]/_components/CookedRecipeList';
@@ -59,27 +59,18 @@ export default function RecipeListPage({ type }: { type: PageType }) {
       page: 1,
     });
 
-  const [defaultRecipes, setDefaultRecipes] = useState(mockDefaultRecipes);
-
   // API 데이터 우선 사용, 없으면 mock 데이터
   const cookedRecipes = completedRecipesData?.items ?? mockCookedRecipes;
   const storedRecipes = storedRecipesData?.items ?? mockDefaultRecipes;
   const recentRecipes = recentRecipesData?.items ?? mockDefaultRecipes;
 
+  const queryClient = useQueryClient();
+  const key = type === 'saved' ? 'stored-recipes' : 'recent-recipes';
   const defaultRecipe = type === 'saved' ? storedRecipes : recentRecipes;
-  const handleToggleSave = (recipeId: number) => {
-    if (type === 'cooked') {
-      // TODO: API 연동 필요 - 보관 토글 API 호출
-      console.log('보관 토글:', recipeId);
-    } else {
-      setDefaultRecipes(prev =>
-        prev.map(recipe =>
-          recipe.id === recipeId
-            ? { ...recipe, isSaved: !recipe.isSaved }
-            : recipe
-        )
-      );
-    }
+  const handleToggleSave = () => {
+    queryClient.invalidateQueries({
+      queryKey: [key, type],
+    });
   };
 
   // 로딩 처리

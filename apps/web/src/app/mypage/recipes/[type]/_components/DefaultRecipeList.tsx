@@ -9,6 +9,7 @@ import RecipeCard from './RecipeCard';
 
 export default function DefaultRecipeList({
   config,
+  onToggleSave,
   recipes,
   type,
 }: DefaultRecipeListProps) {
@@ -73,10 +74,7 @@ export default function DefaultRecipeList({
             <li key={recipe.id}>
               <RecipeCard
                 recipe={recipe}
-                onToggleSave={recipeId => {
-                  // 필요한 경우 추가 로직
-                  console.log('Recipe toggled:', recipeId);
-                }}
+                onToggleSave={onToggleSave}
                 isSavedRecipe={isSavedRecipeList}
               />
             </li>

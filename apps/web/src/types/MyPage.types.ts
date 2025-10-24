@@ -27,7 +27,7 @@ export interface Recipe {
   imageUrl: string;
   title: string;
   description: string;
-  isSaved: boolean;
+  isBookmarked: boolean;
 }
 
 export interface CookedRecipe extends Recipe {
@@ -46,14 +46,14 @@ export type configType = {
 export interface DefaultRecipeListProps {
   recipes: CompletedRecipe[];
   config: configType;
-  onToggleSave: (recipeId: number) => void;
+  onToggleSave: () => void;
   type: string;
 }
 
 export interface CookedRecipeListProps {
   recipes: CompletedRecipe[];
   config: configType;
-  onToggleSave: (recipeId: number) => void;
+  onToggleSave: () => void;
 }
 
 export interface RecipeCardProps {

@@ -15,18 +15,25 @@ interface RecipeCardProps {
   onToggleSave?: (recipeId: number) => void;
 }
 
-export default function RecipeCard({ onToggleSave, recipe }: RecipeCardProps) {
+export default function RecipeCard({
+  isSavedRecipe = false,
+  onToggleSave,
+  recipe,
+}: RecipeCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { isPending: isDeleting, mutate: deleteRecipe } =
     useDeleteStoredRecipe();
   const { isPending: isSaving, mutate: saveRecipe } = usePostStoredRecipe();
-  const isSaved = recipe.isSaved ?? false;
+
+  // saved 타입일 때는 항상 true, 아닐 때는 recipe.isBookmarked 값 사용
+  const isBookmarked = isSavedRecipe ? true : (recipe.isBookmarked ?? false);
 
   const handleHeartClick = () => {
-    if (isSaved) {
+    if (isBookmarked) {
+      // 북마크 해제
       setIsModalOpen(true);
     } else {
-      // 최근 본 레시피인 경우 바로 토글
+      // 북마크 등록
       saveRecipe(recipe.recipeId, {
         onSuccess: () => {
           onToggleSave?.(recipe.id);
@@ -73,7 +80,7 @@ export default function RecipeCard({ onToggleSave, recipe }: RecipeCardProps) {
         >
           <HeartIcon
             size={20}
-            active={isSaved}
+            active={isBookmarked}
             color="hsl(var(--brand-primary))"
           />
         </button>

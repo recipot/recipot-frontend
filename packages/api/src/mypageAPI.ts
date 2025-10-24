@@ -11,7 +11,7 @@ export interface CompletedRecipe {
   createdAt: string;
   isReviewed?: number;
   isCompleted?: number;
-  isSaved?: boolean;
+  isBookmarked?: boolean;
 }
 
 export interface CompletedRecipesResponse {
@@ -71,9 +71,7 @@ export const storedAPI = {
 
   // 보관한 레시피 추가 (북마크 등록)
   postStoredRecipe: async (recipeId: number): Promise<void> => {
-    await mypageApi.delete(`/v1/users/recipes/bookmarks`, {
-      data: { recipeId },
-    });
+    await mypageApi.post(`/v1/users/recipes/bookmarks`, { recipeId });
   },
 };
 
