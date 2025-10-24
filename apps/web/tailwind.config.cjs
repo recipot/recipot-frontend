@@ -63,6 +63,9 @@ module.exports = {
           DEFAULT: '#FEE500',
           pressed: '#e5cf00',
         },
+        ingredient: {
+          green: '#53880A',
+        },
 
         /* Secondary */
         'secondary-soft-green': 'hsl(var(--secondary-soft-green))',

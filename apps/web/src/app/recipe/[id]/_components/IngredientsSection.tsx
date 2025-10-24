@@ -82,12 +82,7 @@ export function IngredientsSection({
           <p className="text-17sb text-gray-900">재료</p>
           <p className="text-15 text-gray-500">1인분</p>
         </div>
-        <IngredientGroup ingredients={ingredients} status="owned" />
-        <IngredientGroup ingredients={ingredients} status="notOwned" />
-        <IngredientGroup
-          ingredients={ingredients}
-          status="alternativeUnavailable"
-        />
+        <IngredientGroup ingredients={ingredients} />
 
         <div className="mt-8">
           <div className="white rounded-2xl p-4">
