@@ -15,11 +15,7 @@ interface RecipeCardProps {
   onToggleSave?: (recipeId: number) => void;
 }
 
-export default function RecipeCard({
-  isSavedRecipe = false,
-  onToggleSave,
-  recipe,
-}: RecipeCardProps) {
+export default function RecipeCard({ onToggleSave, recipe }: RecipeCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { isPending: isDeleting, mutate: deleteRecipe } =
     useDeleteStoredRecipe();

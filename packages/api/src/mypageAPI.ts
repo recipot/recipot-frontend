@@ -11,6 +11,7 @@ export interface CompletedRecipe {
   createdAt: string;
   isReviewed?: number;
   isCompleted?: number;
+  isSaved?: boolean;
 }
 
 export interface CompletedRecipesResponse {

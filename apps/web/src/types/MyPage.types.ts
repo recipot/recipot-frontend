@@ -1,13 +1,16 @@
-import type { CompletedRecipe } from '@/api/mypageAPI';
-
-import type { UserInfo } from '@recipot/types';
+import type { CompletedRecipe } from '@recipot/api';
 
 export interface PageHeaderProps {
   title: string;
 }
 
-// UserInfo에서 필요한 필드만 선택
-export type User = Pick<UserInfo, 'profileImageUrl' | 'nickname' | 'email'>;
+export type User = {
+  profileImageUrl: string;
+  nickname: string;
+  email: string;
+  platform: string;
+  recipeCompleteCount: number;
+};
 
 export interface ProfileSectionProps {
   user: User;

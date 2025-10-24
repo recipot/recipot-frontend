@@ -172,7 +172,7 @@ export default function CookedRecipeList({
           onClose={handleCloseReview}
           onSubmit={handleSubmitReview}
           reviewData={{
-            completionCount: selectedRecipe.isCompleted, // TODO: 실제 완료 횟수로 교체 필요
+            completionCount: selectedRecipe.isCompleted!,
             recipeId: selectedRecipe.recipeId.toString(),
             recipeImage: selectedRecipe.recipeImages[0],
             recipeName: selectedRecipe.recipeTitle,

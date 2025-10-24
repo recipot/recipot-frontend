@@ -102,9 +102,14 @@ export const mockCookedRecipes: CookedRecipe[] = [
 
 // 마이페이지 유저 정보 mock
 export const mockUser = {
-  nickname: '오리무중체다치즈',
+  id: 1,
   email: 'abc@facebook.com',
+  nickname: '오리무중체다치즈',
   profileImageUrl: '/mypage/default-profile.png',
+  recipeCompleteCount: 0,
+  isFirstEntry: true, // 온보딩 미완료 사용자
+  role: 'general',
+  platform: 'google',
 };
 
 // 못 먹는 음식 mock

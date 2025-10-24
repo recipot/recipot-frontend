@@ -45,4 +45,10 @@ export type {
   CompleteOnboardingData,
 } from './types';
 
-export type { CompletedRecipe } from './mypageAPI';
+// Mypage API
+export type {
+  CompletedRecipe,
+  CompletedRecipesResponse,
+  GetCompletedRecipesParams,
+} from './mypageAPI';
+export { recipesAPI, storedAPI, recentAPI } from './mypageAPI';
