@@ -94,20 +94,15 @@ const submitHealthSurvey = async (
   data: HealthSurveyRequest,
   token: string
 ): Promise<HealthSurveyResponse> => {
-  const response = await fetch(`api/v1/health-survey`, {
-    body: JSON.stringify(data),
-    headers: { Authorization: `Bearer ${token}` },
-    method: 'POST',
-  });
+  const { data: responseData } = await axios.post(
+    `api/v1/health-survey`,
+    data,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(
-      errorData.message ?? `HTTP error! status: ${response.status}`
-    );
-  }
-
-  return await response.json();
+  return responseData;
 };
 
 // 유틸리티 함수들
