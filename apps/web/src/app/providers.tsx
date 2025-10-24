@@ -3,31 +3,31 @@
 import { useEffect, useState } from 'react';
 import { AuthProvider, MswProvider } from '@recipot/contexts';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 import { SplashScreen } from '@/components/common/SplashScreen';
 import { SplashProvider } from '@/contexts/SplashContext';
-import { isDevelopment, logEnvironment } from '@/lib/env';
 
 import type { ReactNode } from 'react';
 
 export default function Providers({ children }: { children: ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
-  const [mswReady, setMswReady] = useState(!isDevelopment);
 
-  // 개발 환경에서만 MSW 워커 시작 (localhost + dev.hankkibuteo.com)
+  // MSW 활성화 조건: 개발 환경이면서 NEXT_PUBLIC_APP_ENV가 production이 아닐 때
+  const shouldUseMSW =
+    process.env.NODE_ENV === 'development' &&
+    process.env.NEXT_PUBLIC_APP_ENV !== 'production';
+
+  const [mswReady, setMswReady] = useState(!shouldUseMSW);
+
+  // 조건에 따라 MSW 워커 시작
   useEffect(() => {
-    // 환경 정보 로깅
-    logEnvironment();
-
-    if (isDevelopment) {
-      console.info('🔧 개발 환경: MSW 초기화 중...');
+    if (shouldUseMSW) {
       import('@/mocks/browser')
         .then(({ startMswWorker }) => {
           return startMswWorker();
         })
         .then(() => {
-          console.info('🚀 MSW가 준비되었습니다');
+          console.info('🚀 MSW가 준비되었습니다 (Mock API 사용)');
           setMswReady(true);
         })
         .catch(error => {
@@ -35,9 +35,9 @@ export default function Providers({ children }: { children: ReactNode }) {
           setMswReady(true); // 에러가 있어도 앱은 계속 실행
         });
     } else {
-      console.info('🌐 프로덕션 환경: MSW 비활성화');
+      console.info('✅ 실제 API를 사용합니다');
     }
-  }, []);
+  }, [shouldUseMSW]);
 
   // MSW가 준비되지 않았으면 로딩 표시
   if (!mswReady) {
@@ -58,7 +58,7 @@ export default function Providers({ children }: { children: ReactNode }) {
         <MswProvider mswReady={mswReady}>
           <AuthProvider>{children}</AuthProvider>
         </MswProvider>
-        {isDevelopment ? <ReactQueryDevtools initialIsOpen={false} /> : null}
+        {/* {isDevelopment ? <ReactQueryDevtools initialIsOpen={false} /> : null} */}
       </QueryClientProvider>
     </SplashProvider>
   );

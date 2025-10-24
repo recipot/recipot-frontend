@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import type { MoodType } from '@/components/EmotionState';
+import { useSelectedFoodsStore } from '@/stores/selectedFoodsStore';
 
 import { onboardingStorage } from '../_utils/onboardingStorage';
 import { useOnboardingActions } from './useOnboardingActions';
@@ -16,8 +17,10 @@ export function useOnboardingRestore() {
     null
   );
 
-  const { markStepCompleted, setCurrentStep, setStepData } =
+  const { markStepCompleted, resetStore, setCurrentStep, setStepData } =
     useOnboardingActions();
+
+  const clearAllFoods = useSelectedFoodsStore(state => state.clearAllFoods);
 
   // 페이지 로드 시 복구 데이터 확인
   useEffect(() => {
@@ -106,7 +109,18 @@ export function useOnboardingRestore() {
    */
   const handleRestoreCancel = () => {
     console.info('🗑️ 사용자가 데이터 복구를 거부함');
+
+    // localStorage의 온보딩 데이터 삭제
     onboardingStorage.clearData();
+
+    // Zustand 스토어 초기화 (메모리 상태 초기화)
+    resetStore();
+
+    // 선택된 재료 초기화
+    clearAllFoods();
+
+    console.info('✅ 모든 온보딩 데이터가 초기화되었습니다.');
+
     closeDialog();
   };
 

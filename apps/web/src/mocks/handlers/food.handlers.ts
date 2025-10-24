@@ -1,14 +1,30 @@
-import { http, HttpResponse } from 'msw';
-import { mockFoods } from '../data/foods.mock';
+import { delay, http, HttpResponse } from 'msw';
+
 import { validateAndProcessSelectedFoods } from '@/utils/selectedFoodsValidation';
 
+import { mockFoods } from '../data/foods.mock';
+
 export const foodHandlers = [
-  // 재료 목록 조회
+  // 전체 재료 목록 조회 (새로운 백엔드 API)
+  http.get('/v1/ingredients', async () => {
+    await delay(300); // 네트워크 지연 시뮬레이션
+    return HttpResponse.json(
+      {
+        data: {
+          data: mockFoods,
+        },
+        status: 200,
+      },
+      { status: 200 }
+    );
+  }),
+
+  // 재료 목록 조회 (기존 API - 하위 호환성)
   http.get('/api/foods', () => {
     return HttpResponse.json({
-      success: true,
       data: mockFoods,
       message: '재료 목록을 성공적으로 조회했습니다.',
+      success: true,
     });
   }),
 
@@ -28,8 +44,8 @@ export const foodHandlers = [
     } catch (error) {
       return HttpResponse.json(
         {
-          success: false,
           message: '서버 오류가 발생했습니다.',
+          success: false,
         },
         { status: 500 }
       );
