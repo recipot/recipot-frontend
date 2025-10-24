@@ -30,14 +30,14 @@ export function MeasurementGuideToggle({
         <ArrowIcon
           size={20}
           className={`transition-transform duration-200 ${
-            isOpen ? 'rotate-90' : 'rotate-0'
+            isOpen ? 'rotate-90' : '-rotate-90'
           }`}
         />
       </div>
 
       {/* 토글 콘텐츠 */}
       {isOpen && (
-        <div className="transition-all duration-200 ease-in-out">
+        <div className="no-scrollbar rounded-xl border-[1px] border-dashed">
           {children}
         </div>
       )}
