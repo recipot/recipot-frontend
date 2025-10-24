@@ -81,60 +81,6 @@ export function IngredientsSidebar({
             </div>
           </div>
 
-          {/* 미보유 재료 */}
-          {/* <div className="mb-6">
-            <div className="mb-3 flex items-center justify-between">
-              <p className="text-14sb text-gray-900">미보유</p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {recipe.data.ingredients.notOwned.map(
-                (ingredient: RecipeIngredient) => (
-                  <div
-                    key={ingredient.id}
-                    className="w-fit rounded-md border border-orange-200 bg-orange-50 px-3 py-2"
-                  >
-                    <span className="text-15b mr-[5px] text-[#F88014] opacity-80">
-                      {ingredient.name}
-                    </span>
-                    <span className="text-15 text-[#F88014] opacity-80">
-                      {ingredient.amount}
-                    </span>
-                    {ingredient.isAlternative && (
-                      <span className="ml-1 text-xs text-gray-500">
-                        대체가능
-                      </span>
-                    )}
-                  </div>
-                )
-              )}
-            </div>
-          </div> */}
-
-          {/* 대체불가 재료 */}
-          {/* <div className="mb-6">
-            <div className="mb-3 flex items-center justify-between">
-              <p className="text-14sb text-gray-900">대체불가</p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {recipe.data.ingredients.alternativeUnavailable.map(
-                (ingredient: RecipeIngredient) => (
-                  <div
-                    key={ingredient.id}
-                    className="w-fit rounded-md border border-red-200 bg-red-50 px-3 py-2"
-                  >
-                    <span className="text-15b mr-[5px] text-red-700">
-                      {ingredient.name}
-                    </span>
-                    <span className="text-15 text-red-600">
-                      {ingredient.amount}
-                    </span>
-                    <span className="ml-1 text-xs text-gray-500">필수</span>
-                  </div>
-                )
-              )}
-            </div>
-          </div> */}
-
           {/* 양념류 */}
           <div className="mb-6">
             <div className="mb-3">
