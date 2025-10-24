@@ -5,9 +5,9 @@ import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import axios from 'axios';
 
 import { Button } from '../common/Button';
-import CheckboxIcon from '../common/CheckboxIcon';
 import { CloseIcon } from '../Icons';
 import { Drawer, DrawerClose, DrawerContent, DrawerTitle } from '../ui/drawer';
+import { ImprovementOptions } from './ImprovementOptions';
 
 // API에서 가져온 데이터로 대체될 예정이므로 임시로 유지
 const HEALTH_IMPROVEMENT_OPTIONS = [
@@ -57,6 +57,119 @@ type HealthSurveyResponse = {
   };
 };
 
+// API 호출 함수들
+const getAuthToken = async (): Promise<string> => {
+  const {
+    data: {
+      data: { accessToken },
+    },
+  } = await axios.post(`api/v1/auth/debug`, {
+    role: 'user',
+    userId: 1,
+  });
+  return accessToken;
+};
+
+const getEligibilityData = async (token: string) => {
+  const {
+    data: {
+      data: { isEligible, recentCompletionCount },
+    },
+  } = await axios.get(`api/v1/health-survey/eligibility`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return { isEligible, recentCompletionCount };
+};
+
+const getHealthSurveyPreparation = async (
+  token: string
+): Promise<HealthSurveyPreparationResponse> => {
+  const { data } = await axios.get(`api/v1/health-survey/preparation`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return data;
+};
+
+const submitHealthSurvey = async (
+  data: HealthSurveyRequest,
+  token: string
+): Promise<HealthSurveyResponse> => {
+  const response = await fetch(`api/v1/health-survey`, {
+    body: JSON.stringify(data),
+    headers: { Authorization: `Bearer ${token}` },
+    method: 'POST',
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(
+      errorData.message ?? `HTTP error! status: ${response.status}`
+    );
+  }
+
+  return await response.json();
+};
+
+// 유틸리티 함수들
+const isImprovementSelected = (healthChange: string): boolean => {
+  return healthChange === '개선됐어요' || healthChange === 'H01003';
+};
+
+const shouldShowImprovementSection = (healthChange: string): boolean => {
+  return isImprovementSelected(healthChange);
+};
+
+const isSubmitDisabled = (
+  isEligible: boolean,
+  recentCompletionCount: number,
+  healthChange: string,
+  improvements: string[],
+  isSubmitting: boolean
+): boolean => {
+  return (
+    isEligible === false ||
+    recentCompletionCount >= 1 ||
+    !healthChange ||
+    (isImprovementSelected(healthChange) && improvements.length === 0) ||
+    isSubmitting
+  );
+};
+
+// 옵션 렌더링 컴포넌트
+const HealthChangeOptions = ({
+  onSelect,
+  options,
+  selectedValue,
+}: {
+  options: Array<{ code: string; codeName: string }> | readonly string[];
+  onSelect: (value: string) => void;
+  selectedValue: string;
+}) => (
+  <div className="mt-2 flex gap-2">
+    {options.map(option => {
+      const optionText = typeof option === 'string' ? option : option.codeName;
+      const optionValue = typeof option === 'string' ? option : option.code;
+
+      return (
+        <Button
+          key={optionValue}
+          variant="outline"
+          size="full"
+          type="button"
+          onClick={() => onSelect(optionValue)}
+          className={`text-15sb rounded-[10px] border p-3 ${
+            selectedValue === optionValue
+              ? 'border-secondary-soft-green bg-secondary-light-green text-primary'
+              : 'border-gray-300 text-gray-600'
+          }`}
+        >
+          {optionText}
+        </Button>
+      );
+    })}
+  </div>
+);
+
 export function WeeklySurveyBottomSheet() {
   const [isOpen, setIsOpen] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -67,28 +180,44 @@ export function WeeklySurveyBottomSheet() {
   const [isEligible, setIsEligible] = useState(false);
   const [recentCompletionCount, setRecentCompletionCount] = useState(0);
 
+  // 토큰 가져오기
   useEffect(() => {
-    const getToken = async () => {
-      const response = await axios.post(`api/v1/auth/debug`, {
-        role: 'user',
-        userId: 1,
-      });
-
-      setToken(response.data.data.accessToken);
+    const initializeToken = async () => {
+      try {
+        const authToken = await getAuthToken();
+        setToken(authToken);
+      } catch (error) {
+        console.error('토큰 가져오기 실패:', error);
+      }
     };
-    getToken();
+    initializeToken();
   }, []);
 
+  // 자격 확인 및 준비 데이터 가져오기
   useEffect(() => {
-    const isEligible = async () => {
-      const response = await axios.get(`api/v1/health-survey/eligibility`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+    const initializeData = async () => {
+      if (!token) return;
 
-      setIsEligible(response.data.data.isEligible);
-      setRecentCompletionCount(response.data.data.recentCompletionCount);
+      try {
+        setLoading(true);
+
+        // 병렬로 자격 확인과 준비 데이터 가져오기
+        const [eligibilityData, preparationData] = await Promise.all([
+          getEligibilityData(token),
+          getHealthSurveyPreparation(token),
+        ]);
+
+        setIsEligible(eligibilityData.isEligible);
+        setRecentCompletionCount(eligibilityData.recentCompletionCount);
+        setPreparationData(preparationData);
+      } catch (error) {
+        console.error('데이터 초기화 실패:', error);
+      } finally {
+        setLoading(false);
+      }
     };
-    isEligible();
+
+    initializeData();
   }, [token]);
 
   const { handleSubmit, register, setValue, watch } = useForm<SurveyFormData>({
@@ -122,79 +251,37 @@ export function WeeklySurveyBottomSheet() {
     setIsOpen(false);
   };
 
-  useEffect(() => {
-    const getHealthSurvey = async () => {
-      if (!token) return;
-
-      try {
-        setLoading(true);
-        const response = await axios.get(`api/v1/health-survey/preparation`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setPreparationData(response.data);
-      } catch (error) {
-        console.error('Health survey preparation data fetch error:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    getHealthSurvey();
-  }, [token]);
-
-  // API 호출 함수 (실제 API 엔드포인트에 맞게 수정)
-  const submitHealthSurvey = async (
-    data: HealthSurveyRequest
-  ): Promise<HealthSurveyResponse> => {
-    try {
-      const response = await fetch(`api/v1/health-survey`, {
-        body: JSON.stringify(data),
-        headers: { Authorization: `Bearer ${token}` },
-        method: 'POST',
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          errorData.message ?? `HTTP error! status: ${response.status}`
-        );
-      }
-
-      return await response.json();
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        if (isEligible === false) {
-          throw new Error(
-            error.message || '현재는 건강 설문을 작성할 수 없습니다.'
-          );
-        }
-      }
-      throw error;
-    }
-  };
-
   const onSubmit = async (data: SurveyFormData) => {
+    if (!token) {
+      console.error('토큰이 없습니다.');
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
       // form 데이터를 API 형식으로 변환
       const apiData: HealthSurveyRequest = {
-        additionalNote: data.additionalFeedback || '', // 추가 피드백 (빈 문자열로 기본값 설정)
-        effectCodes: data.improvements, // H02: 개선 사항들
-        persistentIssueCode: data.healthChange, // H01: 건강 변화 선택
+        additionalNote: data.additionalFeedback || '',
+        effectCodes: data.improvements,
+        persistentIssueCode: data.healthChange,
       };
 
       // API 호출
-      const result = await submitHealthSurvey(apiData);
+      const result = await submitHealthSurvey(apiData, token);
 
-      if (result.status === 200 || isEligible || recentCompletionCount >= 1) {
-        // 성공 시 바텀시트 닫기
+      if (result.status === 200) {
         handleClose();
       } else {
         console.error('설문 제출 실패:', result);
         // TODO: 에러 토스트 표시
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('설문 제출 중 오류 발생:', error);
+
+      if (error instanceof Error && isEligible === false) {
+        console.error('현재는 건강 설문을 작성할 수 없습니다.');
+      }
       // TODO: 에러 토스트 표시
     } finally {
       setIsSubmitting(false);
@@ -266,71 +353,30 @@ export function WeeklySurveyBottomSheet() {
                     <h2 className="text-18sb text-gray-900">
                       평소 건강 문제에 변화가 있었나요?
                     </h2>
-                    <div className="mt-2 flex gap-2">
-                      {(
+                    <HealthChangeOptions
+                      options={
                         preparationData?.persistentIssueOption ??
                         HEALTH_CHANGE_OPTIONS
-                      ).map(option => {
-                        const optionText =
-                          typeof option === 'string' ? option : option.codeName;
-                        const optionValue =
-                          typeof option === 'string' ? option : option.code;
-
-                        return (
-                          <Button
-                            key={optionValue}
-                            variant="outline"
-                            size="full"
-                            type="button"
-                            onClick={() =>
-                              handleHealthChangeSelect(optionValue)
-                            }
-                            className={`text-15sb rounded-[10px] border p-3 ${
-                              watchedHealthChange === optionValue
-                                ? 'border-secondary-soft-green bg-secondary-light-green text-primary'
-                                : 'border-gray-300 text-gray-600'
-                            }`}
-                          >
-                            {optionText}
-                          </Button>
-                        );
-                      })}
-                    </div>
+                      }
+                      onSelect={handleHealthChangeSelect}
+                      selectedValue={watchedHealthChange}
+                    />
                   </section>
                   {/* 개선됐어요가 선택되었을 때만 다중선택 영역 표시 */}
-                  {(watchedHealthChange === '개선됐어요' ||
-                    watchedHealthChange === 'H01003') && (
+                  {shouldShowImprovementSection(watchedHealthChange) && (
                     <section className="mt-6">
                       <h2 className="text-18sb mb-6 text-gray-800">
                         어떤 점이 개선되었나요?(다중선택)
                       </h2>
 
-                      {(
-                        preparationData?.effectOptions ??
-                        HEALTH_IMPROVEMENT_OPTIONS
-                      ).map(option => {
-                        const optionText =
-                          typeof option === 'string' ? option : option.codeName;
-                        const optionValue =
-                          typeof option === 'string' ? option : option.code;
-
-                        return (
-                          <div
-                            key={optionValue}
-                            className="flex cursor-pointer items-center gap-3 py-[10px]"
-                            onClick={() => handleOptionToggle(optionValue)}
-                          >
-                            <CheckboxIcon
-                              isSelected={watchedImprovements.includes(
-                                optionValue
-                              )}
-                            />
-                            <span className="text-base text-[#000000]/96">
-                              {optionText}
-                            </span>
-                          </div>
-                        );
-                      })}
+                      <ImprovementOptions
+                        options={
+                          preparationData?.effectOptions ??
+                          HEALTH_IMPROVEMENT_OPTIONS
+                        }
+                        onToggle={handleOptionToggle}
+                        selectedValues={watchedImprovements}
+                      />
 
                       <div className="textarea-container">
                         <textarea
@@ -350,8 +396,7 @@ export function WeeklySurveyBottomSheet() {
 
           {/* 선택 전 또는 개선됐어요가 아닌 경우에만 표시되는 여백 */}
           {(!watchedHealthChange ||
-            (watchedHealthChange !== '개선됐어요' &&
-              watchedHealthChange !== 'H01003')) && (
+            !shouldShowImprovementSection(watchedHealthChange)) && (
             <div className="h-[257px]" />
           )}
 
@@ -359,13 +404,13 @@ export function WeeklySurveyBottomSheet() {
           <div className="sticky bottom-0 bg-white px-[30px] pt-0 pb-[34px]">
             <Button
               type="submit"
-              disabled={
-                !watchedHealthChange ||
-                ((watchedHealthChange === '개선됐어요' ||
-                  watchedHealthChange === 'H01003') &&
-                  watchedImprovements.length === 0) ||
+              disabled={isSubmitDisabled(
+                isEligible,
+                recentCompletionCount,
+                watchedHealthChange,
+                watchedImprovements,
                 isSubmitting
-              }
+              )}
               className="text-17sb w-full rounded-full bg-[#68982d] py-4 text-white hover:bg-[#5a7a26] disabled:bg-gray-300 disabled:text-gray-500"
             >
               {isSubmitting ? '제출 중...' : '설문완료'}
