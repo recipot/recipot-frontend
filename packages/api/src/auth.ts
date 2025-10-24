@@ -100,11 +100,43 @@ const createAuthApiInstance = (): AxiosInstance => {
       );
 
       if (error.response?.status === 401) {
+        const requestUrl = error.config?.url ?? '';
+
+        // /v1/auth/refresh 요청 자체가 실패한 경우는 재시도하지 않음
+        if (requestUrl.includes('/v1/auth/refresh')) {
+          console.error(
+            '❌ Refresh token이 유효하지 않습니다. 로그인이 필요합니다.'
+          );
+          removeStoredToken();
+
+          if (typeof window !== 'undefined') {
+            if (!window.location.pathname.includes('/signin')) {
+              safeRedirect('/signin');
+            }
+          }
+          return Promise.reject(error);
+        }
+
+        // 토큰이 전혀 없는 경우 refresh 시도하지 않음
+        const accessToken = getStoredToken();
         const refreshToken = localStorage.getItem('refreshToken');
+
+        if (!accessToken && !refreshToken) {
+          console.warn('⚠️ 토큰이 없습니다. 로그인 페이지로 이동합니다.');
+
+          if (typeof window !== 'undefined') {
+            if (!window.location.pathname.includes('/signin')) {
+              safeRedirect('/signin');
+            }
+          }
+          return Promise.reject(error);
+        }
+
         if (refreshToken && !error.config._retry) {
           error.config._retry = true;
 
           try {
+            console.info('🔄 토큰 갱신 시도 중...');
             const response = await instance.post('/v1/auth/refresh', {
               refreshToken: refreshToken,
             });
@@ -116,13 +148,25 @@ const createAuthApiInstance = (): AxiosInstance => {
               const newToken = response.data.data.accessToken;
               setStoredToken(newToken);
               error.config.headers.Authorization = `Bearer ${newToken}`;
+              console.info('✅ 토큰 갱신 성공');
               return instance.request(error.config);
             }
           } catch (refreshError) {
-            console.error('토큰 갱신 실패:', refreshError);
+            console.error('❌ 토큰 갱신 실패:', refreshError);
+            // refresh 실패 시 토큰 제거하고 로그인 페이지로
+            removeStoredToken();
+
+            if (typeof window !== 'undefined') {
+              if (!window.location.pathname.includes('/signin')) {
+                safeRedirect('/signin');
+              }
+            }
+            return Promise.reject(refreshError);
           }
         }
 
+        // refreshToken이 없거나 이미 재시도한 경우
+        console.warn('⚠️ Refresh token이 없거나 이미 재시도했습니다.');
         removeStoredToken();
 
         if (typeof window !== 'undefined') {

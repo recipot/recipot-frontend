@@ -78,16 +78,11 @@ export function AuthProvider({ children }: { children: any }) {
 
   const login = async () => {
     const APP_ENV = process.env.NEXT_PUBLIC_APP_ENV || 'production';
-    const isLocalDev = APP_ENV === 'development';
 
     try {
-      // 로컬 개발 환경(localhost)에서는 디버그 토큰 사용
-      if (
-        isLocalDev &&
-        typeof window !== 'undefined' &&
-        window.location.hostname === 'localhost'
-      ) {
-        console.info('🔧 [개발모드] 디버그 토큰으로 로그인 중...');
+      // development 환경: 디버그 토큰으로 로그인
+      if (APP_ENV === 'development') {
+        console.info('🔧 [development] 디버그 토큰으로 로그인 중...');
 
         const tokenData = await authService.getDebugToken(1, 'U01001');
 
@@ -95,13 +90,13 @@ export function AuthProvider({ children }: { children: any }) {
         setRefreshToken(tokenData.refreshToken);
         setUser(tokenData.user);
 
-        console.info('✅ [개발모드] 디버그 로그인 성공');
+        console.info('✅ [development] 디버그 로그인 성공');
         return;
       }
 
-      // 프로덕션 환경에서는 실제 카카오 로그인
+      // production 환경: 실제 카카오 OAuth 로그인
+      console.info('🔐 [production] 카카오 OAuth 로그인 시작');
       const kakaoUrl = await authService.getKakaoLoginUrl();
-      console.log('kakaoUrl', kakaoUrl);
       window.location.href = kakaoUrl;
     } catch (error) {
       console.error('카카오 로그인 실패:', error);
@@ -110,16 +105,11 @@ export function AuthProvider({ children }: { children: any }) {
 
   const googleLogin = async () => {
     const APP_ENV = process.env.NEXT_PUBLIC_APP_ENV || 'production';
-    const isLocalDev = APP_ENV === 'development';
 
     try {
-      // 로컬 개발 환경(localhost)에서는 디버그 토큰 사용
-      if (
-        isLocalDev &&
-        typeof window !== 'undefined' &&
-        window.location.hostname === 'localhost'
-      ) {
-        console.info('🔧 [개발모드] 디버그 토큰으로 로그인 중...');
+      // development 환경: 디버그 토큰으로 로그인
+      if (APP_ENV === 'development') {
+        console.info('🔧 [development] 디버그 토큰으로 로그인 중...');
 
         const tokenData = await authService.getDebugToken(1, 'U01001');
 
@@ -127,11 +117,12 @@ export function AuthProvider({ children }: { children: any }) {
         setRefreshToken(tokenData.refreshToken);
         setUser(tokenData.user);
 
-        console.info('✅ [개발모드] 디버그 로그인 성공');
+        console.info('✅ [development] 디버그 로그인 성공');
         return;
       }
 
-      // 프로덕션 환경에서는 실제 구글 로그인
+      // production 환경: 실제 구글 OAuth 로그인
+      console.info('🔐 [production] 구글 OAuth 로그인 시작');
       const googleUrl = await authService.getGoogleLoginUrl();
       window.location.href = googleUrl;
     } catch (error) {
