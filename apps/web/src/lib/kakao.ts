@@ -21,6 +21,8 @@ interface KakaoShareOptions {
     title: string;
     description: string;
     imageUrl: string;
+    imageWidth?: number;
+    imageHeight?: number;
     link: {
       mobileWebUrl: string;
       webUrl: string;
@@ -109,7 +111,9 @@ export const shareKakao = async (shareData: KakaoShareData): Promise<void> => {
   const shareOptions: KakaoShareOptions = {
     content: {
       description: shareData.description,
+      imageHeight: 400,
       imageUrl: getAbsoluteUrl(shareData.imageUrl),
+      imageWidth: 800,
       link: {
         mobileWebUrl: shareData.url,
         webUrl: shareData.url,
@@ -117,7 +121,6 @@ export const shareKakao = async (shareData: KakaoShareData): Promise<void> => {
       title: shareData.title,
     },
     objectType: 'feed',
-    // buttons 배열 제거
   };
 
   try {

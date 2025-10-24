@@ -11,6 +11,8 @@ interface ShareData {
 }
 
 interface KakaoShareData {
+  title?: string;
+  description?: string;
   imageUrl?: string;
 }
 
@@ -75,9 +77,12 @@ const WebShareButton: React.FC<WebShareButtonProps> = ({
     }
 
     const kakaoData = {
-      description: shareData.text ?? '한끼부터 - 당신의 레시피 추천 서비스',
-      imageUrl: kakaoShareData.imageUrl ?? '/recipeImage.png',
-      title: shareData.title,
+      description:
+        kakaoShareData?.description ??
+        shareData.text ??
+        '한끼부터 - 당신의 레시피 추천 서비스',
+      imageUrl: kakaoShareData?.imageUrl ?? '/recipeImage.png',
+      title: kakaoShareData?.title ?? shareData.title ?? '한끼부터',
       url: shareData.url,
     };
 

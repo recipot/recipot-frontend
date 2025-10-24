@@ -54,17 +54,26 @@ export function RecipeDetailHeader({ recipe }: RecipeHeaderProps) {
     const recipeImageUrl = recipe.images?.[0]?.imageUrl;
 
     const getImageUrl = (url: string | undefined) => {
-      if (!url) return '/recipeImage.png';
+      const baseUrl = 'https://dev.hankkibuteo.com';
+
+      if (!url) return `${baseUrl}/recipeImage.png`;
 
       // 이미 절대 URL인 경우 그대로 사용
       if (url.startsWith('http://') || url.startsWith('https://')) {
         return url;
       }
+
+      // 상대 경로인 경우 절대 URL로 변환
+      return `${baseUrl}${url.startsWith('/') ? url : `/${url}`}`;
     };
 
     const imageUrl = getImageUrl(recipeImageUrl);
 
-    return { imageUrl };
+    return {
+      description: recipe.description,
+      imageUrl,
+      title: recipe.title,
+    };
   }, [recipe]);
 
   const handleToggleBookmark = async (recipeId: number) => {
