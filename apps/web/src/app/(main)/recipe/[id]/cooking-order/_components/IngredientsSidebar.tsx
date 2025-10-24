@@ -68,12 +68,12 @@ export function IngredientsSidebar({
               {uniqueIngredients.map((ingredient: RecipeIngredient) => (
                 <div
                   key={ingredient.id}
-                  className="w-fit rounded-md border border-green-200 bg-green-50 px-3 py-2"
+                  className="border-secondary-soft-green bg-secondary-light-green w-fit rounded-md border px-3 py-2"
                 >
-                  <span className="text-15b mr-[5px] text-green-700">
+                  <span className="text-15b mr-[5px] text-[#53880A]">
                     {ingredient.name}
                   </span>
-                  <span className="text-15 text-green-600">
+                  <span className="text-15 text-[#53880A]">
                     {ingredient.amount}
                   </span>
                 </div>
