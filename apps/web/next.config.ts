@@ -33,6 +33,11 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: '**',
       },
+      {
+        protocol: 'https',
+        hostname:
+          'appcook-bucket-cook-admin-ap-northeast-2.s3.ap-northeast-2.amazonaws.com',
+      },
     ],
   },
 };
