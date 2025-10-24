@@ -1,8 +1,9 @@
 import Link from 'next/link';
 
-import type { CompletedRecipe } from '@/api/mypageAPI';
 import { Button } from '@/components/common/Button';
 import { ArrowIcon, CookIcon } from '@/components/Icons';
+
+import type { CompletedRecipe } from '@recipot/api';
 
 export default function MyRecipesLink({
   cookedRecipes,

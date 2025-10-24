@@ -1,4 +1,5 @@
 import { createApiInstance } from './createApiInstance';
+import { debugAuth } from './debug';
 
 export interface CompletedRecipe {
   id: number;
@@ -8,6 +9,8 @@ export interface CompletedRecipe {
   recipeDescription: string;
   recipeImages: string[];
   createdAt: string;
+  isReviewed?: number;
+  isCompleted?: number;
 }
 
 export interface CompletedRecipesResponse {
@@ -25,8 +28,15 @@ export interface GetCompletedRecipesParams {
   page?: number;
   limit?: number;
 }
+const token = await debugAuth.generateDebugToken({
+  role: 'user',
+  userId: 1,
+});
 
-const mypageApi = createApiInstance({ apiName: 'Mypage' });
+const mypageApi = createApiInstance({
+  apiName: 'Mypage',
+  token: token.accessToken,
+});
 
 export const recipesAPI = {
   // 완료한 요리 목록 조회
@@ -34,7 +44,7 @@ export const recipesAPI = {
     params: GetCompletedRecipesParams = { limit: 10, page: 1 }
   ): Promise<CompletedRecipesResponse['data']> => {
     const response = await mypageApi.get<CompletedRecipesResponse>(
-      '/users/recipes/completed',
+      '/v1/users/recipes/completed',
       { params }
     );
     return response.data.data;
@@ -47,7 +57,7 @@ export const storedAPI = {
     params: GetCompletedRecipesParams = { limit: 10, page: 1 }
   ): Promise<CompletedRecipesResponse['data']> => {
     const response = await mypageApi.get<CompletedRecipesResponse>(
-      '/users/recipes/bookmarks',
+      '/v1/users/recipes/bookmarks',
       { params }
     );
     return response.data.data;
@@ -55,7 +65,14 @@ export const storedAPI = {
 
   // 보관한 레시피 삭제 (북마크 해제)
   deleteStoredRecipe: async (recipeId: number): Promise<void> => {
-    await mypageApi.delete(`/users/recipes/bookmarks/${recipeId}`);
+    await mypageApi.delete(`/v1/users/recipes/bookmarks/${recipeId}`);
+  },
+
+  // 보관한 레시피 추가 (북마크 등록)
+  postStoredRecipe: async (recipeId: number): Promise<void> => {
+    await mypageApi.delete(`/v1/users/recipes/bookmarks`, {
+      data: { recipeId },
+    });
   },
 };
 
@@ -65,7 +82,7 @@ export const recentAPI = {
     params: GetCompletedRecipesParams = { limit: 10, page: 1 }
   ): Promise<CompletedRecipesResponse['data']> => {
     const response = await mypageApi.get<CompletedRecipesResponse>(
-      '/users/recipes/recent',
+      '/v1/users/recipes/recent',
       { params }
     );
     return response.data.data;

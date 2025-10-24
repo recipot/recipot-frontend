@@ -44,3 +44,5 @@ export type {
   FoodListApiResponse,
   CompleteOnboardingData,
 } from './types';
+
+export type { CompletedRecipe } from './mypageAPI';

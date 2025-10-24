@@ -1,11 +1,24 @@
+import { useState } from 'react';
 import Image from 'next/image';
 
-import type { CompletedRecipe } from '@/api/mypageAPI';
 import { Button } from '@/components/common/Button';
+import { ReviewBottomSheet } from '@/components/review/ReviewBottomSheet';
 import { useScrollGradient } from '@/hooks/useScrollGradient';
 import type { CookedRecipeListProps } from '@/types/MyPage.types';
 
 import RecipeCard from './RecipeCard';
+
+import type { CompletedRecipe } from '@recipot/api';
+
+// 날짜 포맷팅 함수
+const formatDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+
+  return `${year}.${month}.${day}`;
+};
 
 export default function CookedRecipeList({
   config,
@@ -13,6 +26,26 @@ export default function CookedRecipeList({
   recipes,
 }: CookedRecipeListProps) {
   const { scrollRef, showGradient } = useScrollGradient([recipes]);
+  const [isReviewOpen, setIsReviewOpen] = useState(false);
+  const [selectedRecipe, setSelectedRecipe] = useState<CompletedRecipe | null>(
+    null
+  );
+
+  const handleOpenReview = (recipe: CompletedRecipe) => {
+    setSelectedRecipe(recipe);
+    setIsReviewOpen(true);
+  };
+
+  const handleCloseReview = () => {
+    setIsReviewOpen(false);
+    setSelectedRecipe(null);
+  };
+
+  const handleSubmitReview = (reviewData: any) => {
+    // TODO: 리뷰 제출 API 호출
+    console.log('리뷰 제출:', reviewData);
+    handleCloseReview();
+  };
 
   if (recipes.length === 0) {
     return (
@@ -59,10 +92,11 @@ export default function CookedRecipeList({
       </div>
     );
   }
-  console.log('recipes: ', recipes);
+
+  // createdAt 기준으로 날짜별 그룹화
   const recipesByDate = recipes.reduce<Record<string, CompletedRecipe[]>>(
     (acc, recipe) => {
-      const date = recipe.cookedDate;
+      const date = formatDate(recipe.createdAt);
       if (!acc[date]) {
         acc[date] = [];
       }
@@ -94,7 +128,7 @@ export default function CookedRecipeList({
                   <li key={recipe.id}>
                     <div className="flex flex-col gap-2 rounded-2xl bg-white px-2 pt-2 pb-5 shadow-sm">
                       <RecipeCard recipe={recipe} onToggleSave={onToggleSave} />
-                      {recipe.reviewId ? (
+                      {recipe.isReviewed === 1 ? (
                         <div className="w-full px-3">
                           <Button
                             variant="outline"
@@ -106,7 +140,11 @@ export default function CookedRecipeList({
                         </div>
                       ) : (
                         <div className="w-full px-3">
-                          <Button size="full" className="text-15sb py-3">
+                          <Button
+                            size="full"
+                            className="text-15sb py-3"
+                            onClick={() => handleOpenReview(recipe)}
+                          >
                             맛있게 드셨나요? 후기를 남겨주세요
                           </Button>
                         </div>
@@ -124,6 +162,20 @@ export default function CookedRecipeList({
           className="pointer-events-none absolute right-0 bottom-0 left-0 h-[5.313rem] rounded-b-[1.25rem]"
           style={{
             background: `linear-gradient(to top, ${config.overLayColor}, transparent)`,
+          }}
+        />
+      )}
+
+      {selectedRecipe && (
+        <ReviewBottomSheet
+          isOpen={isReviewOpen}
+          onClose={handleCloseReview}
+          onSubmit={handleSubmitReview}
+          reviewData={{
+            completionCount: selectedRecipe.isCompleted, // TODO: 실제 완료 횟수로 교체 필요
+            recipeId: selectedRecipe.recipeId.toString(),
+            recipeImage: selectedRecipe.recipeImages[0],
+            recipeName: selectedRecipe.recipeTitle,
           }}
         />
       )}

@@ -8,7 +8,6 @@ import RecipeCard from './RecipeCard';
 
 export default function DefaultRecipeList({
   config,
-  onToggleSave,
   recipes,
   type,
 }: DefaultRecipeListProps) {

@@ -1,16 +1,18 @@
 import { useState } from 'react';
 import Image from 'next/image';
 
-import type { CompletedRecipe } from '@/api/mypageAPI';
 import { Button } from '@/components/common/Button';
 import { Modal } from '@/components/common/Modal/Modal';
 import { ArrowIcon, HeartIcon } from '@/components/Icons';
 import { useDeleteStoredRecipe } from '@/hooks/useDeleteSavedRecipe';
+import { usePostStoredRecipe } from '@/hooks/usePostSavedRecipe';
+
+import type { CompletedRecipe } from '@recipot/api';
 
 interface RecipeCardProps {
   recipe: CompletedRecipe;
   isSavedRecipe?: boolean;
-  onToggleSave?: (recipeId: number) => void; // optional로 변경
+  onToggleSave?: (recipeId: number) => void;
 }
 
 export default function RecipeCard({
@@ -19,14 +21,21 @@ export default function RecipeCard({
   recipe,
 }: RecipeCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { isPending, mutate: deleteRecipe } = useDeleteStoredRecipe();
+  const { isPending: isDeleting, mutate: deleteRecipe } =
+    useDeleteStoredRecipe();
+  const { isPending: isSaving, mutate: saveRecipe } = usePostStoredRecipe();
+  const isSaved = recipe.isSaved ?? false;
 
   const handleHeartClick = () => {
-    if (isSavedRecipe) {
+    if (isSaved) {
       setIsModalOpen(true);
     } else {
       // 최근 본 레시피인 경우 바로 토글
-      onToggleSave?.(recipe.id);
+      saveRecipe(recipe.recipeId, {
+        onSuccess: () => {
+          onToggleSave?.(recipe.id);
+        },
+      });
     }
   };
 
@@ -39,13 +48,15 @@ export default function RecipeCard({
     });
   };
 
+  const isPending = isDeleting || isSaving;
+
   return (
     <>
       <div className="flex items-center gap-3 rounded-2xl bg-white py-3 pr-5 pl-3">
         <div className="relative h-[3.75rem] w-[3.75rem] flex-shrink-0">
           <Image
-            src={recipe.recipeImages[0] || '/placeholder-image.png'}
-            alt={recipe.recipeTitle || '레시피 이미지'}
+            src={recipe.recipeImages[0] ?? '/placeholder-image.png'}
+            alt={recipe.recipeTitle ?? '레시피 이미지'}
             fill
             className="rounded-xl object-cover"
           />
@@ -66,7 +77,7 @@ export default function RecipeCard({
         >
           <HeartIcon
             size={20}
-            active={isSavedRecipe}
+            active={isSaved}
             color="hsl(var(--brand-primary))"
           />
         </button>
@@ -85,7 +96,7 @@ export default function RecipeCard({
             onClick={handleConfirmUnsave}
             disabled={isPending}
           >
-            {isPending ? '처리중...' : '해제하기'}
+            {isDeleting ? '처리중...' : '해제하기'}
           </Button>
           <Button
             className="text-14b h-[2.125rem] bg-[#747474] px-4 py-3 text-white disabled:opacity-50"
