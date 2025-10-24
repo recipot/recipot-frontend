@@ -71,15 +71,8 @@ const createAuthApiInstance = (): AxiosInstance => {
 
   instance.interceptors.request.use(
     config => {
-      const url = config.url ?? '';
-
-      if (isDev && shouldAddAuthHeader(url)) {
-        const token = getStoredToken();
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
-        }
-      }
-
+      // 쿠키가 자동으로 전송되므로 별도로 헤더 추가 불필요
+      // withCredentials: true 설정으로 모든 요청에 쿠키가 포함됨
       return config;
     },
     error => {

@@ -107,6 +107,11 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
           `${provider === 'google' ? '구글' : '카카오'} 사용자 정보를 가져오는 중...`
         );
 
+        // 백엔드가 쿠키에 토큰을 설정했으므로
+        // withCredentials: true로 쿠키가 자동으로 전송됨
+        // LocalStorage 저장 불필요 - 쿠키가 더 안전함 (HttpOnly, SameSite)
+        console.info('🍪 쿠키 기반 인증 사용 - 자동으로 전송됨');
+
         const userInfo = await authService.getUserInfo();
         setupUser(userInfo);
       } catch (error) {
