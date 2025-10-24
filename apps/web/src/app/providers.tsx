@@ -12,10 +12,8 @@ import type { ReactNode } from 'react';
 export default function Providers({ children }: { children: ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
 
-  // MSW 활성화 조건: 개발 환경이면서 NEXT_PUBLIC_APP_ENV가 production이 아닐 때
-  const shouldUseMSW =
-    process.env.NODE_ENV === 'development' &&
-    process.env.NEXT_PUBLIC_APP_ENV !== 'production';
+  // MSW 활성화 조건: NEXT_PUBLIC_APP_ENV가 'local'일 때만 사용
+  const shouldUseMSW = process.env.NEXT_PUBLIC_APP_ENV === 'local';
 
   const [mswReady, setMswReady] = useState(!shouldUseMSW);
 
@@ -27,15 +25,16 @@ export default function Providers({ children }: { children: ReactNode }) {
           return startMswWorker();
         })
         .then(() => {
-          console.info('🚀 MSW가 준비되었습니다 (Mock API 사용)');
+          console.info('🚀 [local] MSW가 준비되었습니다 (Mock API 사용)');
           setMswReady(true);
         })
         .catch(error => {
-          console.error('MSW 초기화 실패:', error);
+          console.error('❌ [local] MSW 초기화 실패:', error);
           setMswReady(true); // 에러가 있어도 앱은 계속 실행
         });
     } else {
-      console.info('✅ 실제 API를 사용합니다');
+      const env = process.env.NEXT_PUBLIC_APP_ENV ?? 'production';
+      console.info(`✅ [${env}] 실제 API를 사용합니다`);
     }
   }, [shouldUseMSW]);
 
