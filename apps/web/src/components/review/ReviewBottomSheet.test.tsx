@@ -6,33 +6,15 @@ import { vi } from 'vitest';
 import { ReviewBottomSheet } from '.';
 
 // axios 모킹
-vi.mock('axios', () => ({
-  create: vi.fn(() => ({
-    get: vi.fn(),
-    interceptors: {
-      request: { use: vi.fn() },
-      response: { use: vi.fn() },
-    },
-    post: vi.fn(),
-  })),
-  default: {
-    create: vi.fn(() => ({
-      get: vi.fn(),
-      interceptors: {
-        request: { use: vi.fn() },
-        response: { use: vi.fn() },
-      },
-      post: vi.fn(),
-    })),
-    get: vi.fn(),
-    interceptors: {
-      request: { use: vi.fn() },
-      response: { use: vi.fn() },
-    },
-    post: vi.fn(),
+vi.mock('axios');
+
+// debugAuth 모킹
+vi.mock('@recipot/api', () => ({
+  debugAuth: {
+    generateDebugToken: vi.fn().mockResolvedValue({
+      accessToken: 'mock-token',
+    }),
   },
-  get: vi.fn(),
-  post: vi.fn(),
 }));
 
 // Drawer 컴포넌트를 간단한 div로 모킹
@@ -119,6 +101,10 @@ describe('ReviewBottomSheet', () => {
         return Promise.resolve(mockReviewDataResponse);
       }
       return Promise.reject(new Error('Unknown URL'));
+    });
+
+    vi.mocked(axios.post).mockResolvedValue({
+      data: { success: true },
     });
   });
 
