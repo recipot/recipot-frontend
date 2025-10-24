@@ -64,6 +64,8 @@ export function WeeklySurveyBottomSheet() {
   const [preparationData, setPreparationData] =
     useState<HealthSurveyPreparationResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isEligible, setIsEligible] = useState(false);
+  const [recentCompletionCount, setRecentCompletionCount] = useState(0);
 
   useEffect(() => {
     const getToken = async () => {
@@ -76,6 +78,18 @@ export function WeeklySurveyBottomSheet() {
     };
     getToken();
   }, []);
+
+  useEffect(() => {
+    const isEligible = async () => {
+      const response = await axios.get(`api/v1/health-survey/eligibility`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setIsEligible(response.data.data.isEligible);
+      setRecentCompletionCount(response.data.data.recentCompletionCount);
+    };
+    isEligible();
+  }, [token]);
 
   const { handleSubmit, register, setValue, watch } = useForm<SurveyFormData>({
     defaultValues: {
@@ -146,8 +160,14 @@ export function WeeklySurveyBottomSheet() {
       }
 
       return await response.json();
-    } catch (error) {
-      console.error('Health Survey API Error:', error);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        if (isEligible === false) {
+          throw new Error(
+            error.message || '현재는 건강 설문을 작성할 수 없습니다.'
+          );
+        }
+      }
       throw error;
     }
   };
@@ -166,7 +186,7 @@ export function WeeklySurveyBottomSheet() {
       // API 호출
       const result = await submitHealthSurvey(apiData);
 
-      if (result.status === 200) {
+      if (result.status === 200 || isEligible || recentCompletionCount >= 1) {
         // 성공 시 바텀시트 닫기
         handleClose();
       } else {
