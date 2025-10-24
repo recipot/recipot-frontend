@@ -77,27 +77,65 @@ export function AuthProvider({ children }: { children: any }) {
   }, [mswReady]);
 
   const login = async () => {
+    const APP_ENV = process.env.NEXT_PUBLIC_APP_ENV || 'production';
+    const isLocalDev = APP_ENV === 'development';
+
     try {
-      // 카카오 로그인 URL 생성
+      // 로컬 개발 환경(localhost)에서는 디버그 토큰 사용
+      if (
+        isLocalDev &&
+        typeof window !== 'undefined' &&
+        window.location.hostname === 'localhost'
+      ) {
+        console.info('🔧 [개발모드] 디버그 토큰으로 로그인 중...');
+
+        const tokenData = await authService.getDebugToken(1, 'U01001');
+
+        setToken(tokenData.accessToken);
+        setRefreshToken(tokenData.refreshToken);
+        setUser(tokenData.user);
+
+        console.info('✅ [개발모드] 디버그 로그인 성공');
+        return;
+      }
+
+      // 프로덕션 환경에서는 실제 카카오 로그인
       const kakaoUrl = await authService.getKakaoLoginUrl();
       console.log('kakaoUrl', kakaoUrl);
-
-      // 카카오 인증 페이지로 리디렉션
       window.location.href = kakaoUrl;
     } catch (error) {
-      console.error('카카오 로그인 URL 생성 실패:', error);
+      console.error('카카오 로그인 실패:', error);
     }
   };
 
   const googleLogin = async () => {
-    try {
-      // 구글 로그인 URL 생성
-      const googleUrl = await authService.getGoogleLoginUrl();
+    const APP_ENV = process.env.NEXT_PUBLIC_APP_ENV || 'production';
+    const isLocalDev = APP_ENV === 'development';
 
-      // 구글 인증 페이지로 리디렉션
+    try {
+      // 로컬 개발 환경(localhost)에서는 디버그 토큰 사용
+      if (
+        isLocalDev &&
+        typeof window !== 'undefined' &&
+        window.location.hostname === 'localhost'
+      ) {
+        console.info('🔧 [개발모드] 디버그 토큰으로 로그인 중...');
+
+        const tokenData = await authService.getDebugToken(1, 'U01001');
+
+        setToken(tokenData.accessToken);
+        setRefreshToken(tokenData.refreshToken);
+        setUser(tokenData.user);
+
+        console.info('✅ [개발모드] 디버그 로그인 성공');
+        return;
+      }
+
+      // 프로덕션 환경에서는 실제 구글 로그인
+      const googleUrl = await authService.getGoogleLoginUrl();
       window.location.href = googleUrl;
     } catch (error) {
-      console.error('구글 로그인 URL 생성 실패:', error);
+      console.error('구글 로그인 실패:', error);
     }
   };
 
