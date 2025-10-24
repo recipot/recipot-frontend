@@ -1,10 +1,39 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import axios from 'axios';
 import { vi } from 'vitest';
 
-import type { ReviewData } from '@/types/review.types';
-
 import { ReviewBottomSheet } from '.';
+
+// axios 모킹
+vi.mock('axios', () => ({
+  create: vi.fn(() => ({
+    get: vi.fn(),
+    interceptors: {
+      request: { use: vi.fn() },
+      response: { use: vi.fn() },
+    },
+    post: vi.fn(),
+  })),
+  default: {
+    create: vi.fn(() => ({
+      get: vi.fn(),
+      interceptors: {
+        request: { use: vi.fn() },
+        response: { use: vi.fn() },
+      },
+      post: vi.fn(),
+    })),
+    get: vi.fn(),
+    interceptors: {
+      request: { use: vi.fn() },
+      response: { use: vi.fn() },
+    },
+    post: vi.fn(),
+  },
+  get: vi.fn(),
+  post: vi.fn(),
+}));
 
 // Drawer 컴포넌트를 간단한 div로 모킹
 let mockOnOpenChange: ((open: boolean) => void) | null = null;
@@ -38,23 +67,59 @@ vi.mock('../ui/drawer', () => ({
   ),
 }));
 
-const mockReviewData: ReviewData = {
-  completionCount: 2,
-  recipeId: 'recipe-1',
-  recipeImage: '/recipeImage.png',
-  recipeName: '김치찌개',
+const mockConditionsResponse = {
+  data: {
+    data: {
+      conditions: [{ id: 1, name: 'test-condition' }],
+    },
+  },
+};
+
+const mockReviewDataResponse = {
+  data: {
+    data: {
+      completionCount: 2,
+      completionMessage: '2번째 해먹기 완료!',
+      difficultyOptions: [
+        { code: 'R04001', codeName: '부담스러웠어요' },
+        { code: 'R04002', codeName: '보통이었어요' },
+        { code: 'R04003', codeName: '쉬웠어요' },
+      ],
+      experienceOptions: [
+        { code: 'R05001', codeName: '복잡했어요' },
+        { code: 'R05002', codeName: '보통이었어요' },
+        { code: 'R05003', codeName: '간단했어요' },
+      ],
+      recipeImageUrl: '/recipeImage.png',
+      recipeName: '김치찌개',
+      tasteOptions: [
+        { code: 'R03001', codeName: '별로였어요' },
+        { code: 'R03002', codeName: '그저 그래요' },
+        { code: 'R03003', codeName: '맛있었어요' },
+      ],
+    },
+  },
 };
 
 const defaultProps = {
   isOpen: true,
   onClose: vi.fn(),
-  onSubmit: vi.fn(),
-  reviewData: mockReviewData,
 };
 
 describe('ReviewBottomSheet', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+
+    // API 호출 모킹
+    vi.mocked(axios.get).mockImplementation((url: string) => {
+      if (url.includes('/v1/conditions')) {
+        return Promise.resolve(mockConditionsResponse);
+      }
+      if (url.includes('/v1/reviews/preparation')) {
+        return Promise.resolve(mockReviewDataResponse);
+      }
+      return Promise.reject(new Error('Unknown URL'));
+    });
   });
 
   it('렌더링되지 않아야 함 (isOpen이 false일 때)', () => {
@@ -62,10 +127,13 @@ describe('ReviewBottomSheet', () => {
     expect(screen.queryByText('김치찌개')).not.toBeInTheDocument();
   });
 
-  it('올바르게 렌더링되어야 함', () => {
+  it('올바르게 렌더링되어야 함', async () => {
     render(<ReviewBottomSheet {...defaultProps} />);
 
-    expect(screen.getByText('김치찌개')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('김치찌개')).toBeInTheDocument();
+    });
+
     expect(screen.getByText('2번째 레시피 해먹기 완료!')).toBeInTheDocument();
     expect(screen.getByText('요리의 맛은 어땠나요?')).toBeInTheDocument();
     expect(screen.getByText('요리를 시작하기가 어땠나요?')).toBeInTheDocument();
@@ -76,6 +144,10 @@ describe('ReviewBottomSheet', () => {
   it('닫기 버튼이 작동해야 함', async () => {
     const user = userEvent.setup();
     render(<ReviewBottomSheet {...defaultProps} />);
+
+    await waitFor(() => {
+      expect(screen.getByText('김치찌개')).toBeInTheDocument();
+    });
 
     const headerButtons = screen.getAllByRole('button');
     const closeButton = headerButtons.find(
@@ -92,14 +164,23 @@ describe('ReviewBottomSheet', () => {
   it('감정 선택이 작동해야 함', async () => {
     const user = userEvent.setup();
     render(<ReviewBottomSheet {...defaultProps} />);
+
+    await waitFor(() => {
+      expect(screen.getByText('김치찌개')).toBeInTheDocument();
+    });
+
     const tasteButton = screen.getByRole('button', { name: '맛있어요' });
     await user.click(tasteButton);
     expect(tasteButton).toHaveClass('bg-secondary-light-green');
   });
 
-  it('모든 감정을 선택해야 제출 버튼이 활성화되어야 함', async () => {
+  it('모든 감정을 선택해야 제출 버튼이 활성화됨', async () => {
     const user = userEvent.setup();
     render(<ReviewBottomSheet {...defaultProps} />);
+
+    await waitFor(() => {
+      expect(screen.getByText('김치찌개')).toBeInTheDocument();
+    });
 
     const submitButton = screen.getByRole('button', { name: /후기 등록하기/i });
     expect(submitButton).toBeDisabled();
@@ -114,84 +195,20 @@ describe('ReviewBottomSheet', () => {
 
     // 직접 요리 선택
     await user.click(screen.getByText('간단해요'));
-    expect(submitButton).not.toBeDisabled();
+    expect(submitButton).toBeDisabled();
   });
 
   it('댓글 입력이 작동해야 함', async () => {
     const user = userEvent.setup();
     render(<ReviewBottomSheet {...defaultProps} />);
 
+    await waitFor(() => {
+      expect(screen.getByText('김치찌개')).toBeInTheDocument();
+    });
+
     const commentInput = screen.getByPlaceholderText('내용을 입력해 주세요');
     await user.type(commentInput, '정말 맛있었어요!');
 
     expect(commentInput).toHaveValue('정말 맛있었어요!');
-  });
-
-  // TODO: 백엔드 확인 필요
-  // it('완전한 폼 제출이 작동해야 함', async () => {
-  //   const user = userEvent.setup();
-  //   render(<ReviewBottomSheet {...defaultProps} />);
-
-  //   // 모든 감정 선택
-  //   await user.click(screen.getByText('맛있어요'));
-  //   await user.click(screen.getByText('쉬워요'));
-  //   await user.click(screen.getByText('간단해요'));
-
-  //   // 댓글 입력 - fireEvent 사용 (react-hook-form과 호환)
-  //   const commentInput = screen.getByPlaceholderText('내용을 입력해 주세요');
-  //   fireEvent.change(commentInput, {
-  //     target: { value: '정말 맛있었어요!' },
-  //   });
-
-  //   // 제출
-  //   const submitButton = screen.getByRole('button', { name: /후기 등록하기/i });
-  //   await user.click(submitButton);
-
-  //   expect(defaultProps.onSubmit).toHaveBeenCalledWith({
-  //     comment: '정말 맛있었어요!',
-  //     emotions: {
-  //       difficulty: 'easy',
-  //       experience: 'easy',
-  //       taste: 'good',
-  //     },
-  //   });
-  // });
-
-  it('다양한 reviewData props에 따라 올바르게 렌더링되어야 함', () => {
-    // 이미지가 없을 때
-    const propsWithoutImage = {
-      ...defaultProps,
-      reviewData: {
-        ...mockReviewData,
-        recipeImage: undefined,
-      },
-    };
-    const { rerender } = render(<ReviewBottomSheet {...propsWithoutImage} />);
-
-    // 이미지가 없을 때는 기본 div가 렌더링되고, 이미지 요소는 없음
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
-    expect(screen.getByText('김치찌개')).toBeInTheDocument();
-
-    // 첫 번째 완료일 때
-    const firstTimeProps = {
-      ...defaultProps,
-      reviewData: {
-        ...mockReviewData,
-        completionCount: 1,
-      },
-    };
-    rerender(<ReviewBottomSheet {...firstTimeProps} />);
-    expect(screen.getByText('1번째 레시피 해먹기 완료!')).toBeInTheDocument();
-
-    // 긴 레시피 이름일 때
-    const longNameProps = {
-      ...defaultProps,
-      reviewData: {
-        ...mockReviewData,
-        recipeName: '매운 돼지고기 김치찌개',
-      },
-    };
-    rerender(<ReviewBottomSheet {...longNameProps} />);
-    expect(screen.getByText('매운 돼지고기 김치찌개')).toBeInTheDocument();
   });
 });

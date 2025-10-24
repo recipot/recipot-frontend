@@ -160,7 +160,7 @@ export function ReviewBottomSheet({ isOpen, onClose }: ReviewBottomSheetProps) {
     watchedTasteOptions.length > 0 &&
     watchedDifficultyOptions.length > 0 &&
     watchedExperienceOptions.length > 0 &&
-    watchedContent.trim();
+    watchedContent?.trim();
 
   const handleEmotionSelect = (type: string, value: string) => {
     if (!reviewData) return;
