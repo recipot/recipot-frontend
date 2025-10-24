@@ -33,7 +33,6 @@ const shouldAddAuthHeader = (url?: string): boolean => {
   // 인증이 필요하지 않은 엔드포인트
   const noAuthPatterns = [
     '/v1/login/', // 모든 로그인 관련 엔드포인트
-    '/v1/auth/info/', // 사용자 ID로 토큰 조회 (토큰 발급 전)
     '/v1/health', // 헬스체크
   ];
 
@@ -67,7 +66,7 @@ const createAuthApiInstance = (): AxiosInstance => {
     headers: {
       'Content-Type': 'application/json',
     },
-    withCredentials: !isDev,
+    withCredentials: true, // 쿠키를 항상 포함하여 백엔드가 인증 정보를 받을 수 있도록 설정
   });
 
   instance.interceptors.request.use(
