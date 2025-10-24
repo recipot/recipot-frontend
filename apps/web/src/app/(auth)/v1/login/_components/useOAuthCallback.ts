@@ -82,23 +82,6 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
     [saveTokens, setupUser, handleError]
   );
 
-  const handleBackendUserIdWithToken = useCallback(
-    async (userId: string) => {
-      try {
-        setStatus(
-          `${provider === 'google' ? '구글' : '카카오'} 로그인 정보를 가져오는 중...`
-        );
-
-        const tokenData = await authService.getTokenByUserId(Number(userId));
-        saveTokens(tokenData.accessToken, tokenData.refreshToken);
-        setupUser(tokenData.user);
-      } catch (error) {
-        handleError(error, '로그인 정보 조회 실패');
-      }
-    },
-    [provider, saveTokens, setupUser, handleError]
-  );
-
   const handleTokensFromQuery = useCallback(
     async (accessToken: string, refreshToken: string) => {
       try {
@@ -124,13 +107,47 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
           `${provider === 'google' ? '구글' : '카카오'} 사용자 정보를 가져오는 중...`
         );
 
+        // 백엔드가 쿠키에 토큰을 설정했으므로 먼저 읽어서 LocalStorage에 저장
+        // 그 다음 /v1/users/profile/me를 호출해서 사용자 정보 조회
+        const getCookie = (name: string) => {
+          const value = `; ${document.cookie}`;
+          const parts = value.split(`; ${name}=`);
+          if (parts.length === 2) return parts.pop()?.split(';').shift();
+          return null;
+        };
+
+        console.info('🔍 [디버깅] 현재 모든 쿠키:', document.cookie);
+
+        const accessToken = getCookie('accessToken');
+        const refreshToken = getCookie('refreshToken');
+
+        console.info(
+          '🔍 [디버깅] accessToken:',
+          accessToken ? `${accessToken.substring(0, 20)}...` : 'null'
+        );
+        console.info(
+          '🔍 [디버깅] refreshToken:',
+          refreshToken ? `${refreshToken.substring(0, 20)}...` : 'null'
+        );
+
+        if (accessToken) {
+          console.info('🍪 쿠키에서 토큰 발견, LocalStorage에 저장');
+          saveTokens(accessToken, refreshToken ?? '');
+          console.info('💾 LocalStorage 저장 완료');
+        } else {
+          console.error('⚠️ 쿠키에 accessToken이 없습니다!');
+          console.error('⚠️ 백엔드의 쿠키 Domain 설정을 확인하세요.');
+        }
+
+        // 토큰으로 사용자 정보 조회
         const userInfo = await authService.getUserInfo();
         setupUser(userInfo);
       } catch (error) {
+        console.error('❌ 사용자 정보 조회 실패:', error);
         handleError(error, '로그인 처리 실패');
       }
     },
-    [provider, setupUser, handleError]
+    [provider, saveTokens, setupUser, handleError]
   );
 
   const handleAuthCode = useCallback(
@@ -174,7 +191,9 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
     if (userId && accessToken) {
       handleTokensFromQuery(accessToken, refreshToken ?? '');
     } else if (userId) {
-      handleBackendUserIdWithToken(userId);
+      // 백엔드가 쿠키에 토큰을 설정해서 리다이렉트한 경우
+      // 쿠키의 토큰을 사용해서 사용자 정보를 조회
+      handleBackendUserId(userId);
     } else if (token) {
       handleTokenReceived(token);
     } else if (code) {
@@ -190,7 +209,6 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
     searchParams,
     handleAuthCode,
     handleBackendUserId,
-    handleBackendUserIdWithToken,
     handleTokenReceived,
     handleTokensFromQuery,
     provider,
