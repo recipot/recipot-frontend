@@ -116,14 +116,29 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
           return null;
         };
 
+        console.info('🔍 [디버깅] 현재 모든 쿠키:', document.cookie);
+
         const accessToken = getCookie('accessToken');
         const refreshToken = getCookie('refreshToken');
+
+        console.info(
+          '🔍 [디버깅] accessToken:',
+          accessToken ? `${accessToken.substring(0, 20)}...` : 'null'
+        );
+        console.info(
+          '🔍 [디버깅] refreshToken:',
+          refreshToken ? `${refreshToken.substring(0, 20)}...` : 'null'
+        );
 
         if (accessToken) {
           console.info('🍪 쿠키에서 토큰 발견, LocalStorage에 저장');
           saveTokens(accessToken, refreshToken ?? '');
+          console.info('💾 LocalStorage 저장 완료');
         } else {
-          console.warn('⚠️ 쿠키에 accessToken이 없습니다.');
+          console.error('⚠️ 쿠키에 accessToken이 없습니다!');
+          console.error(
+            '⚠️ 백엔드가 쿠키를 설정하지 않았거나 쿠키 이름이 다를 수 있습니다.'
+          );
         }
 
         const userInfo = await authService.getUserInfo();
