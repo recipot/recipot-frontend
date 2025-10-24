@@ -3,7 +3,7 @@ import React from 'react';
 import CheckboxIcon from '../common/CheckboxIcon';
 
 interface ImprovementOptionsProps {
-  options: Array<{ code: string; codeName: string }> | readonly string[];
+  options: Array<{ code: string; codeName: string }>;
   onToggle: (value: string) => void;
   selectedValues: string[];
 }
@@ -15,8 +15,8 @@ export const ImprovementOptions: React.FC<ImprovementOptionsProps> = ({
 }) => (
   <>
     {options.map(option => {
-      const optionText = typeof option === 'string' ? option : option.codeName;
-      const optionValue = typeof option === 'string' ? option : option.code;
+      const optionText = option.codeName;
+      const optionValue = option.code;
 
       return (
         <div

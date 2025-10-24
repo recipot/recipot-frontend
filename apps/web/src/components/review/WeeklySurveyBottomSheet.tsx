@@ -10,19 +10,23 @@ import { Drawer, DrawerClose, DrawerContent, DrawerTitle } from '../ui/drawer';
 import { ImprovementOptions } from './ImprovementOptions';
 
 // API에서 가져온 데이터로 대체될 예정이므로 임시로 유지
+// API 응답과 동일한 객체 형태로 변경하여 일관성 유지
 const HEALTH_IMPROVEMENT_OPTIONS = [
-  '피로가 줄었다',
-  '몸이 가벼워 졌다',
-  '속이 편했다',
-  '체중 관리에 도움이 된다',
-  '기타',
+  { code: 'H02001', codeName: '피로가 줄었다' },
+  { code: 'H02002', codeName: '몸이 가벼워 졌다' },
+  { code: 'H02003', codeName: '속이 편했다' },
+  { code: 'H02004', codeName: '체중 관리에 도움이 된다' },
+  { code: 'H02005', codeName: '기타' },
 ] as const;
 
 const HEALTH_CHANGE_OPTIONS = [
-  '더 나빠졌어요',
-  '비슷해요',
-  '개선됐어요',
+  { code: 'H01001', codeName: '더 나빠졌어요' },
+  { code: 'H01002', codeName: '비슷해요' },
+  { code: 'H01003', codeName: '개선됐어요' },
 ] as const;
+
+const HEALTH_CHANGE_OPTIONS_ARRAY = [...HEALTH_CHANGE_OPTIONS];
+const HEALTH_IMPROVEMENT_OPTIONS_ARRAY = [...HEALTH_IMPROVEMENT_OPTIONS];
 
 type SurveyFormData = {
   healthChange: string;
@@ -106,8 +110,10 @@ const submitHealthSurvey = async (
 };
 
 // 유틸리티 함수들
+const IMPROVEMENT_CODE = 'H01003'; // 개선됐어요 코드
+
 const isImprovementSelected = (healthChange: string): boolean => {
-  return healthChange === '개선됐어요' || healthChange === 'H01003';
+  return healthChange === IMPROVEMENT_CODE;
 };
 
 const shouldShowImprovementSection = (healthChange: string): boolean => {
@@ -136,14 +142,14 @@ const HealthChangeOptions = ({
   options,
   selectedValue,
 }: {
-  options: Array<{ code: string; codeName: string }> | readonly string[];
+  options: Array<{ code: string; codeName: string }>;
   onSelect: (value: string) => void;
   selectedValue: string;
 }) => (
   <div className="mt-2 flex gap-2">
     {options.map(option => {
-      const optionText = typeof option === 'string' ? option : option.codeName;
-      const optionValue = typeof option === 'string' ? option : option.code;
+      const optionText = option.codeName;
+      const optionValue = option.code;
 
       return (
         <Button
@@ -351,7 +357,7 @@ export function WeeklySurveyBottomSheet() {
                     <HealthChangeOptions
                       options={
                         preparationData?.persistentIssueOption ??
-                        HEALTH_CHANGE_OPTIONS
+                        HEALTH_CHANGE_OPTIONS_ARRAY
                       }
                       onSelect={handleHealthChangeSelect}
                       selectedValue={watchedHealthChange}
@@ -367,7 +373,7 @@ export function WeeklySurveyBottomSheet() {
                       <ImprovementOptions
                         options={
                           preparationData?.effectOptions ??
-                          HEALTH_IMPROVEMENT_OPTIONS
+                          HEALTH_IMPROVEMENT_OPTIONS_ARRAY
                         }
                         onToggle={handleOptionToggle}
                         selectedValues={watchedImprovements}
