@@ -32,7 +32,29 @@ export const onboarding = {
     data: CompleteOnboardingData
   ): Promise<OnboardingCompleteResponse> => {
     try {
+      const APP_ENV = process.env.NEXT_PUBLIC_APP_ENV || 'production';
+
       console.info('🚀 통합 온보딩 데이터 전송 시작:', data);
+      console.info(`📍 현재 환경: ${APP_ENV}`);
+
+      // local 또는 development 환경에서는 API 호출 건너뛰기
+      if (APP_ENV === 'local' || APP_ENV === 'development') {
+        console.info('✅ [개발 환경] API 호출을 건너뛰고 온보딩 완료 처리');
+        return {
+          data: {
+            preferences: {
+              allergies: data.allergies,
+              mood: data.mood,
+              selectedFoods: data.selectedFoods,
+            },
+          },
+          message: '온보딩이 성공적으로 완료되었습니다. (개발 환경)',
+          success: true,
+        };
+      }
+
+      // production 환경에서만 실제 API 호출
+      console.info('📡 [프로덕션 환경] 실제 API 호출 시작');
 
       // API 이름 상수 정의
       const API_NAMES = {
