@@ -67,13 +67,10 @@ export function WeeklySurveyBottomSheet() {
 
   useEffect(() => {
     const getToken = async () => {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/auth/debug`,
-        {
-          role: 'user',
-          userId: 1,
-        }
-      );
+      const response = await axios.post(`api/v1/auth/debug`, {
+        role: 'user',
+        userId: 1,
+      });
 
       setToken(response.data.data.accessToken);
     };
@@ -117,12 +114,9 @@ export function WeeklySurveyBottomSheet() {
 
       try {
         setLoading(true);
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/health-survey/preparation`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const response = await axios.get(`api/v1/health-survey/preparation`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         setPreparationData(response.data);
       } catch (error) {
         console.error('Health survey preparation data fetch error:', error);
@@ -138,17 +132,11 @@ export function WeeklySurveyBottomSheet() {
     data: HealthSurveyRequest
   ): Promise<HealthSurveyResponse> => {
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/health-survey`,
-        {
-          body: JSON.stringify(data),
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          method: 'POST',
-        }
-      );
+      const response = await fetch(`api/v1/health-survey`, {
+        body: JSON.stringify(data),
+        headers: { Authorization: `Bearer ${token}` },
+        method: 'POST',
+      });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -260,7 +248,7 @@ export function WeeklySurveyBottomSheet() {
                     </h2>
                     <div className="mt-2 flex gap-2">
                       {(
-                        preparationData?.persistentIssueOption ||
+                        preparationData?.persistentIssueOption ??
                         HEALTH_CHANGE_OPTIONS
                       ).map(option => {
                         const optionText =
@@ -298,7 +286,7 @@ export function WeeklySurveyBottomSheet() {
                       </h2>
 
                       {(
-                        preparationData?.effectOptions ||
+                        preparationData?.effectOptions ??
                         HEALTH_IMPROVEMENT_OPTIONS
                       ).map(option => {
                         const optionText =
