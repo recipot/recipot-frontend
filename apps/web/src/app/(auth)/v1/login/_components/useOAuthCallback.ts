@@ -82,23 +82,6 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
     [saveTokens, setupUser, handleError]
   );
 
-  const handleBackendUserIdWithToken = useCallback(
-    async (userId: string) => {
-      try {
-        setStatus(
-          `${provider === 'google' ? '구글' : '카카오'} 로그인 정보를 가져오는 중...`
-        );
-
-        const tokenData = await authService.getTokenByUserId(Number(userId));
-        saveTokens(tokenData.accessToken, tokenData.refreshToken);
-        setupUser(tokenData.user);
-      } catch (error) {
-        handleError(error, '로그인 정보 조회 실패');
-      }
-    },
-    [provider, saveTokens, setupUser, handleError]
-  );
-
   const handleTokensFromQuery = useCallback(
     async (accessToken: string, refreshToken: string) => {
       try {
@@ -174,7 +157,9 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
     if (userId && accessToken) {
       handleTokensFromQuery(accessToken, refreshToken ?? '');
     } else if (userId) {
-      handleBackendUserIdWithToken(userId);
+      // 백엔드가 쿠키에 토큰을 설정해서 리다이렉트한 경우
+      // 쿠키의 토큰을 사용해서 사용자 정보를 조회
+      handleBackendUserId(userId);
     } else if (token) {
       handleTokenReceived(token);
     } else if (code) {
@@ -190,7 +175,6 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
     searchParams,
     handleAuthCode,
     handleBackendUserId,
-    handleBackendUserIdWithToken,
     handleTokenReceived,
     handleTokensFromQuery,
     provider,
