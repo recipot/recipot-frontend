@@ -119,7 +119,7 @@ export function MeasurementGuide({
   return (
     <div className={className}>
       <MeasurementGuideToggle isOpen={isOpen} onToggle={handleToggle}>
-        <div className="space-y-3">
+        <div className="space-y-3 px-4 pt-3 pb-4">
           {isLoading ? (
             <div className="flex items-center justify-center py-4">
               <div className="text-gray-500">계량 가이드를 불러오는 중...</div>

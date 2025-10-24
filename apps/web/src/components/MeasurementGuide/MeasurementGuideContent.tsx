@@ -34,8 +34,8 @@ export function MeasurementGuideContent({
               <Image
                 src={item.imageUrl}
                 alt={item.standard}
-                width={125}
-                height={125}
+                width={84}
+                height={84}
                 className="h-full w-full object-cover"
               />
             ) : (

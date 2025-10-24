@@ -17,6 +17,18 @@ export function IngredientsSidebar({
 }: IngredientsSidebarProps) {
   if (!isOpen) return null;
 
+  // 중복 재료 제거 (name 기준으로 중복 제거)
+  const allIngredients = [
+    ...recipe.data.ingredients.owned,
+    ...recipe.data.ingredients.notOwned,
+    ...recipe.data.ingredients.alternativeUnavailable,
+  ];
+
+  const uniqueIngredients = allIngredients.filter(
+    (ingredient, index, arr) =>
+      arr.findIndex(item => item.name === ingredient.name) === index
+  );
+
   return (
     <div
       className="fixed inset-0 z-50 flex justify-end bg-black/60"
@@ -53,26 +65,24 @@ export function IngredientsSidebar({
               <p className="text-14sb text-gray-900">보유</p>
             </div>
             <div className="flex flex-wrap gap-2">
-              {recipe.data.ingredients.owned.map(
-                (ingredient: RecipeIngredient) => (
-                  <div
-                    key={ingredient.id}
-                    className="w-fit rounded-md border border-green-200 bg-green-50 px-3 py-2"
-                  >
-                    <span className="text-15b mr-[5px] text-green-700">
-                      {ingredient.name}
-                    </span>
-                    <span className="text-15 text-green-600">
-                      {ingredient.amount}
-                    </span>
-                  </div>
-                )
-              )}
+              {uniqueIngredients.map((ingredient: RecipeIngredient) => (
+                <div
+                  key={ingredient.id}
+                  className="w-fit rounded-md border border-green-200 bg-green-50 px-3 py-2"
+                >
+                  <span className="text-15b mr-[5px] text-green-700">
+                    {ingredient.name}
+                  </span>
+                  <span className="text-15 text-green-600">
+                    {ingredient.amount}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
 
           {/* 미보유 재료 */}
-          <div className="mb-6">
+          {/* <div className="mb-6">
             <div className="mb-3 flex items-center justify-between">
               <p className="text-14sb text-gray-900">미보유</p>
             </div>
@@ -98,10 +108,10 @@ export function IngredientsSidebar({
                 )
               )}
             </div>
-          </div>
+          </div> */}
 
           {/* 대체불가 재료 */}
-          <div className="mb-6">
+          {/* <div className="mb-6">
             <div className="mb-3 flex items-center justify-between">
               <p className="text-14sb text-gray-900">대체불가</p>
             </div>
@@ -123,7 +133,7 @@ export function IngredientsSidebar({
                 )
               )}
             </div>
-          </div>
+          </div> */}
 
           {/* 양념류 */}
           <div className="mb-6">
