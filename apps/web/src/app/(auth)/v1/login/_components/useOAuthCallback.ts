@@ -107,10 +107,24 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
           `${provider === 'google' ? '구글' : '카카오'} 사용자 정보를 가져오는 중...`
         );
 
-        // 백엔드가 쿠키에 토큰을 설정했으므로
-        // withCredentials: true로 쿠키가 자동으로 전송됨
-        // LocalStorage 저장 불필요 - 쿠키가 더 안전함 (HttpOnly, SameSite)
-        console.info('🍪 쿠키 기반 인증 사용 - 자동으로 전송됨');
+        // 백엔드가 쿠키로 토큰을 전달하므로 먼저 읽어서 LocalStorage에 저장
+        // 이후 API 호출 시 Authorization Bearer 헤더로 사용
+        const getCookie = (name: string) => {
+          const value = `; ${document.cookie}`;
+          const parts = value.split(`; ${name}=`);
+          if (parts.length === 2) return parts.pop()?.split(';').shift();
+          return null;
+        };
+
+        const accessToken = getCookie('accessToken');
+        const refreshToken = getCookie('refreshToken');
+
+        if (accessToken) {
+          console.info('🍪 쿠키에서 토큰 발견, LocalStorage에 저장');
+          saveTokens(accessToken, refreshToken ?? '');
+        } else {
+          console.warn('⚠️ 쿠키에 accessToken이 없습니다.');
+        }
 
         const userInfo = await authService.getUserInfo();
         setupUser(userInfo);
@@ -118,7 +132,7 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
         handleError(error, '로그인 처리 실패');
       }
     },
-    [provider, setupUser, handleError]
+    [provider, saveTokens, setupUser, handleError]
   );
 
   const handleAuthCode = useCallback(
