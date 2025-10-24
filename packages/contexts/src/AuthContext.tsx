@@ -77,27 +77,56 @@ export function AuthProvider({ children }: { children: any }) {
   }, [mswReady]);
 
   const login = async () => {
-    try {
-      // 카카오 로그인 URL 생성
-      const kakaoUrl = await authService.getKakaoLoginUrl();
-      console.log('kakaoUrl', kakaoUrl);
+    const APP_ENV = process.env.NEXT_PUBLIC_APP_ENV || 'production';
 
-      // 카카오 인증 페이지로 리디렉션
+    try {
+      // development 환경: 디버그 토큰으로 로그인
+      if (APP_ENV === 'development') {
+        console.info('🔧 [development] 디버그 토큰으로 로그인 중...');
+
+        const tokenData = await authService.getDebugToken(1, 'U01001');
+
+        setToken(tokenData.accessToken);
+        setRefreshToken(tokenData.refreshToken);
+        setUser(tokenData.user);
+
+        console.info('✅ [development] 디버그 로그인 성공');
+        return;
+      }
+
+      // production 환경: 실제 카카오 OAuth 로그인
+      console.info('🔐 [production] 카카오 OAuth 로그인 시작');
+      const kakaoUrl = await authService.getKakaoLoginUrl();
       window.location.href = kakaoUrl;
     } catch (error) {
-      console.error('카카오 로그인 URL 생성 실패:', error);
+      console.error('카카오 로그인 실패:', error);
     }
   };
 
   const googleLogin = async () => {
-    try {
-      // 구글 로그인 URL 생성
-      const googleUrl = await authService.getGoogleLoginUrl();
+    const APP_ENV = process.env.NEXT_PUBLIC_APP_ENV || 'production';
 
-      // 구글 인증 페이지로 리디렉션
+    try {
+      // development 환경: 디버그 토큰으로 로그인
+      if (APP_ENV === 'development') {
+        console.info('🔧 [development] 디버그 토큰으로 로그인 중...');
+
+        const tokenData = await authService.getDebugToken(1, 'U01001');
+
+        setToken(tokenData.accessToken);
+        setRefreshToken(tokenData.refreshToken);
+        setUser(tokenData.user);
+
+        console.info('✅ [development] 디버그 로그인 성공');
+        return;
+      }
+
+      // production 환경: 실제 구글 OAuth 로그인
+      console.info('🔐 [production] 구글 OAuth 로그인 시작');
+      const googleUrl = await authService.getGoogleLoginUrl();
       window.location.href = googleUrl;
     } catch (error) {
-      console.error('구글 로그인 URL 생성 실패:', error);
+      console.error('구글 로그인 실패:', error);
     }
   };
 
