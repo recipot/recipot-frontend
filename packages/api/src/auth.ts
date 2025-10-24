@@ -5,22 +5,58 @@ import {
   TokenResponse,
 } from '../../types/src/auth.types';
 
-// 토큰 관리 유틸리티 함수들
+// 토큰 관리 유틸리티 함수들 (Zustand persist 구조 지원)
 const getStoredToken = (): string | null => {
   if (typeof window !== 'undefined') {
+    // Zustand persist에서 토큰 읽기
+    const authStorage = localStorage.getItem('auth-storage');
+    if (authStorage) {
+      try {
+        const parsed = JSON.parse(authStorage);
+        return parsed.state?.token || null;
+      } catch (error) {
+        console.error('토큰 파싱 실패:', error);
+      }
+    }
+
+    // 레거시 지원 (기존 authToken)
     return localStorage.getItem('authToken');
+  }
+  return null;
+};
+
+const getStoredRefreshToken = (): string | null => {
+  if (typeof window !== 'undefined') {
+    // Zustand persist에서 리프레시 토큰 읽기
+    const authStorage = localStorage.getItem('auth-storage');
+    if (authStorage) {
+      try {
+        const parsed = JSON.parse(authStorage);
+        return parsed.state?.refreshToken || null;
+      } catch (error) {
+        console.error('리프레시 토큰 파싱 실패:', error);
+      }
+    }
+
+    // 레거시 지원 (기존 refreshToken)
+    return localStorage.getItem('refreshToken');
   }
   return null;
 };
 
 const setStoredToken = (token: string): void => {
   if (typeof window !== 'undefined') {
+    // Zustand store를 통해 토큰 설정 (authStore에서 처리)
+    // 레거시 호환성을 위해 직접 설정도 유지
     localStorage.setItem('authToken', token);
   }
 };
 
 const removeStoredToken = (): void => {
   if (typeof window !== 'undefined') {
+    // Zustand persist 저장소 제거
+    localStorage.removeItem('auth-storage');
+    // 레거시 토큰도 제거
     localStorage.removeItem('authToken');
     localStorage.removeItem('refreshToken');
   }
@@ -119,7 +155,7 @@ const createAuthApiInstance = (): AxiosInstance => {
 
         // 토큰이 전혀 없는 경우 refresh 시도하지 않음
         const accessToken = getStoredToken();
-        const refreshToken = localStorage.getItem('refreshToken');
+        const refreshToken = getStoredRefreshToken();
 
         if (!accessToken && !refreshToken) {
           console.warn('⚠️ 토큰이 없습니다. 로그인 페이지로 이동합니다.');
@@ -401,15 +437,32 @@ export const authService = {
     try {
       console.info('🔧 [개발모드] 디버그 토큰 발급 중...', { userId, role });
 
-      const response = await authApi.post('/v1/auth/debug', {
-        userId,
-        role,
-      });
+      const response = await authApi.post(
+        '/v1/auth/debug',
+        {
+          userId,
+          role,
+        },
+        {
+          withCredentials: false, // 디버그 토큰 발급은 인증 불필요
+        }
+      );
 
       if (response.data.status === 200 && response.data.data) {
         const data = response.data.data;
 
-        // 토큰 저장
+        // 토큰을 Zustand 형식으로 저장 (auth-storage)
+        const authStorage = {
+          state: {
+            token: data.accessToken,
+            refreshToken: data.refreshToken,
+            user: null, // 사용자 정보는 아직 조회 전
+          },
+          version: 0,
+        };
+        localStorage.setItem('auth-storage', JSON.stringify(authStorage));
+
+        // 레거시 호환성 유지
         setStoredToken(data.accessToken);
         if (data.refreshToken) {
           localStorage.setItem('refreshToken', data.refreshToken);
@@ -417,6 +470,10 @@ export const authService = {
 
         // 사용자 정보 조회
         const userInfo = await this.getUserInfo();
+
+        // 사용자 정보를 포함하여 다시 저장
+        authStorage.state.user = userInfo;
+        localStorage.setItem('auth-storage', JSON.stringify(authStorage));
 
         console.info('✅ [개발모드] 디버그 토큰 발급 성공');
 
