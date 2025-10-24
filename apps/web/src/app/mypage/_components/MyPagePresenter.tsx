@@ -4,11 +4,7 @@ import { useState } from 'react';
 
 import { PageHeader } from '@/app/mypage/_components/PageHeader';
 import { useOnboardingStore } from '@/stores/onboardingStore';
-import type {
-  CookedRecipe,
-  DietaryRestriction,
-  User,
-} from '@/types/MyPage.types';
+import type { DietaryRestriction, User } from '@/types/MyPage.types';
 
 import DietaryRestrictions from './DietaryRestrictions';
 import DietaryRestrictionsSheet from './DietaryRestrictionsSheet';
@@ -17,10 +13,12 @@ import MyRecipesLink from './MyRecipesLink';
 import QuickLinks from './QuickLinks';
 import UserProfile from './UserProfile';
 
+import type { CompletedRecipe } from '@recipot/api';
+
 interface MyPagePresenterProps {
   user: User | null;
   restrictions: DietaryRestriction[];
-  cookedRecipes: CookedRecipe[];
+  cookedRecipes: CompletedRecipe[];
 }
 
 export function MyPagePresenter({

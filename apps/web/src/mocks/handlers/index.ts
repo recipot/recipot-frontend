@@ -3,6 +3,7 @@ import { allergyCheckHandlers } from './allergyCheck.handlers';
 import { foodHandlers } from './food.handlers';
 import { moodHandlers } from './mood.handlers';
 import { recipeRecommendHandlers } from './recipeRecommend.handlers';
+import { mypageHandlers } from './mypage.handlers';
 // 추후 다른 도메인 핸들러들을 추가할 예정
 // import { ingredientHandlers } from './ingredient.handlers';
 // import { recipeHandlers } from './recipe.handlers';
@@ -14,6 +15,7 @@ export const handlers = [
   ...foodHandlers, // 재료 관련 핸들러 추가
   ...moodHandlers, // 기분 상태 관련 핸들러 추가
   ...recipeRecommendHandlers, // 레시피 추천 핸들러 추가
+  ...mypageHandlers,
   // ...ingredientHandlers,    // B 담당자가 완성 후 추가
   // ...recipeHandlers,        // C 담당자가 완성 후 추가
   // ...profileHandlers,       // D 담당자가 완성 후 추가
@@ -25,6 +27,7 @@ export { allergyCheckHandlers };
 export { foodHandlers };
 export { moodHandlers };
 export { recipeRecommendHandlers };
+export { mypageHandlers };
 // export { ingredientHandlers };
 // export { recipeHandlers };
 // export { profileHandlers };
@@ -35,6 +38,7 @@ export const handlerCounts = {
   allergyCheck: allergyCheckHandlers.length,
   food: foodHandlers.length,
   mood: moodHandlers.length,
+  mypage: mypageHandlers.length,
   // ingredient: ingredientHandlers.length,
   // recipe: recipeHandlers.length,
   // profile: profileHandlers.length,
@@ -44,7 +48,14 @@ export const handlerCounts = {
 // MSW 상태 확인용 헬퍼
 export const getMswStatus = () => {
   return {
-    domains: ['auth', 'allergyCheck', 'food', 'mood', 'recipeRecommend'], // 완성된 도메인들
+    domains: [
+      'auth',
+      'allergyCheck',
+      'food',
+      'mood',
+      'recipeRecommend',
+      'mypage',
+    ], // 완성된 도메인들
     handlersCount: handlers.length,
     isEnabled: process.env.NODE_ENV === 'development',
     // domains: ['auth', 'allergyCheck', 'food', 'mood', 'ingredient', 'recipe', 'profile'], // 모든 도메인 완성 후

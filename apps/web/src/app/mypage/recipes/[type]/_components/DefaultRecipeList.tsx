@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/common/Button';
 import { useScrollGradient } from '@/hooks/useScrollGradient';
@@ -10,8 +11,11 @@ export default function DefaultRecipeList({
   config,
   onToggleSave,
   recipes,
+  type,
 }: DefaultRecipeListProps) {
   const { scrollRef, showGradient } = useScrollGradient([recipes]);
+  const router = useRouter();
+  const isSavedRecipeList = type === 'saved';
 
   if (recipes.length === 0) {
     return (
@@ -47,8 +51,7 @@ export default function DefaultRecipeList({
               variant="outline"
               className="text-17sb bg-white px-6 py-3 text-gray-900"
               onClick={() => {
-                // TODO: 레시피 추천 페이지로 이동하는 로직
-                console.info('레시피 추천 받으러 가기');
+                router.push('/recipeRecommend');
               }}
             >
               레시피 추천 받으러 가기
@@ -69,7 +72,11 @@ export default function DefaultRecipeList({
         <ul className="flex flex-col gap-[0.875rem] pb-3">
           {recipes.map(recipe => (
             <li key={recipe.id}>
-              <RecipeCard recipe={recipe} onToggleSave={onToggleSave} />
+              <RecipeCard
+                recipe={recipe}
+                onToggleSave={onToggleSave}
+                isSavedRecipe={isSavedRecipeList}
+              />
             </li>
           ))}
         </ul>
