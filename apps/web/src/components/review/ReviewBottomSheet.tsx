@@ -103,7 +103,7 @@ export function ReviewBottomSheet({ isOpen, onClose }: ReviewBottomSheetProps) {
     };
 
     getCondition();
-  }, [token, conditionId]); // token이 변경될 때만 실행
+  }, [token]); // token이 변경될 때만 실행
 
   // v1/reviews/preparation API 호출
   useEffect(() => {
