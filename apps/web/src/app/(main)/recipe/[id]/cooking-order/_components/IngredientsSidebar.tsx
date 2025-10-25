@@ -49,19 +49,21 @@ export function IngredientsSidebar({
               <p className="text-14sb text-gray-900">보유</p>
             </div>
             <div className="flex flex-wrap gap-2">
-              {recipe.ingredients.owned.map((ingredient: RecipeIngredient) => (
-                <div
-                  key={ingredient.id}
-                  className="w-fit rounded-md border border-green-200 bg-green-50 px-3 py-2"
-                >
-                  <span className="text-15b mr-[5px] text-green-700">
-                    {ingredient.name}
-                  </span>
-                  <span className="text-15 text-green-600">
-                    {ingredient.amount}
-                  </span>
-                </div>
-              ))}
+              {recipe.ingredients?.owned?.map(
+                (ingredient: RecipeIngredient) => (
+                  <div
+                    key={ingredient.id}
+                    className="w-fit rounded-md border border-green-200 bg-green-50 px-3 py-2"
+                  >
+                    <span className="text-15b mr-[5px] text-green-700">
+                      {ingredient.name}
+                    </span>
+                    <span className="text-15 text-green-600">
+                      {ingredient.amount}
+                    </span>
+                  </div>
+                )
+              )}
             </div>
           </div>
 
@@ -71,7 +73,7 @@ export function IngredientsSidebar({
               <p className="text-14sb text-gray-900">미보유</p>
             </div>
             <div className="flex flex-wrap gap-2">
-              {recipe.ingredients.notOwned.map(
+              {recipe.ingredients?.notOwned?.map(
                 (ingredient: RecipeIngredient) => (
                   <div
                     key={ingredient.id}
@@ -96,11 +98,11 @@ export function IngredientsSidebar({
 
           {/* 대체불가 재료 */}
           <div className="mb-6">
-            <div className="mb-3 flex items-center justify-between">
+            <div className="justify -between mb-3 flex items-center">
               <p className="text-14sb text-gray-900">대체불가</p>
             </div>
             <div className="flex flex-wrap gap-2">
-              {recipe.ingredients.alternativeUnavailable.map(
+              {recipe.ingredients?.alternativeUnavailable?.map(
                 (ingredient: RecipeIngredient) => (
                   <div
                     key={ingredient.id}

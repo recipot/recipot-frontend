@@ -1,31 +1,12 @@
 import React from 'react';
 
-import { CookwareIcon, HeartIcon } from '@/components/Icons';
-import RecipeWareIcon from '@/components/Icons/RecipeWareIcon';
-
 interface ToastProps {
   message: string;
   isVisible: boolean;
-  icon?: 'heart' | 'recipe';
 }
 
-export const Toast: React.FC<ToastProps> = ({
-  icon = 'recipe',
-  isVisible,
-  message,
-}) => {
+export const Toast = ({ isVisible, message }: ToastProps) => {
   if (!isVisible) return null;
-
-  const renderIcon = () => {
-    switch (icon) {
-      case 'heart':
-        return <HeartIcon className="h-4 w-4" active color="#FFB8D2" />;
-      case 'recipe':
-        return <RecipeWareIcon className="h-4 w-4" color="#FFFFFF" />;
-      default:
-        return <CookwareIcon className="h-4 w-4" color="#FFB8D2" />;
-    }
-  };
 
   // 메시지에 따른 너비 설정
   const getToastWidth = () => {
@@ -43,9 +24,6 @@ export const Toast: React.FC<ToastProps> = ({
         className={`h-11 ${getToastWidth()} rounded-xl bg-black/60 px-6 py-3`}
       >
         <div className="flex items-center justify-center">
-          <div className="mr-2 flex h-4 w-4 items-center justify-center">
-            {renderIcon()}
-          </div>
           <p className="text-14sb text-center whitespace-nowrap text-white">
             {message}
           </p>
