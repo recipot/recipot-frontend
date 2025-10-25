@@ -165,7 +165,7 @@ export function RecipeDetailHeader({ recipe }: RecipeHeaderProps) {
               <span className="text-gray-500">이미지 없음</span>
             </div>
           )}
-          <div className="recipe-detail-image absolute inset-0" />
+
           <div className="absolute top-4 right-4 left-4 flex space-x-2">
             <div className="flex items-center space-x-1 rounded-full px-3 py-1.5">
               <CardTimeIcon size={24} color="#ffffff" />
