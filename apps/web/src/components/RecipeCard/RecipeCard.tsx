@@ -28,13 +28,13 @@ export const RecipeCard = memo(
       onToggleLike(index, recipe.id);
     }, [onToggleLike, index, recipe.id]);
 
-    // const handleCardClick = useCallback(() => {
-    //   // 레시피 상세 URL로 이동 (외부 링크 또는 API 엔드포인트)
-    //   window.open(`/recipe/${recipe.id}`, '_blank');
-    // }, [recipe.id]);
+    const handleCardClick = useCallback(() => {
+      // 레시피 상세 URL로 이동 (외부 링크 또는 API 엔드포인트)
+      window.open(`/recipe/${recipe.id}`, '_blank');
+    }, [recipe.id]);
 
     return (
-      <div style={CARD_STYLES.container}>
+      <div style={CARD_STYLES.container} onClick={handleCardClick}>
         <div
           className="relative z-10 flex flex-col overflow-hidden rounded-[32px] bg-white"
           style={CARD_STYLES.card}
