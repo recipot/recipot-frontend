@@ -13,6 +13,7 @@ export const allergy = {
    */
   fetchRestrictedIngredients: async () => {
     const response = await allergyApi.get('/v1/ingredients/restricted');
+    // 백엔드 응답 구조: { data: { data: { data: [...] } } }
     return response.data.data.data;
   },
 
