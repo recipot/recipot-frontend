@@ -21,7 +21,7 @@ export interface Recipe {
     name: string;
   }[];
   isBookmarked: boolean;
-  ingredients: RecipeIngredients;
+  ingredients?: RecipeIngredients;
   steps?: {
     orderNum: number;
     summary: string;
@@ -36,9 +36,9 @@ export interface RecipeIngredient {
 }
 
 export interface RecipeIngredients {
-  owned: RecipeIngredient[];
-  notOwned: RecipeIngredient[];
-  alternativeUnavailable: RecipeIngredient[];
+  owned?: RecipeIngredient[];
+  notOwned?: RecipeIngredient[];
+  alternativeUnavailable?: RecipeIngredient[];
 }
 
 export interface RecipeRecommendResponse {

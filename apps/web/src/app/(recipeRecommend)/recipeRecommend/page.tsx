@@ -46,7 +46,9 @@ export default function RecipeRecommend() {
   const [showTutorial, setShowTutorial] = useState(false);
 
   // API 응답을 Recipe 타입으로 변환하는 함수
-  const mapRecommendationToRecipe = (item: RecommendationItem): Recipe => {
+  const mapRecommendationToRecipe = (
+    item: RecommendationItem
+  ): Omit<Recipe, 'ingredients'> => {
     return {
       description: item.description,
       duration: parseInt(item.duration),
@@ -55,11 +57,6 @@ export default function RecipeRecommend() {
         id: index + 1,
         imageUrl: url,
       })),
-      ingredients: {
-        alternativeUnavailable: [],
-        notOwned: [],
-        owned: [],
-      },
       isBookmarked: item.isBookmarked,
       title: item.title,
       tools: item.tools.map((toolName, index) => ({
