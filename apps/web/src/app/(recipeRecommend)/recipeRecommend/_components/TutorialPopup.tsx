@@ -11,7 +11,7 @@ interface TutorialPopupProps {
 
 export default function TutorialPopup({ onClose }: TutorialPopupProps) {
   return (
-    <div className="">
+    <>
       {/* 배경 딤 (dim) - opacity: 0.8 */}
       <div className="dim-80" />
 
@@ -42,6 +42,6 @@ export default function TutorialPopup({ onClose }: TutorialPopupProps) {
           </Button>
         </div>
       </div>
-    </div>
+    </>
   );
 }
