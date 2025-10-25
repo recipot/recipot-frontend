@@ -1,5 +1,4 @@
 'use client';
-import '../styles.css';
 
 import React, { useMemo, useState } from 'react';
 import axios from 'axios';
