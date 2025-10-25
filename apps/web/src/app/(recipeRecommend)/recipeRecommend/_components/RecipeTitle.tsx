@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { moodToConditionId } from '@/app/onboarding/_utils';
+import type { MoodType } from '@/components/EmotionState';
 import type { Condition } from '@/types/recipe.types';
 
 interface RecipeTitleProps {
@@ -7,17 +9,18 @@ interface RecipeTitleProps {
 }
 
 const RecipeTitle = ({ condition }: RecipeTitleProps) => {
+  const mood = moodToConditionId(condition?.name as MoodType);
   const getTitleByCondition = (condition: Condition | null | undefined) => {
     if (!condition) {
       return '요리할 여유가 그저 그래요'; // 기본값
     }
 
-    switch (condition.name) {
-      case '힘들어':
+    switch (mood) {
+      case 1:
         return '요리할 여유가 거의...없어요';
-      case '충분해':
+      case 2:
         return '요리할 여유가 충분해요!';
-      case '그럭저럭':
+      case 3:
         return '요리할 여유가 그저 그래요';
       default:
         return '요리할 여유가 그저 그래요';
@@ -30,13 +33,15 @@ const RecipeTitle = ({ condition }: RecipeTitleProps) => {
       return '\u{1F611}';
     }
 
-    switch (condition.name) {
-      case '힘들어':
+    switch (mood) {
+      case 1:
         return '\u{1F623}';
-      case '그럭저럭':
+      case 2:
         return '\u{1F611}';
-      case '충분해':
+      case 3:
         return '\u{1F60A}';
+      default:
+        return '\u{1F611}';
     }
   };
 
@@ -46,7 +51,9 @@ const RecipeTitle = ({ condition }: RecipeTitleProps) => {
   return (
     <div className="flex w-full items-center justify-center self-stretch">
       <h2 className="text-22 mr-[2px]">{title}</h2>
-      <div className="text-24 flex h-6 w-6 items-center">{emoji}</div>
+      <div className="text-24 flex h-6 w-6 items-center justify-center">
+        <span className="text-2xl">{emoji}</span>
+      </div>
     </div>
   );
 };
