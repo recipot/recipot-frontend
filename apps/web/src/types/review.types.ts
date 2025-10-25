@@ -1,20 +1,28 @@
 import type { StaticImageData } from 'next/image';
 
+export interface ReviewOption {
+  code: string;
+  codeName: string;
+}
+
 export interface ReviewFormData {
   completedRecipeId: number;
-  tasteOptions: {
-    code: string;
-    codeName: string;
-  }[];
-  difficultyOptions: {
-    code: string;
-    codeName: string;
-  }[];
-  experienceOptions: {
-    code: string;
-    codeName: string;
-  }[];
+  tasteOption: ReviewOption | null;
+  difficultyOption: ReviewOption | null;
+  experienceOption: ReviewOption | null;
   content: string;
+}
+
+export interface ReviewSubmitData {
+  completedRecipeId: number;
+  tasteOptions: ReviewOption[];
+  difficultyOptions: ReviewOption[];
+  experienceOptions: ReviewOption[];
+  content: string;
+  completionCount: number;
+  completionMessage: string;
+  recipeImageUrl?: string;
+  recipeName: string;
 }
 
 export interface ReviewBottomSheetProps {
@@ -27,17 +35,8 @@ export interface ReviewData {
   recipeName: string;
   recipeImageUrl?: string | StaticImageData | undefined;
   completionCount: number;
-  tasteOptions: {
-    code: string;
-    codeName: string;
-  }[];
-  difficultyOptions: {
-    code: string;
-    codeName: string;
-  }[];
-  experienceOptions: {
-    code: string;
-    codeName: string;
-  }[];
+  tasteOptions: ReviewOption[];
+  difficultyOptions: ReviewOption[];
+  experienceOptions: ReviewOption[];
   completionMessage: string;
 }

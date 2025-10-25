@@ -3,10 +3,12 @@
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
-import { debugAuth } from '@recipot/api';
 import axios from 'axios';
 import Image from 'next/image';
+import { tokenUtils } from 'packages/api/src/auth';
 
+import { moodToConditionId } from '@/app/onboarding/_utils';
+import { useCookStateStepData } from '@/stores';
 // import Image from 'next/image';
 import type {
   ReviewBottomSheetProps,
@@ -40,35 +42,20 @@ const UI_TEXT_MAPPING: Record<string, string> = {
 };
 
 export function ReviewBottomSheet({ isOpen, onClose }: ReviewBottomSheetProps) {
-  const [token, setToken] = useState<string | null>(null);
-  const [conditionId, setConditionId] = useState(0);
+  const [conditionId, setConditionId] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-  const [tokenError, setTokenError] = useState<string | null>(null);
   const [reviewData, setReviewData] = useState<ReviewData | null>(null);
 
-  // 토큰 생성 - 에러 처리 개선
+  const cookStateData = useCookStateStepData();
+
   useEffect(() => {
-    const getToken = async () => {
-      try {
-        setIsLoading(true);
-        setTokenError(null);
+    if (cookStateData) {
+      const conditionId = moodToConditionId(cookStateData.mood);
+      setConditionId(conditionId);
+    }
+  }, [cookStateData]);
 
-        const tokenResponse = await debugAuth.generateDebugToken({
-          role: 'user',
-          userId: 1,
-        });
-
-        setToken(tokenResponse.accessToken);
-      } catch (error: unknown) {
-        if (error instanceof Error) {
-          setTokenError(error.message);
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    getToken();
-  }, []);
+  const token = tokenUtils.getToken();
 
   // v1/conditions API 호출하여 conditionId 가져오기
   useEffect(() => {
@@ -92,7 +79,6 @@ export function ReviewBottomSheet({ isOpen, onClose }: ReviewBottomSheetProps) {
             },
           }
         );
-        console.info(conditions, 'conditions');
 
         setConditionId(conditions[0]?.id ?? 0);
       } catch (error) {
@@ -135,16 +121,16 @@ export function ReviewBottomSheet({ isOpen, onClose }: ReviewBottomSheetProps) {
     defaultValues: {
       completedRecipeId: conditionId,
       content: '',
-      difficultyOptions: [],
-      experienceOptions: [],
-      tasteOptions: [],
+      difficultyOption: null,
+      experienceOption: null,
+      tasteOption: null,
     },
     mode: 'onChange',
   });
 
-  const watchedTasteOptions = watch('tasteOptions');
-  const watchedDifficultyOptions = watch('difficultyOptions');
-  const watchedExperienceOptions = watch('experienceOptions');
+  const watchedTasteOption = watch('tasteOption');
+  const watchedDifficultyOption = watch('difficultyOption');
+  const watchedExperienceOption = watch('experienceOption');
   const watchedContent = watch('content');
 
   // conditionId가 변경될 때 폼의 completedRecipeId도 업데이트
@@ -156,89 +142,55 @@ export function ReviewBottomSheet({ isOpen, onClose }: ReviewBottomSheetProps) {
 
   // 폼 유효성 검사
   const isFormValid =
-    watchedTasteOptions.length > 0 &&
-    watchedDifficultyOptions.length > 0 &&
-    watchedExperienceOptions.length > 0 &&
+    watchedTasteOption !== null &&
+    watchedDifficultyOption !== null &&
+    watchedExperienceOption !== null &&
     watchedContent?.trim();
 
-  const handleEmotionSelect = (type: string, value: string) => {
+  const handleEmotionSelect = (
+    type: 'taste' | 'difficulty' | 'experience',
+    value: string
+  ) => {
     if (!reviewData) return;
 
-    // 선택된 옵션을 찾아서 배열에 추가/제거
-    if (type === 'taste') {
-      const selectedOption = reviewData.tasteOptions.find(
-        option => option.code === value
-      );
-      if (selectedOption) {
-        const currentOptions = watchedTasteOptions;
-        const isSelected = currentOptions.some(option => option.code === value);
+    const fieldMap = {
+      difficulty: 'difficultyOption',
+      experience: 'experienceOption',
+      taste: 'tasteOption',
+    } as const;
 
-        if (isSelected) {
-          // 이미 선택된 경우 제거
-          setValue(
-            'tasteOptions',
-            currentOptions.filter(option => option.code !== value)
-          );
-        } else {
-          // 선택되지 않은 경우 추가
-          setValue('tasteOptions', [...currentOptions, selectedOption]);
-        }
-      }
-    } else if (type === 'difficulty') {
-      const selectedOption = reviewData.difficultyOptions.find(
-        option => option.code === value
-      );
-      if (selectedOption) {
-        const currentOptions = watchedDifficultyOptions;
-        const isSelected = currentOptions.some(option => option.code === value);
+    const optionsMap = {
+      difficulty: reviewData.difficultyOptions,
+      experience: reviewData.experienceOptions,
+      taste: reviewData.tasteOptions,
+    } as const;
 
-        if (isSelected) {
-          setValue(
-            'difficultyOptions',
-            currentOptions.filter(option => option.code !== value)
-          );
-        } else {
-          setValue('difficultyOptions', [...currentOptions, selectedOption]);
-        }
-      }
-    } else if (type === 'experience') {
-      const selectedOption = reviewData.experienceOptions.find(
-        option => option.code === value
-      );
-      if (selectedOption) {
-        const currentOptions = watchedExperienceOptions;
-        const isSelected = currentOptions.some(option => option.code === value);
+    const field = fieldMap[type];
+    const options = optionsMap[type];
+    const selectedOption = options.find(option => option.code === value);
 
-        if (isSelected) {
-          setValue(
-            'experienceOptions',
-            currentOptions.filter(option => option.code !== value)
-          );
-        } else {
-          setValue('experienceOptions', [...currentOptions, selectedOption]);
-        }
-      }
+    if (selectedOption) {
+      const currentValue = watch(field);
+      // 토글: 같은 값 클릭 시 선택 해제, 다른 값 클릭 시 교체
+      setValue(field, currentValue?.code === value ? null : selectedOption);
     }
   };
 
   const onFormSubmit = async (data: ReviewFormData) => {
     if (!reviewData) return;
 
-    const { content, difficultyOptions, experienceOptions, tasteOptions } =
-      data;
+    const { content, difficultyOption, experienceOption, tasteOption } = data;
 
     const submitData = {
-      data: {
-        completedRecipeId: conditionId,
-        completionCount: reviewData.completionCount,
-        completionMessage: reviewData.completionMessage,
-        content,
-        difficultyOptions,
-        experienceOptions,
-        recipeImageUrl: reviewData.recipeImageUrl,
-        recipeName: reviewData.recipeName,
-        tasteOptions,
-      },
+      completedRecipeId: conditionId,
+      completionCount: reviewData.completionCount,
+      completionMessage: reviewData.completionMessage,
+      content,
+      difficultyOptions: difficultyOption ? [difficultyOption] : [],
+      experienceOptions: experienceOption ? [experienceOption] : [],
+      recipeImageUrl: reviewData.recipeImageUrl,
+      recipeName: reviewData.recipeName,
+      tasteOptions: tasteOption ? [tasteOption] : [],
     };
 
     try {
@@ -293,12 +245,6 @@ export function ReviewBottomSheet({ isOpen, onClose }: ReviewBottomSheetProps) {
                 </div>
               )}
 
-              {tokenError && (
-                <div className="rounded-lg bg-red-50 p-3">
-                  <div className="text-sm text-red-600">{tokenError}</div>
-                </div>
-              )}
-
               {/* 레시피 정보 */}
               <div className="flex items-center gap-4">
                 <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gray-100">
@@ -328,41 +274,37 @@ export function ReviewBottomSheet({ isOpen, onClose }: ReviewBottomSheetProps) {
               {/* 감정 선택 섹션 */}
               {reviewData && (
                 <div>
-                  <EmotionSection
-                    title="요리의 맛은 어땠나요?"
-                    options={reviewData.tasteOptions}
-                    selectedValue={
-                      watchedTasteOptions.length > 0
-                        ? watchedTasteOptions[0].code
-                        : null
-                    }
-                    onSelect={value => handleEmotionSelect('taste', value)}
-                    uiTextMapping={UI_TEXT_MAPPING}
-                  />
-
-                  <EmotionSection
-                    title="요리를 시작하기가 어땠나요?"
-                    options={reviewData.difficultyOptions}
-                    selectedValue={
-                      watchedDifficultyOptions.length > 0
-                        ? watchedDifficultyOptions[0].code
-                        : null
-                    }
-                    onSelect={value => handleEmotionSelect('difficulty', value)}
-                    uiTextMapping={UI_TEXT_MAPPING}
-                  />
-
-                  <EmotionSection
-                    title="직접 요리해보니 어땠나요?"
-                    options={reviewData.experienceOptions}
-                    selectedValue={
-                      watchedExperienceOptions.length > 0
-                        ? watchedExperienceOptions[0].code
-                        : null
-                    }
-                    onSelect={value => handleEmotionSelect('experience', value)}
-                    uiTextMapping={UI_TEXT_MAPPING}
-                  />
+                  {[
+                    {
+                      options: reviewData.tasteOptions,
+                      title: '요리의 맛은 어땠나요?',
+                      type: 'taste' as const,
+                      value: watchedTasteOption,
+                    },
+                    {
+                      options: reviewData.difficultyOptions,
+                      title: '요리를 시작하기가 어땠나요?',
+                      type: 'difficulty' as const,
+                      value: watchedDifficultyOption,
+                    },
+                    {
+                      options: reviewData.experienceOptions,
+                      title: '직접 요리해보니 어땠나요?',
+                      type: 'experience' as const,
+                      value: watchedExperienceOption,
+                    },
+                  ].map(section => (
+                    <EmotionSection
+                      key={section.type}
+                      title={section.title}
+                      options={section.options}
+                      selectedValue={section.value?.code ?? null}
+                      onSelect={value =>
+                        handleEmotionSelect(section.type, value)
+                      }
+                      uiTextMapping={UI_TEXT_MAPPING}
+                    />
+                  ))}
                 </div>
               )}
 
