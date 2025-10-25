@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import axios from 'axios';
+import { tokenUtils } from 'packages/api/src/auth';
 
 import { useCookingOrder } from '@/hooks/useCookingOrder';
 
@@ -21,8 +23,9 @@ interface CookingOrderPresenterProps {
 export default function CookingOrderPresenter({
   recipeId,
 }: CookingOrderPresenterProps) {
-  const { completeCooking, completeStep, error, isLoading, recipe } =
-    useCookingOrder(recipeId);
+  const { completeStep, error, isLoading, recipe } = useCookingOrder(recipeId);
+
+  const token = tokenUtils.getToken();
 
   // 모달 상태 통합 관리
   const [activeModal, setActiveModal] = useState<ModalType>(null);
@@ -40,8 +43,19 @@ export default function CookingOrderPresenter({
   const closeModal = () => setActiveModal(null);
 
   const handleCookingComplete = async () => {
+    // await completeCooking();
+    await axios.post(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/users/recipes/${recipeId}/complete`,
+      {
+        recipeId,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     completeStep(currentStep);
-    await completeCooking();
   };
 
   const handleBack = () => {

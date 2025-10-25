@@ -14,16 +14,16 @@ export default function CookingOrderContent({
   currentStep,
   recipe,
 }: CookingOrderContentProps) {
-  const currentStepData = recipe.data.steps[currentStep - 1];
+  const currentStepData = recipe?.steps[currentStep - 1];
 
   return (
     <div className="px-4 py-6">
       {/* 이미지 */}
       <div className="mb-4 aspect-video overflow-hidden rounded-lg bg-gray-100">
-        {recipe.data?.images?.[currentStep - 1]?.imageUrl ? (
+        {recipe?.images?.[currentStep - 1]?.imageUrl ? (
           <Image
-            src={recipe.data?.images[currentStep - 1].imageUrl}
-            alt={recipe.data?.title}
+            src={recipe?.images?.[currentStep - 1]?.imageUrl}
+            alt={recipe?.title}
             width={400}
             height={225}
             className="h-full w-full object-cover"
@@ -37,49 +37,53 @@ export default function CookingOrderContent({
 
       {/* 설명 */}
 
-      <p className="text-16 text-[#000]">{currentStepData.summary}</p>
+      <p className="text-16 text-[#000]">{currentStepData?.summary}</p>
 
       {/* 단계 진행률 */}
-      <div className="mb-6">
+      <div className="mt-[147px] mb-6">
         {/* 원형 인디케이터 */}
-        <div className="mb-2 flex w-[390px] items-center justify-center px-6">
-          {recipe.data.steps.map((_, index: number) => (
-            <div key={index} className="mt-[147px] flex flex-row items-center">
-              <div
-                className={`flex h-4 w-4 items-center justify-center rounded-full border-2 ${
-                  index < currentStep - 1
-                    ? 'border-primary'
-                    : index === currentStep - 1
+        {/* 진행 상태 인디케이터와 순서 라벨 */}
+        <div className="mb-2 flex w-[390px] flex-col items-center px-6">
+          {/* 원형 인디케이터 */}
+          <div className="flex flex-row items-center">
+            {recipe?.steps?.map((_, index: number) => (
+              <div key={index} className="flex flex-row items-center">
+                <div
+                  className={`flex h-4 w-4 items-center justify-center rounded-full border-2 ${
+                    index < currentStep - 1
                       ? 'border-primary'
-                      : 'border-gray-300'
-                }`}
-              >
-                {index < currentStep - 1 && (
-                  <div className="bg-primary h-2 w-2 rounded-full" />
-                )}
-                {index === currentStep - 1 && (
-                  <div className="bg-primary h-2 w-2 rounded-full" />
+                      : index === currentStep - 1
+                        ? 'border-primary'
+                        : 'border-gray-300'
+                  }`}
+                >
+                  {index < currentStep - 1 && (
+                    <div className="bg-primary h-2 w-2 rounded-full" />
+                  )}
+                  {index === currentStep - 1 && (
+                    <div className="bg-primary h-2 w-2 rounded-full" />
+                  )}
+                </div>
+                {index < recipe?.steps?.length - 1 && (
+                  <div className="mr-[2px] ml-[2px] h-0.5 w-12 bg-gray-300" />
                 )}
               </div>
-              {index < recipe.data.steps.length - 1 && (
-                <div className="mr-[2px] ml-[2px] h-0.5 w-12 bg-gray-300" />
-              )}
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
 
-        {/* 순서 라벨 */}
-        <div className="flex justify-center">
-          {recipe.data.steps.map((step, index: number) => (
-            <div
-              key={index}
-              className={`flex h-5 w-16 items-start justify-center ${
-                index < currentStep ? 'text-gray-900' : 'text-gray-500'
-              }`}
-            >
-              <p className="text-14sb"> step {index + 1}</p>
-            </div>
-          ))}
+          {/* 순서 라벨 */}
+          <div className="flex flex-row">
+            {recipe?.steps?.map((step, index: number) => (
+              <div
+                key={index}
+                className={`flex h-5 w-16 items-start justify-center ${
+                  index < currentStep ? 'text-gray-900' : 'text-gray-500'
+                }`}
+              >
+                <p className="text-14sb"> step {step.orderNum}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

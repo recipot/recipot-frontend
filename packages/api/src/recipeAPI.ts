@@ -241,44 +241,6 @@ export const recipe = {
   },
 
   /**
-   * 요리 시작 API
-   * @param recipeId - 레시피 ID
-   * @returns 요리 시작 결과
-   */
-  startCooking: async (recipeId: string): Promise<void> => {
-    // 임시 토큰 발급
-    const tokenData = await debugAuth.generateDebugToken({
-      role: 'user',
-      userId: 1,
-    });
-
-    // 토큰을 사용하여 API 호출
-    const tokenizedApi = createTokenizedApiInstance(tokenData.accessToken);
-    await tokenizedApi.post(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/users/recipes/${recipeId}/start`
-    );
-  },
-
-  /**
-   * 요리 완료 API
-   * @param recipeId - 레시피 ID
-   * @returns 요리 완료 결과
-   */
-  completeCooking: async (recipeId: string): Promise<void> => {
-    // 임시 토큰 발급
-    const tokenData = await debugAuth.generateDebugToken({
-      role: 'user',
-      userId: 1,
-    });
-
-    // 토큰을 사용하여 API 호출
-    const tokenizedApi = createTokenizedApiInstance(tokenData.accessToken);
-    await tokenizedApi.post(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/users/recipes/${recipeId}/complete`
-    );
-  },
-
-  /**
    * 계량 가이드 조회 API
    * @returns 계량 가이드 데이터
    */

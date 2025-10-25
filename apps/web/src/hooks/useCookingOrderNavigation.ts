@@ -6,7 +6,7 @@ export function useCookingOrderNavigation(recipe: Recipe | null) {
   const [currentStep, setCurrentStep] = useState(1);
 
   // recipe와 steps가 존재하는지 안전하게 확인
-  const stepsLength = recipe?.data?.steps?.length ?? 0;
+  const stepsLength = recipe?.steps?.length ?? 0;
 
   const handleNextStep = () => {
     if (recipe && stepsLength > 0 && currentStep < stepsLength) {
