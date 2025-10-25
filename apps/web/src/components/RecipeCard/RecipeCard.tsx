@@ -1,4 +1,4 @@
-import React, { memo, useCallback } from 'react';
+import { memo, useCallback } from 'react';
 
 import type { Recipe } from '@/types/recipe.types';
 
