@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import { authService } from '@recipot/api';
 import { useAuth } from '@recipot/contexts';
+import { getCookie } from '@recipot/utils';
 import { useRouter, useSearchParams } from 'next/navigation';
+
 import type { UserInfo } from '@recipot/types';
 
 export type OAuthProvider = 'google' | 'kakao';
@@ -14,19 +16,13 @@ const getProviderName = (provider: OAuthProvider): string => {
   return provider === 'google' ? '구글' : '카카오';
 };
 
-const getCookie = (name: string): string | null => {
-  if (typeof document === 'undefined') return null;
-
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  return parts.length === 2 ? parts.pop()?.split(';').shift() ?? null : null;
-};
-
 export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { setRefreshToken, setToken, setUser } = useAuth();
-  const [status, setStatus] = useState(`${getProviderName(provider)} 로그인 처리 중...`);
+  const [status, setStatus] = useState(
+    `${getProviderName(provider)} 로그인 처리 중...`
+  );
 
   const saveTokens = useCallback(
     (accessToken: string, refreshToken: string) => {
@@ -48,7 +44,9 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
   const handleError = useCallback(
     (error: unknown) => {
       console.error(`[${provider}] OAuth error:`, error);
-      setStatus(`${getProviderName(provider)} 로그인 처리 중 오류가 발생했습니다.`);
+      setStatus(
+        `${getProviderName(provider)} 로그인 처리 중 오류가 발생했습니다.`
+      );
       setTimeout(() => router.push('/'), 2000);
     },
     [provider, router]
@@ -88,27 +86,24 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
     [provider, saveTokens, navigateAfterLogin, handleError]
   );
 
-  const handleTokenFromCookie = useCallback(
-    async () => {
-      try {
-        setStatus(`${getProviderName(provider)} 사용자 정보를 가져오는 중...`);
+  const handleTokenFromCookie = useCallback(async () => {
+    try {
+      setStatus(`${getProviderName(provider)} 사용자 정보를 가져오는 중...`);
 
-        const accessToken = getCookie('accessToken');
-        const refreshToken = getCookie('refreshToken');
+      const accessToken = getCookie('accessToken');
+      const refreshToken = getCookie('refreshToken');
 
-        if (!accessToken) {
-          throw new Error('No access token in cookie');
-        }
-
-        saveTokens(accessToken, refreshToken ?? '');
-        const userInfo = await authService.getUserInfo();
-        navigateAfterLogin(userInfo);
-      } catch (error) {
-        handleError(error);
+      if (!accessToken) {
+        throw new Error('No access token in cookie');
       }
-    },
-    [provider, saveTokens, navigateAfterLogin, handleError]
-  );
+
+      saveTokens(accessToken, refreshToken ?? '');
+      const userInfo = await authService.getUserInfo();
+      navigateAfterLogin(userInfo);
+    } catch (error) {
+      handleError(error);
+    }
+  }, [provider, saveTokens, navigateAfterLogin, handleError]);
 
   const handleTokenVerification = useCallback(
     async (token: string) => {

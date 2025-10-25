@@ -33,7 +33,7 @@ export const onboarding = {
     const errors: string[] = [];
 
     if (!Array.isArray(data.allergies)) {
-      errors.push('Invalid allergy data');
+      errors.push('알레르기 데이터는 배열이어야 합니다');
     }
 
     if (!data.mood || !['bad', 'neutral', 'good'].includes(data.mood)) {

@@ -157,6 +157,12 @@ importers:
       '@recipot/contexts':
         specifier: workspace:*
         version: link:../../packages/contexts
+      '@recipot/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@recipot/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
       '@tanstack/react-query':
         specifier: ^5.59.16
         version: 5.90.4(react@18.3.1)
@@ -304,12 +310,6 @@ importers:
         specifier: ^5
         version: 5.9.3
 
-  packages/constants:
-    devDependencies:
-      typescript:
-        specifier: ^5
-        version: 5.9.3
-
   packages/contexts:
     dependencies:
       react:
@@ -326,19 +326,6 @@ importers:
         specifier: ^5
         version: 5.9.3
 
-  packages/hooks:
-    dependencies:
-      react:
-        specifier: ^18.3.1
-        version: 18.3.1
-    devDependencies:
-      '@types/react':
-        specifier: ^18
-        version: 18.3.26
-      typescript:
-        specifier: ^5
-        version: 5.9.3
-
   packages/types:
     devDependencies:
       typescript:
@@ -347,12 +334,9 @@ importers:
 
   packages/utils:
     devDependencies:
-      typescript:
-        specifier: ^5
-        version: 5.9.3
-
-  packages/validators:
-    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.21
       typescript:
         specifier: ^5
         version: 5.9.3

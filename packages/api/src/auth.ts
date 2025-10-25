@@ -36,8 +36,12 @@ const storage = {
   saveTokens(token: string, refreshToken: string): void {
     if (typeof window === 'undefined') return;
 
+    // 기존 storage에서 user 정보를 유지
+    const existingStorage = this.getAuthStorage();
+    const existingUser = existingStorage?.state?.user ?? null;
+
     const authStorage: AuthStorage = {
-      state: { token, refreshToken, user: null },
+      state: { token, refreshToken, user: existingUser },
       version: STORAGE_VERSION,
     };
     localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authStorage));
@@ -51,7 +55,10 @@ const storage = {
 };
 
 const redirectToSignIn = (): void => {
-  if (typeof window !== 'undefined' && !window.location.pathname.includes('/signin')) {
+  if (
+    typeof window !== 'undefined' &&
+    !window.location.pathname.includes('/signin')
+  ) {
     window.location.href = '/signin';
   }
 };
@@ -109,10 +116,18 @@ const createAuthApiInstance = (): AxiosInstance => {
       error.config._retry = true;
 
       try {
-        const response = await instance.post('/v1/auth/refresh', { refreshToken });
+        const response = await instance.post('/v1/auth/refresh', {
+          refreshToken,
+        });
 
         if (response.data?.status === 200 && response.data?.data?.accessToken) {
           const newToken = response.data.data.accessToken;
+          const newRefreshToken =
+            response.data.data.refreshToken ?? refreshToken;
+
+          // 새 토큰을 storage에 저장하여 zustand store와 동기화
+          storage.saveTokens(newToken, newRefreshToken);
+
           error.config.headers.Authorization = `Bearer ${newToken}`;
           return instance.request(error.config);
         }
@@ -174,11 +189,15 @@ export const authService = {
   },
 
   async getTokenFromGoogleCallback(code: string): Promise<AuthTokens> {
-    const response = await authApi.get(`/v1/login/google/callback?code=${code}`);
+    const response = await authApi.get(
+      `/v1/login/google/callback?code=${code}`
+    );
     return response.data.data;
   },
 
-  async verifyToken(token?: string): Promise<{ success: boolean; data: UserInfo; message: string }> {
+  async verifyToken(
+    token?: string
+  ): Promise<{ success: boolean; data: UserInfo; message: string }> {
     if (token) {
       storage.saveTokens(token, '');
     }
@@ -194,7 +213,9 @@ export const authService = {
   },
 
   async refreshToken(refreshToken: string): Promise<TokenResponse> {
-    const response = await authApi.post<TokenResponse>('/v1/auth/refresh', { refreshToken });
+    const response = await authApi.post<TokenResponse>('/v1/auth/refresh', {
+      refreshToken,
+    });
     return response.data;
   },
 
@@ -203,12 +224,17 @@ export const authService = {
     return response.data.status === 200 ? response.data.data : response.data;
   },
 
-  async updateProfile(updates: Partial<Pick<UserInfo, 'nickname' | 'isFirstEntry'>>): Promise<UserInfo> {
+  async updateProfile(
+    updates: Partial<Pick<UserInfo, 'nickname' | 'isFirstEntry'>>
+  ): Promise<UserInfo> {
     const response = await authApi.patch('/v1/users/profile', updates);
     return response.data.status === 200 ? response.data.data : response.data;
   },
 
-  async getDebugToken(userId: number, role: string = 'U01001'): Promise<AuthTokens> {
+  async getDebugToken(
+    userId: number,
+    role: string = 'U01001'
+  ): Promise<AuthTokens> {
     const response = await authApi.post(
       '/v1/auth/debug',
       { userId, role },

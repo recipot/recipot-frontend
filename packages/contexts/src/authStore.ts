@@ -20,116 +20,111 @@ interface AuthState {
   initializeAuth: () => Promise<void>;
 }
 
-const isProduction = () => process.env.NEXT_PUBLIC_APP_ENV !== 'development';
+const isProduction = () =>
+  process.env.NEXT_PUBLIC_APP_ENV !== 'development' &&
+  process.env.NEXT_PUBLIC_APP_ENV !== 'local';
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set, get) => ({
-      user: null,
-      token: null,
-      refreshToken: null,
-      loading: true,
+    (set, get) => {
+      // 디버그 모드에서 사용하는 공유 헬퍼 함수
+      const handleDebugLogin = async (): Promise<void> => {
+        const tokenData = await authService.getDebugToken(1, 'U01001');
+        set({
+          token: tokenData.accessToken,
+          refreshToken: tokenData.refreshToken,
+          user: tokenData.user,
+        });
+      };
 
-      setUser: (user: UserInfo | null) => set({ user }),
-      setToken: (token: string | null) => set({ token }),
-      setRefreshToken: (refreshToken: string | null) => set({ refreshToken }),
-      setLoading: (loading: boolean) => set({ loading }),
+      return {
+        user: null,
+        token: null,
+        refreshToken: null,
+        loading: true,
 
-      verifyAndRefreshToken: async () => {
-        const { token, refreshToken } = get();
+        setUser: (user: UserInfo | null) => set({ user }),
+        setToken: (token: string | null) => set({ token }),
+        setRefreshToken: (refreshToken: string | null) => set({ refreshToken }),
+        setLoading: (loading: boolean) => set({ loading }),
 
-        if (!token) return false;
+        verifyAndRefreshToken: async () => {
+          const { token } = get();
 
-        try {
-          await authService.verifyToken(token);
-          return true;
-        } catch {
-          if (!refreshToken) {
+          if (!token) {
             get().logout();
             return false;
           }
 
           try {
-            const newTokenData = await authService.refreshToken(refreshToken);
-            set({
-              token: newTokenData.accessToken,
-              refreshToken: newTokenData.refreshToken ?? refreshToken,
-            });
+            // 토큰 검증 API 호출 - 만료 시 axios 인터셉터가 자동으로 재발급 처리
+            await authService.verifyToken(token);
             return true;
-          } catch {
+          } catch (error) {
+            // axios 인터셉터에서 재발급을 시도했지만 실패한 경우 (예: refreshToken도 만료)
             get().logout();
             return false;
           }
-        }
-      },
+        },
 
-      initializeAuth: async () => {
-        set({ loading: true });
+        initializeAuth: async () => {
+          set({ loading: true });
 
-        const { token, user } = get();
+          const { token, user } = get();
 
-        if (!token) {
-          set({ loading: false });
-          return;
-        }
-
-        if (user) {
-          set({ loading: false });
-          return;
-        }
-
-        try {
-          const userInfo = await authService.getUserInfo();
-          set({ user: userInfo });
-        } catch (error) {
-          console.error('Failed to fetch user info:', error);
-        }
-
-        set({ loading: false });
-      },
-
-      login: async () => {
-        try {
-          if (!isProduction()) {
-            const tokenData = await authService.getDebugToken(1, 'U01001');
-            set({
-              token: tokenData.accessToken,
-              refreshToken: tokenData.refreshToken,
-              user: tokenData.user,
-            });
+          if (!token) {
+            set({ loading: false });
             return;
           }
 
-          const kakaoUrl = await authService.getKakaoLoginUrl();
-          window.location.href = kakaoUrl;
-        } catch (error) {
-          console.error('Login failed:', error);
-        }
-      },
-
-      googleLogin: async () => {
-        try {
-          if (!isProduction()) {
-            const tokenData = await authService.getDebugToken(1, 'U01001');
-            set({
-              token: tokenData.accessToken,
-              refreshToken: tokenData.refreshToken,
-              user: tokenData.user,
-            });
+          if (user) {
+            set({ loading: false });
             return;
           }
 
-          const googleUrl = await authService.getGoogleLoginUrl();
-          window.location.href = googleUrl;
-        } catch (error) {
-          console.error('Google login failed:', error);
-        }
-      },
+          try {
+            const userInfo = await authService.getUserInfo();
+            set({ user: userInfo });
+          } catch (error) {
+            console.error('Failed to fetch user info:', error);
+          }
 
-      logout: () => {
-        set({ user: null, token: null, refreshToken: null });
-      },
-    }),
+          set({ loading: false });
+        },
+
+        login: async () => {
+          try {
+            if (!isProduction()) {
+              await handleDebugLogin();
+              return;
+            }
+
+            const kakaoUrl = await authService.getKakaoLoginUrl();
+            window.location.href = kakaoUrl;
+          } catch (error) {
+            console.error('Login failed:', error);
+          }
+        },
+
+        googleLogin: async () => {
+          try {
+            if (!isProduction()) {
+              await handleDebugLogin();
+              return;
+            }
+
+            const googleUrl = await authService.getGoogleLoginUrl();
+            window.location.href = googleUrl;
+          } catch (error) {
+            console.error('Google login failed:', error);
+          }
+        },
+
+        logout: () => {
+          set({ user: null, token: null, refreshToken: null });
+        },
+      };
+    },
     {
       name: 'auth-storage',
       partialize: state => ({
