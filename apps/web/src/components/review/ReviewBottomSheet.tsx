@@ -3,9 +3,9 @@
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+import { tokenUtils } from '@recipot/api';
 import axios from 'axios';
 import Image from 'next/image';
-import { tokenUtils } from 'packages/api/src/auth';
 
 import { moodToConditionId } from '@/app/onboarding/_utils';
 import { useCookStateStepData } from '@/stores';

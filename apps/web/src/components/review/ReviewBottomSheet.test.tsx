@@ -8,12 +8,12 @@ import { ReviewBottomSheet } from '.';
 // axios 모킹
 vi.mock('axios');
 
-// debugAuth 모킹
+// @recipot/api 모킹
 vi.mock('@recipot/api', () => ({
-  debugAuth: {
-    generateDebugToken: vi.fn().mockResolvedValue({
-      accessToken: 'mock-token',
-    }),
+  tokenUtils: {
+    getToken: vi.fn().mockReturnValue('mock-token'),
+    removeToken: vi.fn(),
+    setToken: vi.fn(),
   },
 }));
 

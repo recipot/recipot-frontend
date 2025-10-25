@@ -1,5 +1,5 @@
 // Auth API
-export { authService } from './auth';
+export { authService, tokenUtils } from './auth';
 
 // Allergy API
 export { allergy } from './allergy';
