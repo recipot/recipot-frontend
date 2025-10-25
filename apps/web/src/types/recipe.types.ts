@@ -1,7 +1,7 @@
 export interface Recipe {
   description: string;
   duration: number;
-  healthPoints: {
+  healthPoints?: {
     content: string;
   }[];
   images: {
@@ -12,17 +12,17 @@ export interface Recipe {
   title: string;
   tools: {
     id: number;
-    imageUrl: string;
+    imageUrl?: string;
     name: string;
   }[];
-  seasonings: {
+  seasonings?: {
     amount: string;
     id: number;
     name: string;
   }[];
   isBookmarked: boolean;
   ingredients: RecipeIngredients;
-  steps: {
+  steps?: {
     orderNum: number;
     summary: string;
   }[];

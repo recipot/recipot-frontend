@@ -43,8 +43,6 @@ export default function RecipeRecommend() {
 
   const token = tokenUtils.getToken();
 
-  // 토스트 상태 관리
-  const [toastIcon, setToastIcon] = useState<'heart' | 'recipe'>('recipe');
   const [showTutorial, setShowTutorial] = useState(false);
 
   // API 응답을 Recipe 타입으로 변환하는 함수
@@ -52,7 +50,6 @@ export default function RecipeRecommend() {
     return {
       description: item.description,
       duration: parseInt(item.duration),
-      healthPoints: [], // API에서 제공되지 않음
       id: item.recipeId,
       images: item.imageUrls.map((url, index) => ({
         id: index + 1,
@@ -64,12 +61,9 @@ export default function RecipeRecommend() {
         owned: [],
       },
       isBookmarked: item.isBookmarked,
-      seasonings: [], // API에서 제공되지 않음
-      steps: [], // API에서 제공되지 않음
       title: item.title,
       tools: item.tools.map((toolName, index) => ({
         id: index + 1,
-        imageUrl: '', // API에서 이미지 URL이 제공되지 않음
         name: toolName,
       })),
     };
@@ -84,8 +78,6 @@ export default function RecipeRecommend() {
           `api/v1/recipes/recommendations`,
           {
             conditionId,
-            page: 1,
-            pageSize: 3,
             pantryIds: selectedFoodIds,
           },
           {
@@ -94,7 +86,7 @@ export default function RecipeRecommend() {
             },
           }
         );
-
+        console.log(res, 'res');
         // API 응답을 Recipe 타입으로 변환
         const mappedRecipes = res.data.data.items.map(
           mapRecommendationToRecipe
@@ -159,18 +151,15 @@ export default function RecipeRecommend() {
           newSet.delete(recipeId);
           return newSet;
         });
-        setToastIcon('heart');
-        showToast('북마크에서 제거했어요');
       } else {
         // POST 요청
         await axios.post(bookmarkURL, { recipeId }, config);
         setLikedRecipes(prev => new Set(prev).add(recipeId));
-        setToastIcon('heart');
-        showToast('레시피를 북마크에 추가했어요');
+
+        showToast('레시피가 저장되었어요!');
       }
     } catch (error: unknown) {
       console.error('북마크 토글 실패:', error);
-      setToastIcon('heart');
       showToast(
         isCurrentlyLiked
           ? '북마크 제거에 실패했어요'
@@ -189,8 +178,6 @@ export default function RecipeRecommend() {
         `api/v1/recipes/recommendations`,
         {
           conditionId,
-          page: 1,
-          pageSize: 3,
           pantryIds: selectedFoodIds,
         },
         {
@@ -201,6 +188,7 @@ export default function RecipeRecommend() {
       );
 
       const mappedRecipes = res.data.data.items.map(mapRecommendationToRecipe);
+
       setRecipes(mappedRecipes);
 
       const bookmarkedIds = new Set(
@@ -213,7 +201,6 @@ export default function RecipeRecommend() {
       console.error('레시피 추천 조회 실패:', error);
     }
 
-    setToastIcon('recipe');
     showToast('새로운 레시피가 추천되었어요');
   };
 
@@ -286,7 +273,7 @@ export default function RecipeRecommend() {
       {/* 튜토리얼 팝업 */}
       {showTutorial && <TutorialPopup onClose={handleCloseTutorial} />}
 
-      <Toast message={message} isVisible={isVisible} icon={toastIcon} />
+      <Toast message={message} isVisible={isVisible} />
     </>
   );
 }
