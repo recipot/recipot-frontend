@@ -4,7 +4,7 @@ import 'swiper/css';
 import 'swiper/css/effect-cards';
 import './styles.css';
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
 import { tokenUtils } from 'packages/api/src/auth';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -69,43 +69,48 @@ export default function RecipeRecommend() {
     };
   };
 
-  useEffect(() => {
-    const fetchRecommendRecipes = async () => {
-      try {
-        const conditionId = moodToConditionId(userSelectedMood);
+  // 레시피 추천 API 호출 공통 함수
+  const fetchRecommendRecipes = useCallback(async () => {
+    try {
+      const conditionId = moodToConditionId(userSelectedMood);
 
-        const res = await axios.post<RecommendationResponse>(
-          `api/v1/recipes/recommendations`,
-          {
-            conditionId,
-            pantryIds: selectedFoodIds,
+      const {
+        data: {
+          data: { items },
+        },
+      } = await axios.post<RecommendationResponse>(
+        `api/v1/recipes/recommendations`,
+        {
+          conditionId,
+          pantryIds: selectedFoodIds,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
           },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        console.log(res, 'res');
-        // API 응답을 Recipe 타입으로 변환
-        const mappedRecipes = res.data.data.items.map(
-          mapRecommendationToRecipe
-        );
-        setRecipes(mappedRecipes);
+        }
+      );
 
-        // 초기 북마크 상태 설정
-        const bookmarkedIds = new Set(
-          mappedRecipes
-            .filter(recipe => recipe.isBookmarked)
-            .map(recipe => recipe.id)
-        );
-        setLikedRecipes(bookmarkedIds);
-      } catch (error) {
-        console.error('레시피 추천 조회 실패:', error);
-      }
-    };
-    fetchRecommendRecipes();
+      // API 응답을 Recipe 타입으로 변환
+      const mappedRecipes = items.map(mapRecommendationToRecipe);
+      setRecipes(mappedRecipes);
+
+      // 초기 북마크 상태 설정
+      const bookmarkedRecipe = mappedRecipes.filter(
+        recipe => recipe.isBookmarked
+      );
+
+      const bookmarkedIds = new Set(bookmarkedRecipe.map(recipe => recipe.id));
+
+      setLikedRecipes(bookmarkedIds);
+    } catch (error) {
+      console.error('레시피 추천 조회 실패:', error);
+    }
   }, [userSelectedMood, selectedFoodIds, token]);
+
+  useEffect(() => {
+    fetchRecommendRecipes();
+  }, [fetchRecommendRecipes]);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -171,36 +176,7 @@ export default function RecipeRecommend() {
   };
 
   const handleRefresh = async () => {
-    try {
-      const conditionId = moodToConditionId(userSelectedMood);
-
-      const res = await axios.post<RecommendationResponse>(
-        `api/v1/recipes/recommendations`,
-        {
-          conditionId,
-          pantryIds: selectedFoodIds,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      const mappedRecipes = res.data.data.items.map(mapRecommendationToRecipe);
-
-      setRecipes(mappedRecipes);
-
-      const bookmarkedIds = new Set(
-        mappedRecipes
-          .filter(recipe => recipe.isBookmarked)
-          .map(recipe => recipe.id)
-      );
-      setLikedRecipes(bookmarkedIds);
-    } catch (error) {
-      console.error('레시피 추천 조회 실패:', error);
-    }
-
+    await fetchRecommendRecipes();
     showToast('새로운 레시피가 추천되었어요');
   };
 
