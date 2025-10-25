@@ -25,8 +25,8 @@ export const RecipeCard = memo(
     recipe,
   }: RecipeCardProps) => {
     const handleToggleLike = useCallback(() => {
-      onToggleLike(index, recipe.data.id);
-    }, [onToggleLike, index, recipe.data.id]);
+      onToggleLike(index, recipe.id);
+    }, [onToggleLike, index, recipe.id]);
 
     return (
       <div style={CARD_STYLES.container}>
@@ -70,10 +70,10 @@ export const RecipeCard = memo(
   (prevProps, nextProps) => {
     // 커스텀 비교 함수로 불필요한 리렌더링 방지
     return (
-      prevProps.recipe.data.id === nextProps.recipe.data.id &&
-      prevProps.recipe.data.title === nextProps.recipe.data.title &&
-      prevProps.recipe.data.images[0].imageUrl ===
-        nextProps.recipe.data.images[0].imageUrl &&
+      prevProps.recipe.id === nextProps.recipe.id &&
+      prevProps.recipe.title === nextProps.recipe.title &&
+      prevProps.recipe.images[0].imageUrl ===
+        nextProps.recipe.images[0].imageUrl &&
       prevProps.isLiked === nextProps.isLiked &&
       prevProps.isMainCard === nextProps.isMainCard &&
       prevProps.index === nextProps.index
