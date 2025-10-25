@@ -5,83 +5,89 @@ import 'swiper/css/effect-cards';
 import './styles.css';
 
 import React, { useEffect, useState } from 'react';
-import { debugAuth } from '@recipot/api';
 import axios from 'axios';
-import { Swiper } from 'swiper/react';
+import { tokenUtils } from 'packages/api/src/auth';
+import { Swiper, SwiperSlide } from 'swiper/react';
 
+import { moodToConditionId } from '@/app/onboarding/_utils/conditionMapper';
 import { Header } from '@/components/common/Header';
 import { Toast } from '@/components/common/Toast';
+import { RecipeCard } from '@/components/RecipeCard';
 import { useToast } from '@/hooks/useToast';
 import { useCookStateStepData } from '@/stores/onboardingStore';
-import type { Condition, ConditionsResponse } from '@/types/recipe.types';
+import { useSelectedFoodsStore } from '@/stores/selectedFoodsStore';
+import type {
+  Recipe,
+  RecommendationItem,
+  RecommendationResponse,
+} from '@/types/recipe.types';
 
 import RecipeHeader from './_components/RecipeHeader';
+import RecipeTags from './_components/RecipeTags';
 import RecipeTitle from './_components/RecipeTitle';
+import TutorialPopup from './_components/TutorialPopup';
 import { SWIPER_CONFIG, SWIPER_MODULES, swiperStyles } from '../constants';
 
 export default function RecipeRecommend() {
-  const [token, setToken] = useState<string | null>(null);
-  // const [likedRecipes, setLikedRecipes] = useState<Set<number>>(new Set());
-  // const [isLoading, setIsLoading] = useState(false);
-  // const [activeIndex, setActiveIndex] = useState(0);
-  const [currentCondition, setCurrentCondition] = useState<Condition | null>(
-    null
-  );
+  const [likedRecipes, setLikedRecipes] = useState<Set<number>>(new Set());
+  const [isLoading, setIsLoading] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
   const { isVisible, message, showToast } = useToast();
 
   // 온보딩에서 저장된 사용자의 기분 상태 가져오기
   const cookStateData = useCookStateStepData();
+  const selectedFoodIds = useSelectedFoodsStore(state => state.selectedFoodIds);
+
   const userSelectedMood = cookStateData?.mood ?? 'neutral';
 
-  // const token = tokenUtils.getToken();
+  const token = tokenUtils.getToken();
 
   // 토스트 상태 관리
   const [toastIcon, setToastIcon] = useState<'heart' | 'recipe'>('recipe');
+  const [showTutorial, setShowTutorial] = useState(false);
 
-  // 사용자 기분 상태에 따른 조건 매핑
-  const getConditionByMood = (
-    mood: string | undefined,
-    conditions: Condition[]
-  ): Condition | null => {
-    if (!mood || conditions.length === 0) return null;
-
-    // 기분 상태에 따른 조건 매핑
-    const moodToConditionMap: Record<string, string> = {
-      bad: '힘들어',
-      good: '충분해',
-      neutral: '그럭저럭',
+  // API 응답을 Recipe 타입으로 변환하는 함수
+  const mapRecommendationToRecipe = (item: RecommendationItem): Recipe => {
+    return {
+      description: item.description,
+      duration: parseInt(item.duration),
+      healthPoints: [], // API에서 제공되지 않음
+      id: item.recipeId,
+      images: item.imageUrls.map((url, index) => ({
+        id: index + 1,
+        imageUrl: url,
+      })),
+      ingredients: {
+        alternativeUnavailable: [],
+        notOwned: [],
+        owned: [],
+      },
+      isBookmarked: item.isBookmarked,
+      seasonings: [], // API에서 제공되지 않음
+      steps: [], // API에서 제공되지 않음
+      title: item.title,
+      tools: item.tools.map((toolName, index) => ({
+        id: index + 1,
+        imageUrl: '', // API에서 이미지 URL이 제공되지 않음
+        name: toolName,
+      })),
     };
-
-    const targetConditionName = moodToConditionMap[mood];
-    if (!targetConditionName) return null;
-
-    // 조건 목록에서 해당하는 조건 찾기
-    return (
-      conditions.find(condition => condition.name === targetConditionName) ??
-      null
-    );
   };
 
   useEffect(() => {
-    const getToken = async () => {
+    const fetchRecommendRecipes = async () => {
       try {
-        const res = await debugAuth.generateDebugToken({
-          role: 'user',
-          userId: 1,
-        });
-        setToken(res.accessToken);
-      } catch (error) {
-        console.error('초기 토큰 생성 실패:', error);
-      }
-    };
-    getToken();
-  }, []);
+        const conditionId = moodToConditionId(userSelectedMood);
 
-  useEffect(() => {
-    const getCondition = async () => {
-      try {
-        const { data } = await axios.get<ConditionsResponse>(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/conditions`,
+        const res = await axios.post<RecommendationResponse>(
+          `api/v1/recipes/recommendations`,
+          {
+            conditionId,
+            page: 1,
+            pageSize: 3,
+            pantryIds: selectedFoodIds,
+          },
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -89,85 +95,145 @@ export default function RecipeRecommend() {
           }
         );
 
-        // 사용자가 선택한 기분 상태에 따라 조건 설정
-        const userCondition = getConditionByMood(
-          userSelectedMood,
-          data.data.conditions
+        // API 응답을 Recipe 타입으로 변환
+        const mappedRecipes = res.data.data.items.map(
+          mapRecommendationToRecipe
         );
+        setRecipes(mappedRecipes);
 
-        setCurrentCondition(userCondition);
+        // 초기 북마크 상태 설정
+        const bookmarkedIds = new Set(
+          mappedRecipes
+            .filter(recipe => recipe.isBookmarked)
+            .map(recipe => recipe.id)
+        );
+        setLikedRecipes(bookmarkedIds);
       } catch (error) {
-        console.error('조건 조회 실패:', error);
+        console.error('레시피 추천 조회 실패:', error);
       }
     };
-    getCondition();
-  }, [token, userSelectedMood]);
+    fetchRecommendRecipes();
+  }, [userSelectedMood, selectedFoodIds, token]);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await axios.get(`api/v1/users/profile/me`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const userInfo = res.data.data;
+
+        // 첫 진입 시 튜토리얼 표시
+        if (userInfo.isFirstEntry) {
+          setShowTutorial(true);
+        }
+      } catch (error) {
+        console.error('프로필 조회 실패:', error);
+      }
+    };
+    fetchProfile();
+  }, [token]);
 
   // 하트 아이콘 클릭 시 북마크 토글 함수
-  // const handleToggleBookmark = async (recipeId: number) => {
-  //   if (isLoading) return;
+  const handleToggleBookmark = async (index: number, recipeId: number) => {
+    if (isLoading) return;
 
-  //   setIsLoading(true);
-  //   const bookmarkURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/users/recipes/bookmarks`;
-  //   const config = {
-  //     headers: {
-  //       Authorization: `Bearer ${token}`,
-  //     },
-  //   };
+    setIsLoading(true);
+    const bookmarkURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/users/recipes/bookmarks`;
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
 
-  //   const isCurrentlyLiked = likedRecipes.has(recipeId);
+    const isCurrentlyLiked = likedRecipes.has(recipeId);
 
-  //   try {
-  //     if (isCurrentlyLiked) {
-  //       // DELETE 요청
-  //       await axios.delete(`${bookmarkURL}/${recipeId}`, config);
-  //       setLikedRecipes(prev => {
-  //         const newSet = new Set(prev);
-  //         newSet.delete(recipeId);
-  //         return newSet;
-  //       });
-  //       setToastIcon('heart');
-  //       showToast('북마크에서 제거했어요');
-  //     } else {
-  //       // POST 요청
-  //       await axios.post(bookmarkURL, { recipeId }, config);
-  //       setLikedRecipes(prev => new Set(prev).add(recipeId));
-  //       setToastIcon('heart');
-  //       showToast('레시피를 북마크에 추가했어요');
-  //     }
-  //   } catch (error: unknown) {
-  //     console.error('북마크 토글 실패:', error);
-  //     setToastIcon('heart');
-  //     showToast(
-  //       isCurrentlyLiked
-  //         ? '북마크 제거에 실패했어요'
-  //         : '북마크 추가에 실패했어요'
-  //     );
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
+    try {
+      if (isCurrentlyLiked) {
+        // DELETE 요청
+        await axios.delete(`${bookmarkURL}/${recipeId}`, config);
+        setLikedRecipes(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(recipeId);
+          return newSet;
+        });
+        setToastIcon('heart');
+        showToast('북마크에서 제거했어요');
+      } else {
+        // POST 요청
+        await axios.post(bookmarkURL, { recipeId }, config);
+        setLikedRecipes(prev => new Set(prev).add(recipeId));
+        setToastIcon('heart');
+        showToast('레시피를 북마크에 추가했어요');
+      }
+    } catch (error: unknown) {
+      console.error('북마크 토글 실패:', error);
+      setToastIcon('heart');
+      showToast(
+        isCurrentlyLiked
+          ? '북마크 제거에 실패했어요'
+          : '북마크 추가에 실패했어요'
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  const handleRefresh = () => {
-    // refetch();
+  const handleRefresh = async () => {
+    try {
+      const conditionId = moodToConditionId(userSelectedMood);
+
+      const res = await axios.post<RecommendationResponse>(
+        `api/v1/recipes/recommendations`,
+        {
+          conditionId,
+          page: 1,
+          pageSize: 3,
+          pantryIds: selectedFoodIds,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const mappedRecipes = res.data.data.items.map(mapRecommendationToRecipe);
+      setRecipes(mappedRecipes);
+
+      const bookmarkedIds = new Set(
+        mappedRecipes
+          .filter(recipe => recipe.isBookmarked)
+          .map(recipe => recipe.id)
+      );
+      setLikedRecipes(bookmarkedIds);
+    } catch (error) {
+      console.error('레시피 추천 조회 실패:', error);
+    }
+
     setToastIcon('recipe');
     showToast('새로운 레시피가 추천되었어요');
   };
 
+  const handleCloseTutorial = () => {
+    setShowTutorial(false);
+  };
+
   // 이미지 사전 로딩
-  // useEffect(() => {
-  //   if (data?.recipes?.length && data.recipes.length > 0) {
-  //     // 현재 카드와 다음 2개 카드의 이미지를 미리 로딩
-  //     const preloadImages = data.recipes.slice(activeIndex, activeIndex + 3);
-  //     preloadImages.forEach(recipe => {
-  //       const img = new Image();
-  //       img.src = recipe.images[0].imageUrl;
-  //     });
-  //   }
-  // }, [activeIndex, data?.recipes]);
+  useEffect(() => {
+    if (recipes?.length && recipes.length > 0) {
+      // 현재 카드와 다음 2개 카드의 이미지를 미리 로딩
+      const preloadImages = recipes.slice(activeIndex, activeIndex + 3);
+      preloadImages.forEach(recipe => {
+        const img = new Image();
+        img.src = recipe.images[0].imageUrl;
+      });
+    }
+  }, [activeIndex, recipes]);
 
   return (
-    // TODO : 추후 감정 상태에 따라 그래디언트 적용 필요
     <>
       <RecipeHeader onRefresh={handleRefresh} />
       <Header.Spacer />
@@ -176,10 +242,10 @@ export default function RecipeRecommend() {
         <div className="px-6 pt-5 pb-6">
           <div className="recipe-header-group mb-5">
             {/* Tags - 고정 높이 */}
-            {/* <RecipeTags selectedIngredients={selectedIngredients} /> */}
+            <RecipeTags />
 
             {/* Title - 고정 높이 */}
-            <RecipeTitle condition={currentCondition} />
+            <RecipeTitle condition={null} />
           </div>
 
           <div className="flex h-full w-full flex-col items-center">
@@ -190,9 +256,9 @@ export default function RecipeRecommend() {
                 {...SWIPER_CONFIG}
                 className="recipe-swiper h-full w-full"
                 style={swiperStyles}
-                // onSlideChange={swiper => setActiveIndex(swiper.activeIndex)}
+                onSlideChange={swiper => setActiveIndex(swiper.activeIndex)}
               >
-                {/* {data?.recipes?.map((recipe, index) => (
+                {recipes?.map((recipe, index) => (
                   <SwiperSlide
                     key={recipe.id}
                     className="flex items-center justify-center"
@@ -200,12 +266,12 @@ export default function RecipeRecommend() {
                     <RecipeCard
                       recipe={recipe}
                       index={index}
-                      onToggleLike={() => handleToggleBookmark(recipe.id)}
+                      onToggleLike={handleToggleBookmark}
                       isLiked={likedRecipes.has(recipe.id)}
                       isMainCard={index === activeIndex}
                     />
                   </SwiperSlide>
-                ))} */}
+                ))}
               </Swiper>
             </div>
 
@@ -216,6 +282,10 @@ export default function RecipeRecommend() {
 
         {/* 전역 토스트 */}
       </div>
+
+      {/* 튜토리얼 팝업 */}
+      {showTutorial && <TutorialPopup onClose={handleCloseTutorial} />}
+
       <Toast message={message} isVisible={isVisible} icon={toastIcon} />
     </>
   );

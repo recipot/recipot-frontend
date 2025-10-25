@@ -63,3 +63,24 @@ export interface ConditionsResponse {
     conditions: Condition[];
   };
 }
+
+export interface RecommendationItem {
+  recipeId: number;
+  title: string;
+  description: string;
+  imageUrls: string[];
+  duration: string;
+  tools: string[];
+  isBookmarked: boolean;
+}
+
+export interface RecommendationResponse {
+  data: {
+    items: RecommendationItem[];
+    currentPage: number;
+    pageSize: number;
+    totalItems: number;
+    totalPages: number;
+    hasNextPage: boolean;
+  };
+}
