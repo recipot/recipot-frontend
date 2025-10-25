@@ -33,7 +33,7 @@ const shouldAddAuthHeader = (url?: string): boolean => {
   // 인증이 필요하지 않은 엔드포인트
   const noAuthPatterns = [
     '/v1/login/', // 모든 로그인 관련 엔드포인트
-    '/v1/auth/info/', // 사용자 ID로 토큰 조회 (토큰 발급 전)
+    '/v1/auth/debug', // 개발 환경 디버그 토큰 발급
     '/v1/health', // 헬스체크
   ];
 
@@ -67,14 +67,16 @@ const createAuthApiInstance = (): AxiosInstance => {
     headers: {
       'Content-Type': 'application/json',
     },
-    withCredentials: !isDev,
+    withCredentials: true, // 쿠키를 항상 포함하여 백엔드가 인증 정보를 받을 수 있도록 설정
   });
 
   instance.interceptors.request.use(
     config => {
       const url = config.url ?? '';
 
-      if (isDev && shouldAddAuthHeader(url)) {
+      // 백엔드는 Authorization Bearer 헤더 방식으로 인증
+      // 쿠키는 초기 토큰 전달용, 이후 LocalStorage에서 읽어서 헤더에 추가
+      if (shouldAddAuthHeader(url)) {
         const token = getStoredToken();
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
@@ -98,11 +100,43 @@ const createAuthApiInstance = (): AxiosInstance => {
       );
 
       if (error.response?.status === 401) {
+        const requestUrl = error.config?.url ?? '';
+
+        // /v1/auth/refresh 요청 자체가 실패한 경우는 재시도하지 않음
+        if (requestUrl.includes('/v1/auth/refresh')) {
+          console.error(
+            '❌ Refresh token이 유효하지 않습니다. 로그인이 필요합니다.'
+          );
+          removeStoredToken();
+
+          if (typeof window !== 'undefined') {
+            if (!window.location.pathname.includes('/signin')) {
+              safeRedirect('/signin');
+            }
+          }
+          return Promise.reject(error);
+        }
+
+        // 토큰이 전혀 없는 경우 refresh 시도하지 않음
+        const accessToken = getStoredToken();
         const refreshToken = localStorage.getItem('refreshToken');
+
+        if (!accessToken && !refreshToken) {
+          console.warn('⚠️ 토큰이 없습니다. 로그인 페이지로 이동합니다.');
+
+          if (typeof window !== 'undefined') {
+            if (!window.location.pathname.includes('/signin')) {
+              safeRedirect('/signin');
+            }
+          }
+          return Promise.reject(error);
+        }
+
         if (refreshToken && !error.config._retry) {
           error.config._retry = true;
 
           try {
+            console.info('🔄 토큰 갱신 시도 중...');
             const response = await instance.post('/v1/auth/refresh', {
               refreshToken: refreshToken,
             });
@@ -114,13 +148,25 @@ const createAuthApiInstance = (): AxiosInstance => {
               const newToken = response.data.data.accessToken;
               setStoredToken(newToken);
               error.config.headers.Authorization = `Bearer ${newToken}`;
+              console.info('✅ 토큰 갱신 성공');
               return instance.request(error.config);
             }
           } catch (refreshError) {
-            console.error('토큰 갱신 실패:', refreshError);
+            console.error('❌ 토큰 갱신 실패:', refreshError);
+            // refresh 실패 시 토큰 제거하고 로그인 페이지로
+            removeStoredToken();
+
+            if (typeof window !== 'undefined') {
+              if (!window.location.pathname.includes('/signin')) {
+                safeRedirect('/signin');
+              }
+            }
+            return Promise.reject(refreshError);
           }
         }
 
+        // refreshToken이 없거나 이미 재시도한 경우
+        console.warn('⚠️ Refresh token이 없거나 이미 재시도했습니다.');
         removeStoredToken();
 
         if (typeof window !== 'undefined') {
@@ -339,6 +385,53 @@ export const authService = {
     } catch (error) {
       console.error('프로필 업데이트 에러:', error);
       throw new Error('프로필 업데이트에 실패했습니다.');
+    }
+  },
+
+  // 개발 환경용 디버그 토큰 발급
+  async getDebugToken(
+    userId: number,
+    role: string = 'U01001'
+  ): Promise<{
+    accessToken: string;
+    refreshToken: string;
+    expiresIn: number;
+    user: UserInfo;
+  }> {
+    try {
+      console.info('🔧 [개발모드] 디버그 토큰 발급 중...', { userId, role });
+
+      const response = await authApi.post('/v1/auth/debug', {
+        userId,
+        role,
+      });
+
+      if (response.data.status === 200 && response.data.data) {
+        const data = response.data.data;
+
+        // 토큰 저장
+        setStoredToken(data.accessToken);
+        if (data.refreshToken) {
+          localStorage.setItem('refreshToken', data.refreshToken);
+        }
+
+        // 사용자 정보 조회
+        const userInfo = await this.getUserInfo();
+
+        console.info('✅ [개발모드] 디버그 토큰 발급 성공');
+
+        return {
+          accessToken: data.accessToken,
+          refreshToken: data.refreshToken,
+          expiresIn: data.expiresIn ?? 3600,
+          user: userInfo,
+        };
+      } else {
+        throw new Error('디버그 토큰 응답 형식이 올바르지 않습니다.');
+      }
+    } catch (error) {
+      console.error('❌ [개발모드] 디버그 토큰 발급 실패:', error);
+      throw new Error('디버그 토큰 발급에 실패했습니다.', { cause: error });
     }
   },
 };
