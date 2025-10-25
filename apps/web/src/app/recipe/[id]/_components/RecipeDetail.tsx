@@ -2,6 +2,7 @@
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
 import { tokenUtils } from 'packages/api/src/auth';
 
 import { Button } from '@/components/common/Button';
@@ -20,8 +21,7 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
   const tabContainerRef = useRef<HTMLDivElement>(null);
   const token = tokenUtils.getToken();
   const [recipeData, setRecipeData] = useState<Recipe | null>(null);
-
-  // 인증된 사용자는 실제 토큰, 비인증 사용자는 디버그 토큰 사용
+  const router = useRouter();
 
   useEffect(() => {
     const fetchRecipe = async () => {
@@ -88,6 +88,10 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
     );
   }
 
+  const handleCookingOrder = () => {
+    router.push(`/recipe/${recipeId}/cooking-order`);
+  };
+
   return (
     <div className="flex min-h-screen w-full justify-center bg-gray-50">
       <div className="w-[390px] bg-gray-100">
@@ -123,6 +127,7 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
               variant="default"
               size="full"
               className="bg-primary px-8 py-[15px]"
+              onClick={handleCookingOrder}
             >
               <CookIcon className="mr-[6px] h-6 w-6" color="#ffffff" />
               <p className="text-17sb text-white">요리하러 가기</p>
