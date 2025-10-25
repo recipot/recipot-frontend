@@ -208,7 +208,12 @@ export default function RecipeRecommend() {
             <RecipeTags />
 
             {/* Title - 고정 높이 */}
-            <RecipeTitle condition={null} />
+            <RecipeTitle
+              condition={{
+                id: moodToConditionId(userSelectedMood),
+                name: userSelectedMood,
+              }}
+            />
           </div>
 
           <div className="flex h-full w-full flex-col items-center">
