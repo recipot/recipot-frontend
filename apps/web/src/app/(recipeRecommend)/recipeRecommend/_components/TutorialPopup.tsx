@@ -35,7 +35,7 @@ export default function TutorialPopup({ onClose }: TutorialPopupProps) {
         </div>
 
         {/* 확인 버튼 */}
-        <div className="flex h-6 justify-center">
+        <div className="mb-4 flex h-6 justify-center">
           <button
             onClick={onClose}
             className="text-15sb h-10 w-[294px] rounded-[100px] bg-[#68982d] px-5 py-2 text-center text-white transition-colors hover:bg-[#5a7a26] focus:ring-2 focus:ring-[#68982d] focus:ring-offset-2 focus:outline-none"
