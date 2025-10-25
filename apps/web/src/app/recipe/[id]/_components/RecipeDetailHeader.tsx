@@ -1,4 +1,6 @@
 'use client';
+import '../styles.css';
+
 import React, { useMemo, useState } from 'react';
 import axios from 'axios';
 import Image from 'next/image';
@@ -163,15 +165,15 @@ export function RecipeDetailHeader({ recipe }: RecipeHeaderProps) {
               <span className="text-gray-500">이미지 없음</span>
             </div>
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+          <div className="recipe-detail-image absolute inset-0" />
           <div className="absolute top-4 right-4 left-4 flex space-x-2">
-            <div className="flex items-center space-x-1 rounded-full px-3 py-1.5 backdrop-blur-sm">
+            <div className="flex items-center space-x-1 rounded-full px-3 py-1.5">
               <CardTimeIcon size={24} color="#ffffff" />
               <span className="text-sm font-medium text-white">
                 {recipe.duration}분
               </span>
             </div>
-            <div className="flex items-center space-x-1 rounded-full px-3 py-1.5 backdrop-blur-sm">
+            <div className="flex items-center space-x-1 rounded-full px-3 py-1.5">
               <CookOrderIcon size={24} color="#ffffff" />
               <span className="text-sm font-medium text-white">
                 {recipe.condition?.name}
