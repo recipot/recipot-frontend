@@ -1,9 +1,8 @@
 'use client';
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { debugAuth } from '@recipot/api';
-import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
+import { tokenUtils } from 'packages/api/src/auth';
 
 import { Button } from '@/components/common/Button';
 import { CookIcon } from '@/components/Icons';
@@ -15,46 +14,32 @@ import RecipeDetailHeader from './RecipeDetailHeader';
 import StepSection from './StepSection';
 import TabNavigation from './TabNavigation';
 
-import type { ApiResponse, TabId } from '../types/recipe.types';
+import type { ApiResponse, Recipe, TabId } from '../types/recipe.types';
 
 export function RecipeDetail({ recipeId }: { recipeId: string }) {
   const tabContainerRef = useRef<HTMLDivElement>(null);
-  const [token, setToken] = useState<string | null>(null);
-
-  // 개발 환경에서만 디버그 토큰 생성
-  useEffect(() => {
-    const getDebugToken = async () => {
-      const res = await debugAuth.generateDebugToken({
-        role: 'user',
-        userId: 1,
-      });
-      setToken(res.accessToken);
-    };
-    getDebugToken();
-  }, []);
+  const token = tokenUtils.getToken();
+  const [recipeData, setRecipeData] = useState<Recipe | null>(null);
 
   // 인증된 사용자는 실제 토큰, 비인증 사용자는 디버그 토큰 사용
 
-  const {
-    data: recipeResponse,
-    error,
-    isError,
-    isLoading,
-  } = useQuery({
-    enabled: !!token, // 토큰이 있고 인증 로딩이 완료되었을 때만 쿼리 실행
-    queryFn: async () => {
-      const response = await axios.get<ApiResponse>(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/recipes/${recipeId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      return response.data;
-    },
-    queryKey: ['recipe', recipeId],
-  });
-
-  const recipeData = recipeResponse?.data;
+  useEffect(() => {
+    const fetchRecipe = async () => {
+      if (!token) return;
+      try {
+        const response = await axios.get<ApiResponse>(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/recipes/${recipeId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setRecipeData(response.data.data);
+      } catch (error) {
+        console.error('Recipe fetch error:', error);
+      }
+    };
+    fetchRecipe();
+  }, [token, recipeId]);
 
   // 섹션 ID 배열 생성
   const sectionIds = useMemo(() => ['ingredients', 'cookware', 'steps'], []);
@@ -91,34 +76,6 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
       });
     }
   };
-
-  if (isLoading || !token) {
-    return (
-      <div className="flex min-h-screen w-full items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="border-primary mb-4 h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" />
-          <p className="text-gray-600">레시피를 불러오는 중...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (isError) {
-    return (
-      <div className="flex min-h-screen w-full items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <p className="mb-4 text-red-600">{error?.message}</p>
-          <Button
-            variant="default"
-            onClick={() => window.location.reload()}
-            className="bg-primary px-4 py-2"
-          >
-            다시 시도
-          </Button>
-        </div>
-      </div>
-    );
-  }
 
   if (!recipeData) {
     return (

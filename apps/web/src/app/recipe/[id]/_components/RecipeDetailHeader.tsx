@@ -1,9 +1,9 @@
 'use client';
-import React, { useEffect, useMemo, useState } from 'react';
-import { debugAuth } from '@recipot/api';
+import React, { useMemo, useState } from 'react';
 import axios from 'axios';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { tokenUtils } from 'packages/api/src/auth';
 
 import { Button } from '@/components/common/Button';
 import { Modal } from '@/components/common/Modal/Modal';
@@ -24,23 +24,11 @@ interface RecipeHeaderProps {
 
 export function RecipeDetailHeader({ recipe }: RecipeHeaderProps) {
   const router = useRouter();
-  // const token = tokenUtils.getToken();
-  const [token, setToken] = useState<string | null>(null);
+  const token = tokenUtils.getToken();
 
   const [isLiked, setIsLiked] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
-
-  useEffect(() => {
-    const getToken = async () => {
-      const res = await debugAuth.generateDebugToken({
-        role: 'user',
-        userId: 1,
-      });
-      setToken(res.accessToken);
-    };
-    getToken();
-  }, []);
 
   const shareData = useMemo(() => {
     return {
