@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { tokenUtils } from '@recipot/api';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import Image from 'next/image';
 
 import { moodToConditionId } from '@/app/onboarding/_utils';
@@ -186,11 +186,9 @@ export function ReviewBottomSheet({ isOpen, onClose }: ReviewBottomSheetProps) {
       completionCount: reviewData.completionCount,
       completionMessage: reviewData.completionMessage,
       content,
-      difficultyOptions: difficultyOption ? [difficultyOption] : [],
-      experienceOptions: experienceOption ? [experienceOption] : [],
-      recipeImageUrl: reviewData.recipeImageUrl,
-      recipeName: reviewData.recipeName,
-      tasteOptions: tasteOption ? [tasteOption] : [],
+      difficultyCode: difficultyOption?.code,
+      experienceCode: experienceOption?.code,
+      tasteCode: tasteOption?.code,
     };
 
     try {
@@ -206,6 +204,23 @@ export function ReviewBottomSheet({ isOpen, onClose }: ReviewBottomSheetProps) {
       console.info('리뷰 제출 결과:', res.data);
       onClose(); // 성공 시 모달 닫기
     } catch (error) {
+      if (error instanceof AxiosError) {
+        if (error.status === 400) {
+          throw new Error('레시피 완료 후에만 후기를 작성할 수 있습니다.');
+        }
+
+        if (error.status === 401) {
+          throw new Error('인증이 필요합니다.');
+        }
+
+        if (error.status === 404) {
+          throw new Error('사용자를 찾을 수 없습니다.');
+        }
+
+        if (error.status === 409) {
+          throw new Error('이미 해당 레시피에 대한 후기를 작성했습니다.');
+        }
+      }
       console.error('리뷰 제출 실패:', error);
     }
   };
