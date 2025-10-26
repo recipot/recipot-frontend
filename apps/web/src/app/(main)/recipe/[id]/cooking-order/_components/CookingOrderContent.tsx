@@ -38,7 +38,6 @@ export default function CookingOrderContent({
       {/* 설명 */}
 
       <p className="text-16 text-[#000]">{currentStepData?.summary}</p>
-      <p className="text-16 text-[#000]">{currentStepData?.summary}</p>
 
       {/* 단계 진행률 */}
       <div className="mt-[147px] mb-6">
