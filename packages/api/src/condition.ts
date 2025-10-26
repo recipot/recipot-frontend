@@ -1,5 +1,10 @@
 import axios from 'axios';
 
+import { createApiInstance } from './createApiInstance';
+
+// API 인스턴스
+const conditionApi = createApiInstance({ apiName: 'Condition' });
+
 /**
  * 일일 컨디션 저장 요청 타입
  */
@@ -35,8 +40,8 @@ export const condition = {
     try {
       console.info('🚀 일일 컨디션 저장 요청:', data);
 
-      const response = await axios.post<SaveDailyConditionResponse>(
-        '/v1/user/conditions/daily',
+      const response = await conditionApi.post<SaveDailyConditionResponse>(
+        '/v1/users/conditions/daily',
         data
       );
 
