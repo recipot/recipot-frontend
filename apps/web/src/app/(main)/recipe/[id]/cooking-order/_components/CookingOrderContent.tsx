@@ -38,10 +38,9 @@ export default function CookingOrderContent({
       {/* 설명 */}
 
       <p className="text-16 text-[#000]">{currentStepData?.summary}</p>
-      <p className="text-16 text-[#000]">{currentStepData?.summary}</p>
 
       {/* 단계 진행률 */}
-      <div className="mt-[147px] mb-6">
+      <div className="mt-[147px] mb-6 flex flex-col items-center">
         {/* 원형 인디케이터 */}
         <div className="mb-2 flex w-[390px] items-center justify-center px-6">
           {recipe.steps?.map((step, index: number) => (
@@ -68,7 +67,6 @@ export default function CookingOrderContent({
             </div>
           ))}
         </div>
-
         {/* 순서 라벨 */}
         <div className="flex justify-center">
           {recipe.steps?.map((step, index: number) => (

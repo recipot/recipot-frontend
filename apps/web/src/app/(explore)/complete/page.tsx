@@ -12,10 +12,13 @@ import { useCookStateStepData } from '@/stores/onboardingStore';
 import { getEmotionGradient } from '@/utils/emotionGradient';
 
 import ExploreComplete from '../../../../public/explore.png';
+import { useRouter } from 'next/navigation';
 
 export default function ExploreCompletePage() {
   const cookStateData = useCookStateStepData();
   const userSelectedMood = cookStateData?.mood ?? 'neutral';
+
+  const router = useRouter();
 
   return (
     <>
@@ -42,7 +45,7 @@ export default function ExploreCompletePage() {
           </h3>
         </section>
         <div className="mt-[30px]">
-          <Button>
+          <Button onClick={() => router.push('/recipeRecommend')}>
             <CookIcon size={18} color="#ffffff" />
             다시 선택하러 가기
           </Button>
