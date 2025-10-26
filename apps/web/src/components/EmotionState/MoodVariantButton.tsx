@@ -71,6 +71,7 @@ const MoodVariantButton: React.FC<MoodVariantButtonProps> = ({
   const textStyle = useMemo(() => ({ color: colors.text }), [colors.text]);
 
   // 그림자 클래스
+  /* eslint-disable-next-line security/detect-object-injection */
   const shadowClass = selected ? EMOTION_CONFIG[color]?.shadow : '';
 
   // 컨테이너 크기 클래스

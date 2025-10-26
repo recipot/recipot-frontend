@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
 import { tokenUtils } from 'packages/api/src/auth';
 
 import { useCookingOrder } from '@/hooks/useCookingOrder';
@@ -30,8 +29,6 @@ export default function CookingOrderPresenter({
 
   // 모달 상태 통합 관리
   const [activeModal, setActiveModal] = useState<ModalType>(null);
-
-  const router = useRouter();
 
   const {
     currentStep,
