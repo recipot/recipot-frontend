@@ -16,8 +16,8 @@ export function CookwareSection({ cookware }: CookwareSectionProps) {
         <span className="text-18sb text-primary">{cookware?.length}</span>
       </div>
       <div className="grid grid-cols-3 gap-4">
-        {cookware?.map((item, index) => (
-          <div key={index} className="flex flex-col items-center">
+        {cookware?.map(item => (
+          <div key={item.id} className="flex flex-col items-center">
             <CookWareTransparentIcon size={40} />
             <span className="text-15">{item.name}</span>
           </div>
