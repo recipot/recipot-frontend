@@ -85,7 +85,7 @@ export function IngredientsSection({
         <IngredientGroup ingredients={ingredients} />
 
         <div className="mt-8">
-          <div className="white rounded-2xl p-4">
+          <div className="rounded-2xl bg-white p-4">
             <div className="mb-5 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-gray-900">양념류</h3>
             </div>
