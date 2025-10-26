@@ -72,7 +72,7 @@ export default function CookingOrderContent({
         <div className="flex justify-center">
           {recipe.steps?.map((step, index: number) => (
             <div
-              key={index}
+              key={step.orderNum}
               className={`flex h-5 w-16 items-start justify-center ${
                 index < currentStep ? 'text-gray-900' : 'text-gray-500'
               }`}

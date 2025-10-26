@@ -19,7 +19,9 @@ export default function RecipeCard({ onToggleSave, recipe }: RecipeCardProps) {
           <h3 className="text-17sb text-gray-900">{recipe.title}</h3>
           <ArrowIcon size={18} color="hsl(var(--gray-900))" />
         </div>
-        <p className="text-14 truncate text-gray-600">{recipe.description}</p>
+        <p className="text-14 truncate text-gray-600">
+          {recipe.healthPoints?.map(point => point.content)}
+        </p>
       </div>
       <button onClick={() => onToggleSave(recipe.id)} className="flex-shrink-0">
         <HeartIcon

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 
 import { useCookingOrder } from '@/hooks/useCookingOrder';
 
@@ -23,12 +22,9 @@ export default function CookingOrderPresenter({
   recipeId,
 }: CookingOrderPresenterProps) {
   const { completeStep, error, isLoading, recipe } = useCookingOrder(recipeId);
-  console.log(recipe, 'cooking Order Presenter');
 
   // 모달 상태 통합 관리
   const [activeModal, setActiveModal] = useState<ModalType>(null);
-
-  const router = useRouter();
 
   const {
     currentStep,
@@ -57,12 +53,6 @@ export default function CookingOrderPresenter({
 
   const handleBack = () => {
     openModal('warning');
-  };
-
-  const handleConfirmExit = ({ recipeId }: { recipeId: string }) => {
-    // 레시피 상세 페이지로 되돌아가는 로직 필요
-    // recipeId는 params로?
-    router.push(`/recipe/${recipeId}`);
   };
 
   if (isLoading) {
@@ -122,11 +112,7 @@ export default function CookingOrderPresenter({
         recipe={recipe}
       />
 
-      <WarningModal
-        isOpen={activeModal === 'warning'}
-        onClose={closeModal}
-        onConfirm={() => handleConfirmExit({ recipeId })}
-      />
+      <WarningModal isOpen={activeModal === 'warning'} onClose={closeModal} />
     </div>
   );
 }
