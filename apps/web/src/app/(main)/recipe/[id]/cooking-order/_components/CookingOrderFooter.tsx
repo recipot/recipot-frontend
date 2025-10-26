@@ -23,19 +23,19 @@ export default function CookingOrderFooter({
   return (
     <div className="fixed bottom-0 left-1/2 w-full max-w-sm -translate-x-1/2 transform bg-[#FFFFFF]/50">
       <div className="bg-white/50 px-4 py-4 backdrop-blur-sm">
-        {isFirstStep ? (
-          <Button
-            onClick={onNextStep}
-            className="bg-primary w-full rounded-full py-3 text-white"
-          >
-            <p className={buttonTextClassName}>다음으로</p>
-          </Button>
-        ) : isLastStep ? (
+        {isLastStep ? (
           <Button
             onClick={onStepComplete}
             className="bg-primary w-full rounded-full py-3 text-white"
           >
             <p className={buttonTextClassName}>해먹기 완료!</p>
+          </Button>
+        ) : isFirstStep ? (
+          <Button
+            onClick={onNextStep}
+            className="bg-primary w-full rounded-full py-3 text-white"
+          >
+            <p className={buttonTextClassName}>다음으로</p>
           </Button>
         ) : (
           <div className="flex space-x-3">

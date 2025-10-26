@@ -13,7 +13,6 @@ export type {
 
 // Onboarding API
 export { onboarding } from './onboarding';
-export type { OnboardingCompleteResponse } from './onboarding';
 
 // Condition API
 export { condition } from './condition';
@@ -33,6 +32,8 @@ export type {
   RecipeIngredients,
   RecipeRecommendResponse,
   RecipeLikeResponse,
+  MeasurementGuideItem,
+  MeasurementGuideResponse,
 } from './recipeAPI';
 
 // Debug API

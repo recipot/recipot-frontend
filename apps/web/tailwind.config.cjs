@@ -63,6 +63,9 @@ module.exports = {
           DEFAULT: '#FEE500',
           pressed: '#e5cf00',
         },
+        ingredient: {
+          green: '#53880A',
+        },
 
         /* Secondary */
         'secondary-soft-green': 'hsl(var(--secondary-soft-green))',
@@ -108,6 +111,7 @@ module.exports = {
         '15b': ['0.9375rem', { lineHeight: '150%', fontWeight: '700' }], // text-15b
         16: ['1rem', { lineHeight: '150%' }], // text-16
         '16sb': ['1rem', { lineHeight: '150%', fontWeight: '600' }], // text-16sb
+        '16b': ['1rem', { lineHeight: '150%', fontWeight: '700' }], // text-16b
         17: ['1.0625rem', { lineHeight: '140%' }], // text-17
         '17sb': ['1.0625rem', { lineHeight: '140%', fontWeight: '600' }], // text-17sb
         18: ['1.125rem', { lineHeight: '150%' }], // text-18

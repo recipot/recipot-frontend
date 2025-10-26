@@ -38,3 +38,7 @@ export { default as KakaoIcon } from './KakaoIcon';
 
 // 찜 아이콘
 export { default as HeartIcon } from './HeartIcon';
+
+// 재료 아이콘들
+export { default as PowderIcon } from './PowderIcon';
+export { default as WaterIcon } from './WaterIcon';

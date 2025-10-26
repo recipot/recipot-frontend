@@ -31,6 +31,7 @@ export const startMswWorker = async () => {
       });
     } catch (error) {
       console.error('MSW 시작 실패:', error);
+      throw error;
     }
   }
 };
