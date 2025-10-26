@@ -47,7 +47,7 @@ export function MeasurementGuideContent({
               {item.standard}
             </div>
             <div className="flex w-full items-center justify-center rounded-lg bg-gray-100 px-2 py-[2px]">
-              <p className="text-13">{item.description || '상세 설명'}</p>
+              <p className="text-13">{item.description ?? '상세 설명'}</p>
             </div>
           </div>
         </div>

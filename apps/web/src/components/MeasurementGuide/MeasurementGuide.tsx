@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { recipe } from '@recipot/api';
+import axios from 'axios';
+import { tokenUtils } from 'packages/api/src/auth';
 
 import {
   MeasurementGuideContent,
@@ -21,28 +22,9 @@ interface MeasurementGuideProps {
   >;
   /** 초기 활성 탭 (선택사항) */
   initialActiveTab?: string;
-  /** 컴포넌트 클래스명 (선택사항) */
-  className?: string;
 }
 
-/**
- * 재활용 가능한 계량 가이드 컴포넌트
- *
- * @example
- * ```tsx
- * // 기본 사용법
- * <MeasurementGuide />
- *
- * // 커스텀 데이터와 함께 사용
- * <MeasurementGuide
- *   measurementData={customData}
- *   initialActiveTab="cups"
- *   className="my-custom-class"
- * />
- * ```
- */
 export function MeasurementGuide({
-  className = '',
   initialActiveTab,
   measurementData: propMeasurementData,
 }: MeasurementGuideProps) {
@@ -61,6 +43,8 @@ export function MeasurementGuide({
     setActiveTab(tab);
   };
 
+  const token = tokenUtils.getToken();
+
   const fetchMeasurementGuides = React.useCallback(async () => {
     if (isLoading) return;
 
@@ -68,12 +52,20 @@ export function MeasurementGuide({
     setError(null);
 
     try {
-      const response: MeasurementGuideResponse =
-        await recipe.getMeasurementGuides();
-      const apiData = response.data.data;
-
-      setMeasurementData(apiData);
-      const apiCategories = Object.keys(apiData);
+      const {
+        data: {
+          data: { data },
+        },
+      }: MeasurementGuideResponse = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/measurement-guides`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setMeasurementData(data);
+      const apiCategories = Object.keys(data);
       setCategories(apiCategories);
       if (!activeTab && apiCategories.length > 0) {
         setActiveTab(apiCategories[0]);
@@ -87,7 +79,7 @@ export function MeasurementGuide({
     } finally {
       setIsLoading(false);
     }
-  }, [isLoading, activeTab]);
+  }, [isLoading, activeTab, token]);
 
   useEffect(() => {
     if (isOpen && categories.length === 0) {
@@ -117,32 +109,30 @@ export function MeasurementGuide({
   }, [initialActiveTab, activeTab]);
 
   return (
-    <div className={className}>
-      <MeasurementGuideToggle isOpen={isOpen} onToggle={handleToggle}>
-        <div className="space-y-3 px-4 pt-3 pb-4">
-          {isLoading ? (
-            <div className="flex items-center justify-center py-4">
-              <div className="text-gray-500">계량 가이드를 불러오는 중...</div>
-            </div>
-          ) : error ? (
-            <div className="flex items-center justify-center py-4">
-              <div className="text-red-500">{error}</div>
-            </div>
-          ) : (
-            <>
-              <MeasurementTab
-                activeTab={activeTab}
-                onTabChange={handleTabChange}
-                categories={categories}
-              />
-              <MeasurementGuideContent
-                activeTab={activeTab}
-                measurementData={measurementData}
-              />
-            </>
-          )}
-        </div>
-      </MeasurementGuideToggle>
-    </div>
+    <MeasurementGuideToggle isOpen={isOpen} onToggle={handleToggle}>
+      <div className="space-y-3 px-4 pt-3 pb-4">
+        {isLoading ? (
+          <div className="flex items-center justify-center py-4">
+            <div className="text-gray-500">계량 가이드를 불러오는 중...</div>
+          </div>
+        ) : error ? (
+          <div className="flex items-center justify-center py-4">
+            <div className="text-red-500">{error}</div>
+          </div>
+        ) : (
+          <>
+            <MeasurementTab
+              activeTab={activeTab}
+              onTabChange={handleTabChange}
+              categories={categories}
+            />
+            <MeasurementGuideContent
+              activeTab={activeTab}
+              measurementData={measurementData}
+            />
+          </>
+        )}
+      </div>
+    </MeasurementGuideToggle>
   );
 }
