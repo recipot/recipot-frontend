@@ -44,7 +44,7 @@ export default function CookingOrderContent({
       <div className="mt-[147px] mb-6">
         {/* 원형 인디케이터 */}
         <div className="mb-2 flex w-[390px] items-center justify-center px-6">
-          {recipe.steps.map((step, index: number) => (
+          {recipe.steps?.map((step, index: number) => (
             <div key={index} className="mt-[147px] flex items-center">
               <div
                 className={`flex h-4 w-4 items-center justify-center rounded-full border-2 ${
@@ -62,7 +62,7 @@ export default function CookingOrderContent({
                   <div className="bg-primary h-2 w-2 rounded-full" />
                 )}
               </div>
-              {index < recipe.steps.length - 1 && (
+              {index < (recipe.steps?.length ?? 0) - 1 && (
                 <div className="mr-[2px] ml-[2px] h-0.5 w-12 bg-gray-300" />
               )}
             </div>
@@ -81,7 +81,6 @@ export default function CookingOrderContent({
               <p className="text-14sb"> step {index + 1}</p>
             </div>
           ))}
->>>>>>> ba5dbdacb050dea37b0a69b6a33901986e0c51b4
         </div>
       </div>
     </div>
