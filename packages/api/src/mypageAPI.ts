@@ -29,10 +29,6 @@ export interface GetCompletedRecipesParams {
   page?: number;
   limit?: number;
 }
-const token = await debugAuth.generateDebugToken({
-  role: 'user',
-  userId: 1,
-});
 
 const mypageApi = createApiInstance({
   apiName: 'Mypage',
