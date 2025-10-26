@@ -32,6 +32,8 @@ export type {
   RecipeIngredients,
   RecipeRecommendResponse,
   RecipeLikeResponse,
+  MeasurementGuideItem,
+  MeasurementGuideResponse,
 } from './recipeAPI';
 
 // Debug API

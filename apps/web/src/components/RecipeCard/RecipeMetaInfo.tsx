@@ -18,7 +18,7 @@ export const RecipeMetaInfo = memo(({ recipe }: RecipeMetaInfoProps) => (
     <div className="flex h-[32px] items-center gap-1 px-3">
       <ChefHat className="h-[18px] w-[18px] text-white" />
       <span className="text-17 whitespace-nowrap text-white">
-        {recipe.tools.length}
+        {recipe.tools?.length}
       </span>
     </div>
   </div>

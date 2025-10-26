@@ -1,6 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import axios from 'axios';
+import { useRouter } from 'next/navigation';
+import { tokenUtils } from 'packages/api/src/auth';
 
 import { useCookingOrder } from '@/hooks/useCookingOrder';
 
@@ -22,6 +25,9 @@ export default function CookingOrderPresenter({
   recipeId,
 }: CookingOrderPresenterProps) {
   const { completeStep, error, isLoading, recipe } = useCookingOrder(recipeId);
+  const router = useRouter();
+
+  const token = tokenUtils.getToken();
 
   // 모달 상태 통합 관리
   const [activeModal, setActiveModal] = useState<ModalType>(null);
@@ -38,21 +44,28 @@ export default function CookingOrderPresenter({
   const openModal = (modalType: ModalType) => setActiveModal(modalType);
   const closeModal = () => setActiveModal(null);
 
-  const completeStepHandler = (stepNumber: number) => {
-    completeStep(stepNumber);
-  };
-
-  const handleStepComplete = () => {
-    completeStepHandler(currentStep);
-    if (isLastStep) {
-      // 바텀시트 띄우기
-    } else {
-      handleNextStep();
-    }
+  const handleCookingComplete = async () => {
+    // await completeCooking();
+    await axios.post(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/users/recipes/${recipeId}/complete`,
+      {
+        recipeId,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    completeStep(currentStep);
   };
 
   const handleBack = () => {
     openModal('warning');
+  };
+
+  const handleConfirm = () => {
+    router.push(`/recipe/${recipeId}`);
   };
 
   if (isLoading) {
@@ -103,7 +116,7 @@ export default function CookingOrderPresenter({
         isLastStep={isLastStep}
         onPrevStep={handlePrevStep}
         onNextStep={handleNextStep}
-        onStepComplete={handleStepComplete}
+        onStepComplete={handleCookingComplete}
       />
 
       <IngredientsSidebar
@@ -112,7 +125,11 @@ export default function CookingOrderPresenter({
         recipe={recipe}
       />
 
-      <WarningModal isOpen={activeModal === 'warning'} onClose={closeModal} />
+      <WarningModal
+        isOpen={activeModal === 'warning'}
+        onClose={closeModal}
+        onConfirm={handleConfirm}
+      />
     </div>
   );
 }
