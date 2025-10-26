@@ -48,6 +48,7 @@ export interface IngredientsGroup {
 
 export interface Recipe {
   id: number;
+  isBookmarked: boolean;
   title: string;
   description: string;
   duration: string;

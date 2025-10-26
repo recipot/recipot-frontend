@@ -27,7 +27,7 @@ export function RecipeDetailHeader({ recipe }: RecipeHeaderProps) {
   const router = useRouter();
   const token = tokenUtils.getToken();
 
-  const [isLiked, setIsLiked] = useState(false);
+  const [isLiked, setIsLiked] = useState(recipe.isBookmarked);
   const [isLoading, setIsLoading] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
 
