@@ -107,7 +107,7 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
         <div className="px-4 pb-24">
           <div className="bg-secondary-light-green border-secondary-soft-green my-4 rounded-2xl border-[1px] px-5 py-4">
             <p className="text-15sb text-primary-pressed">
-              {recipeData?.healthPoints.map(point => point.content)}
+              {recipeData?.healthPoints.map(point => point.content).join(', ')}
             </p>
           </div>
 
