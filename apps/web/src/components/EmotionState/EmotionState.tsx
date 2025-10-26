@@ -1,7 +1,10 @@
+'use client';
 import './styles.css';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import Image from 'next/image';
+import { tokenUtils } from 'packages/api/src/auth';
 
 import { cn } from '@/lib/utils';
 
@@ -30,6 +33,23 @@ const EmotionState: React.FC<EmotionStateProps> = ({
   initialMood = null,
   onMoodChange,
 }) => {
+  const [firstEntry, setFirstEntry] = useState(false);
+  useEffect(() => {
+    const token = tokenUtils.getToken();
+    const fetchFirstEntry = async () => {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/users/profile/me`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setFirstEntry(response.data.data.isFirstEntry);
+    };
+    fetchFirstEntry();
+  }, []);
+
   const getEmotionImage = (mood: MoodType | null) => {
     switch (mood) {
       case 'bad':
@@ -96,13 +116,15 @@ const EmotionState: React.FC<EmotionStateProps> = ({
         ))}
       </div>
 
-      <Image
-        width={390}
-        height={302}
-        src={getEmotionImage(selectedMood)}
-        alt="emotion"
-        quality={100}
-      />
+      {!firstEntry && (
+        <Image
+          width={390}
+          height={302}
+          src={getEmotionImage(selectedMood)}
+          alt="emotion"
+          quality={100}
+        />
+      )}
     </div>
   );
 };
