@@ -1,10 +1,8 @@
 'use client';
 import './styles.css';
 
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
 import Image from 'next/image';
-import { tokenUtils } from 'packages/api/src/auth';
 
 import { cn } from '@/lib/utils';
 
@@ -15,11 +13,13 @@ import TiredBird from '../../../public/emotion/tired.png';
 import { EMOTION_OPTIONS } from './emotionConstants';
 import EmotionOptionButton from './EmotionOptionButton';
 
+import type { ShowImageProps } from '@recipot/types';
+
 export type MoodType = 'bad' | 'neutral' | 'good';
 export type MoodState = 'default' | 'selected' | 'disabled';
 export type EmotionColor = 'blue' | 'yellow' | 'red';
 
-interface EmotionStateProps {
+interface EmotionStateProps extends ShowImageProps {
   onMoodChange?: (mood: MoodType | null) => void;
   initialMood?: MoodType | null;
   className?: string;
@@ -32,24 +32,8 @@ const EmotionState: React.FC<EmotionStateProps> = ({
   className = '',
   initialMood = null,
   onMoodChange,
+  showImage,
 }) => {
-  const [firstEntry, setFirstEntry] = useState(false);
-  useEffect(() => {
-    const token = tokenUtils.getToken();
-    const fetchFirstEntry = async () => {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/users/profile/me`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setFirstEntry(response.data.data.isFirstEntry);
-    };
-    fetchFirstEntry();
-  }, []);
-
   const getEmotionImage = (mood: MoodType | null) => {
     switch (mood) {
       case 'bad':
@@ -116,7 +100,7 @@ const EmotionState: React.FC<EmotionStateProps> = ({
         ))}
       </div>
 
-      {!firstEntry && (
+      {showImage && (
         <Image
           width={390}
           height={302}
