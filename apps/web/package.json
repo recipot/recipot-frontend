@@ -23,6 +23,8 @@
     "@radix-ui/react-visually-hidden": "^1.2.3",
     "@recipot/api": "workspace:*",
     "@recipot/contexts": "workspace:*",
+    "@recipot/types": "workspace:*",
+    "@recipot/utils": "workspace:*",
     "@tanstack/react-query": "^5.59.16",
     "@tanstack/react-query-devtools": "^5.59.16",
     "axios": "^1.7.7",
