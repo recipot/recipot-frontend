@@ -19,9 +19,9 @@ export function IngredientsSidebar({
 
   // 중복 재료 제거 (name 기준으로 중복 제거)
   const allIngredients = [
-    ...recipe?.ingredients.owned,
-    ...recipe?.ingredients.notOwned,
-    ...recipe?.ingredients.alternativeUnavailable,
+    ...(recipe?.ingredients?.owned ?? []),
+    ...(recipe?.ingredients?.notOwned ?? []),
+    ...(recipe?.ingredients?.alternativeUnavailable ?? []),
   ];
 
   const uniqueIngredients = allIngredients.filter(
@@ -87,7 +87,7 @@ export function IngredientsSidebar({
               <span className="text-14sb text-gray-900">양념류</span>
             </div>
             <div className="space-y-2 rounded-lg bg-gray-50 p-3">
-              {recipe?.seasonings.map(seasoning => (
+              {recipe?.seasonings?.map(seasoning => (
                 <div key={seasoning.id} className="flex items-center gap-3">
                   {/* TODO : 아이콘 추가 필요 */}
                   <div className="flex flex-1 items-center justify-between">
