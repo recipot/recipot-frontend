@@ -19,10 +19,9 @@ export function useCookingOrder(recipeId: string): UseCookingOrderReturn {
   const [error, setError] = useState<string | null>(null);
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
 
-  const token = tokenUtils.getToken();
-
   useEffect(() => {
     const fetchRecipe = async () => {
+      const token = tokenUtils.getToken();
       try {
         setIsLoading(true);
         setError(null);
