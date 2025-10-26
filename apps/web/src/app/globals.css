@@ -140,3 +140,9 @@
     scrollbar-width: none;
   }
 }
+.dim-80 {
+  background: #00000080;
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+}
