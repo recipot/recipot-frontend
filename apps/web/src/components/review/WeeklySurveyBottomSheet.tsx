@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import axios from 'axios';
+import { tokenUtils } from 'packages/api/src/auth';
 
 import { Button } from '../common/Button';
 import { CloseIcon } from '../Icons';
@@ -59,19 +60,6 @@ type HealthSurveyResponse = {
   data: {
     surveyId: number;
   };
-};
-
-// API 호출 함수들
-const getAuthToken = async (): Promise<string> => {
-  const {
-    data: {
-      data: { accessToken },
-    },
-  } = await axios.post(`api/v1/auth/debug`, {
-    role: 'user',
-    userId: 1,
-  });
-  return accessToken;
 };
 
 const getEligibilityData = async (token: string) => {
@@ -172,27 +160,14 @@ const HealthChangeOptions = ({
 );
 
 export function WeeklySurveyBottomSheet() {
+  const token = tokenUtils.getToken();
   const [isOpen, setIsOpen] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [token, setToken] = useState<string | null>(null);
   const [preparationData, setPreparationData] =
     useState<HealthSurveyPreparationResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [isEligible, setIsEligible] = useState(false);
   const [recentCompletionCount, setRecentCompletionCount] = useState(0);
-
-  // 토큰 가져오기
-  useEffect(() => {
-    const initializeToken = async () => {
-      try {
-        const authToken = await getAuthToken();
-        setToken(authToken);
-      } catch (error) {
-        console.error('토큰 가져오기 실패:', error);
-      }
-    };
-    initializeToken();
-  }, []);
 
   // 자격 확인 및 준비 데이터 가져오기
   useEffect(() => {
