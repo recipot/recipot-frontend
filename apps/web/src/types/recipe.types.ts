@@ -28,6 +28,11 @@ export interface Recipe {
   }[];
 }
 
+export interface PendingReviewsResponse {
+  completedRecipeIds: number[];
+  totalCount: number;
+}
+
 export interface RecipeIngredient {
   amount: string;
   id: number;
