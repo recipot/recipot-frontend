@@ -10,11 +10,11 @@ export function useCookingOrderNavigation(recipe: Recipe | null) {
 
   const handleNextStep = () => {
     if (recipe && currentStep < (recipe?.steps?.length ?? 0)) {
-    if (recipe && stepsLength > 0 && currentStep < stepsLength) {
-      setCurrentStep(prev => prev + 1);
+      if (recipe && stepsLength > 0 && currentStep < stepsLength) {
+        setCurrentStep(prev => prev + 1);
+      }
     }
   };
-
   const handlePrevStep = () => {
     if (currentStep > 1) {
       setCurrentStep(prev => prev - 1);

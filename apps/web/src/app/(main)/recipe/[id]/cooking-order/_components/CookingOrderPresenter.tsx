@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
 import { tokenUtils } from 'packages/api/src/auth';
 
 import { useCookingOrder } from '@/hooks/useCookingOrder';
@@ -24,6 +25,7 @@ export default function CookingOrderPresenter({
   recipeId,
 }: CookingOrderPresenterProps) {
   const { completeStep, error, isLoading, recipe } = useCookingOrder(recipeId);
+  const router = useRouter();
 
   const token = tokenUtils.getToken();
 

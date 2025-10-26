@@ -6,9 +6,14 @@ import { Modal } from '@/components/common/Modal/Modal';
 interface WarningModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onConfirm: () => void;
 }
 
-export default function WarningModal({ isOpen, onClose }: WarningModalProps) {
+export default function WarningModal({
+  isOpen,
+  onClose,
+  onConfirm,
+}: WarningModalProps) {
   return (
     <Modal
       open={isOpen}
