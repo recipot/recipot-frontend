@@ -17,6 +17,7 @@ export default function SignInPage() {
   const router = useRouter();
 
   // 🔍 개발 중 확인용: 로그인 상태 콘솔 출력
+  // TODO: 토큰 리스폰스 버전으로 추후 작업
   useEffect(() => {
     if (user && token) {
       // 쿠키에서 토큰 확인
