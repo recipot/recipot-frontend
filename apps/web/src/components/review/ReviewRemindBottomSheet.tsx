@@ -58,7 +58,7 @@ export function ReviewRemindBottomSheet() {
       }
 
       // 각 레시피 ID로 상세 정보 조회
-      const recipePromises = response.data.completedRecipeIds?.map(
+      const recipePromises = response.data.completedRecipeIds.map(
         async (id: number) => {
           try {
             const recipeDetail: { data: { data: Recipe } } = await axios.get(
@@ -162,7 +162,7 @@ export function ReviewRemindBottomSheet() {
                 </div>
 
                 {/* 레시피 정보 카드 */}
-                {recipes?.map(recipe => (
+                {recipes.map(recipe => (
                   <ReviewRecipeCard
                     key={recipe.id}
                     onClick={() => handleRecipeClick(recipe.id)}
