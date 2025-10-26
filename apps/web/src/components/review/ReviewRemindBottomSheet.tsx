@@ -41,8 +41,7 @@ export function ReviewRemindBottomSheet() {
   const loadPendingReviews = useCallback(async () => {
     try {
       setLoading(true);
-      // const response: PendingReviewsResponse = await recipe.getPendingReviews();
-      const response: PendingReviewsResponse = await axios.get(
+      const axiosResponse = await axios.get(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/users/pending-reviews`,
         {
           headers: {
@@ -51,13 +50,15 @@ export function ReviewRemindBottomSheet() {
         }
       );
 
-      if (response.totalCount === 0) {
+      const response: PendingReviewsResponse = axiosResponse.data;
+
+      if (response.data.totalCount === 0) {
         setIsOpen(false);
         return;
       }
 
       // 각 레시피 ID로 상세 정보 조회
-      const recipePromises = response.completedRecipeIds.map(
+      const recipePromises = response.data.completedRecipeIds?.map(
         async (id: number) => {
           try {
             const recipeDetail: { data: { data: Recipe } } = await axios.get(
@@ -84,7 +85,6 @@ export function ReviewRemindBottomSheet() {
           }
         }
       );
-
       const recipeDetails = await Promise.all(recipePromises);
       const validRecipes = recipeDetails.filter(
         (recipe: ReviewRecipeData | null): recipe is ReviewRecipeData =>
@@ -162,7 +162,7 @@ export function ReviewRemindBottomSheet() {
                 </div>
 
                 {/* 레시피 정보 카드 */}
-                {recipes.map(recipe => (
+                {recipes?.map(recipe => (
                   <ReviewRecipeCard
                     key={recipe.id}
                     onClick={() => handleRecipeClick(recipe.id)}

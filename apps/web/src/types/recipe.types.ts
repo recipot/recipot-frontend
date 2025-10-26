@@ -29,8 +29,10 @@ export interface Recipe {
 }
 
 export interface PendingReviewsResponse {
-  completedRecipeIds: number[];
-  totalCount: number;
+  data: {
+    completedRecipeIds: number[];
+    totalCount: number;
+  };
 }
 
 export interface RecipeIngredient {
