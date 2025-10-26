@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { authService } from '@recipot/api';
 import { useAuth } from '@recipot/contexts';
+import { getCookie } from '@recipot/utils';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import type { UserInfo } from '@recipot/types';
@@ -11,151 +12,50 @@ interface UseOAuthCallbackProps {
   provider: OAuthProvider;
 }
 
+const getProviderName = (provider: OAuthProvider): string => {
+  return provider === 'google' ? '구글' : '카카오';
+};
+
 export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { setRefreshToken, setToken, setUser } = useAuth();
   const [status, setStatus] = useState(
-    `${provider === 'google' ? '구글' : '카카오'} 로그인 처리 중...`
-  );
-
-  const navigateWithDelay = useCallback(
-    (delay: number = 1000) => {
-      setTimeout(() => {
-        router.push('/');
-      }, delay);
-    },
-    [router]
+    `${getProviderName(provider)} 로그인 처리 중...`
   );
 
   const saveTokens = useCallback(
     (accessToken: string, refreshToken: string) => {
-      localStorage.setItem('authToken', accessToken);
-      localStorage.setItem('refreshToken', refreshToken);
       setToken(accessToken);
       setRefreshToken(refreshToken);
     },
     [setToken, setRefreshToken]
   );
 
-  const setupUser = useCallback(
+  const navigateAfterLogin = useCallback(
     (user: UserInfo) => {
       setUser(user);
-
-      // isFirstEntry가 true이면 온보딩이 필요한 사용자
-      if (user.isFirstEntry) {
-        router.push('/onboarding');
-      } else {
-        router.push('/');
-      }
+      const destination = user.isFirstEntry ? '/onboarding' : '/';
+      router.push(destination);
     },
     [setUser, router]
   );
 
   const handleError = useCallback(
-    (error: unknown, context: string) => {
-      console.error(`[${provider}] ${context}:`, error);
+    (error: unknown) => {
+      console.error(`[${provider}] OAuth error:`, error);
       setStatus(
-        `${provider === 'google' ? '구글' : '카카오'} 로그인 처리 중 오류가 발생했습니다.`
+        `${getProviderName(provider)} 로그인 처리 중 오류가 발생했습니다.`
       );
-      navigateWithDelay(2000);
+      setTimeout(() => router.push('/'), 2000);
     },
-    [provider, navigateWithDelay]
-  );
-
-  const handleTokenReceived = useCallback(
-    async (token: string) => {
-      try {
-        setStatus('사용자 정보를 확인하는 중...');
-
-        const userResponse = await authService.verifyToken(token);
-        if (!userResponse?.success || !userResponse?.data) {
-          throw new Error('사용자 정보 조회 실패');
-        }
-
-        saveTokens(token, `temp_refresh_${Date.now()}`);
-        setupUser(userResponse.data);
-      } catch (error) {
-        handleError(error, '토큰 처리 실패');
-      }
-    },
-    [saveTokens, setupUser, handleError]
-  );
-
-  const handleTokensFromQuery = useCallback(
-    async (accessToken: string, refreshToken: string) => {
-      try {
-        setStatus(
-          `${provider === 'google' ? '구글' : '카카오'} 로그인 처리 중...`
-        );
-
-        saveTokens(accessToken, refreshToken);
-        const userInfo = await authService.getUserInfo();
-        setupUser(userInfo);
-      } catch (error) {
-        handleError(error, '로그인 처리 실패');
-      }
-    },
-    [provider, saveTokens, setupUser, handleError]
-  );
-
-  const handleBackendUserId = useCallback(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    async (_userId: string) => {
-      try {
-        setStatus(
-          `${provider === 'google' ? '구글' : '카카오'} 사용자 정보를 가져오는 중...`
-        );
-
-        // 백엔드가 쿠키에 토큰을 설정했으므로 먼저 읽어서 LocalStorage에 저장
-        // 그 다음 /v1/users/profile/me를 호출해서 사용자 정보 조회
-        const getCookie = (name: string) => {
-          const value = `; ${document.cookie}`;
-          const parts = value.split(`; ${name}=`);
-          if (parts.length === 2) return parts.pop()?.split(';').shift();
-          return null;
-        };
-
-        console.info('🔍 [디버깅] 현재 모든 쿠키:', document.cookie);
-
-        const accessToken = getCookie('accessToken');
-        const refreshToken = getCookie('refreshToken');
-
-        console.info(
-          '🔍 [디버깅] accessToken:',
-          accessToken ? `${accessToken.substring(0, 20)}...` : 'null'
-        );
-        console.info(
-          '🔍 [디버깅] refreshToken:',
-          refreshToken ? `${refreshToken.substring(0, 20)}...` : 'null'
-        );
-
-        if (accessToken) {
-          console.info('🍪 쿠키에서 토큰 발견, LocalStorage에 저장');
-          saveTokens(accessToken, refreshToken ?? '');
-          console.info('💾 LocalStorage 저장 완료');
-        } else {
-          console.error('⚠️ 쿠키에 accessToken이 없습니다!');
-          console.error('⚠️ 백엔드의 쿠키 Domain 설정을 확인하세요.');
-        }
-
-        // 토큰으로 사용자 정보 조회
-        const userInfo = await authService.getUserInfo();
-        setupUser(userInfo);
-      } catch (error) {
-        console.error('❌ 사용자 정보 조회 실패:', error);
-        handleError(error, '로그인 처리 실패');
-      }
-    },
-    [provider, saveTokens, setupUser, handleError]
+    [provider, router]
   );
 
   const handleAuthCode = useCallback(
     async (code: string) => {
       try {
-        setStatus(
-          `${provider === 'google' ? '구글' : '카카오'} 인증을 처리하는 중...`
-        );
+        setStatus(`${getProviderName(provider)} 인증을 처리하는 중...`);
 
         const tokenData =
           provider === 'google'
@@ -163,12 +63,65 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
             : await authService.completeKakaoLogin(code);
 
         saveTokens(tokenData.accessToken, tokenData.refreshToken);
-        setupUser(tokenData.user);
+        navigateAfterLogin(tokenData.user);
       } catch (error) {
-        handleError(error, '인증 코드 처리 실패');
+        handleError(error);
       }
     },
-    [provider, saveTokens, setupUser, handleError]
+    [provider, saveTokens, navigateAfterLogin, handleError]
+  );
+
+  const handleTokensFromQuery = useCallback(
+    async (accessToken: string, refreshToken: string) => {
+      try {
+        setStatus(`${getProviderName(provider)} 로그인 처리 중...`);
+
+        saveTokens(accessToken, refreshToken);
+        const userInfo = await authService.getUserInfo();
+        navigateAfterLogin(userInfo);
+      } catch (error) {
+        handleError(error);
+      }
+    },
+    [provider, saveTokens, navigateAfterLogin, handleError]
+  );
+
+  const handleTokenFromCookie = useCallback(async () => {
+    try {
+      setStatus(`${getProviderName(provider)} 사용자 정보를 가져오는 중...`);
+
+      const accessToken = getCookie('accessToken');
+      const refreshToken = getCookie('refreshToken');
+
+      if (!accessToken) {
+        throw new Error('No access token in cookie');
+      }
+
+      saveTokens(accessToken, refreshToken ?? '');
+      const userInfo = await authService.getUserInfo();
+      navigateAfterLogin(userInfo);
+    } catch (error) {
+      handleError(error);
+    }
+  }, [provider, saveTokens, navigateAfterLogin, handleError]);
+
+  const handleTokenVerification = useCallback(
+    async (token: string) => {
+      try {
+        setStatus('사용자 정보를 확인하는 중...');
+
+        const userResponse = await authService.verifyToken(token);
+        if (!userResponse?.success || !userResponse?.data) {
+          throw new Error('Token verification failed');
+        }
+
+        saveTokens(token, `temp_refresh_${Date.now()}`);
+        navigateAfterLogin(userResponse.data);
+      } catch (error) {
+        handleError(error);
+      }
+    },
+    [saveTokens, navigateAfterLogin, handleError]
   );
 
   useEffect(() => {
@@ -180,39 +133,32 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
     const error = searchParams.get('error');
 
     if (error) {
-      console.error(`[${provider}] 로그인 에러:`, error);
-      setStatus(
-        `${provider === 'google' ? '구글' : '카카오'} 로그인에 실패했습니다.`
-      );
-      navigateWithDelay(2000);
+      console.error(`[${provider}] OAuth error from query:`, error);
+      setStatus(`${getProviderName(provider)} 로그인에 실패했습니다.`);
+      setTimeout(() => router.push('/'), 2000);
       return;
     }
 
     if (userId && accessToken) {
       handleTokensFromQuery(accessToken, refreshToken ?? '');
     } else if (userId) {
-      // 백엔드가 쿠키에 토큰을 설정해서 리다이렉트한 경우
-      // 쿠키의 토큰을 사용해서 사용자 정보를 조회
-      handleBackendUserId(userId);
+      handleTokenFromCookie();
     } else if (token) {
-      handleTokenReceived(token);
+      handleTokenVerification(token);
     } else if (code) {
       handleAuthCode(code);
     } else {
-      console.error(`[${provider}] 필요한 파라미터를 찾을 수 없습니다.`);
-      setStatus(
-        `${provider === 'google' ? '구글' : '카카오'} 인증 정보를 찾을 수 없습니다.`
-      );
-      navigateWithDelay(2000);
+      setStatus(`${getProviderName(provider)} 인증 정보를 찾을 수 없습니다.`);
+      setTimeout(() => router.push('/'), 2000);
     }
   }, [
     searchParams,
-    handleAuthCode,
-    handleBackendUserId,
-    handleTokenReceived,
-    handleTokensFromQuery,
     provider,
-    navigateWithDelay,
+    router,
+    handleAuthCode,
+    handleTokenFromCookie,
+    handleTokenVerification,
+    handleTokensFromQuery,
   ]);
 
   return { status };
