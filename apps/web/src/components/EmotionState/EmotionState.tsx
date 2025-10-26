@@ -1,3 +1,4 @@
+'use client';
 import './styles.css';
 
 import React, { useState } from 'react';
@@ -12,11 +13,13 @@ import TiredBird from '../../../public/emotion/tired.png';
 import { EMOTION_OPTIONS } from './emotionConstants';
 import EmotionOptionButton from './EmotionOptionButton';
 
+import type { ShowImageProps } from '@recipot/types';
+
 export type MoodType = 'bad' | 'neutral' | 'good';
 export type MoodState = 'default' | 'selected' | 'disabled';
 export type EmotionColor = 'blue' | 'yellow' | 'red';
 
-interface EmotionStateProps {
+interface EmotionStateProps extends ShowImageProps {
   onMoodChange?: (mood: MoodType | null) => void;
   initialMood?: MoodType | null;
   className?: string;
@@ -29,6 +32,7 @@ const EmotionState: React.FC<EmotionStateProps> = ({
   className = '',
   initialMood = null,
   onMoodChange,
+  showImage,
 }) => {
   const getEmotionImage = (mood: MoodType | null) => {
     switch (mood) {
@@ -96,13 +100,15 @@ const EmotionState: React.FC<EmotionStateProps> = ({
         ))}
       </div>
 
-      <Image
-        width={390}
-        height={302}
-        src={getEmotionImage(selectedMood)}
-        alt="emotion"
-        quality={100}
-      />
+      {showImage && (
+        <Image
+          width={390}
+          height={302}
+          src={getEmotionImage(selectedMood)}
+          alt="emotion"
+          quality={100}
+        />
+      )}
     </div>
   );
 };
