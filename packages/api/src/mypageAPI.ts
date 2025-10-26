@@ -36,7 +36,6 @@ const token = await debugAuth.generateDebugToken({
 
 const mypageApi = createApiInstance({
   apiName: 'Mypage',
-  token: token.accessToken,
 });
 
 export const recipesAPI = {

@@ -69,7 +69,7 @@ export default function RecipeListPage({ type }: { type: PageType }) {
   const defaultRecipe = type === 'saved' ? storedRecipes : recentRecipes;
   const handleToggleSave = () => {
     queryClient.invalidateQueries({
-      queryKey: [key, type],
+      queryKey: [key],
     });
   };
 

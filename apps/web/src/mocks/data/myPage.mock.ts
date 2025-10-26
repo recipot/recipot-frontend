@@ -96,9 +96,9 @@ export const mockDefaultRecipes: CompletedRecipe[] = [
 // 내가 만든 요리 목록 mock
 export const mockCookedRecipes: CompletedRecipe[] = [
   {
-    id: 101,
+    id: 100,
     userId: 1,
-    recipeId: 201,
+    recipeId: 200,
     recipeTitle: '닭가슴살 스테이크',
     recipeDescription: '부드러운 닭가슴살과 특제 소스의 조화',
     recipeImages: ['/recipeImage.png'],

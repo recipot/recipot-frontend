@@ -12,7 +12,7 @@ import type { CompletedRecipe } from '@recipot/api';
 interface RecipeCardProps {
   recipe: CompletedRecipe;
   isSavedRecipe?: boolean;
-  onToggleSave?: (recipeId: number) => void;
+  onToggleSave?: () => void;
 }
 
 export default function RecipeCard({
@@ -36,7 +36,7 @@ export default function RecipeCard({
       // 북마크 등록
       saveRecipe(recipe.recipeId, {
         onSuccess: () => {
-          onToggleSave?.(recipe.id);
+          onToggleSave?.();
         },
       });
     }
@@ -46,7 +46,7 @@ export default function RecipeCard({
     deleteRecipe(recipe.recipeId, {
       onSuccess: () => {
         setIsModalOpen(false);
-        onToggleSave?.(recipe.id);
+        onToggleSave?.();
       },
     });
   };

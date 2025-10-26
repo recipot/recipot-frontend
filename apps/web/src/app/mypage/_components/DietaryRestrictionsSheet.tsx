@@ -109,6 +109,7 @@ function DietaryRestrictionsContent({
       onClose();
     } catch (error) {
       console.error('못 먹는 음식 설정에 실패했습니다: ', error);
+      alert('못 먹는 음식 설정에 실패했습니다. 잠시 후 다시 시도해주세요.');
     }
   };
 

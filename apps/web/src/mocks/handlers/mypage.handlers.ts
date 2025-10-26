@@ -40,7 +40,7 @@ const createSuccessResponse = (message: string) => ({
 
 export const mypageHandlers = [
   // 내가 만든 요리 목록 조회 (useCompletedRecipes)
-  http.get('/api/recipes/completed', async ({ request }) => {
+  http.get('/api/v1/users/recipes/completed', async ({ request }) => {
     const url = new URL(request.url);
     const page = Number(url.searchParams.get('page') || 1);
     const size = Number(url.searchParams.get('size') || 10);
@@ -52,7 +52,7 @@ export const mypageHandlers = [
   }),
 
   // 최근 본 레시피 목록 조회 (useRecentRecipes)
-  http.get('/api/recipes/recent', async ({ request }) => {
+  http.get('/api/v1/users/recipes/recent', async ({ request }) => {
     const url = new URL(request.url);
     const page = Number(url.searchParams.get('page') || 1);
     const size = Number(url.searchParams.get('size') || 10);
@@ -64,7 +64,7 @@ export const mypageHandlers = [
   }),
 
   // 보관된 레시피 목록 조회 (STORED_RECIPES_QUERY_KEY)
-  http.get('/api/recipes/bookmarks', async ({ request }) => {
+  http.get('/api/v1/users/recipes/bookmarks', async ({ request }) => {
     const url = new URL(request.url);
     const page = Number(url.searchParams.get('page') || 1);
     const size = Number(url.searchParams.get('size') || 10);
@@ -76,7 +76,7 @@ export const mypageHandlers = [
   }),
 
   // 보관 레시피 등록 (usePostStoredRecipe)
-  http.post('/api/recipes/bookmarks', async ({ request }) => {
+  http.post('/api/v1/users/recipes/bookmarks', async ({ request }) => {
     const body = (await request.json()) as { recipeId: number };
     const { recipeId } = body;
 
@@ -90,18 +90,21 @@ export const mypageHandlers = [
   }),
 
   // 보관 레시피 삭제 (useDeleteStoredRecipe)
-  http.delete('/api/recipes/bookmarks/:recipeId', async ({ params }) => {
-    const { recipeId } = params;
-    console.log(`레시피 ID ${recipeId} 북마크 해제 시도`);
+  http.delete(
+    '/api/v1/users/recipes/bookmarks/:recipeId',
+    async ({ params }) => {
+      const { recipeId } = params;
+      console.log(`레시피 ID ${recipeId} 북마크 해제 시도`);
 
-    return HttpResponse.json(
-      createSuccessResponse(`레시피 ID ${recipeId} 북마크 해제 성공`),
-      { status: 200 }
-    );
-  }),
+      return HttpResponse.json(
+        createSuccessResponse(`레시피 ID ${recipeId} 북마크 해제 성공`),
+        { status: 200 }
+      );
+    }
+  ),
 
   // 못 먹는 음식 목록 조회
-  http.get('/api/user/restrictions', async () => {
+  http.get('/api/v1/users/user/restrictions', async () => {
     return HttpResponse.json(
       {
         data: mockRestrictions,

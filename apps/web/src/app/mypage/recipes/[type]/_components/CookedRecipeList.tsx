@@ -172,7 +172,7 @@ export default function CookedRecipeList({
           onClose={handleCloseReview}
           onSubmit={handleSubmitReview}
           reviewData={{
-            completionCount: selectedRecipe.isCompleted!,
+            completionCount: selectedRecipe.isCompleted ?? 0,
             recipeId: selectedRecipe.recipeId.toString(),
             recipeImage: selectedRecipe.recipeImages[0],
             recipeName: selectedRecipe.recipeTitle,
