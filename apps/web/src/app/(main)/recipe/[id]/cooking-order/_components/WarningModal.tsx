@@ -6,9 +6,14 @@ import { Modal } from '@/components/common/Modal/Modal';
 interface WarningModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onConfirm: () => void;
 }
 
-export default function WarningModal({ isOpen, onClose }: WarningModalProps) {
+export default function WarningModal({
+  isOpen,
+  onClose,
+  onConfirm,
+}: WarningModalProps) {
   return (
     <Modal
       open={isOpen}
@@ -24,7 +29,7 @@ export default function WarningModal({ isOpen, onClose }: WarningModalProps) {
     >
       <div className="space-y-4">
         <div className="flex justify-center space-x-2">
-          <Button variant="outline" size="full" onClick={onClose}>
+          <Button variant="outline" size="full" onClick={onConfirm}>
             확인
           </Button>
           <Button

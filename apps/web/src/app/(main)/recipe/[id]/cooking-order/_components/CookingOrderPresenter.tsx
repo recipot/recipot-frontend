@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
 import { tokenUtils } from 'packages/api/src/auth';
 
 import { useCookingOrder } from '@/hooks/useCookingOrder';
@@ -29,6 +30,8 @@ export default function CookingOrderPresenter({
 
   // 모달 상태 통합 관리
   const [activeModal, setActiveModal] = useState<ModalType>(null);
+
+  const router = useRouter();
 
   const {
     currentStep,
@@ -60,6 +63,10 @@ export default function CookingOrderPresenter({
 
   const handleBack = () => {
     openModal('warning');
+  };
+
+  const handleConfirm = () => {
+    router.push(`/recipe/${recipeId}`);
   };
 
   if (isLoading) {
@@ -119,7 +126,11 @@ export default function CookingOrderPresenter({
         recipe={recipe}
       />
 
-      <WarningModal isOpen={activeModal === 'warning'} onClose={closeModal} />
+      <WarningModal
+        isOpen={activeModal === 'warning'}
+        onClose={closeModal}
+        onConfirm={handleConfirm}
+      />
     </div>
   );
 }
