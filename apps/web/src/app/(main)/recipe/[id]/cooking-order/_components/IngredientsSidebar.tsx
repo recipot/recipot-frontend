@@ -1,9 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-
 import { Button } from '@/components/common/Button';
-import { ArrowIcon } from '@/components/Icons';
+import { MeasurementGuide } from '@/components/MeasurementGuide';
 import type { Recipe, RecipeIngredient } from '@/types/recipe.types';
 
 interface IngredientsSidebarProps {
@@ -17,22 +15,40 @@ export function IngredientsSidebar({
   onClose,
   recipe,
 }: IngredientsSidebarProps) {
-  const [isGuideOpen, setIsGuideOpen] = useState(false);
-
-  const handleToggle = () => {
-    setIsGuideOpen(!isGuideOpen);
-  };
-
   if (!isOpen) return null;
+
+  // 중복 재료 제거 (name 기준으로 중복 제거)
+  const allIngredients = [
+    ...(recipe?.ingredients?.owned ?? []),
+    ...(recipe?.ingredients?.notOwned ?? []),
+    ...(recipe?.ingredients?.alternativeUnavailable ?? []),
+  ];
+
+  const uniqueIngredients = allIngredients.filter(
+    (ingredient, index, arr) =>
+      arr.findIndex(item => item.name === ingredient.name) === index
+  );
 
   return (
     <div
       className="fixed inset-0 z-50 flex justify-end bg-black/60"
-      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label="재료 목록 사이드바"
     >
-      <section
-        className="h-full w-64 bg-white"
-        onClick={e => e.stopPropagation()}
+      <button
+        className="absolute inset-0 h-full w-full"
+        onClick={onClose}
+        onKeyDown={e => {
+          if (e.key === 'Escape') {
+            onClose();
+          }
+        }}
+        aria-label="사이드바 닫기"
+      />
+      <div
+        className="relative z-10 h-full w-64 bg-white"
+        aria-label="재료 목록"
       >
         <div className="h-full w-full overflow-y-auto p-6 px-6 pt-18 pb-5">
           {/* 헤더 */}
@@ -49,109 +65,48 @@ export function IngredientsSidebar({
               <p className="text-14sb text-gray-900">보유</p>
             </div>
             <div className="flex flex-wrap gap-2">
-              {recipe.ingredients?.owned?.map(
-                (ingredient: RecipeIngredient) => (
-                  <div
-                    key={ingredient.id}
-                    className="w-fit rounded-md border border-green-200 bg-green-50 px-3 py-2"
-                  >
-                    <span className="text-15b mr-[5px] text-green-700">
-                      {ingredient.name}
-                    </span>
-                    <span className="text-15 text-green-600">
-                      {ingredient.amount}
-                    </span>
-                  </div>
-                )
-              )}
-            </div>
-          </div>
-
-          {/* 미보유 재료 */}
-          <div className="mb-6">
-            <div className="mb-3 flex items-center justify-between">
-              <p className="text-14sb text-gray-900">미보유</p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {recipe.ingredients?.notOwned?.map(
-                (ingredient: RecipeIngredient) => (
-                  <div
-                    key={ingredient.id}
-                    className="w-fit rounded-md border border-orange-200 bg-orange-50 px-3 py-2"
-                  >
-                    <span className="text-15b mr-[5px] text-[#F88014] opacity-80">
-                      {ingredient.name}
-                    </span>
-                    <span className="text-15 text-[#F88014] opacity-80">
-                      {ingredient.amount}
-                    </span>
-                    {ingredient.isAlternative && (
-                      <span className="ml-1 text-xs text-gray-500">
-                        대체가능
-                      </span>
-                    )}
-                  </div>
-                )
-              )}
-            </div>
-          </div>
-
-          {/* 대체불가 재료 */}
-          <div className="mb-6">
-            <div className="justify -between mb-3 flex items-center">
-              <p className="text-14sb text-gray-900">대체불가</p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {recipe.ingredients?.alternativeUnavailable?.map(
-                (ingredient: RecipeIngredient) => (
-                  <div
-                    key={ingredient.id}
-                    className="w-fit rounded-md border border-red-200 bg-red-50 px-3 py-2"
-                  >
-                    <span className="text-15b mr-[5px] text-red-700">
-                      {ingredient.name}
-                    </span>
-                    <span className="text-15 text-red-600">
-                      {ingredient.amount}
-                    </span>
-                    <span className="ml-1 text-xs text-gray-500">필수</span>
-                  </div>
-                )
-              )}
+              {uniqueIngredients.map((ingredient: RecipeIngredient) => (
+                <div
+                  key={ingredient.id}
+                  className="border-secondary-soft-green bg-secondary-light-green w-fit rounded-md border px-3 py-2"
+                >
+                  <span className="text-15b mr-[5px] text-[#53880A]">
+                    {ingredient.name}
+                  </span>
+                  <span className="text-15 text-[#53880A]">
+                    {ingredient.amount}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
 
           {/* 양념류 */}
           <div className="mb-6">
-            <div className="mb-3 flex items-center justify-between">
-              <span className="text-sm font-semibold text-gray-900">
-                양념류
-              </span>
+            <div className="mb-3">
+              <span className="text-14sb text-gray-900">양념류</span>
             </div>
-            <div className="mt-5 flex items-center justify-between px-3 py-1.5 transition-colors">
-              <div className="text-15sb text-gray-600">계량가이드</div>
-              <ArrowIcon
-                size={20}
-                className={`transition-transform duration-200 ${isGuideOpen ? 'rotate-90' : 'rotate-0'}`}
-                onClick={handleToggle}
-              />
+            <div className="space-y-2 rounded-lg bg-gray-50 p-3">
+              {recipe?.seasonings?.map(seasoning => (
+                <div key={seasoning.id} className="flex items-center gap-3">
+                  {/* TODO : 아이콘 추가 필요 */}
+                  <div className="flex flex-1 items-center justify-between">
+                    <span className="text-15sb mr-2 text-gray-900">
+                      {seasoning.name}
+                    </span>
+                    <div className="mx-[18px] h-1 flex-1 border-b border-dashed border-gray-200" />
+                    <span className="text-15 ml-2 text-gray-700">
+                      {seasoning.amount}
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
-            {isGuideOpen && (
-              <div className="space-y-1">
-                <div className="flex items-center justify-between border-b border-gray-200 py-2">
-                  <span className="text-sm text-gray-600">소금</span>
-                  <span className="text-sm text-gray-600">1꼬집</span>
-                </div>
-                <div className="flex items-center justify-between border-b border-gray-200 py-2">
-                  <span className="text-sm text-gray-600">간장</span>
-                  <span className="text-sm text-gray-600">1스푼</span>
-                </div>
-                <div className="flex items-center justify-between py-2">
-                  <span className="text-sm text-gray-600">고추장</span>
-                  <span className="text-sm text-gray-600">1스푼</span>
-                </div>
-              </div>
-            )}
+
+            {/* 계량 가이드 */}
+            <div className="mt-5">
+              <MeasurementGuide />
+            </div>
           </div>
 
           <Button
@@ -161,7 +116,7 @@ export function IngredientsSidebar({
             확인
           </Button>
         </div>
-      </section>
+      </div>
     </div>
   );
 }
