@@ -44,16 +44,6 @@ export const recipe = {
   },
 
   /**
-   * 특정 레시피 상세 조회
-   * @param id - 레시피 ID
-   * @returns 레시피 상세 정보
-   */
-  getRecipeDetail: async (id: number): Promise<Recipe> => {
-    const response = await recipeApi.get<Recipe>(`/api/recipe-recommend/${id}`);
-    return response.data;
-  },
-
-  /**
    * 레시피 좋아요 토글
    * @param id - 레시피 ID
    * @returns 좋아요 결과
