@@ -14,15 +14,16 @@ export function IngredientGroup({ ingredients }: IngredientGroupProps) {
     ...ingredients.alternativeUnavailable,
   ];
 
-  const uniqueIngredients = allIngredients.reduce((acc, current) => {
-    const existing = acc.find(
-      item => item.name === current.name && item.amount === current.amount
-    );
-    if (!existing) {
-      acc.push(current);
-    }
-    return acc;
-  }, [] as Ingredient[]);
+  const uniqueIngredients = Array.from(
+    allIngredients
+      .reduce((acc, current) => {
+        if (!acc.has(current.name)) {
+          acc.set(current.name, current);
+        }
+        return acc;
+      }, new Map<string, Ingredient>())
+      .values()
+  );
 
   return (
     <div className="mb-4">
