@@ -3,6 +3,7 @@
 import 'swiper/css';
 import 'swiper/css/effect-cards';
 import './styles.css';
+import '@/components/EmotionState/styles.css';
 
 import React, { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
@@ -21,6 +22,7 @@ import type {
   RecommendationItem,
   RecommendationResponse,
 } from '@/types/recipe.types';
+import { getEmotionGradient } from '@/utils/emotionGradient';
 
 import RecipeHeader from './_components/RecipeHeader';
 import RecipeTags from './_components/RecipeTags';
@@ -42,6 +44,12 @@ export default function RecipeRecommend() {
   const userSelectedMood = cookStateData?.mood ?? 'neutral';
 
   const token = tokenUtils.getToken();
+
+  // condition 객체를 미리 생성하여 JSX에서 재사용
+  const condition = {
+    id: moodToConditionId(userSelectedMood),
+    name: userSelectedMood,
+  };
 
   const [showTutorial, setShowTutorial] = useState(false);
 
@@ -197,7 +205,9 @@ export default function RecipeRecommend() {
     <>
       <RecipeHeader onRefresh={handleRefresh} />
       <Header.Spacer />
-      <div className="recipe-recommend-main flex flex-col items-center justify-center overflow-hidden">
+      <div
+        className={`recipe-recommend-main flex flex-col items-center justify-center overflow-hidden ${getEmotionGradient(userSelectedMood)}`}
+      >
         {/* Swiper Cards Effect - 남은 공간 차지 */}
         <div className="px-6 pt-5 pb-6">
           <div className="recipe-header-group mb-5">
@@ -205,12 +215,7 @@ export default function RecipeRecommend() {
             <RecipeTags />
 
             {/* Title - 고정 높이 */}
-            <RecipeTitle
-              condition={{
-                id: moodToConditionId(userSelectedMood),
-                name: userSelectedMood,
-              }}
-            />
+            <RecipeTitle condition={condition} />
           </div>
 
           <div className="flex h-full w-full flex-col items-center">

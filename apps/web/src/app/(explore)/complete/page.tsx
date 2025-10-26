@@ -2,20 +2,28 @@
 
 import React from 'react';
 import Image from 'next/image';
+import '@/components/EmotionState/styles.css';
 
 import RecipeHeader from '@/app/(recipeRecommend)/recipeRecommend/_components/RecipeHeader';
 import { Button } from '@/components/common/Button';
 import { Header } from '@/components/common/Header';
 import { CookIcon } from '@/components/Icons';
+import { useCookStateStepData } from '@/stores/onboardingStore';
+import { getEmotionGradient } from '@/utils/emotionGradient';
 
 import ExploreComplete from '../../../../public/explore.png';
 
 export default function ExploreCompletePage() {
+  const cookStateData = useCookStateStepData();
+  const userSelectedMood = cookStateData?.mood ?? 'neutral';
+
   return (
     <>
       <RecipeHeader onRefresh={() => {}} />
       <Header.Spacer />
-      <div className="flex h-screen w-screen flex-col items-center justify-center">
+      <div
+        className={`flex h-screen w-screen flex-col items-center justify-center ${getEmotionGradient(userSelectedMood)}`}
+      >
         <h2 className="text-22sb text-center text-gray-900">
           재료 조합 탐험 완료!
           <span className="text-24 ml-[2px]">&#x1F50D;</span>
