@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { recipe as recipeAPI } from '@recipot/api';
+import axios from 'axios';
+import { tokenUtils } from 'packages/api/src/auth';
 
 import type { Recipe } from '@/types/recipe.types';
 
@@ -20,15 +21,43 @@ export function useCookingOrder(recipeId: string): UseCookingOrderReturn {
 
   useEffect(() => {
     const fetchRecipe = async () => {
+      const token = tokenUtils.getToken();
       try {
         setIsLoading(true);
         setError(null);
 
-        const fetchedRecipe = await recipeAPI.getRecipe(recipeId);
-        setRecipe(fetchedRecipe);
+        // 요리 시작 API 호출
+        // await recipeAPI.startCooking(recipeId);
+        await axios.post(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/users/recipes/${recipeId}/start`,
+          {
+            recipeId,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        // const fetchedRecipe = await recipeAPI.getRecipe(recipeId);
+        const {
+          data: { data },
+        } = await axios.get(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/recipes/${recipeId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        setRecipe(data);
+
+        // setRecipe(fetchedRecipe);
       } catch (err) {
-        setError('레시피를 불러오는 중 오류가 발생했습니다.');
         console.error('Recipe fetch error:', err);
+        setError('레시피를 불러오는 중 오류가 발생했습니다.');
       } finally {
         setIsLoading(false);
       }
@@ -46,7 +75,7 @@ export function useCookingOrder(recipeId: string): UseCookingOrderReturn {
   };
 
   const getProgressPercentage = (): number => {
-    if (!recipe) return 0;
+    if (!recipe?.steps || recipe.steps.length === 0) return 0;
     return Math.round((completedSteps.size / recipe.steps.length) * 100);
   };
 

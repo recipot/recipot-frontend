@@ -1,10 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { PageHeader } from '@/app/mypage/_components/PageHeader';
 import CookedRecipeList from '@/app/mypage/recipes/[type]/_components/CookedRecipeList';
 import DefaultRecipeList from '@/app/mypage/recipes/[type]/_components/DefaultRecipeList';
+import { useCompletedRecipes } from '@/hooks/useCompletedRecipes';
+import { useRecentRecipes } from '@/hooks/useRecentRecipes';
+import { useStoredRecipes } from '@/hooks/useStoredRecipes';
 import {
   mockCookedRecipes,
   mockDefaultRecipes,
@@ -13,7 +16,7 @@ import type { PageType } from '@/types/MyPage.types';
 
 const PAGE_CONFIG = {
   cooked: {
-    noneBackImage: '',
+    noneBackImage: '/mypage/none-refrigrator-green.png',
     overLayColor: '#F4FCE3',
     themeColor: '#F4FCE3',
     title: '내가 만든 요리',
@@ -38,28 +41,51 @@ const PAGE_CONFIG = {
 export default function RecipeListPage({ type }: { type: PageType }) {
   const config = PAGE_CONFIG[type];
 
-  const [cookedRecipes, setCookedRecipes] = useState(mockCookedRecipes);
-  const [defaultRecipes, setDefaultRecipes] = useState(mockDefaultRecipes);
+  // 완료한 요리 데이터
+  const { data: completedRecipesData, isLoading } = useCompletedRecipes({
+    limit: 100,
+    page: 1,
+  });
 
-  const handleToggleSave = (recipeId: number) => {
-    if (type === 'cooked') {
-      setCookedRecipes(prev =>
-        prev.map(recipe =>
-          recipe.id === recipeId
-            ? { ...recipe, isSaved: !recipe.isSaved }
-            : recipe
-        )
-      );
-    } else {
-      setDefaultRecipes(prev =>
-        prev.map(recipe =>
-          recipe.id === recipeId
-            ? { ...recipe, isSaved: !recipe.isSaved }
-            : recipe
-        )
-      );
-    }
+  const { data: storedRecipesData, isLoading: isStoredLoading } =
+    useStoredRecipes({
+      limit: 100,
+      page: 1,
+    });
+
+  const { data: recentRecipesData, isLoading: isRecentLoading } =
+    useRecentRecipes({
+      limit: 100,
+      page: 1,
+    });
+
+  // API 데이터 우선 사용, 없으면 mock 데이터
+  const cookedRecipes = completedRecipesData?.items ?? mockCookedRecipes;
+  const storedRecipes = storedRecipesData?.items ?? mockDefaultRecipes;
+  const recentRecipes = recentRecipesData?.items ?? mockDefaultRecipes;
+
+  const queryClient = useQueryClient();
+  const key = type === 'saved' ? 'stored-recipes' : 'recent-recipes';
+  const defaultRecipe = type === 'saved' ? storedRecipes : recentRecipes;
+  const handleToggleSave = () => {
+    queryClient.invalidateQueries({
+      queryKey: [key],
+    });
   };
+
+  // 로딩 처리
+  if (isLoading || isStoredLoading || isRecentLoading) {
+    return (
+      <div>
+        <div className="px-5">
+          <PageHeader title={config.title} />
+        </div>
+        <main className="px-5">
+          <div className="py-20 text-center text-gray-500">로딩 중...</div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -76,8 +102,9 @@ export default function RecipeListPage({ type }: { type: PageType }) {
         ) : (
           <DefaultRecipeList
             config={config}
-            recipes={defaultRecipes}
+            recipes={defaultRecipe}
             onToggleSave={handleToggleSave}
+            type={type}
           />
         )}
       </main>

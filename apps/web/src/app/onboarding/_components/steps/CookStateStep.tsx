@@ -11,7 +11,12 @@ import { getSubmitButtonText } from '../../_utils';
 
 import type { CookStateStepData } from '../../_types';
 
-export default function CookStateStep() {
+interface CookStateStepProps {
+  /** 이미지 표시 여부 */
+  showImage?: boolean;
+}
+
+export default function CookStateStep({ showImage }: CookStateStepProps) {
   // 온보딩 스텝 로직
   const { handleError, isSubmitting, saveAndProceed } = useOnboardingStep(2);
 
@@ -58,6 +63,7 @@ export default function CookStateStep() {
           onMoodChange={handleMoodChange}
           initialMood={selectedMood}
           className="h-full"
+          showImage={showImage}
         />
       </div>
 

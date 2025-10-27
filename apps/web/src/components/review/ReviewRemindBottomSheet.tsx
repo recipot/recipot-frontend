@@ -1,50 +1,127 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import { tokenUtils } from 'packages/api/src/auth';
+
+import type { PendingReviewsResponse, Recipe } from '@/types/recipe.types';
 
 import { CloseIcon } from '../Icons';
 import { Drawer, DrawerClose, DrawerContent, DrawerTitle } from '../ui/drawer';
 import { ReviewRecipeCard, type ReviewRecipeData } from './ReviewRecipeCard';
 
+const STORAGE_KEY = 'reviewRemindLastShown';
+
 export function ReviewRemindBottomSheet() {
   const router = useRouter();
 
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
+  const [recipes, setRecipes] = useState<ReviewRecipeData[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleRecipeClick = (recipeId: number) => {
-    // TODO : URL 수정 여부 확인 필요
-    router.push(`/mypage/recipes/cooked/${recipeId}`);
+  const token = tokenUtils.getToken();
+
+  // 24시간 경과 여부 체크
+  const shouldShowBottomSheet = () => {
+    if (typeof window === 'undefined') return false;
+
+    const lastShown = localStorage.getItem(STORAGE_KEY);
+    if (!lastShown) return true;
+
+    const lastShownTime = new Date(lastShown).getTime();
+    const now = new Date().getTime();
+    const twentyFourHours = 24 * 60 * 60 * 1000;
+
+    return now - lastShownTime >= twentyFourHours;
   };
 
-  const recipes: ReviewRecipeData[] = [
-    {
-      alt: '새우 땅콩버거 버터 버거 레시피 이미지',
-      description: '2번째 레시피 해먹기 완료!',
-      id: 1,
-      imageUrl: '/recipeImage.png',
-      title: '새우 땅콩버거 버터 버거',
-    },
-    {
-      alt: '새우 땅콩버거 버터 버거 레시피 이미지',
-      description: '2번째 레시피 해먹기 완료!',
-      id: 2,
-      imageUrl: '/recipeImage.png',
-      title: '새우 땅콩버거 버터 버거',
-    },
-    {
-      alt: '새우 땅콩버거 버터 버거 레시피 이미지',
-      description: '2번째 레시피 해먹기 완료!',
-      id: 3,
-      imageUrl: '/recipeImage.png',
-      title: '새우 땅콩버거 버터 버거',
-    },
-  ];
+  // API에서 데이터 로드
+  const loadPendingReviews = useCallback(async () => {
+    try {
+      setLoading(true);
+      const axiosResponse = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/users/pending-reviews`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const response: PendingReviewsResponse = axiosResponse.data;
+
+      if (response.data.totalCount === 0) {
+        setIsOpen(false);
+        return;
+      }
+
+      // 각 레시피 ID로 상세 정보 조회
+      const recipePromises = response.data.completedRecipeIds.map(
+        async (id: number) => {
+          try {
+            const recipeDetail: { data: { data: Recipe } } = await axios.get(
+              `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/recipes/${id}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
+
+            return {
+              alt: `${recipeDetail.data.data.title} 레시피 이미지`,
+              description: '레시피 해먹기 완료!',
+              id: recipeDetail.data.data.id,
+              imageUrl:
+                recipeDetail.data.data.images[0]?.imageUrl ??
+                '/recipeImage.png',
+              title: recipeDetail.data.data.title,
+            };
+          } catch (error) {
+            console.error(`Failed to load recipe ${id}:`, error);
+            return null;
+          }
+        }
+      );
+      const recipeDetails = await Promise.all(recipePromises);
+      const validRecipes = recipeDetails.filter(
+        (recipe: ReviewRecipeData | null): recipe is ReviewRecipeData =>
+          recipe !== null
+      );
+
+      setRecipes(validRecipes);
+      setIsOpen(validRecipes.length > 0 && shouldShowBottomSheet());
+    } catch (error) {
+      console.error('Failed to load pending reviews:', error);
+      setIsOpen(false);
+    } finally {
+      setLoading(false);
+    }
+  }, [token]);
+
+  useEffect(() => {
+    loadPendingReviews();
+  }, [loadPendingReviews]);
+
+  const handleRecipeClick = (recipeId: number) => {
+    router.push(`/mypage/recipes/cooked/${recipeId}`);
+    handleClose();
+  };
 
   const handleClose = () => {
     setIsOpen(false);
+    // 현재 시간을 localStorage에 저장
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(STORAGE_KEY, new Date().toISOString());
+    }
   };
+
+  // 로딩 중이거나 바텀시트를 표시하지 않을 때는 null 반환
+  if (loading || !isOpen) {
+    return null;
+  }
 
   return (
     <Drawer open={isOpen} onOpenChange={handleClose}>

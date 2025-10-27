@@ -139,4 +139,29 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
+  /* Textarea gradient overlay using container pseudo-element */
+  .textarea-container {
+    position: relative;
+  }
+
+  .textarea-container::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1.5rem;
+    background: linear-gradient(
+      0deg,
+      hsl(var(--background)) 0%,
+      rgba(255, 255, 255, 0) 100%
+    );
+  }
+}
+.dim-80 {
+  background: #00000080;
+  position: fixed;
+  inset: 0;
+  z-index: 50;
 }

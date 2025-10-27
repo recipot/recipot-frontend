@@ -1,7 +1,7 @@
 export interface Recipe {
   description: string;
   duration: number;
-  healthPoints: {
+  healthPoints?: {
     content: string;
   }[];
   images: {
@@ -12,20 +12,27 @@ export interface Recipe {
   title: string;
   tools: {
     id: number;
-    imageUrl: string;
+    imageUrl?: string;
     name: string;
   }[];
-  seasonings: {
+  seasonings?: {
     amount: string;
     id: number;
     name: string;
   }[];
   isBookmarked: boolean;
-  ingredients: RecipeIngredients;
-  steps: {
+  ingredients?: RecipeIngredients;
+  steps?: {
     orderNum: number;
     summary: string;
   }[];
+}
+
+export interface PendingReviewsResponse {
+  data: {
+    completedRecipeIds: number[];
+    totalCount: number;
+  };
 }
 
 export interface RecipeIngredient {
@@ -36,9 +43,9 @@ export interface RecipeIngredient {
 }
 
 export interface RecipeIngredients {
-  owned: RecipeIngredient[];
-  notOwned: RecipeIngredient[];
-  alternativeUnavailable: RecipeIngredient[];
+  owned?: RecipeIngredient[];
+  notOwned?: RecipeIngredient[];
+  alternativeUnavailable?: RecipeIngredient[];
 }
 
 export interface RecipeRecommendResponse {
@@ -50,4 +57,37 @@ export interface RecipeLikeResponse {
   recipeId: number;
   liked: boolean;
   message: string;
+}
+
+export interface Condition {
+  id: number;
+  name: string;
+}
+
+export interface ConditionsResponse {
+  status: number;
+  data: {
+    conditions: Condition[];
+  };
+}
+
+export interface RecommendationItem {
+  recipeId: number;
+  title: string;
+  description: string;
+  imageUrls: string[];
+  duration: string;
+  tools: string[];
+  isBookmarked: boolean;
+}
+
+export interface RecommendationResponse {
+  data: {
+    items: RecommendationItem[];
+    currentPage: number;
+    pageSize: number;
+    totalItems: number;
+    totalPages: number;
+    hasNextPage: boolean;
+  };
 }

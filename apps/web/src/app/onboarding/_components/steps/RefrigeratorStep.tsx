@@ -94,58 +94,55 @@ export default function RefrigeratorStep() {
 
       console.info('🚀 통합 온보딩 데이터 전송 시작:', completeData);
 
-      // 4. 통합 API 호출
-      const result = await onboarding.submitComplete(completeData);
+      // 4. 병렬 API 호출: 온보딩 완료 + 컨디션 저장
+      const conditionId = moodToConditionId(
+        completeData.mood as 'bad' | 'neutral' | 'good'
+      );
 
-      if (result.success) {
-        // 5. 일일 컨디션 저장
-        try {
-          const conditionId = moodToConditionId(
-            completeData.mood as 'bad' | 'neutral' | 'good'
-          );
-          await condition.saveDailyCondition({
+      await Promise.all([
+        // 못먹는 음식 저장 + 온보딩 완료 플래그 (development에서는 플래그만 건너뜀)
+        onboarding.submitComplete(completeData),
+        // 일일 컨디션 저장
+        condition
+          .saveDailyCondition({
             conditionId,
             isRecommendationStarted: true,
-          });
-          console.info('✅ 일일 컨디션 저장 성공:', {
-            conditionId,
-            mood: completeData.mood,
-          });
-        } catch (conditionError) {
-          // 컨디션 저장 실패는 로그만 남기고 온보딩 진행 계속
-          console.error('⚠️ 일일 컨디션 저장 실패:', conditionError);
-        }
+          })
+          .catch(conditionError => {
+            // 컨디션 저장 실패는 로그만 남기고 온보딩 진행 계속
+            console.error('⚠️ 일일 컨디션 저장 실패:', conditionError);
+          }),
+      ]);
 
-        // 6. 온보딩 완료 처리 - clearData 전에 Zustand 스토어에 모든 데이터 저장
-        // 알레르기 데이터 저장
-        setStepData(1, {
-          allergies: completeData.allergies,
-          selectedItems: completeData.allergies,
-        });
-        markStepCompleted(1);
+      console.info('✅ 모든 온보딩 API 호출 완료');
 
-        // 냉장고 데이터 저장
-        const refrigeratorData = {
-          selectedFoods: selectedFoodIds,
-        };
-        setStepData(3, refrigeratorData);
-        markStepCompleted(3);
+      // 6. 온보딩 완료 처리 - clearData 전에 Zustand 스토어에 모든 데이터 저장
+      // 알레르기 데이터 저장
+      setStepData(1, {
+        allergies: completeData.allergies,
+        selectedItems: completeData.allergies,
+      });
+      markStepCompleted(1);
 
-        await completeOnboarding();
+      // 냉장고 데이터 저장
+      const refrigeratorData = {
+        selectedFoods: selectedFoodIds,
+      };
+      setStepData(3, refrigeratorData);
+      markStepCompleted(3);
 
-        // 7. localStorage 데이터 정리 (Zustand는 유지됨)
-        onboardingStorage.clearData();
+      await completeOnboarding();
 
-        console.info('✅ 온보딩 완료!', {
-          allergies: completeData.allergies,
-          mood: completeData.mood,
-          selectedFoods: completeData.selectedFoods,
-        });
+      // 7. localStorage 데이터 정리 (Zustand는 유지됨)
+      onboardingStorage.clearData();
 
-        router.push('/');
-      } else {
-        throw new Error(result.message || '온보딩 완료 처리에 실패했습니다.');
-      }
+      console.info('✅ 온보딩 완료!', {
+        allergies: completeData.allergies,
+        mood: completeData.mood,
+        selectedFoods: completeData.selectedFoods,
+      });
+
+      router.push('/');
     } catch (error) {
       console.error('❌ 온보딩 완료 실패:', error);
 

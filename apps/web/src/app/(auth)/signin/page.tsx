@@ -4,6 +4,7 @@ import './styles.css';
 
 import { useEffect, useMemo } from 'react';
 import { useAuth } from '@recipot/contexts';
+import { getCookie } from '@recipot/utils';
 import { useRouter } from 'next/navigation';
 
 import { AuthButtons } from './_components/AuthButtons';
@@ -16,15 +17,10 @@ export default function SignInPage() {
   const router = useRouter();
 
   // 🔍 개발 중 확인용: 로그인 상태 콘솔 출력
+  // TODO: 토큰 리스폰스 버전으로 추후 작업
   useEffect(() => {
     if (user && token) {
       // 쿠키에서 토큰 확인
-      const getCookie = (name: string) => {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop()?.split(';').shift();
-        return null;
-      };
 
       const cookieToken =
         getCookie('accessToken') ??

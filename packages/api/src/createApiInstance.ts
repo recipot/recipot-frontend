@@ -1,5 +1,25 @@
 import axios, { AxiosInstance } from 'axios';
 
+// Zustand persist에서 토큰 읽기
+const getAuthToken = (): string | null => {
+  if (typeof window !== 'undefined') {
+    // Zustand persist에서 토큰 읽기
+    const authStorage = localStorage.getItem('auth-storage');
+    if (authStorage) {
+      try {
+        const parsed = JSON.parse(authStorage);
+        return parsed.state?.token || null;
+      } catch (error) {
+        console.error('토큰 파싱 실패:', error);
+      }
+    }
+
+    // 레거시 지원 (기존 authToken)
+    return localStorage.getItem('authToken');
+  }
+  return null;
+};
+
 export interface CreateApiInstanceOptions {
   /**
    * API 이름 (로깅용)
@@ -22,11 +42,6 @@ export interface CreateApiInstanceOptions {
    * 추가 헤더
    */
   headers?: Record<string, string>;
-
-  /**
-   * 인증 토큰 (선택적) - 삭제 예정
-   */
-  token?: string;
 }
 
 /**
@@ -52,7 +67,6 @@ export const createApiInstance = (
     baseURL: customBaseURL,
     headers = {},
     timeout = 10000,
-    token,
   } = options;
 
   // 환경별 baseURL 설정
@@ -72,7 +86,6 @@ export const createApiInstance = (
     baseURL,
     headers: {
       'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
       ...headers,
     },
     timeout,
@@ -81,12 +94,10 @@ export const createApiInstance = (
   // 요청 인터셉터
   instance.interceptors.request.use(
     config => {
-      // LocalStorage에서 토큰을 읽어서 Authorization 헤더에 추가
-      if (typeof window !== 'undefined') {
-        const token = localStorage.getItem('authToken');
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
-        }
+      // Zustand persist에서 토큰을 읽어서 Authorization 헤더에 추가
+      const token = getAuthToken();
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
       }
 
       if (process.env.NODE_ENV === 'development') {

@@ -29,7 +29,7 @@ export default function WarningModal({
     >
       <div className="space-y-4">
         <div className="flex justify-center space-x-2">
-          <Button variant="outline" size="full" onClick={onClose}>
+          <Button variant="outline" size="full" onClick={onConfirm}>
             확인
           </Button>
           <Button
@@ -37,7 +37,6 @@ export default function WarningModal({
             size="full"
             onClick={() => {
               onClose();
-              onConfirm();
             }}
           >
             취소
