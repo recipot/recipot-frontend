@@ -142,7 +142,7 @@ export default function RefrigeratorStep() {
         selectedFoods: completeData.selectedFoods,
       });
 
-      router.push('/');
+      router.push('/recipeRecommend');
     } catch (error) {
       console.error('❌ 온보딩 완료 실패:', error);
 
