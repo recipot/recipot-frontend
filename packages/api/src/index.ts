@@ -26,7 +26,7 @@ export { createApiInstance } from './createApiInstance';
 export type { CreateApiInstanceOptions } from './createApiInstance';
 
 // Recipe API
-export { recipe } from './recipeAPI';
+export { recipe } from './recipe';
 export type {
   RecipeIngredient,
   RecipeIngredients,

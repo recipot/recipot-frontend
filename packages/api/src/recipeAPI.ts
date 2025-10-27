@@ -41,33 +41,3 @@ export interface MeasurementGuideResponse {
     };
   };
 }
-
-// API 인스턴스
-const recipeApi = createApiInstance({ apiName: 'Recipe' });
-
-/**
- * 토큰을 사용하는 API 인스턴스 생성 헬퍼
- * @param token - 인증 토큰
- * @returns 토큰이 설정된 API 인스턴스
- */
-const createTokenizedApiInstance = (token: string) => {
-  const instance = createApiInstance({ apiName: 'Recipe' });
-
-  // 요청 인터셉터에서 토큰 추가
-  instance.interceptors.request.use(config => {
-    config.headers.Authorization = `Bearer ${token}`;
-    return config;
-  });
-
-  return instance;
-};
-
-/**
- * 레시피 관련 API
- */
-export const recipe = {
-  /**
-   * 레시피 추천 목록 조회
-   * @returns 추천 레시피 목록
-   */
-};
