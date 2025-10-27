@@ -99,7 +99,7 @@ export default function RecipeRecommend() {
           data: { items },
         },
       } = await axios.post<RecommendationResponse>(
-        `api/v1/recipes/recommendations`,
+        `/api/v1/recipes/recommendations`,
         {
           conditionId,
           pantryIds: selectedFoodIds,
@@ -142,7 +142,7 @@ export default function RecipeRecommend() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await axios.get(`api/v1/users/profile/me`, {
+        const res = await axios.get(`/api/v1/users/profile/me`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
