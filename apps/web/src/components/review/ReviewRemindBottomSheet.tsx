@@ -41,14 +41,11 @@ export function ReviewRemindBottomSheet() {
   const loadPendingReviews = useCallback(async () => {
     try {
       setLoading(true);
-      const axiosResponse = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/users/pending-reviews`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const axiosResponse = await axios.get(`api/v1/users/pending-reviews`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       const response: PendingReviewsResponse = axiosResponse.data;
 
