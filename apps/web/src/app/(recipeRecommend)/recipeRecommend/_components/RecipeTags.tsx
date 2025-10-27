@@ -1,14 +1,32 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
-const RecipeTags = ({
-  selectedIngredients,
-}: {
-  selectedIngredients?: string[];
-}) => {
+import { useFoodList } from '@/hooks/useFoodList';
+import { useSelectedFoodsStore } from '@/stores/selectedFoodsStore';
+
+const RecipeTags = () => {
+  const { data: foodList = [], isLoading } = useFoodList();
+  const selectedFoodIds = useSelectedFoodsStore(state => state.selectedFoodIds);
+
+  // ID를 이름으로 매핑
+  const selectedFoodNames = useMemo(() => {
+    return selectedFoodIds
+      .map(id => foodList.find(food => food.id === id)?.name)
+      .filter((name): name is string => name !== undefined);
+  }, [selectedFoodIds, foodList]);
+
+  // 최대 5개만 표시
+  const displayedFoods = selectedFoodNames.slice(0, 5);
+  const remainingCount = selectedFoodNames.length - 5;
+
+  // 로딩 중이거나 식재료가 없는 경우 렌더링하지 않음
+  if (isLoading || selectedFoodNames.length === 0) {
+    return null;
+  }
+
   return (
     <div className="recipe-tags mb-4 px-4">
       <div className="flex items-center justify-center gap-[6px]">
-        {selectedIngredients?.map(ingredient => (
+        {displayedFoods.map(ingredient => (
           <div
             key={ingredient}
             className="bg-secondary-light-green border-secondary-soft-green rounded-[6px] border px-2 py-[2px] text-[#53880A]"
@@ -16,6 +34,11 @@ const RecipeTags = ({
             <p className="text-14b">{ingredient}</p>
           </div>
         ))}
+        {remainingCount > 0 && (
+          <div className="bg-secondary-light-green border-secondary-soft-green rounded-[6px] border px-2 py-[2px] text-[#53880A]">
+            <p className="text-14b">+{remainingCount}개</p>
+          </div>
+        )}
       </div>
     </div>
   );
