@@ -19,9 +19,9 @@ const RecipeTitle = ({ condition }: RecipeTitleProps) => {
       case 1:
         return '요리할 여유가 거의...없어요';
       case 2:
-        return '요리할 여유가 충분해요!';
-      case 3:
         return '요리할 여유가 그저 그래요';
+      case 3:
+        return '요리할 여유가 충분해요!';
       default:
         return '요리할 여유가 그저 그래요';
     }
