@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
+import { allergy } from '@recipot/api';
 
 import { Allergy, useAllergyContext } from '@/components/Allergy';
 import type { AllergyFormSchema } from '@/components/Allergy/constants/constants';
@@ -101,10 +102,15 @@ function DietaryRestrictionsContent({
     return () => scrollContainer.removeEventListener('scroll', handleScroll);
   }, [scrollContainerRef, setActiveIndex]);
 
-  const handleSubmit = (data: z.infer<typeof AllergyFormSchema>) => {
-    // TODO: API 연동
-    onSave?.(data.items);
-    onClose();
+  const handleSubmit = async (data: z.infer<typeof AllergyFormSchema>) => {
+    try {
+      await allergy.updateRestrictedIngredients(data.items);
+      onSave?.(data.items);
+      onClose();
+    } catch (error) {
+      console.error('못 먹는 음식 설정에 실패했습니다: ', error);
+      alert('못 먹는 음식 설정에 실패했습니다. 잠시 후 다시 시도해주세요.');
+    }
   };
 
   return (
