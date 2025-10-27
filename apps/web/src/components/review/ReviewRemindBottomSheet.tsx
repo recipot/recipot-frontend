@@ -41,7 +41,7 @@ export function ReviewRemindBottomSheet() {
   const loadPendingReviews = useCallback(async () => {
     try {
       setLoading(true);
-      const axiosResponse = await axios.get(`/v1/users/pending-reviews`, {
+      const axiosResponse = await axios.get(`api/v1/users/pending-reviews`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
