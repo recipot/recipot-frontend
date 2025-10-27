@@ -26,12 +26,18 @@ export const RecipeActions = ({
           variant="ghost"
           size="icon"
           className="rounded-full border border-white bg-transparent hover:bg-transparent hover:text-white focus:bg-transparent focus:outline-none active:bg-transparent"
-          onClick={onToggleLike}
+          onClick={e => {
+            e.stopPropagation(); // 이벤트 전파 방지
+            onToggleLike();
+          }}
         >
           <HeartIcon className="h-5 w-5" color="#ffffff" active={isLiked} />
         </Button>
         <Button
-          onClick={handleExploreComplete}
+          onClick={e => {
+            e.stopPropagation(); // 이벤트 전파 방지
+            handleExploreComplete();
+          }}
           className="h-[52px] flex-1 rounded-full bg-white text-gray-900"
         >
           <CookIcon className="mr-2 h-[18px] w-[18px]" color="#212529" />
