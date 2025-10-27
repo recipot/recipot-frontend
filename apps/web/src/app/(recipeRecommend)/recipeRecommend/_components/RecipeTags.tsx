@@ -36,7 +36,7 @@ const RecipeTags = () => {
         ))}
         {remainingCount > 0 && (
           <div className="bg-secondary-light-green border-secondary-soft-green rounded-[6px] border px-2 py-[2px] text-[#53880A]">
-            <p className="text-14b">+{remainingCount}개</p>
+            <p className="text-14b">+{remainingCount}</p>
           </div>
         )}
       </div>
