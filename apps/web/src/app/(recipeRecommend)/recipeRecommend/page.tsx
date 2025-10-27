@@ -6,7 +6,9 @@ import './styles.css';
 import '@/components/EmotionState/styles.css';
 
 import React, { useCallback, useEffect, useState } from 'react';
+import { useAuth } from '@recipot/contexts';
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
 import { tokenUtils } from 'packages/api/src/auth';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
@@ -31,11 +33,24 @@ import TutorialPopup from './_components/TutorialPopup';
 import { SWIPER_CONFIG, SWIPER_MODULES, swiperStyles } from '../constants';
 
 export default function RecipeRecommend() {
+  const { loading, user } = useAuth();
+  const router = useRouter();
   const [likedRecipes, setLikedRecipes] = useState<Set<number>>(new Set());
   const [isLoading, setIsLoading] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const { isVisible, message, showToast } = useToast();
+
+  // 인증 상태 확인 및 리다이렉트
+  useEffect(() => {
+    if (loading) {
+      return;
+    }
+
+    if (!user) {
+      router.push('/signin');
+    }
+  }, [loading, user, router]);
 
   // 온보딩에서 저장된 사용자의 기분 상태 가져오기
   const cookStateData = useCookStateStepData();
@@ -110,6 +125,13 @@ export default function RecipeRecommend() {
       setLikedRecipes(bookmarkedIds);
     } catch (error) {
       console.error('레시피 추천 조회 실패:', error);
+      // 인증 오류인 경우 로그인 페이지로 리다이렉트
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        console.info('🔒 인증 오류, 로그인 페이지로 이동');
+        router.push('/signin');
+        return;
+      }
+      showToast('레시피를 불러오는데 실패했어요');
     }
   }, [userSelectedMood, selectedFoodIds, token]);
 
@@ -133,6 +155,12 @@ export default function RecipeRecommend() {
         }
       } catch (error) {
         console.error('프로필 조회 실패:', error);
+        // 인증 오류인 경우 로그인 페이지로 리다이렉트
+        if (axios.isAxiosError(error) && error.response?.status === 401) {
+          console.info('🔒 인증 오류, 로그인 페이지로 이동');
+          router.push('/signin');
+          return;
+        }
       }
     };
     fetchProfile();
@@ -170,6 +198,12 @@ export default function RecipeRecommend() {
       }
     } catch (error: unknown) {
       console.error('북마크 토글 실패:', error);
+      // 인증 오류인 경우 로그인 페이지로 리다이렉트
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        console.info('🔒 인증 오류, 로그인 페이지로 이동');
+        router.push('/signin');
+        return;
+      }
       showToast(
         isCurrentlyLiked
           ? '북마크 제거에 실패했어요'
@@ -200,6 +234,11 @@ export default function RecipeRecommend() {
       });
     }
   }, [activeIndex, recipes]);
+
+  // 로딩 중이거나 비로그인 사용자인 경우 빈 화면 표시
+  if (loading || !user) {
+    return null;
+  }
 
   return (
     <>

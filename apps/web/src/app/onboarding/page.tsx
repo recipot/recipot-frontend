@@ -34,10 +34,10 @@ function OnboardingContent() {
       return;
     }
 
-    // 이미 온보딩 완료한 사용자 → 메인 페이지로 이동
+    // 이미 온보딩 완료한 사용자 → 레시피 추천 페이지로 이동
     if (!user.isFirstEntry) {
-      console.info('✅ 이미 온보딩 완료, 메인 페이지로 이동');
-      router.push('/');
+      console.info('✅ 이미 온보딩 완료, 레시피 추천 페이지로 이동');
+      router.push('/recipeRecommend');
     }
   }, [loading, user, router]);
 
