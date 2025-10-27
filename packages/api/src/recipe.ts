@@ -17,8 +17,19 @@ export const recipe = {
     return response.data;
   },
 
-  getMyProfile: async () => {
-    const response = await recipeAPI.get(`/v1/users/profile/me`);
-    return response.data.data;
+  toggleBookmark: async (recipeId: number, isBookmarked: boolean) => {
+    if (isBookmarked) {
+      // DELETE 요청
+      const response = await recipeAPI.delete(
+        `/v1/users/recipes/bookmarks/${recipeId}`
+      );
+      return response.data;
+    } else {
+      // POST 요청
+      const response = await recipeAPI.post(`/v1/users/recipes/bookmarks`, {
+        recipeId,
+      });
+      return response.data;
+    }
   },
 };

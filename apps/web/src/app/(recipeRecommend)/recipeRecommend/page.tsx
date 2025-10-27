@@ -6,11 +6,11 @@ import './styles.css';
 import '@/components/EmotionState/styles.css';
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { recipe } from '@recipot/api';
+import { recipe, storedAPI } from '@recipot/api';
 import { useAuth } from '@recipot/contexts';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
-import { tokenUtils } from 'packages/api/src/auth';
+import { authService } from 'packages/api/src/auth';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
 import { moodToConditionId } from '@/app/onboarding/_utils/conditionMapper';
@@ -54,8 +54,6 @@ export default function RecipeRecommend() {
   const selectedFoodIds = useSelectedFoodsStore(state => state.selectedFoodIds);
 
   const userSelectedMood = cookStateData?.mood ?? 'neutral';
-
-  const token = tokenUtils.getToken();
 
   // condition 객체를 useMemo로 메모이제이션
   const condition = useMemo(
@@ -121,6 +119,8 @@ export default function RecipeRecommend() {
         bookmarkedRecipe.map((recipe: Recipe) => recipe.id)
       );
 
+      // 초기 북마크 상태 설정 완료
+
       setLikedRecipes(bookmarkedIds);
     } catch (error) {
       console.error('레시피 추천 조회 실패:', error);
@@ -141,7 +141,7 @@ export default function RecipeRecommend() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const userInfo = await recipe.getMyProfile();
+        const userInfo = await authService.getUserInfo();
 
         // 첫 진입 시 튜토리얼 표시
         if (userInfo.isFirstEntry) {
@@ -158,46 +158,61 @@ export default function RecipeRecommend() {
       }
     };
     fetchProfile();
-  }, [token]);
+  }, [router]);
 
   // 하트 아이콘 클릭 시 북마크 토글 함수
   const handleToggleBookmark = async (index: number, recipeId: number) => {
     if (isLoading) return;
 
-    setIsLoading(true);
-    const bookmarkURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/users/recipes/bookmarks`;
-    const config = {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
+    // 북마크 토글 시작
 
+    setIsLoading(true);
     const isCurrentlyLiked = likedRecipes.has(recipeId);
 
     try {
       if (isCurrentlyLiked) {
-        // DELETE 요청
-        await axios.delete(`${bookmarkURL}/${recipeId}`, config);
+        // 북마크 해제
+        await storedAPI.deleteStoredRecipe(recipeId);
         setLikedRecipes(prev => {
           const newSet = new Set(prev);
           newSet.delete(recipeId);
           return newSet;
         });
       } else {
-        // POST 요청
-        await axios.post(bookmarkURL, { recipeId }, config);
+        // 북마크 추가
+        await storedAPI.postStoredRecipe(recipeId);
         setLikedRecipes(prev => new Set(prev).add(recipeId));
-
         showToast('레시피가 저장되었어요!');
       }
     } catch (error: unknown) {
       console.error('북마크 토글 실패:', error);
+
       // 인증 오류인 경우 로그인 페이지로 리다이렉트
       if (axios.isAxiosError(error) && error.response?.status === 401) {
         console.info('🔒 인증 오류, 로그인 페이지로 이동');
         router.push('/signin');
         return;
       }
+
+      // 북마크를 찾을 수 없는 경우 (E1003) - 상태 동기화
+      if (axios.isAxiosError(error) && error.response?.status === 400) {
+        const errorData = error.response.data;
+        if (errorData?.code === 'E1003') {
+          console.warn('북마크 상태 불일치 감지, 프론트엔드 상태 동기화');
+          // 프론트엔드 상태를 백엔드와 동기화
+          if (isCurrentlyLiked) {
+            // 북마크 해제 시도했는데 북마크가 없다면, 프론트엔드에서 제거
+            setLikedRecipes(prev => {
+              const newSet = new Set(prev);
+              newSet.delete(recipeId);
+              return newSet;
+            });
+            showToast('북마크가 해제되었어요');
+            return;
+          }
+        }
+      }
+
       showToast(
         isCurrentlyLiked
           ? '북마크 제거에 실패했어요'
