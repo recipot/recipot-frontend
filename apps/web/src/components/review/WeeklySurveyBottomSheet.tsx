@@ -67,7 +67,7 @@ const getEligibilityData = async (token: string) => {
     data: {
       data: { isEligible, recentCompletionCount },
     },
-  } = await axios.get(`api/v1/health-survey/eligibility`, {
+  } = await axios.get(`/v1/health-survey/eligibility`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return { isEligible, recentCompletionCount };
@@ -76,7 +76,7 @@ const getEligibilityData = async (token: string) => {
 const getHealthSurveyPreparation = async (
   token: string
 ): Promise<HealthSurveyPreparationResponse> => {
-  const { data } = await axios.get(`api/v1/health-survey/preparation`, {
+  const { data } = await axios.get(`/v1/health-survey/preparation`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return data;
@@ -86,13 +86,9 @@ const submitHealthSurvey = async (
   data: HealthSurveyRequest,
   token: string
 ): Promise<HealthSurveyResponse> => {
-  const { data: responseData } = await axios.post(
-    `api/v1/health-survey`,
-    data,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
-  );
+  const { data: responseData } = await axios.post(`/v1/health-survey`, data, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
 
   return responseData;
 };
