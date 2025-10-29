@@ -150,7 +150,7 @@ export function ReviewBottomSheet({
     };
 
     try {
-      const res = await axios.post(
+      await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/reviews`,
         submitData,
         {
@@ -159,25 +159,30 @@ export function ReviewBottomSheet({
           },
         }
       );
-      console.info('리뷰 제출 결과:', res.data);
+
       onClose(); // 성공 시 모달 닫기
     } catch (error) {
-      if (error instanceof AxiosError) {
-        if (error.status === 400) {
-          throw new Error('레시피 완료 후에만 후기를 작성할 수 있습니다.');
+      if (error instanceof AxiosError && error.response) {
+        let errorMessage =
+          '리뷰 제출에 실패했습니다. 잠시 후 다시 시도해주세요.';
+        switch (error.response.status) {
+          case 400:
+            errorMessage = '레시피 완료 후에만 후기를 작성할 수 있습니다.';
+            break;
+          case 401:
+            errorMessage = '인증이 필요합니다. 다시 로그인해주세요.';
+            break;
+          case 404:
+            errorMessage = '사용자를 찾을 수 없습니다.';
+            break;
+          case 409:
+            errorMessage = '이미 해당 레시피에 대한 후기를 작성했습니다.';
+            break;
         }
-
-        if (error.status === 401) {
-          throw new Error('인증이 필요합니다.');
-        }
-
-        if (error.status === 404) {
-          throw new Error('사용자를 찾을 수 없습니다.');
-        }
-
-        if (error.status === 409) {
-          throw new Error('이미 해당 레시피에 대한 후기를 작성했습니다.');
-        }
+        // TODO: 사용자에게 토스트 메시지 등으로 에러를 알려주세요.
+        console.error(errorMessage, error);
+      } else {
+        console.error('리뷰 제출 실패:', error);
       }
       console.error('리뷰 제출 실패:', error);
     }
