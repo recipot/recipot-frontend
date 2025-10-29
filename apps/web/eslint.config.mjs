@@ -10,8 +10,8 @@ export default [
           ...config.languageOptions,
           parserOptions: {
             ...config.languageOptions.parserOptions,
-            project: undefined,
-            tsconfigRootDir: import.meta.dirname,
+            project: './tsconfig.json',
+            // tsconfigRootDir: import.meta.dirname,
           },
         },
       };
@@ -19,13 +19,7 @@ export default [
     return config;
   }),
   {
-    ignorePatterns: [
-      "node_modules/",
-      ".next/",
-      "dist/",
-      "build/",
-    ],
-
+    ignores: ['node_modules/', '.next/', 'dist/', 'build/'],
   },
   {
     rules: {
@@ -38,5 +32,4 @@ export default [
       parserOptions: { project: null },
     },
   },
-
 ];
