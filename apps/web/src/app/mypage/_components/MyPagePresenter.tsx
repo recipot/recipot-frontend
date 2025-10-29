@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 import { PageHeader } from '@/app/mypage/_components/PageHeader';
-import { useOnboardingStore } from '@/stores/onboardingStore';
+import { useAllergiesStore } from '@/stores/allergiesStore';
 import type { DietaryRestriction, User } from '@/types/MyPage.types';
 
 import DietaryRestrictions from './DietaryRestrictions';
@@ -27,7 +27,8 @@ export function MyPagePresenter({
   user,
 }: MyPagePresenterProps) {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const setStepData = useOnboardingStore(state => state.setStepData);
+  const setAllergies = useAllergiesStore(state => state.setAllergies);
+  const setSelectedItems = useAllergiesStore(state => state.setSelectedItems);
 
   const handleOpenSheet = () => setIsSheetOpen(true);
   const handleCloseSheet = () => setIsSheetOpen(false);
@@ -39,11 +40,9 @@ export function MyPagePresenter({
     // TODO: API 연동하여 서버에 저장
     console.info('선택된 못먹는 음식 ID:', selectedItems);
 
-    // 온보딩 스토어 업데이트 (로컬 상태 관리)
-    setStepData(1, {
-      allergies: selectedItems,
-      selectedItems,
-    });
+    // 알러지 스토어 업데이트 (로컬 상태 관리)
+    setAllergies(selectedItems);
+    setSelectedItems(selectedItems);
 
     console.info('✅ 못먹는 음식이 업데이트되었습니다.');
     // 서버 응답 후 restrictions 상태를 업데이트해야 함
