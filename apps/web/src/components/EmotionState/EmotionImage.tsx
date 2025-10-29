@@ -40,27 +40,27 @@ export default function EmotionImage({ mood }: { mood: MoodType }) {
     switch (mood) {
       case 'bad':
         return {
-          arrow: 'after:border-t-[#ECF2FF]',
-          bg: 'bg-[#ECF2FF]',
-          text: 'text-[#4F70B5]',
+          arrow: 'after:border-t-[hsl(var(--feel-back-tired))]',
+          bg: 'bg-feel-back-tired',
+          text: 'text-feel-tired-text',
         };
       case 'neutral':
         return {
-          arrow: 'after:border-t-[#FFFADB]',
-          bg: 'bg-[#FFFADB]',
-          text: 'text-[#BDAA2A]',
+          arrow: 'after:border-t-[hsl(var(--feel-back-soso))]',
+          bg: 'bg-feel-back-soso',
+          text: 'text-feel-soso-text',
         };
       case 'good':
         return {
-          arrow: 'after:border-t-[#FFEEEE]',
-          bg: 'bg-[#FFEEEE]',
-          text: 'text-[#CF7284]',
+          arrow: 'after:border-t-[hsl(var(--feel-back-free))]',
+          bg: 'bg-feel-back-free',
+          text: 'text-feel-free-text',
         };
       default:
         return {
-          arrow: 'after:border-t-[#ECF8DF]',
-          bg: 'bg-[#ECF8DF]',
-          text: 'text-[#629227]',
+          arrow: 'after:border-t-[hsl(var(--feel-back-default))]',
+          bg: 'bg-feel-back-default',
+          text: 'text-primary',
         };
     }
   };
