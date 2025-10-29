@@ -82,7 +82,7 @@ export default function EmotionImage({ mood }: { mood: MoodType }) {
           {getMessage(mood)}
         </p>
       </div>
-      <div className="relative flex h-[200px] w-full items-center justify-center overflow-hidden">
+      <div className="relative flex h-[200px] w-full items-center justify-center overflow-hidden pb-10">
         {/* 캐릭터 - 젓가락 위에 올라감 */}
         <div className="relative z-10 before:absolute before:bottom-[-30px] before:-left-4 before:z-[-1] before:h-[74px] before:w-[320px] before:bg-[url('/emotion/img-chopsticks.png')] before:bg-contain before:bg-no-repeat before:content-['']">
           <Image

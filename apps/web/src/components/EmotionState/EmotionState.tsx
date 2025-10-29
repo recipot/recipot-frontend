@@ -67,7 +67,7 @@ const EmotionState: React.FC<EmotionStateProps> = ({
   return (
     <div
       className={cn(
-        'flex h-[95vh] w-full flex-col items-center justify-center overflow-hidden',
+        'flex w-full flex-col items-center justify-center overflow-hidden',
         className,
         getBackgroundGradient(selectedMood)
       )}
