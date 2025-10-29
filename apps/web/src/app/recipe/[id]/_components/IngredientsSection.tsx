@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { useAuth } from '@recipot/contexts';
 import axios from 'axios';
-import { tokenUtils } from 'packages/api/src/auth';
 
 import IngredientGroup from './IngredientGroup';
 import {
@@ -39,7 +39,7 @@ export function IngredientsSection({
   const [activeTab, setActiveTab] = useState<string | null>(null);
   const [measurementData, setMeasurementData] = useState<MeasurementData>({});
 
-  const token = tokenUtils.getToken();
+  const { token } = useAuth();
 
   // 탭 ID와 API 카테고리명 매핑
 

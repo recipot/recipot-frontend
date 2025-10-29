@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
+import { useAuth } from '@recipot/contexts';
 import axios from 'axios';
-import { tokenUtils } from 'packages/api/src/auth';
 
 import type { Recipe } from '@/types/recipe.types';
 
@@ -18,10 +18,10 @@ export function useCookingOrder(recipeId: string): UseCookingOrderReturn {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
+  const { token } = useAuth();
 
   useEffect(() => {
     const fetchRecipe = async () => {
-      const token = tokenUtils.getToken();
       try {
         setIsLoading(true);
         setError(null);

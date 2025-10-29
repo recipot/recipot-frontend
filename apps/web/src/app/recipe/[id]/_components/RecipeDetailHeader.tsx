@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
+import { useAuth } from '@recipot/contexts';
 import axios from 'axios';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { tokenUtils } from 'packages/api/src/auth';
 
 import { Button } from '@/components/common/Button';
 import { Modal } from '@/components/common/Modal/Modal';
@@ -25,7 +25,7 @@ interface RecipeHeaderProps {
 
 export function RecipeDetailHeader({ recipe }: RecipeHeaderProps) {
   const router = useRouter();
-  const token = tokenUtils.getToken();
+  const { token } = useAuth();
 
   const [isLiked, setIsLiked] = useState(recipe.isBookmarked);
   const [isLoading, setIsLoading] = useState(false);

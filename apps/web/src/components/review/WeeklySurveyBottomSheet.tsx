@@ -2,8 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+import { useAuth } from '@recipot/contexts';
 import axios from 'axios';
-import { tokenUtils } from 'packages/api/src/auth';
 
 import { Button } from '../common/Button';
 import { CloseIcon } from '../Icons';
@@ -156,7 +156,7 @@ const HealthChangeOptions = ({
 );
 
 export function WeeklySurveyBottomSheet() {
-  const token = tokenUtils.getToken();
+  const { token } = useAuth();
   const [isOpen, setIsOpen] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [preparationData, setPreparationData] =

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { useAuth } from '@recipot/contexts';
 import axios from 'axios';
-import { tokenUtils } from 'packages/api/src/auth';
 
 import {
   MeasurementGuideContent,
@@ -43,7 +43,7 @@ export function MeasurementGuide({
     setActiveTab(tab);
   };
 
-  const token = tokenUtils.getToken();
+  const { token } = useAuth();
 
   const fetchMeasurementGuides = React.useCallback(async () => {
     if (isLoading) return;

@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useAuth } from '@recipot/contexts';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
-import { tokenUtils } from 'packages/api/src/auth';
 
 import { Button } from '@/components/common/Button';
 import { CookIcon } from '@/components/Icons';
@@ -19,7 +19,7 @@ import type { ApiResponse, Recipe, TabId } from '../types/recipe.types';
 
 export function RecipeDetail({ recipeId }: { recipeId: string }) {
   const tabContainerRef = useRef<HTMLDivElement>(null);
-  const token = tokenUtils.getToken();
+  const { token } = useAuth();
   const [recipeData, setRecipeData] = useState<Recipe | null>(null);
   const router = useRouter();
 

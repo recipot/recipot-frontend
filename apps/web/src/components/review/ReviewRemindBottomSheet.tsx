@@ -2,9 +2,9 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+import { useAuth } from '@recipot/contexts';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
-import { tokenUtils } from 'packages/api/src/auth';
 
 import type { PendingReviewsResponse, Recipe } from '@/types/recipe.types';
 
@@ -21,7 +21,7 @@ export function ReviewRemindBottomSheet() {
   const [recipes, setRecipes] = useState<ReviewRecipeData[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const token = tokenUtils.getToken();
+  const { token } = useAuth();
 
   // 24시간 경과 여부 체크
   const shouldShowBottomSheet = () => {

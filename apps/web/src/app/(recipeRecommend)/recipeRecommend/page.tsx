@@ -10,7 +10,6 @@ import { recipe } from '@recipot/api';
 import { useAuth } from '@recipot/contexts';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
-import { tokenUtils } from 'packages/api/src/auth';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
 import { moodToConditionId } from '@/app/onboarding/_utils/conditionMapper';
@@ -58,7 +57,7 @@ export default function RecipeRecommend() {
 
   const userSelectedMood = mood ?? 'neutral';
 
-  const token = tokenUtils.getToken();
+  const { token } = useAuth();
 
   // condition 객체를 useMemo로 메모이제이션
   const condition = useMemo(

@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import { useAuth } from '@recipot/contexts';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
-import { tokenUtils } from 'packages/api/src/auth';
 
 import { useCookingOrder } from '@/hooks/useCookingOrder';
 
@@ -27,7 +27,7 @@ export default function CookingOrderPresenter({
   const { completeStep, error, isLoading, recipe } = useCookingOrder(recipeId);
   const router = useRouter();
 
-  const token = tokenUtils.getToken();
+  const { token } = useAuth();
 
   // 모달 상태 통합 관리
   const [activeModal, setActiveModal] = useState<ModalType>(null);

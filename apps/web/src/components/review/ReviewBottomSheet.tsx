@@ -3,11 +3,10 @@
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+import { useAuth } from '@recipot/contexts';
 import axios, { AxiosError } from 'axios';
 import Image from 'next/image';
-import { tokenUtils } from 'packages/api/src/auth';
 
-// import Image from 'next/image';
 import type {
   ReviewBottomSheetProps,
   ReviewData,
@@ -44,8 +43,7 @@ export function ReviewBottomSheet({
 }: ReviewBottomSheetProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [reviewData, setReviewData] = useState<ReviewData | null>(null);
-
-  const token = tokenUtils.getToken();
+  const { token } = useAuth();
 
   // v1/reviews/preparation API 호출
   useEffect(() => {

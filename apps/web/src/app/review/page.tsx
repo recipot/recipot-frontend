@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { ReviewBottomSheet } from '@/components/review/ReviewBottomSheet';
 
-export default function ReviewPage() {
+function ReviewContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isOpen, setIsOpen] = useState(false);
@@ -46,5 +46,13 @@ export default function ReviewPage() {
       onClose={handleClose}
       recipeId={completedRecipeId}
     />
+  );
+}
+
+export default function ReviewPage() {
+  return (
+    <Suspense fallback={null}>
+      <ReviewContent />
+    </Suspense>
   );
 }
