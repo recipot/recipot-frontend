@@ -2,10 +2,10 @@ import Image from 'next/image';
 
 import { cn } from '@/lib/utils';
 
+import TiredBird from '../../../public/emotion/img-bird-bad.png';
 import DefaultBird from '../../../public/emotion/img-bird-default.png';
-import TiredBird from '../../../public/emotion/img-brid-bad.png';
-import HappyBird from '../../../public/emotion/img-brid-good.png';
-import NormalBird from '../../../public/emotion/img-brid-neutral.png';
+import HappyBird from '../../../public/emotion/img-bird-good.png';
+import NormalBird from '../../../public/emotion/img-bird-neutral.png';
 
 import type { MoodType } from './EmotionState';
 
@@ -82,12 +82,12 @@ export default function EmotionImage({ mood }: { mood: MoodType }) {
           {getMessage(mood)}
         </p>
       </div>
-      <div className="relative flex h-[200px] w-full items-center justify-center overflow-hidden pb-10">
+      <div className="relative flex h-[200px] w-full items-center justify-center overflow-hidden">
         {/* 캐릭터 - 젓가락 위에 올라감 */}
-        <div className="relative z-10 before:absolute before:bottom-[-30px] before:-left-4 before:z-[-1] before:h-[74px] before:w-[320px] before:bg-[url('/emotion/img-chopsticks.png')] before:bg-contain before:bg-no-repeat before:content-['']">
+        <div className="relative z-10 before:absolute before:bottom-[-5px] before:-left-4 before:z-[-1] before:h-[74px] before:w-[320px] before:bg-[url('/emotion/img-chopsticks.png')] before:bg-contain before:bg-no-repeat before:content-['']">
           <Image
-            width={118}
-            height={133}
+            width={180}
+            height={180}
             src={getEmotionImage(mood)}
             alt="emotion"
             quality={100}
