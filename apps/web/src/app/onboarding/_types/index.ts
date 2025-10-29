@@ -10,13 +10,7 @@ export interface OnboardingStepProps {
   isSubmitting: boolean;
 }
 
-/**
- * 복구 다이얼로그 데이터
- */
-export interface RestoreDialogData {
-  restoredStep: number;
-  completedSteps: number[];
-}
+
 
 /**
  * 알레르기 스텝 데이터

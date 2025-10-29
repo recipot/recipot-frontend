@@ -7,7 +7,7 @@ import { MyPagePresenter } from '@/app/mypage/_components/MyPagePresenter';
 import { useAllergyData } from '@/components/Allergy';
 import { useCompletedRecipes } from '@/hooks/useCompletedRecipes';
 import { mockRestrictions, mockUser } from '@/mocks/data/myPage.mock';
-import { useAllergyStepData } from '@/stores/onboardingStore';
+import { useAllergiesStore } from '@/stores/allergiesStore';
 
 export function MyPageContainer() {
   const { user } = useAuth();
@@ -17,7 +17,7 @@ export function MyPageContainer() {
     useCompletedRecipes({ limit: 10, page: 1 });
 
   // 온보딩에서 저장된 알레르기 데이터 가져오기
-  const allergyStepData = useAllergyStepData();
+  const allergyStepData = useAllergiesStore();
   const { categories } = useAllergyData();
 
   const restrictions = useMemo(() => {

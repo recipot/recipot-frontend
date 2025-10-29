@@ -18,7 +18,7 @@ import { Header } from '@/components/common/Header';
 import { Toast } from '@/components/common/Toast';
 import { RecipeCard } from '@/components/RecipeCard';
 import { useToast } from '@/hooks/useToast';
-import { useCookStateStepData } from '@/stores/onboardingStore';
+import { useMoodStore } from '@/stores/moodStore';
 import { useSelectedFoodsStore } from '@/stores/selectedFoodsStore';
 import type { Recipe, RecommendationItem } from '@/types/recipe.types';
 import { getEmotionGradient } from '@/utils/emotionGradient';
@@ -28,6 +28,9 @@ import RecipeTags from './_components/RecipeTags';
 import RecipeTitle from './_components/RecipeTitle';
 import TutorialPopup from './_components/TutorialPopup';
 import { SWIPER_CONFIG, SWIPER_MODULES, swiperStyles } from '../constants';
+
+// localStorage 키 상수
+const TUTORIAL_CLOSED_KEY = 'recipe-recommend-tutorial-closed';
 
 export default function RecipeRecommend() {
   const { loading, user } = useAuth();
@@ -50,10 +53,10 @@ export default function RecipeRecommend() {
   }, [loading, user, router]);
 
   // 온보딩에서 저장된 사용자의 기분 상태 가져오기
-  const cookStateData = useCookStateStepData();
+  const mood = useMoodStore(state => state.mood);
   const selectedFoodIds = useSelectedFoodsStore(state => state.selectedFoodIds);
 
-  const userSelectedMood = cookStateData?.mood ?? 'neutral';
+  const userSelectedMood = mood ?? 'neutral';
 
   const token = tokenUtils.getToken();
 
@@ -143,8 +146,11 @@ export default function RecipeRecommend() {
       try {
         const userInfo = await recipe.getMyProfile();
 
-        // 첫 진입 시 튜토리얼 표시
-        if (userInfo.isFirstEntry) {
+        // localStorage 확인 - 이미 튜토리얼을 닫은 적이 있는지 체크
+        const tutorialClosed = localStorage.getItem(TUTORIAL_CLOSED_KEY);
+
+        // 첫 진입이고, 아직 튜토리얼을 닫은 적이 없을 때만 표시
+        if (userInfo.isFirstEntry && !tutorialClosed) {
           setShowTutorial(true);
         }
       } catch (error) {
@@ -214,6 +220,8 @@ export default function RecipeRecommend() {
   };
 
   const handleCloseTutorial = () => {
+    // localStorage에 튜토리얼 닫음 플래그 저장
+    localStorage.setItem(TUTORIAL_CLOSED_KEY, 'true');
     setShowTutorial(false);
   };
 

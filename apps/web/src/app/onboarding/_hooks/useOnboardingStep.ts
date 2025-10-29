@@ -1,56 +1,40 @@
 import { useState } from 'react';
 
-import { onboardingStorage } from '../_utils/onboardingStorage';
 import { useOnboardingActions } from './useOnboardingActions';
 
 import type { OnboardingStepNumber } from '../_constants';
-import type { OnboardingStepDataMap } from '../_types';
-import type {
-  Step1Data,
-  Step2Data,
-  Step3Data,
-} from '../_utils/onboardingStorage';
 
 /**
  * 온보딩 스텝 공통 로직 훅
+ *
+ * 주의: 데이터는 각 도메인 스토어에서 관리됩니다:
+ * - allergiesStore: 알러지 데이터
+ * - moodStore: 기분/컨디션 데이터
+ * - selectedFoodsStore: 선택된 음식 데이터
  */
 export function useOnboardingStep<T extends OnboardingStepNumber>(
   stepNumber: T
 ) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { goToNextStep, markStepCompleted, setStepData } =
-    useOnboardingActions();
+  const { goToNextStep, markStepCompleted } = useOnboardingActions();
 
   /**
-   * 데이터 저장 및 다음 단계 진행
+   * 다음 단계 진행
    */
-  const saveAndProceed = async (data: OnboardingStepDataMap[T]) => {
+  const saveAndProceed = async () => {
     try {
       setIsSubmitting(true);
-      // localStorage에 데이터 저장
-      // 타입 안전성을 위한 조건부 호출
-      if (stepNumber === 1) {
-        onboardingStorage.saveStepData(1, data as Omit<Step1Data, 'timestamp'>);
-      } else if (stepNumber === 2) {
-        onboardingStorage.saveStepData(2, data as Omit<Step2Data, 'timestamp'>);
-      } else if (stepNumber === 3) {
-        onboardingStorage.saveStepData(3, data as Omit<Step3Data, 'timestamp'>);
-      } else {
-        throw new Error(`지원하지 않는 스텝 번호: ${stepNumber}`);
-      }
 
-      // 스토어 업데이트 (UI 상태 관리용)
-      setStepData(stepNumber, data);
+      // 온보딩 진행 상태 업데이트
       markStepCompleted(stepNumber);
-
-      console.info(`✅ Step ${stepNumber} 완료:`, data);
 
       // 다음 단계로 이동
       goToNextStep();
     } catch (error) {
-      console.error(`❌ Step ${stepNumber} 데이터 저장 실패:`, error);
-      throw error;
+      console.error(`❌ Step ${stepNumber} 진행 실패:`, error);
+      throw error; // 에러를 다시 던져서 호출한 쪽에서 처리할 수 있도록 함
     } finally {
+      // 비동기 작업이므로 finally에서 false로 설정
       setIsSubmitting(false);
     }
   };

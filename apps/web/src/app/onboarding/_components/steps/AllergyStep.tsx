@@ -3,13 +3,14 @@
 import { useEffect, useMemo } from 'react';
 
 import { Allergy, useAllergyContext } from '@/components/Allergy';
-import { useOnboardingStore } from '@/stores/onboardingStore';
+import { useAllergiesStore } from '@/stores/allergiesStore';
 
 import { ONBOARDING_CONSTANTS, SCROLLBAR_HIDE_STYLE } from '../../_constants';
 import { useOnboardingActions, useOnboardingStep } from '../../_hooks';
 import { getSubmitButtonText, onboardingStyles } from '../../_utils';
 
-import type { AllergyStepData } from '../../_types';
+// 온보딩에서는 초기값이 빈 배열이어야 함
+const EMPTY_INITIAL_ITEMS: number[] = [];
 
 function AllergyStepContent() {
   // 온보딩 스텝 로직
@@ -21,6 +22,10 @@ function AllergyStepContent() {
   // Context에서 상태 가져오기
   const { resetItems, selectedItems } = useAllergyContext();
 
+  // 알러지 스토어에 저장
+  const setAllergies = useAllergiesStore(state => state.setAllergies);
+  const setSelectedItems = useAllergiesStore(state => state.setSelectedItems);
+
   // 새로고침 버튼을 눌렀을 때만 로컬 상태 초기화
   useEffect(() => {
     if (isRefreshed) {
@@ -31,12 +36,11 @@ function AllergyStepContent() {
 
   const handleSubmit = async (data: { items: number[] }) => {
     try {
-      const allergyData: AllergyStepData = {
-        allergies: data.items,
-        selectedItems,
-      };
+      // 알러지 스토어에 저장
+      setAllergies(data.items);
+      setSelectedItems(selectedItems);
 
-      await saveAndProceed(allergyData);
+      await saveAndProceed();
     } catch (error) {
       handleError(error as Error);
     }
@@ -76,10 +80,6 @@ function AllergyStepContent() {
 }
 
 export default function AllergyStep() {
-  // 저장된 데이터 불러오기
-  const stepData = useOnboardingStore(state => state.stepData[1]);
-  const savedSelectedItems = stepData?.selectedItems ?? [];
-
   const scrollConfig = useMemo(
     () => ({
       navigationOffset: 130,
@@ -92,7 +92,8 @@ export default function AllergyStep() {
   return (
     <Allergy
       formId="allergy-form"
-      initialSelectedItems={savedSelectedItems}
+      initialSelectedItems={EMPTY_INITIAL_ITEMS}
+      isOnboarding
       scrollConfig={scrollConfig}
     >
       <AllergyStepContent />

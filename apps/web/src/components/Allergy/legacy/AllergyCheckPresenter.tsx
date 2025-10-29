@@ -1,5 +1,6 @@
 'use client';
 
+import CheckboxIcon from '@/components/common/CheckboxIcon';
 import type { AllergyCategory } from '@/types/allergy.types';
 
 import AllergyCheckItem from '../legacy/AllergyCheckItem';
@@ -63,16 +64,15 @@ export default function AllergyCheckPresenter({
                 {category.title}
               </legend>
               {onCategoryToggle && (
-                <label className="flex cursor-pointer items-center gap-2">
-                  {/* TODO: 추후 공통 컴포넌트로 교체 예정 */}
-                  <input
-                    type="checkbox"
-                    checked={isFullySelected}
-                    onChange={() => onCategoryToggle(categoryItemIds)}
-                    className="text-primary focus:ring-primary h-5 w-5 cursor-pointer rounded border-gray-300 focus:ring-2 focus:ring-offset-2"
-                  />
+                <button
+                  type="button"
+                  className="flex cursor-pointer items-center gap-2"
+                  onClick={() => onCategoryToggle(categoryItemIds)}
+                  aria-label="전체선택"
+                >
+                  <CheckboxIcon isSelected={isFullySelected} />
                   <span className="text-15 text-gray-700">전체선택</span>
-                </label>
+                </button>
               )}
             </div>
             <AllergyCheckItem

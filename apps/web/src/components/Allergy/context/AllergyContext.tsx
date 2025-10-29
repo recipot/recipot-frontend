@@ -47,6 +47,8 @@ interface AllergyProviderProps {
   children: ReactNode;
   formId: string;
   initialSelectedItems?: number[];
+  /** 온보딩 모드 여부 (true일 경우 백엔드 초기값 무시) */
+  isOnboarding?: boolean;
   scrollConfig?: Partial<AllergyContextValue['scrollConfig']>;
 }
 
@@ -54,19 +56,23 @@ export function AllergyProvider({
   children,
   formId,
   initialSelectedItems = [],
+  isOnboarding = false,
   scrollConfig: customScrollConfig,
 }: AllergyProviderProps) {
   // 백엔드에서 재료 데이터 페칭
   const { categories, error, initialSelectedIds, isLoading } = useAllergyData();
 
-  // 초기값 결정 (props > 백엔드 초기값 > 빈 배열) - 메모이제이션으로 무한 렌더링 방지
-  const initialItems = useMemo(
-    () =>
-      initialSelectedItems.length > 0
-        ? initialSelectedItems
-        : (initialSelectedIds ?? []),
-    [initialSelectedItems, initialSelectedIds]
-  );
+  // 초기값 결정 - 메모이제이션으로 무한 렌더링 방지
+  // 온보딩 모드: 항상 빈 배열 (백엔드 초기값 무시)
+  // 일반 모드: props > 백엔드 초기값 > 빈 배열
+  const initialItems = useMemo(() => {
+    if (isOnboarding) {
+      return [];
+    }
+    return initialSelectedItems.length > 0
+      ? initialSelectedItems
+      : (initialSelectedIds ?? []);
+  }, [isOnboarding, initialSelectedItems, initialSelectedIds]);
 
   const { handleCategoryToggle, handleItemToggle, resetItems, selectedItems } =
     useAllergyCheck(initialItems);

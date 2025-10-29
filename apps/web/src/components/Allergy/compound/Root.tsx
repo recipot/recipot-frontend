@@ -8,6 +8,8 @@ interface AllergyRootProps {
   children: ReactNode;
   formId: string;
   initialSelectedItems?: number[];
+  /** 온보딩 모드 여부 (true일 경우 백엔드 초기값 무시) */
+  isOnboarding?: boolean;
   scrollConfig?: {
     containerRef?: RefObject<HTMLElement>;
     navigationOffset?: number;
@@ -24,6 +26,7 @@ interface AllergyRootProps {
  * @param children - 자식 컴포넌트
  * @param formId - 폼 ID (외부 버튼과 연결용)
  * @param initialSelectedItems - 초기 선택된 항목 ID 배열
+ * @param isOnboarding - 온보딩 모드 여부 (true일 경우 백엔드 초기값 무시)
  * @param scrollConfig - 스크롤 설정
  *   - containerRef: 스크롤 컨테이너 ref (드로어용)
  *   - navigationOffset: 네비게이션 오프셋
@@ -34,12 +37,14 @@ export default function AllergyRoot({
   children,
   formId,
   initialSelectedItems,
+  isOnboarding,
   scrollConfig,
 }: AllergyRootProps) {
   return (
     <AllergyProvider
       formId={formId}
       initialSelectedItems={initialSelectedItems}
+      isOnboarding={isOnboarding}
       scrollConfig={scrollConfig}
     >
       {children}

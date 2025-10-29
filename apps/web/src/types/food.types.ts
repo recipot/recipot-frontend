@@ -21,9 +21,11 @@ export interface FoodListApiResponse {
 
 export interface SelectedFoodsStore {
   selectedFoodIds: number[];
+  userId: string | null;
   toggleFood: (foodId: number) => void;
   clearAllFoods: () => void;
   isSelected: (foodId: number) => boolean;
   getSelectedCount: () => number;
   getSelectedFoods: (foodList: Food[]) => Food[];
+  validateUserSession: (currentUserId: string | null) => void;
 }

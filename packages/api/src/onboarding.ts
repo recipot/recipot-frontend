@@ -44,9 +44,7 @@ export const onboarding = {
       errors.push('At least 2 ingredients required');
     }
 
-    if (!data.sessionId || typeof data.sessionId !== 'string') {
-      errors.push('Invalid session information');
-    }
+    // sessionId는 현재 사용하지 않으므로 검증 제외
 
     return {
       errors,
