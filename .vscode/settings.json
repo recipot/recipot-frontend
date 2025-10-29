@@ -45,5 +45,13 @@
     "editor.codeActionsOnSave": {
       "source.fixAll.eslint": "explicit"
     }
-  }
+  },
+  
+  // TypeScript 설정
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.preferences.includePackageJsonAutoImports": "on",
+  "typescript.suggest.autoImports": true,
+  
+  // 프로젝트 참조 관련 경고 무시
+  "typescript.tsc.autoDetect": "off"
 }
