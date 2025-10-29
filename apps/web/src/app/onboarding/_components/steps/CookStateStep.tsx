@@ -53,7 +53,7 @@ export default function CookStateStep() {
   };
 
   return (
-    <div className="relative">
+    <div className="relative overflow-hidden">
       {/* 배경 - 전체 화면 고정 */}
       <EmotionBackground mood={selectedMood} className="fixed inset-0 -z-10" />
 
