@@ -12,8 +12,7 @@ import { Button } from '@/components/common/Button';
 import { Header } from '@/components/common/Header';
 import { LoadingPage } from '@/components/common/Loading';
 import { Toast } from '@/components/common/Toast/Toast';
-import type { MoodType } from '@/components/EmotionState';
-import EmotionState from '@/components/EmotionState';
+import { EmotionContainer, type MoodType } from '@/components/EmotionState';
 import UserIcon from '@/components/Icons/UserIcon';
 import { IngredientsSearch } from '@/components/IngredientsSearch';
 import { ReviewRemindBottomSheet } from '@/components/review/ReviewRemindBottomSheet';
@@ -243,9 +242,9 @@ export default function Home() {
             </p>
           </div>
 
-          {/* EmotionState Component */}
+          {/* EmotionContainer Component */}
           <div className="flex-1">
-            <EmotionState
+            <EmotionContainer
               showImage
               onMoodChange={handleMoodChange}
               onTypingComplete={handleTypingComplete}
