@@ -1,6 +1,6 @@
 import React from 'react';
 
-import type { Ingredient, IngredientsGroup } from '../types/recipe.types';
+import type { Ingredient, IngredientsGroup } from 'packages/api/src/types';
 
 interface IngredientGroupProps {
   ingredients: IngredientsGroup;

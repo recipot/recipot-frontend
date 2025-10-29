@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
-import { tokenUtils } from 'packages/api/src/auth';
+import { recipe as recipeAPI } from 'packages/api/src/recipe';
 
-import type { Recipe } from '@/types/recipe.types';
+import type { Recipe } from 'packages/api/src/types';
 
 interface UseCookingOrderReturn {
   recipe: Recipe | null;
@@ -13,7 +12,7 @@ interface UseCookingOrderReturn {
   getProgressPercentage: () => number;
 }
 
-export function useCookingOrder(recipeId: string): UseCookingOrderReturn {
+export function useCookingOrder(recipeId: number): UseCookingOrderReturn {
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -21,40 +20,16 @@ export function useCookingOrder(recipeId: string): UseCookingOrderReturn {
 
   useEffect(() => {
     const fetchRecipe = async () => {
-      const token = tokenUtils.getToken();
       try {
         setIsLoading(true);
         setError(null);
 
         // 요리 시작 API 호출
-        // await recipeAPI.startCooking(recipeId);
-        await axios.post(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/users/recipes/${recipeId}/start`,
-          {
-            recipeId,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        await recipeAPI.startCooking(recipeId);
 
-        // const fetchedRecipe = await recipeAPI.getRecipe(recipeId);
-        const {
-          data: { data },
-        } = await axios.get(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/recipes/${recipeId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
+        // 레시피 상세 조회
+        const data = await recipeAPI.getRecipeDetail(recipeId);
         setRecipe(data);
-
-        // setRecipe(fetchedRecipe);
       } catch (err) {
         console.error('Recipe fetch error:', err);
         setError('레시피를 불러오는 중 오류가 발생했습니다.');

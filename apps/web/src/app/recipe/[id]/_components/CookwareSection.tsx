@@ -2,7 +2,7 @@ import React from 'react';
 
 import CookWareTransparentIcon from '@/components/Icons/CookWareTransparentIcon';
 
-import type { Cookware } from '../types/recipe.types';
+import type { Cookware } from 'packages/api/src/types';
 
 interface CookwareSectionProps {
   cookware: Cookware[];

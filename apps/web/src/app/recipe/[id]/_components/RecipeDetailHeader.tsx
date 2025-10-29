@@ -17,7 +17,7 @@ import {
 } from '@/components/Icons';
 import WebShareButton from '@/components/Share/WebShareButton';
 
-import type { Recipe } from '../types/recipe.types';
+import type { Recipe } from 'packages/api/src/types';
 
 interface RecipeHeaderProps {
   recipe: Recipe;
@@ -168,14 +168,12 @@ export function RecipeDetailHeader({ recipe }: RecipeHeaderProps) {
           <div className="absolute top-4 right-4 left-4 flex space-x-2">
             <div className="flex items-center space-x-1 rounded-full px-3 py-1.5">
               <CardTimeIcon size={24} color="#ffffff" />
-              <span className="text-sm font-medium text-white">
-                {recipe.duration}분
-              </span>
+              <span className="text-17 text-white">{recipe.duration}분</span>
             </div>
             <div className="flex items-center space-x-1 rounded-full px-3 py-1.5">
               <CookOrderIcon size={24} color="#ffffff" />
-              <span className="text-sm font-medium text-white">
-                {recipe.condition?.name}
+              <span className="text-17 text-white">
+                {recipe.tools.map(tool => tool.name).join(', ')}
               </span>
             </div>
           </div>

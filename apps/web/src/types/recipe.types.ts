@@ -1,6 +1,6 @@
 export interface Recipe {
   description: string;
-  duration: number;
+  duration: string;
   healthPoints?: {
     content: string;
   }[];

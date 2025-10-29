@@ -14,7 +14,7 @@ import MeasurementGuideToggle from './MeasurementGuideToggle';
 import { MeasurementTab } from './MeasurementTab';
 import SeasoningList from './SeasoningList';
 
-import type { IngredientsGroup, Seasoning } from '../types/recipe.types';
+import type { IngredientsGroup, Seasoning } from 'packages/api/src/types';
 
 interface MeasurementItem {
   standard: string;

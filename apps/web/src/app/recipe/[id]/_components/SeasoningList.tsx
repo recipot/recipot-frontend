@@ -2,7 +2,7 @@ import React from 'react';
 
 import PowderIcon from '@/components/Icons/PowderIcon';
 
-import type { Seasoning } from '../types/recipe.types';
+import type { Seasoning } from 'packages/api/src/types';
 
 interface SeasoningListProps {
   seasonings: Seasoning[];

@@ -72,7 +72,7 @@ export default function RecipeRecommend() {
   ): Omit<Recipe, 'ingredients'> => {
     return {
       description: item.description,
-      duration: parseInt(item.duration),
+      duration: item.duration,
       id: item.recipeId,
       images: item.imageUrls.map((url, index) => ({
         id: index + 1,

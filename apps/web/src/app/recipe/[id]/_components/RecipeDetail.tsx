@@ -1,9 +1,8 @@
 'use client';
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import axios from 'axios';
 import { useRouter } from 'next/navigation';
-import { tokenUtils } from 'packages/api/src/auth';
+import { recipe } from 'packages/api/src/recipe';
 
 import { Button } from '@/components/common/Button';
 import { CookIcon } from '@/components/Icons';
@@ -15,31 +14,26 @@ import RecipeDetailHeader from './RecipeDetailHeader';
 import StepSection from './StepSection';
 import TabNavigation from './TabNavigation';
 
-import type { ApiResponse, Recipe, TabId } from '../types/recipe.types';
+import type { TabId } from '../types/recipe.types';
+import type { Recipe } from 'packages/api/src/types';
 
 export function RecipeDetail({ recipeId }: { recipeId: string }) {
   const tabContainerRef = useRef<HTMLDivElement>(null);
-  const token = tokenUtils.getToken();
   const [recipeData, setRecipeData] = useState<Recipe | null>(null);
   const router = useRouter();
 
   useEffect(() => {
     const fetchRecipe = async () => {
-      if (!token) return;
       try {
-        const response = await axios.get<ApiResponse>(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/recipes/${recipeId}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        setRecipeData(response.data.data);
+        const data = await recipe.getRecipeDetail(Number(recipeId));
+
+        setRecipeData(data);
       } catch (error) {
         console.error('Recipe fetch error:', error);
       }
     };
     fetchRecipe();
-  }, [token, recipeId]);
+  }, [recipeId]);
 
   // 섹션 ID 배열 생성
   const sectionIds = useMemo(() => ['ingredients', 'cookware', 'steps'], []);
@@ -92,6 +86,16 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
     router.push(`/recipe/${recipeId}/cooking-order`);
   };
 
+  if (!recipeData) {
+    return (
+      <div className="flex min-h-screen w-full justify-center bg-gray-50">
+        <div className="flex w-[390px] items-center justify-center bg-gray-100">
+          <p className="text-gray-500">레시피를 불러오는 중...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex min-h-screen w-full justify-center bg-gray-50">
       <div className="w-[390px] bg-gray-100">
@@ -107,18 +111,18 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
         <div className="px-4 pb-24">
           <div className="bg-secondary-light-green border-secondary-soft-green my-4 rounded-2xl border-[1px] px-5 py-4">
             <p className="text-15sb text-primary-pressed">
-              {recipeData?.healthPoints.map(point => point.content).join(', ')}
+              {recipeData.healthPoints.map(point => point.content).join(', ')}
             </p>
           </div>
 
           <IngredientsSection
             ingredients={recipeData.ingredients}
-            seasonings={recipeData?.seasonings}
+            seasonings={recipeData.seasonings}
           />
 
-          <CookwareSection cookware={recipeData?.tools} />
+          <CookwareSection cookware={recipeData.tools} />
 
-          <StepSection steps={recipeData?.steps} />
+          <StepSection steps={recipeData.steps ?? []} />
         </div>
 
         <div className="fixed right-0 bottom-0 left-0 flex justify-center">

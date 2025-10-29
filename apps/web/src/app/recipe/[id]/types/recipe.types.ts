@@ -52,7 +52,7 @@ export interface Recipe {
   title: string;
   description: string;
   duration: string;
-  condition: Condition;
+  condition?: Condition;
   images: {
     id: number;
     imageUrl: string;
@@ -60,7 +60,7 @@ export interface Recipe {
   ingredients: IngredientsGroup;
   seasonings: Seasoning[];
   tools: Cookware[];
-  steps: CookingStep[];
+  steps?: CookingStep[] | undefined;
   healthPoints: HealthPoint[];
 }
 

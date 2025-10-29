@@ -1,6 +1,6 @@
 import React from 'react';
 
-import type { CookingStep } from '../types/recipe.types';
+import type { CookingStep } from 'packages/api/src/types';
 
 interface StepSectionProps {
   steps: CookingStep[];
