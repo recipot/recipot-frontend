@@ -45,19 +45,35 @@ export default function CookingOrderPresenter({
   const closeModal = () => setActiveModal(null);
 
   const handleCookingComplete = async () => {
-    // await completeCooking();
-    await axios.post(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/users/recipes/${recipeId}/complete`,
-      {
-        recipeId,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/users/recipes/${recipeId}/complete`,
+        {
+          recipeId,
         },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const isSuccess =
+        response.data?.status === 200 || response.data?.data === true;
+
+      if (isSuccess) {
+        const completedRecipeId = Number(recipeId);
+
+        router.push(`/review?completedRecipeId=${completedRecipeId}`);
+      } else {
+        console.error('해먹기 완료 실패:', response.data);
       }
-    );
-    completeStep(currentStep);
+
+      completeStep(currentStep);
+    } catch (error) {
+      console.error('해먹기 완료 API 호출 실패:', error);
+      completeStep(currentStep);
+    }
   };
 
   const handleBack = () => {
