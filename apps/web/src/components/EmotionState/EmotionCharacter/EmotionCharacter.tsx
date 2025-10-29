@@ -47,16 +47,6 @@ export default function EmotionCharacter({
     nickname,
   });
 
-  // 디버깅 로그
-  console.info('🐣 EmotionCharacter 렌더링:', {
-    cacheValue: cacheCompletedRecipesCount,
-    completedRecipesCount,
-    level,
-    mood,
-    nickname,
-    propsValue: propsCompletedRecipesCount,
-  });
-
   return (
     <div className="flex h-full w-full flex-col items-center justify-center">
       {/* 말풍선 영역 */}

@@ -28,7 +28,7 @@ export default function CharacterTestPage() {
   const [nickname, setNickname] = useState('테스트유저');
 
   // 레벨이 변경될 때마다 새로운 QueryClient 생성
-
+  // level이 변경되면 캐시를 초기화하기 위해 의도적으로 dependency에 포함
   const queryClient = useMemo(
     () =>
       new QueryClient({
@@ -39,6 +39,7 @@ export default function CharacterTestPage() {
           },
         },
       }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [level]
   );
 

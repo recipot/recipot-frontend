@@ -56,11 +56,6 @@ export function MockDataSetter({
         ['mypage', 'completed-recipes', { limit: 10, page: 1 }],
         data
       );
-
-      console.info('✅ Mock 데이터 설정 완료:', {
-        completedRecipesCount,
-        nickname,
-      });
     }
   }, [completedRecipesCount, queryClient, nickname]);
 
