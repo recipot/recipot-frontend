@@ -18,6 +18,7 @@ import UserIcon from '@/components/Icons/UserIcon';
 import { IngredientsSearch } from '@/components/IngredientsSearch';
 import { ReviewRemindBottomSheet } from '@/components/review/ReviewRemindBottomSheet';
 import { useSplash } from '@/contexts/SplashContext';
+import { useCompletedRecipes } from '@/hooks/useCompletedRecipes';
 import { useToast } from '@/hooks/useToast';
 import { useMoodStore } from '@/stores/moodStore';
 import { useSelectedFoodsStore } from '@/stores/selectedFoodsStore';
@@ -41,6 +42,10 @@ export default function Home() {
   const [showIngredientsSearch, setShowIngredientsSearch] = useState(false);
   const [selectedCount, setSelectedCount] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // 완료한 레시피 수 조회 (로그인 상태일 때만)
+  // 이 데이터는 EmotionImage에서 캐시를 통해 사용됨
+  useCompletedRecipes({ limit: 10, page: 1 });
 
   useEffect(() => {
     // 로딩 중에는 체크하지 않음

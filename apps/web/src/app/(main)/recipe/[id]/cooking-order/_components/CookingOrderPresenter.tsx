@@ -1,10 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { tokenUtils } from 'packages/api/src/auth';
 
+import { COMPLETED_RECIPES_QUERY_KEY } from '@/hooks/useCompletedRecipes';
 import { useCookingOrder } from '@/hooks/useCookingOrder';
 
 import { useCookingOrderNavigation } from '../../../../../../hooks/useCookingOrderNavigation';
@@ -26,6 +28,7 @@ export default function CookingOrderPresenter({
 }: CookingOrderPresenterProps) {
   const { completeStep, error, isLoading, recipe } = useCookingOrder(recipeId);
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const token = tokenUtils.getToken();
 
@@ -58,6 +61,11 @@ export default function CookingOrderPresenter({
       }
     );
     completeStep(currentStep);
+
+    // 완료한 레시피 캐시 무효화 - 메인 페이지에서 최신 데이터 반영
+    queryClient.invalidateQueries({
+      queryKey: COMPLETED_RECIPES_QUERY_KEY,
+    });
   };
 
   const handleBack = () => {
