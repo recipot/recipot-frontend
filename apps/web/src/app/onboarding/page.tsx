@@ -5,7 +5,10 @@ import { useAuth } from '@recipot/contexts';
 import { useRouter } from 'next/navigation';
 
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
-import { useCurrentStep } from '@/stores/onboardingStore';
+import { useAllergiesStore } from '@/stores/allergiesStore';
+import { useMoodStore } from '@/stores/moodStore';
+import { useCurrentStep, useOnboardingStore } from '@/stores/onboardingStore';
+import { useSelectedFoodsStore } from '@/stores/selectedFoodsStore';
 
 import StepIndicator from './_components/StepIndicator';
 import AllergyStep from './_components/steps/AllergyStep';
@@ -20,6 +23,41 @@ function OnboardingContent() {
   const router = useRouter();
   const currentStep = useCurrentStep();
   const currentStepData = STEP_CONFIG[currentStep - 1];
+
+  // 모든 스토어의 세션 검증 함수
+  const validateOnboardingSession = useOnboardingStore(
+    state => state.validateUserSession
+  );
+  const validateAllergiesSession = useAllergiesStore(
+    state => state.validateUserSession
+  );
+  const validateMoodSession = useMoodStore(
+    state => state.validateUserSession
+  );
+  const validateFoodsSession = useSelectedFoodsStore(
+    state => state.validateUserSession
+  );
+
+  // 사용자 세션 검증 (사용자가 변경되면 모든 온보딩 데이터 초기화)
+  useEffect(() => {
+    if (!loading && user) {
+      // user.id가 있다면 사용하고, 없으면 user 객체를 문자열로 변환하여 사용
+      const userId = user.id?.toString() ?? JSON.stringify(user);
+
+      // 모든 스토어의 세션 검증
+      validateOnboardingSession(userId);
+      validateAllergiesSession(userId);
+      validateMoodSession(userId);
+      validateFoodsSession(userId);
+    }
+  }, [
+    user,
+    loading,
+    validateOnboardingSession,
+    validateAllergiesSession,
+    validateMoodSession,
+    validateFoodsSession,
+  ]);
 
   // 온보딩 페이지 접근 제어
   useEffect(() => {

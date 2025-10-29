@@ -3,20 +3,23 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-import type { OnboardingStepDataMap } from '@/app/onboarding/_types';
-
 /**
  * 온보딩 스테이트 인터페이스
+ *
+ * 주의: 실제 데이터(알러지, 기분, 선택된 음식)는 각각의 도메인 스토어에서 관리됩니다:
+ * - allergiesStore: 알러지 데이터
+ * - moodStore: 기분/컨디션 데이터
+ * - selectedFoodsStore: 선택된 음식 데이터
  */
 interface OnboardingState {
   /** 현재 단계 (1-3) */
   currentStep: number;
   /** 완료된 단계들 */
   completedSteps: number[];
-  /** 각 단계별 데이터 */
-  stepData: Partial<OnboardingStepDataMap>;
   /** 새로고침 플래그 */
   isRefreshed: boolean;
+  /** 현재 사용자 ID (세션 추적용) */
+  userId: string | null;
 }
 
 /**
@@ -25,11 +28,6 @@ interface OnboardingState {
 interface OnboardingActions {
   /** 현재 단계 설정 */
   setCurrentStep: (step: number) => void;
-  /** 특정 단계의 데이터 설정 */
-  setStepData: <T extends keyof OnboardingStepDataMap>(
-    step: T,
-    data: OnboardingStepDataMap[T]
-  ) => void;
   /** 단계 완료 표시 */
   markStepCompleted: (step: number) => void;
   /** 다음 단계로 이동 */
@@ -44,12 +42,14 @@ interface OnboardingActions {
   canGoToPreviousStep: () => boolean;
   /** 온보딩 완료 처리 */
   completeOnboarding: () => void;
-  /** 현재 단계 초기화 */
+  /** 현재 단계 초기화 (새로고침 플래그 설정) */
   resetCurrentStep: () => void;
   /** 전체 스토어 초기화 */
   resetStore: () => void;
   /** 새로고침 플래그 리셋 */
   clearRefreshFlag: () => void;
+  /** 사용자 세션 검증 및 필요시 초기화 */
+  validateUserSession: (currentUserId: string | null) => void;
 }
 
 /** 총 온보딩 단계 수 */
@@ -60,7 +60,7 @@ const initialState: OnboardingState = {
   completedSteps: [],
   currentStep: 1,
   isRefreshed: false,
-  stepData: {},
+  userId: null,
 };
 
 /**
@@ -126,14 +126,8 @@ export const useOnboardingStore = create<OnboardingState & OnboardingActions>()(
       },
 
       resetCurrentStep: () => {
-        const { currentStep } = get();
-        set(state => {
-          const newStepData = { ...state.stepData };
-          delete newStepData[currentStep as keyof OnboardingStepDataMap];
-          return {
-            isRefreshed: true, // 새로고침 플래그 설정
-            stepData: newStepData,
-          };
+        set({
+          isRefreshed: true, // 새로고침 플래그 설정
         });
       },
 
@@ -147,16 +141,17 @@ export const useOnboardingStore = create<OnboardingState & OnboardingActions>()(
         }
       },
 
-      setStepData: <T extends keyof OnboardingStepDataMap>(
-        step: T,
-        data: OnboardingStepDataMap[T]
-      ) => {
-        set(state => ({
-          stepData: {
-            ...state.stepData,
-            [step]: data,
-          },
-        }));
+      validateUserSession: (currentUserId: string | null) => {
+        const { userId } = get();
+
+        // 사용자가 변경되었으면 온보딩 데이터 초기화
+        if (userId !== null && userId !== currentUserId) {
+          console.info('🔄 사용자 세션 변경 감지, 온보딩 데이터 초기화');
+          set({ ...initialState, userId: currentUserId });
+        } else if (userId === null) {
+          // 첫 진입 시 userId 설정
+          set({ userId: currentUserId });
+        }
       },
     }),
     {
@@ -168,6 +163,11 @@ export const useOnboardingStore = create<OnboardingState & OnboardingActions>()(
 /**
  * 온보딩 스토어의 특정 값들만 선택적으로 구독하는 훅들
  * 성능 최적화를 위해 필요한 값들만 구독
+ *
+ * 주의: 실제 데이터(알러지, 기분, 선택된 음식)를 구독하려면 각 도메인 스토어를 사용하세요:
+ * - useAllergiesStore: 알러지 데이터
+ * - useMoodStore: 기분/컨디션 데이터
+ * - useSelectedFoodsStore: 선택된 음식 데이터
  */
 
 /** 현재 단계만 구독 */
@@ -177,18 +177,6 @@ export const useCurrentStep = () =>
 /** 완료된 단계들만 구독 */
 export const useCompletedSteps = () =>
   useOnboardingStore(state => state.completedSteps);
-
-/** 1단계 (알레르기) 데이터 구독 */
-export const useAllergyStepData = () =>
-  useOnboardingStore(state => state.stepData[1]);
-
-/** 2단계 (요리 상태) 데이터 구독 */
-export const useCookStateStepData = () =>
-  useOnboardingStore(state => state.stepData[2]);
-
-/** 3단계 (냉장고) 데이터 구독 */
-export const useRefrigeratorStepData = () =>
-  useOnboardingStore(state => state.stepData[3]);
 
 /** 네비게이션 액션들만 구독 */
 export const useOnboardingNavigation = () => {
@@ -234,13 +222,9 @@ export const useOnboardingCompletion = () => {
 export const useOnboardingData = () => {
   const resetCurrentStep = useOnboardingStore(state => state.resetCurrentStep);
   const resetStore = useOnboardingStore(state => state.resetStore);
-  const setStepData = useOnboardingStore(state => state.setStepData);
-  const stepData = useOnboardingStore(state => state.stepData);
 
   return {
     resetCurrentStep,
     resetStore,
-    setStepData,
-    stepData,
   };
 };

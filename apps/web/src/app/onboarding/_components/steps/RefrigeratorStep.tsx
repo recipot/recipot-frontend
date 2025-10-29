@@ -7,6 +7,8 @@ import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/common/Button';
 import { IngredientsSearch } from '@/components/IngredientsSearch';
+import { useAllergiesStore } from '@/stores/allergiesStore';
+import { useMoodStore } from '@/stores/moodStore';
 import { useSelectedFoodsStore } from '@/stores/selectedFoodsStore';
 
 import { ONBOARDING_CONSTANTS } from '../../_constants';
@@ -21,7 +23,7 @@ export default function RefrigeratorStep() {
   const { setUser, user } = useAuth();
   const router = useRouter();
   // 온보딩 액션들
-  const { clearRefreshFlag, isRefreshed, markStepCompleted, setStepData } =
+  const { clearRefreshFlag, isRefreshed, markStepCompleted } =
     useOnboardingActions();
 
   const clearAllFoods = useSelectedFoodsStore(state => state.clearAllFoods);
@@ -71,8 +73,12 @@ export default function RefrigeratorStep() {
     try {
       setIsSubmitting(true);
 
-      // 1. 현재 스텝 데이터 저장
+      // 1. 모든 온보딩 데이터 수집 (각 도메인 스토어에서)
+      const { allergies } = useAllergiesStore.getState();
+      const { mood } = useMoodStore.getState();
       const { selectedFoodIds } = useSelectedFoodsStore.getState();
+
+      // onboardingStorage에 마지막 단계 데이터 저장 (완료 데이터 수집을 위해)
       onboardingStorage.saveStepData(3, {
         selectedFoods: selectedFoodIds,
       });
@@ -116,19 +122,10 @@ export default function RefrigeratorStep() {
 
       console.info('✅ 모든 온보딩 API 호출 완료');
 
-      // 6. 온보딩 완료 처리 - clearData 전에 Zustand 스토어에 모든 데이터 저장
-      // 알레르기 데이터 저장
-      setStepData(1, {
-        allergies: completeData.allergies,
-        selectedItems: completeData.allergies,
-      });
+      // 6. 온보딩 완료 처리
+      // 데이터는 이미 각 도메인 스토어(allergiesStore, moodStore, selectedFoodsStore)에 저장되어 있음
       markStepCompleted(1);
-
-      // 냉장고 데이터 저장
-      const refrigeratorData = {
-        selectedFoods: selectedFoodIds,
-      };
-      setStepData(3, refrigeratorData);
+      markStepCompleted(2);
       markStepCompleted(3);
 
       await completeOnboarding();

@@ -4,12 +4,10 @@ import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/common/Button';
 import EmotionState, { type MoodType } from '@/components/EmotionState';
-import { useOnboardingStore } from '@/stores/onboardingStore';
+import { useMoodStore } from '@/stores/moodStore';
 
 import { useOnboardingActions, useOnboardingStep } from '../../_hooks';
 import { getSubmitButtonText } from '../../_utils';
-
-import type { CookStateStepData } from '../../_types';
 
 interface CookStateStepProps {
   /** 이미지 표시 여부 */
@@ -23,9 +21,9 @@ export default function CookStateStep({ showImage }: CookStateStepProps) {
   // 온보딩 액션들
   const { clearRefreshFlag, isRefreshed } = useOnboardingActions();
 
-  // 저장된 데이터 불러오기
-  const stepData = useOnboardingStore(state => state.stepData[2]);
-  const savedMood = stepData?.mood ?? null;
+  // 저장된 데이터 불러오기 (moodStore에서)
+  const savedMood = useMoodStore(state => state.mood);
+  const setMood = useMoodStore(state => state.setMood);
 
   const [selectedMood, setSelectedMood] = useState<MoodType | null>(savedMood);
 
@@ -45,11 +43,10 @@ export default function CookStateStep({ showImage }: CookStateStepProps) {
     if (!selectedMood) return;
 
     try {
-      const cookStateData: CookStateStepData = {
-        mood: selectedMood,
-      };
+      // 기분 스토어에 저장
+      setMood(selectedMood);
 
-      await saveAndProceed(cookStateData);
+      await saveAndProceed();
     } catch (error) {
       handleError(error as Error);
     }

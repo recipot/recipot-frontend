@@ -5,10 +5,20 @@ import type { SelectedFoodsStore } from '@/types/food.types';
 
 import type { Food } from '@recipot/api';
 
+/** 초기 상태 */
+const initialState = {
+  selectedFoodIds: [] as number[],
+  userId: null as string | null,
+};
+
 export const useSelectedFoodsStore = create<SelectedFoodsStore>()(
   devtools(
     persist(
       (set, get) => ({
+        // 초기 상태
+        ...initialState,
+
+        // 액션들
         clearAllFoods: () => {
           set({ selectedFoodIds: [] }, false, 'clearAllFoods');
         },
@@ -21,7 +31,7 @@ export const useSelectedFoodsStore = create<SelectedFoodsStore>()(
         },
 
         isSelected: foodId => get().selectedFoodIds.includes(foodId),
-        selectedFoodIds: [] as number[],
+
         toggleFood: foodId => {
           const state = get();
           const isCurrentlySelected = state.selectedFoodIds.includes(foodId);
@@ -35,6 +45,19 @@ export const useSelectedFoodsStore = create<SelectedFoodsStore>()(
             false,
             `toggleFood-${isCurrentlySelected ? 'remove' : 'add'}`
           );
+        },
+
+        validateUserSession: (currentUserId: string | null) => {
+          const { userId } = get();
+
+          // 사용자가 변경되었으면 선택된 음식 데이터 초기화
+          if (userId !== null && userId !== currentUserId) {
+            console.info('🔄 사용자 세션 변경 감지, 선택된 음식 데이터 초기화');
+            set({ ...initialState, userId: currentUserId }, false, 'resetSession');
+          } else if (userId === null) {
+            // 첫 진입 시 userId 설정
+            set({ userId: currentUserId }, false, 'setUserId');
+          }
         },
       }),
       {
