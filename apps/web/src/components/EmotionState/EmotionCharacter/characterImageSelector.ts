@@ -26,9 +26,9 @@ import type { StaticImageData } from 'next/image';
  */
 export const calculateLevel = (completedRecipesCount: number): number => {
   if (completedRecipesCount >= 16) return 3;
-  if (completedRecipesCount >= 7) return 3;
-  if (completedRecipesCount >= 3) return 2;
-  if (completedRecipesCount >= 1) return 1;
+  if (completedRecipesCount >= 7 && completedRecipesCount < 16) return 3;
+  if (completedRecipesCount >= 3 && completedRecipesCount < 7) return 2;
+  if (completedRecipesCount >= 1 && completedRecipesCount < 3) return 1;
   return 0;
 };
 
