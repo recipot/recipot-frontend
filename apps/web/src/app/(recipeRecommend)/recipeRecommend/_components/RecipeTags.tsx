@@ -15,8 +15,8 @@ const RecipeTags = () => {
   }, [selectedFoodIds, foodList]);
 
   // 최대 5개만 표시
-  const displayedFoods = selectedFoodNames.slice(0, 5);
-  const remainingCount = selectedFoodNames.length - 5;
+  const displayedFoods = selectedFoodNames.slice(0, 3);
+  const remainingCount = selectedFoodNames.length - 3;
 
   // 로딩 중이거나 식재료가 없는 경우 렌더링하지 않음
   if (isLoading || selectedFoodNames.length === 0) {

@@ -11,12 +11,16 @@ export default [
           parserOptions: {
             ...config.languageOptions.parserOptions,
             project: './tsconfig.json',
+            // tsconfigRootDir: import.meta.dirname,
           },
         },
       };
     }
     return config;
   }),
+  {
+    ignores: ['node_modules/', '.next/', 'dist/', 'build/'],
+  },
   {
     rules: {
       'import/no-relative-parent-imports': 'off',
