@@ -1,22 +1,23 @@
 'use client';
 
+import '@/components/EmotionState/styles.css';
+
 import React from 'react';
 import Image from 'next/image';
-import '@/components/EmotionState/styles.css';
+import { useRouter } from 'next/navigation';
 
 import RecipeHeader from '@/app/(recipeRecommend)/recipeRecommend/_components/RecipeHeader';
 import { Button } from '@/components/common/Button';
 import { Header } from '@/components/common/Header';
 import { CookIcon } from '@/components/Icons';
-import { useCookStateStepData } from '@/stores/onboardingStore';
+import { useMoodStore } from '@/stores/moodStore';
 import { getEmotionGradient } from '@/utils/emotionGradient';
 
 import ExploreComplete from '../../../../public/explore.png';
-import { useRouter } from 'next/navigation';
 
 export default function ExploreCompletePage() {
-  const cookStateData = useCookStateStepData();
-  const userSelectedMood = cookStateData?.mood ?? 'neutral';
+  const mood = useMoodStore(state => state.mood);
+  const userSelectedMood = mood ?? 'neutral';
 
   const router = useRouter();
 

@@ -23,5 +23,5 @@ export interface CompleteOnboardingData {
   allergies: number[];
   mood: string;
   selectedFoods: number[];
-  sessionId: string;
+  sessionId?: string; // Optional: not currently used
 }

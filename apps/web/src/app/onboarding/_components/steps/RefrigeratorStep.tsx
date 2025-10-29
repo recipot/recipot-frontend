@@ -9,15 +9,12 @@ import { Button } from '@/components/common/Button';
 import { IngredientsSearch } from '@/components/IngredientsSearch';
 import { useAllergiesStore } from '@/stores/allergiesStore';
 import { useMoodStore } from '@/stores/moodStore';
+import { useOnboardingStore } from '@/stores/onboardingStore';
 import { useSelectedFoodsStore } from '@/stores/selectedFoodsStore';
 
 import { ONBOARDING_CONSTANTS } from '../../_constants';
 import { useOnboardingActions } from '../../_hooks';
-import {
-  getSubmitButtonText,
-  moodToConditionId,
-  onboardingStorage,
-} from '../../_utils';
+import { getSubmitButtonText, moodToConditionId } from '../../_utils';
 
 export default function RefrigeratorStep() {
   const { setUser, user } = useAuth();
@@ -26,6 +23,10 @@ export default function RefrigeratorStep() {
   const { clearRefreshFlag, isRefreshed, markStepCompleted } =
     useOnboardingActions();
 
+  // 온보딩 진행 상태만 관리하는 스토어 초기화 함수
+  const resetOnboardingStore = useOnboardingStore(state => state.resetStore);
+
+  // 새로고침용: 선택된 재료만 임시로 초기화
   const clearAllFoods = useSelectedFoodsStore(state => state.clearAllFoods);
 
   const [selectedCount, setSelectedCount] = useState(0);
@@ -44,14 +45,6 @@ export default function RefrigeratorStep() {
   const completeOnboarding = async () => {
     if (user?.isFirstEntry) {
       try {
-        // TODO: 백엔드 API 구현 대기 중
-        // PATCH /v1/users/profile 엔드포인트로 isFirstEntry를 false로 업데이트
-        // 백엔드에서 API가 준비되면 주석을 해제하세요
-        // const updatedUser = await authService.updateProfile({
-        //   isFirstEntry: false,
-        // });
-        // setUser(updatedUser);
-
         // 임시: 클라이언트 상태만 업데이트
         setUser({
           ...user,
@@ -78,21 +71,19 @@ export default function RefrigeratorStep() {
       const { mood } = useMoodStore.getState();
       const { selectedFoodIds } = useSelectedFoodsStore.getState();
 
-      // onboardingStorage에 마지막 단계 데이터 저장 (완료 데이터 수집을 위해)
-      onboardingStorage.saveStepData(3, {
-        selectedFoods: selectedFoodIds,
-      });
-
-      // 2. 모든 온보딩 데이터 수집
-      const completeData = onboardingStorage.getCompleteOnboardingData();
-
-      if (!completeData) {
+      if (!mood) {
         throw new Error(
-          '온보딩 데이터가 불완전합니다. 처음부터 다시 진행해주세요.'
+          '기분 데이터가 없습니다. 이전 단계로 돌아가 다시 시도해주세요.'
         );
       }
 
-      // 3. 데이터 유효성 검증
+      const completeData = {
+        allergies,
+        mood,
+        selectedFoods: selectedFoodIds,
+      };
+
+      // 2. 데이터 유효성 검증
       const validation = onboarding.validateOnboardingData(completeData);
       if (!validation.isValid) {
         throw new Error(`입력 데이터 오류: ${validation.errors.join(', ')}`);
@@ -100,38 +91,35 @@ export default function RefrigeratorStep() {
 
       console.info('🚀 통합 온보딩 데이터 전송 시작:', completeData);
 
-      // 4. 병렬 API 호출: 온보딩 완료 + 컨디션 저장
+      // 3. 병렬 API 호출: 온보딩 완료 + 컨디션 저장
       const conditionId = moodToConditionId(
         completeData.mood as 'bad' | 'neutral' | 'good'
       );
 
       await Promise.all([
-        // 못먹는 음식 저장 + 온보딩 완료 플래그 (development에서는 플래그만 건너뜀)
         onboarding.submitComplete(completeData),
-        // 일일 컨디션 저장
         condition
           .saveDailyCondition({
             conditionId,
             isRecommendationStarted: true,
           })
           .catch(conditionError => {
-            // 컨디션 저장 실패는 로그만 남기고 온보딩 진행 계속
             console.error('⚠️ 일일 컨디션 저장 실패:', conditionError);
           }),
       ]);
 
       console.info('✅ 모든 온보딩 API 호출 완료');
 
-      // 6. 온보딩 완료 처리
-      // 데이터는 이미 각 도메인 스토어(allergiesStore, moodStore, selectedFoodsStore)에 저장되어 있음
+      // 4. 온보딩 완료 처리
       markStepCompleted(1);
       markStepCompleted(2);
       markStepCompleted(3);
 
       await completeOnboarding();
 
-      // 7. localStorage 데이터 정리 (Zustand는 유지됨)
-      onboardingStorage.clearData();
+      // 5. 온보딩 진행 상태만 초기화 (도메인 데이터는 유지)
+      // 알레르기, 기분, 선택한 음식은 다른 페이지에서 사용하므로 초기화하지 않음
+      resetOnboardingStore();
 
       console.info('✅ 온보딩 완료!', {
         allergies: completeData.allergies,
@@ -143,8 +131,6 @@ export default function RefrigeratorStep() {
     } catch (error) {
       console.error('❌ 온보딩 완료 실패:', error);
 
-      // 사용자에게 에러 메시지 표시
-      // TODO: 에러 토스트 메시지 표시
       const errorMessage =
         error instanceof Error
           ? error.message

@@ -50,13 +50,14 @@ export const useSelectedFoodsStore = create<SelectedFoodsStore>()(
         validateUserSession: (currentUserId: string | null) => {
           const { userId } = get();
 
-          // 사용자가 변경되었으면 선택된 음식 데이터 초기화
-          if (userId !== null && userId !== currentUserId) {
+          if (!currentUserId) {
+            set({ ...initialState, userId: null }, false, 'resetSession');
+            return;
+          }
+
+          if (userId !== currentUserId) {
             console.info('🔄 사용자 세션 변경 감지, 선택된 음식 데이터 초기화');
             set({ ...initialState, userId: currentUserId }, false, 'resetSession');
-          } else if (userId === null) {
-            // 첫 진입 시 userId 설정
-            set({ userId: currentUserId }, false, 'setUserId');
           }
         },
       }),

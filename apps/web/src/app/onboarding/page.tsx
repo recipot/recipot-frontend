@@ -4,7 +4,6 @@ import { useEffect } from 'react';
 import { useAuth } from '@recipot/contexts';
 import { useRouter } from 'next/navigation';
 
-import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import { useAllergiesStore } from '@/stores/allergiesStore';
 import { useMoodStore } from '@/stores/moodStore';
 import { useCurrentStep, useOnboardingStore } from '@/stores/onboardingStore';
@@ -15,7 +14,6 @@ import AllergyStep from './_components/steps/AllergyStep';
 import CookStateStep from './_components/steps/CookStateStep';
 import RefrigeratorStep from './_components/steps/RefrigeratorStep';
 import { STEP_CONFIG } from './_constants';
-import { useOnboardingRestore } from './_hooks';
 import { onboardingStyles } from './_utils';
 
 function OnboardingContent() {
@@ -26,14 +24,12 @@ function OnboardingContent() {
 
   // 모든 스토어의 세션 검증 함수
   const validateOnboardingSession = useOnboardingStore(
-    state => state.validateUserSession
+    state => state.resetStore
   );
   const validateAllergiesSession = useAllergiesStore(
     state => state.validateUserSession
   );
-  const validateMoodSession = useMoodStore(
-    state => state.validateUserSession
-  );
+  const validateMoodSession = useMoodStore(state => state.validateUserSession);
   const validateFoodsSession = useSelectedFoodsStore(
     state => state.validateUserSession
   );
@@ -45,7 +41,7 @@ function OnboardingContent() {
       const userId = user.id?.toString() ?? JSON.stringify(user);
 
       // 모든 스토어의 세션 검증
-      validateOnboardingSession(userId);
+      validateOnboardingSession();
       validateAllergiesSession(userId);
       validateMoodSession(userId);
       validateFoodsSession(userId);
@@ -79,10 +75,6 @@ function OnboardingContent() {
     }
   }, [loading, user, router]);
 
-  // 데이터 복구 로직
-  const { handleRestoreCancel, handleRestoreConfirm, showRestoreDialog } =
-    useOnboardingRestore();
-
   // 로딩 중이거나 리다이렉트 대상인 경우 빈 화면 표시
   if (loading || !user?.isFirstEntry) {
     return null;
@@ -103,25 +95,6 @@ function OnboardingContent() {
 
   return (
     <>
-      {/* 데이터 복구 다이얼로그 */}
-      <ConfirmDialog
-        open={showRestoreDialog}
-        onOpenChange={() => {}}
-        title="이전 온보딩 데이터 발견"
-        description={
-          <>
-            이전에 진행하던 온보딩이 있습니다.
-            <br />
-            이어서 진행하시겠습니까?
-          </>
-        }
-        cancelText="새로 시작"
-        confirmText="이어서 진행"
-        onCancel={handleRestoreCancel}
-        onConfirm={handleRestoreConfirm}
-        disableOverlayClick
-      />
-
       <StepIndicator />
 
       <div className={onboardingStyles.stepHeader.wrapper}>

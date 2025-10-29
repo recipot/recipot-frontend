@@ -18,7 +18,7 @@ import { Header } from '@/components/common/Header';
 import { Toast } from '@/components/common/Toast';
 import { RecipeCard } from '@/components/RecipeCard';
 import { useToast } from '@/hooks/useToast';
-import { useCookStateStepData } from '@/stores/onboardingStore';
+import { useMoodStore } from '@/stores/moodStore';
 import { useSelectedFoodsStore } from '@/stores/selectedFoodsStore';
 import type { Recipe, RecommendationItem } from '@/types/recipe.types';
 import { getEmotionGradient } from '@/utils/emotionGradient';
@@ -50,10 +50,10 @@ export default function RecipeRecommend() {
   }, [loading, user, router]);
 
   // 온보딩에서 저장된 사용자의 기분 상태 가져오기
-  const cookStateData = useCookStateStepData();
+  const mood = useMoodStore(state => state.mood);
   const selectedFoodIds = useSelectedFoodsStore(state => state.selectedFoodIds);
 
-  const userSelectedMood = cookStateData?.mood ?? 'neutral';
+  const userSelectedMood = mood ?? 'neutral';
 
   const token = tokenUtils.getToken();
 
