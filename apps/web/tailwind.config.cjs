@@ -1,7 +1,8 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: ['class'],
-  content: ['./src/**/*.{ts,tsx}'],
+  content: ['./src/**/*.{ts,tsx}'  ,'!./src/**/*.stories.{ts,tsx}', 
+    '!./src/**/__tests__/**/*',],
   theme: {
     extend: {
       screens: {

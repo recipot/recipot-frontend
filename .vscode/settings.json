@@ -27,6 +27,8 @@
     "javascript": "javascript",
     "javascriptreact": "javascriptreact"
   },
+  "tailwindCSS.experimental.configFile": "apps/web/tailwind.config.cjs",
+  "tailwindCSS.experimental.classRegex": [],
   "files.associations": {
     "*.css": "tailwindcss"
   },

@@ -10,6 +10,7 @@
 !.yarn/releases
 !.yarn/versions
 !.gitkeep
+.cursor/
 
 # 워크스페이스 하위 node_modules 전부
 **/node_modules/
