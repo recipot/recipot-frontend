@@ -5,7 +5,7 @@ import 'swiper/css/effect-cards';
 import './styles.css';
 import '@/components/EmotionState/styles.css';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { recipe } from '@recipot/api';
 import { useAuth } from '@recipot/contexts';
 import axios from 'axios';
@@ -93,7 +93,7 @@ export default function RecipeRecommend() {
   };
 
   // 레시피 추천 API 호출 공통 함수
-  const fetchRecommendRecipes = async () => {
+  const fetchRecommendRecipes = useCallback(async () => {
     try {
       // selectedFoodIds가 비어있으면 API 호출하지 않음
       if (selectedFoodIds?.length === 0) {
@@ -135,11 +135,11 @@ export default function RecipeRecommend() {
       }
       showToast('레시피를 불러오는데 실패했어요');
     }
-  };
+  }, [userSelectedMood, selectedFoodIds, router, showToast]);
 
   useEffect(() => {
     fetchRecommendRecipes();
-  }, [userSelectedMood, selectedFoodIds]);
+  }, [fetchRecommendRecipes]);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -164,7 +164,7 @@ export default function RecipeRecommend() {
       }
     };
     fetchProfile();
-  }, [token]);
+  }, [token, router]);
 
   // 하트 아이콘 클릭 시 북마크 토글 함수
   const handleToggleBookmark = async (index: number, recipeId: number) => {
