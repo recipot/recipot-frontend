@@ -1,7 +1,8 @@
+import { useEffect } from 'react';
 import { useAuth } from '@recipot/contexts';
 import Image from 'next/image';
 
-import { useCompletedRecipesCache } from '@/hooks';
+import { useCompletedRecipesCache, useTypingEffect } from '@/hooks';
 import { cn } from '@/lib/utils';
 
 import TiredBird from '../../../public/emotion/img-bird-bad.png';
@@ -26,7 +27,18 @@ import NormalBird from '../../../public/emotion/img-bird-neutral.png';
 
 import type { MoodType } from './EmotionState';
 
-export default function EmotionImage({ mood }: { mood: MoodType }) {
+interface EmotionImageProps {
+  mood: MoodType;
+  /**
+   * 타이핑 완료 시 호출되는 콜백
+   */
+  onTypingComplete?: () => void;
+}
+
+export default function EmotionImage({
+  mood,
+  onTypingComplete,
+}: EmotionImageProps) {
   const { user } = useAuth();
   const { completedRecipesCount } = useCompletedRecipesCache();
   const nickname = user?.nickname ?? '당신';
@@ -98,7 +110,7 @@ export default function EmotionImage({ mood }: { mood: MoodType }) {
     }
   };
 
-  const renderMessage = (mood: MoodType) => {
+  const getMessage = (mood: MoodType): string => {
     // mood가 default일 때만 레벨별 메시지 사용
     if (mood === 'default' && completedRecipesCount > 0) {
       let firstLine = '';
@@ -115,25 +127,9 @@ export default function EmotionImage({ mood }: { mood: MoodType }) {
       }
 
       if (completedRecipesCount >= 3) {
-        return (
-          <>
-            {nickname}님, 지금까지{' '}
-            <span className="font-bold">{completedRecipesCount}</span>번
-            해먹었네요!
-            {'\n'}
-            {firstLine}
-          </>
-        );
+        return `${nickname}님, 지금까지 ${completedRecipesCount}번 해먹었네요!\n${firstLine}`;
       } else {
-        return (
-          <>
-            {nickname}님, 드디어{' '}
-            <span className="font-bold">{completedRecipesCount}</span>번
-            해먹었네요!
-            {'\n'}
-            {secondLine}
-          </>
-        );
+        return `${nickname}님, 드디어 ${completedRecipesCount}번 해먹었네요!\n${secondLine}`;
       }
     }
 
@@ -188,23 +184,66 @@ export default function EmotionImage({ mood }: { mood: MoodType }) {
   };
   const styles = getMessageStyles(mood);
 
+  // 메시지 가져오기
+  const message = getMessage(mood);
+
+  // 타이핑 효과 적용 (모든 상태에서 적용)
+  const { displayedText, isComplete } = useTypingEffect(message, {
+    delay: 300,
+    speed: 30,
+  });
+
+  // 타이핑 완료 시 콜백 호출
+  useEffect(() => {
+    if (isComplete && onTypingComplete) {
+      onTypingComplete();
+    }
+  }, [isComplete, onTypingComplete]);
+
+  // 숫자를 bold 처리한 JSX 반환
+  const renderMessageWithBold = (text: string) => {
+    // 숫자 뒤에 "번"이 오는 패턴을 찾아 bold 처리
+    const parts = text.split(/(\d+번)/g);
+
+    return parts.map((part, index) => {
+      // 숫자+번 패턴이면 bold 처리
+      if (/\d+번/.test(part)) {
+        const number = part.replace('번', '');
+        return (
+          <span key={index}>
+            <span className="font-bold">{number}</span>번
+          </span>
+        );
+      }
+      return part;
+    });
+  };
+
   return (
-    <>
-      <div
-        className={cn(
-          'relative rounded-[80px] px-6 py-4',
-          "after:absolute after:top-full after:left-1/2 after:-translate-x-1/2 after:border-[10px] after:border-transparent after:content-['']",
-          styles.bg,
-          styles.arrow
-        )}
-      >
-        <p
-          className={cn('text-17 text-center whitespace-pre-line', styles.text)}
+    <div className="flex h-full w-full flex-col items-center justify-center">
+      {/* 말풍선 영역 - 고정 높이 */}
+      <div className="mb-[10px] flex h-[100px] w-full items-center justify-center">
+        <div
+          className={cn(
+            'relative rounded-[80px] px-6 py-4',
+            "after:absolute after:top-full after:left-1/2 after:-translate-x-1/2 after:border-[10px] after:border-transparent after:content-['']",
+            styles.bg,
+            styles.arrow
+          )}
         >
-          {renderMessage(mood)}
-        </p>
+          <p
+            className={cn(
+              'text-17 text-center whitespace-pre-line',
+              styles.text
+            )}
+          >
+            {renderMessageWithBold(displayedText)}
+          </p>
+        </div>
       </div>
-      <div className="relative flex h-[200px] w-full items-center justify-center overflow-hidden">
+
+      {/* 캐릭터 영역 - 고정 높이 */}
+      <div className="relative flex h-[220px] w-full items-center justify-center overflow-hidden pb-10">
         {/* 캐릭터 - 젓가락 위에 올라감 */}
         <div className="relative z-10 before:absolute before:bottom-[-5px] before:-left-4 before:z-[-1] before:h-[74px] before:w-[320px] before:bg-[url('/emotion/img-chopsticks.png')] before:bg-contain before:bg-no-repeat before:content-['']">
           <Image
@@ -216,6 +255,6 @@ export default function EmotionImage({ mood }: { mood: MoodType }) {
           />
         </div>
       </div>
-    </>
+    </div>
   );
 }

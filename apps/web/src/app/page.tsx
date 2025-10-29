@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { condition } from '@recipot/api';
 import { useAuth } from '@recipot/contexts';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -42,6 +42,10 @@ export default function Home() {
   const [showIngredientsSearch, setShowIngredientsSearch] = useState(false);
   const [selectedCount, setSelectedCount] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [waitingForTyping, setWaitingForTyping] = useState(false);
+
+  // 재료 입력 화면 이동 타이머
+  const transitionTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // 완료한 레시피 수 조회 (로그인 상태일 때만)
   // 이 데이터는 EmotionImage에서 캐시를 통해 사용됨
@@ -66,17 +70,67 @@ export default function Home() {
   }, [loading, user, router]);
 
   const handleMoodChange = (mood: MoodType | null) => {
+    console.log('🔄 상태 변경:', mood);
+
+    // 기존 타이머가 있으면 취소 (이전 상태 선택 취소)
+    if (transitionTimerRef.current) {
+      console.log('⏹️ 기존 타이머 취소');
+      clearTimeout(transitionTimerRef.current);
+      transitionTimerRef.current = null;
+    }
+
     setMood(mood);
 
-    // mood 선택 시 재료 검색 화면을 슬라이드로 표시
-    if (mood) {
-      setShowIngredientsSearch(true);
+    // mood 선택 시 타이핑 완료 대기 상태로 전환
+    // bad, neutral, good 중 하나가 선택되었을 때만 재료 입력으로 이동 대기
+    if (mood && mood !== 'default') {
+      // 새로운 상태 선택 시 대기 상태 초기화
+      setWaitingForTyping(true);
+      setShowIngredientsSearch(false);
+    } else {
+      // 상태 선택 해제 시 모든 상태 리셋
+      setWaitingForTyping(false);
+      setShowIngredientsSearch(false);
+    }
+  };
+
+  // 타이핑 완료 시 재료 검색 화면으로 이동 (2.3초 후)
+  const handleTypingComplete = () => {
+    // 이미 타이머가 실행 중이거나 재료 입력 창이 열려있으면 무시
+    if (transitionTimerRef.current || showIngredientsSearch) {
+      console.log('⏭️ 타이머 실행 중 또는 이미 열림, 무시');
+      return;
+    }
+
+    // mood가 실제로 선택되어 있고, 타이핑 대기 중일 때만 이동
+    if (waitingForTyping && mood && mood !== 'default') {
+      console.log('✅ 타이핑 완료, 2.3초 후 재료 입력 화면으로 이동');
+      transitionTimerRef.current = setTimeout(() => {
+        setShowIngredientsSearch(true);
+        setWaitingForTyping(false);
+        transitionTimerRef.current = null;
+      }, 2300);
     }
   };
 
   const handleBack = () => {
+    // 타이머 취소
+    if (transitionTimerRef.current) {
+      clearTimeout(transitionTimerRef.current);
+      transitionTimerRef.current = null;
+    }
     setShowIngredientsSearch(false);
+    setWaitingForTyping(false);
   };
+
+  // 컴포넌트 언마운트 시 타이머 정리
+  useEffect(() => {
+    return () => {
+      if (transitionTimerRef.current) {
+        clearTimeout(transitionTimerRef.current);
+      }
+    };
+  }, []);
 
   // Mood를 Condition ID로 매핑하는 객체
   const MOOD_TO_CONDITION_ID: Record<string, number> = {
@@ -194,6 +248,7 @@ export default function Home() {
             <EmotionState
               showImage
               onMoodChange={handleMoodChange}
+              onTypingComplete={handleTypingComplete}
               initialMood={mood}
               className="h-full"
             />

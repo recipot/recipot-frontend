@@ -19,6 +19,10 @@ interface EmotionStateProps extends ShowImageProps {
   onMoodChange?: (mood: MoodType | null) => void;
   initialMood?: MoodType | null;
   className?: string;
+  /**
+   * 타이핑 완료 시 호출되는 콜백
+   */
+  onTypingComplete?: () => void;
 }
 
 /**
@@ -28,6 +32,7 @@ const EmotionState: React.FC<EmotionStateProps> = ({
   className = '',
   initialMood = null,
   onMoodChange,
+  onTypingComplete,
   showImage,
 }) => {
   const [selectedMood, setSelectedMood] = useState<MoodType | null>(
@@ -67,25 +72,36 @@ const EmotionState: React.FC<EmotionStateProps> = ({
   return (
     <div
       className={cn(
-        'flex w-full flex-col items-center justify-center overflow-hidden',
+        'flex w-full flex-col items-center overflow-hidden',
         className,
         getBackgroundGradient(selectedMood)
       )}
     >
-      <div className="mb-[30px] flex w-fit justify-between gap-[15.5px] px-10">
-        {EMOTION_OPTIONS.mood.map(({ color, label, mood }) => (
-          <EmotionOptionButton
-            key={mood}
-            label={label}
-            color={color}
-            selected={getButtonSelectedState(mood)}
-            onClick={() => handleMoodClick(mood)}
-            variant="mood"
-          />
-        ))}
+      {/* 버튼 영역 - 고정 높이 */}
+      <div className="flex h-[140px] w-full items-center justify-center pt-8">
+        <div className="flex w-fit justify-between gap-[15.5px] px-10">
+          {EMOTION_OPTIONS.mood.map(({ color, label, mood }) => (
+            <EmotionOptionButton
+              key={mood}
+              label={label}
+              color={color}
+              selected={getButtonSelectedState(mood)}
+              onClick={() => handleMoodClick(mood)}
+              variant="mood"
+            />
+          ))}
+        </div>
       </div>
 
-      {showImage && <EmotionImage mood={selectedMood ?? 'default'} />}
+      {/* 캐릭터 영역 - flex-1로 나머지 공간 차지 */}
+      {showImage && (
+        <div className="flex w-full flex-1 items-center justify-center">
+          <EmotionImage
+            mood={selectedMood ?? 'default'}
+            onTypingComplete={onTypingComplete}
+          />
+        </div>
+      )}
     </div>
   );
 };
