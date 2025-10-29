@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { useTypingEffect } from '@/hooks';
 import { cn } from '@/lib/utils';
 
-import type { MoodType } from '../EmotionState';
+import type { MoodType } from '../index';
 
 /**
  * 말풍선 스타일 정의

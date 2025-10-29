@@ -1,7 +1,7 @@
 import { EMOTION_OPTIONS } from './emotionConstants';
 import EmotionOptionButton from './EmotionOptionButton';
 
-import type { MoodType } from './EmotionState';
+import type { MoodType } from './index';
 
 interface EmotionSelectorProps {
   selectedMood: MoodType | null;

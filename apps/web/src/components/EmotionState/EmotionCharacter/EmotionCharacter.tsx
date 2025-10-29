@@ -7,7 +7,7 @@ import { calculateLevel, getCharacterImage } from './characterImageSelector';
 import { generateCharacterMessage } from './characterMessageGenerator';
 import CharacterSpeechBubble from './CharacterSpeechBubble';
 
-import type { MoodType } from '../EmotionState';
+import type { MoodType } from '../index';
 
 interface EmotionCharacterProps {
   mood: MoodType;

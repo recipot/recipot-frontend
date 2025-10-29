@@ -2,7 +2,7 @@ import '../EmotionState/styles.css';
 
 import { cn } from '@/lib/utils';
 
-import type { MoodType } from './EmotionState';
+import type { MoodType } from './index';
 
 /**
  * mood에 따른 그라디언트 클래스 매핑

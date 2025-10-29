@@ -18,7 +18,7 @@ import LevelBird3Good from '../../../../public/emotion/img-bird-lv3-good.png';
 import LevelBird3Neutral from '../../../../public/emotion/img-bird-lv3-neutral.png';
 import NormalBird from '../../../../public/emotion/img-bird-neutral.png';
 
-import type { MoodType } from '../EmotionState';
+import type { MoodType } from '../index';
 import type { StaticImageData } from 'next/image';
 
 /**
@@ -77,11 +77,11 @@ export const getCharacterImage = (
   if (level > 0 && level <= 3) {
     /* eslint-disable security/detect-object-injection */
     const levelImages = LEVEL_IMAGES[level as 1 | 2 | 3];
-    return levelImages[mood] || levelImages.default;
+    return levelImages[mood] ?? levelImages.default;
     /* eslint-enable security/detect-object-injection */
   }
 
   // 레벨이 없을 때 기본 이미지 사용
   /* eslint-disable-next-line security/detect-object-injection */
-  return DEFAULT_IMAGES[mood] || DEFAULT_IMAGES.default;
+  return DEFAULT_IMAGES[mood] ?? DEFAULT_IMAGES.default;
 };

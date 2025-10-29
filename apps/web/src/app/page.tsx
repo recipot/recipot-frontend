@@ -12,7 +12,12 @@ import { Button } from '@/components/common/Button';
 import { Header } from '@/components/common/Header';
 import { LoadingPage } from '@/components/common/Loading';
 import { Toast } from '@/components/common/Toast/Toast';
-import { EmotionContainer, type MoodType } from '@/components/EmotionState';
+import {
+  EmotionBackground,
+  EmotionCharacter,
+  EmotionSelector,
+  type MoodType,
+} from '@/components/EmotionState';
 import UserIcon from '@/components/Icons/UserIcon';
 import { IngredientsSearch } from '@/components/IngredientsSearch';
 import { ReviewRemindBottomSheet } from '@/components/review/ReviewRemindBottomSheet';
@@ -68,8 +73,9 @@ export default function Home() {
     }
   }, [loading, user, router]);
 
-  const handleMoodChange = (mood: MoodType | null) => {
-    console.log('🔄 상태 변경:', mood);
+  const handleMoodSelect = (selectedMood: MoodType) => {
+    const newMood = mood === selectedMood ? null : selectedMood;
+    console.log('🔄 상태 변경:', newMood);
 
     // 기존 타이머가 있으면 취소 (이전 상태 선택 취소)
     if (transitionTimerRef.current) {
@@ -78,11 +84,11 @@ export default function Home() {
       transitionTimerRef.current = null;
     }
 
-    setMood(mood);
+    setMood(newMood);
 
     // mood 선택 시 타이핑 완료 대기 상태로 전환
     // bad, neutral, good 중 하나가 선택되었을 때만 재료 입력으로 이동 대기
-    if (mood && mood !== 'default') {
+    if (newMood && newMood !== 'default') {
       // 새로운 상태 선택 시 대기 상태 초기화
       setWaitingForTyping(true);
       setShowIngredientsSearch(false);
@@ -230,6 +236,9 @@ export default function Home() {
           </Header>
         </div>
 
+        {/* 배경 - 전체 화면 */}
+        <EmotionBackground mood={mood} className="fixed inset-0 -z-10" />
+
         {/* 본문 컨텐츠 - 헤더 영역 포함 */}
         <div className="flex h-full w-full flex-col pt-14">
           {/* Title */}
@@ -242,14 +251,17 @@ export default function Home() {
             </p>
           </div>
 
-          {/* EmotionContainer Component */}
-          <div className="flex-1">
-            <EmotionContainer
-              showImage
-              onMoodChange={handleMoodChange}
+          {/* 기분 선택 버튼 영역 */}
+          <EmotionSelector
+            selectedMood={mood}
+            onMoodSelect={handleMoodSelect}
+          />
+
+          {/* 캐릭터 영역 */}
+          <div className="flex flex-1 items-center justify-center">
+            <EmotionCharacter
+              mood={mood ?? 'default'}
               onTypingComplete={handleTypingComplete}
-              initialMood={mood}
-              className="h-full"
             />
           </div>
         </div>

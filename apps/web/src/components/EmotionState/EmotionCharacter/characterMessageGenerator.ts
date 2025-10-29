@@ -1,4 +1,4 @@
-import type { MoodType } from '../EmotionState';
+import type { MoodType } from '../index';
 
 /**
  * 메시지 생성 파라미터
