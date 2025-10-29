@@ -2,20 +2,16 @@
 import './styles.css';
 
 import React, { useState } from 'react';
-import Image from 'next/image';
 
 import { cn } from '@/lib/utils';
 
-import HappyBird from '../../../public/emotion/enough.png';
-import VisualMain from '../../../public/emotion/initial.png';
-import NormalBird from '../../../public/emotion/soso.png';
-import TiredBird from '../../../public/emotion/tired.png';
 import { EMOTION_OPTIONS } from './emotionConstants';
+import EmotionImage from './EmotionImage';
 import EmotionOptionButton from './EmotionOptionButton';
 
 import type { ShowImageProps } from '@recipot/types';
 
-export type MoodType = 'bad' | 'neutral' | 'good';
+export type MoodType = 'bad' | 'neutral' | 'good' | 'default';
 export type MoodState = 'default' | 'selected' | 'disabled';
 export type EmotionColor = 'blue' | 'yellow' | 'red';
 
@@ -34,18 +30,6 @@ const EmotionState: React.FC<EmotionStateProps> = ({
   onMoodChange,
   showImage,
 }) => {
-  const getEmotionImage = (mood: MoodType | null) => {
-    switch (mood) {
-      case 'bad':
-        return TiredBird;
-      case 'good':
-        return HappyBird;
-      case 'neutral':
-        return NormalBird;
-      default:
-        return VisualMain;
-    }
-  };
   const [selectedMood, setSelectedMood] = useState<MoodType | null>(
     initialMood
   );
@@ -67,6 +51,7 @@ const EmotionState: React.FC<EmotionStateProps> = ({
     // 선택된 감정에 따른 그래디언트
     const gradientMap = {
       bad: 'emotion-gradient-bad',
+      default: 'emotion-gradient-default',
       good: 'emotion-gradient-good',
       neutral: 'emotion-gradient-neutral',
     };
@@ -100,15 +85,7 @@ const EmotionState: React.FC<EmotionStateProps> = ({
         ))}
       </div>
 
-      {showImage && (
-        <Image
-          width={390}
-          height={302}
-          src={getEmotionImage(selectedMood)}
-          alt="emotion"
-          quality={100}
-        />
-      )}
+      {showImage && <EmotionImage mood={selectedMood ?? 'default'} />}
     </div>
   );
 };
