@@ -10,6 +10,7 @@ import { condition } from '@recipot/api';
 
 import { Button } from '@/components/common/Button';
 import { LoadingPage } from '@/components/common/Loading';
+import { Toast } from '@/components/common/Toast/Toast';
 import type { MoodType } from '@/components/EmotionState';
 import EmotionState from '@/components/EmotionState';
 import UserIcon from '@/components/Icons/UserIcon';
@@ -19,6 +20,7 @@ import { Header } from '@/components/common/Header';
 import { useMoodStore } from '@/stores/moodStore';
 import { IngredientsSearch } from '@/components/IngredientsSearch';
 import { useSelectedFoodsStore } from '@/stores/selectedFoodsStore';
+import { useToast } from '@/hooks/useToast';
 
 import { onboardingStyles } from './onboarding/_utils/onboardingStyles';
 
@@ -30,6 +32,11 @@ export default function Home() {
   const { isCompleted } = useSplash();
   const { mood, setMood } = useMoodStore();
   const { selectedFoodIds } = useSelectedFoodsStore();
+  const {
+    isVisible: isToastVisible,
+    message: toastMessage,
+    showToast,
+  } = useToast();
 
   const [showIngredientsSearch, setShowIngredientsSearch] = useState(false);
   const [selectedCount, setSelectedCount] = useState(0);
@@ -66,17 +73,18 @@ export default function Home() {
     setShowIngredientsSearch(false);
   };
 
+  // Mood를 Condition ID로 매핑하는 객체
+  const MOOD_TO_CONDITION_ID: Record<string, number> = {
+    bad: 1,
+    neutral: 2,
+    good: 3,
+  };
+
+  const DEFAULT_CONDITION_ID = 2;
+
   const moodToConditionId = (moodValue: string | null): number => {
-    switch (moodValue) {
-      case 'bad':
-        return 1;
-      case 'neutral':
-        return 2;
-      case 'good':
-        return 3;
-      default:
-        return 2;
-    }
+    if (!moodValue) return DEFAULT_CONDITION_ID;
+    return MOOD_TO_CONDITION_ID[moodValue] ?? DEFAULT_CONDITION_ID;
   };
 
   const handleComplete = async () => {
@@ -84,7 +92,7 @@ export default function Home() {
       setIsSubmitting(true);
 
       if (!mood) {
-        alert('기분을 먼저 선택해주세요.');
+        showToast('기분을 먼저 선택해주세요');
         setShowIngredientsSearch(false);
         return;
       }
@@ -97,14 +105,10 @@ export default function Home() {
       // 컨디션 저장
       const conditionId = moodToConditionId(mood);
 
-      await condition
-        .saveDailyCondition({
-          conditionId,
-          isRecommendationStarted: true,
-        })
-        .catch(conditionError => {
-          console.error('⚠️ 일일 컨디션 저장 실패:', conditionError);
-        });
+      await condition.saveDailyCondition({
+        conditionId,
+        isRecommendationStarted: true,
+      });
 
       console.info('✅ 재료 선택 및 컨디션 저장 완료');
 
@@ -116,10 +120,8 @@ export default function Home() {
       const errorMessage =
         error instanceof Error
           ? error.message
-          : '알 수 없는 오류가 발생했습니다.';
-      alert(
-        `재료 선택 완료 중 오류가 발생했습니다.\n\n${errorMessage}\n\n다시 시도해주세요.`
-      );
+          : '알 수 없는 오류가 발생했습니다';
+      showToast(`재료 선택 완료 중 오류가 발생했습니다: ${errorMessage}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -142,6 +144,9 @@ export default function Home() {
   // 정상적으로 로그인하고 온보딩 완료한 사용자만 표시
   return (
     <div className="relative h-screen w-full overflow-hidden">
+      {/* Toast 알림 */}
+      <Toast isVisible={isToastVisible} message={toastMessage} />
+
       {/* 메인 화면 - 기분 선택 */}
       <div className="relative h-full w-full pt-14">
         <Header className="px-5">
