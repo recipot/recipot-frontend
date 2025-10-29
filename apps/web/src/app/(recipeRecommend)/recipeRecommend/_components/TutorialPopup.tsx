@@ -21,7 +21,7 @@ export default function TutorialPopup({ onClose }: TutorialPopupProps) {
       </div>
 
       {/* 튜토리얼 다이얼로그 */}
-      <div className="absolute top-[5rem] left-1/2 z-[70] w-[342px] -translate-x-1/2 rounded-[18px] bg-white px-6 pb-6 before:absolute before:-top-[10px] before:right-6 before:border-r-[10px] before:border-b-[10px] before:border-l-[10px] before:border-r-transparent before:border-b-white before:border-l-transparent before:content-['']">
+      <div className="absolute top-[5rem] left-1/2 z-[70] w-[calc(100%-48px)] -translate-x-1/2 rounded-[18px] bg-white px-6 pb-6 before:absolute before:-top-[8px] before:right-[0.7rem] before:border-r-[10px] before:border-b-[10px] before:border-l-[10px] before:border-r-transparent before:border-b-white before:border-l-transparent before:content-['']">
         {/* 텍스트 영역 */}
         <div className="px-6 pt-[26px] pb-6 text-center">
           <p className="text-16b text-[#212529]">
