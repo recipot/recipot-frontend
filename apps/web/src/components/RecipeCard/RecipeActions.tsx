@@ -7,16 +7,18 @@ import { CookIcon, HeartIcon } from '@/components/Icons';
 interface RecipeActionsProps {
   isLiked?: boolean;
   onToggleLike: () => void;
+  recipeId: number;
 }
 
 export const RecipeActions = ({
   isLiked,
   onToggleLike,
+  recipeId,
 }: RecipeActionsProps) => {
   const router = useRouter();
 
-  const handleExploreComplete = () => {
-    router.push('/complete');
+  const handleCookingOrder = (recipeId: number) => {
+    router.push(`/recipe/${recipeId}/cooking-order`);
   };
 
   return (
@@ -36,7 +38,7 @@ export const RecipeActions = ({
         <Button
           onClick={e => {
             e.stopPropagation(); // 이벤트 전파 방지
-            handleExploreComplete();
+            handleCookingOrder(recipeId);
           }}
           className="h-[52px] flex-1 rounded-full bg-white text-gray-900"
         >

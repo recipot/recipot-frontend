@@ -99,6 +99,10 @@ export function RecipeDetailHeader({ recipe }: RecipeHeaderProps) {
     }
   };
 
+  const handleBack = () => {
+    router.back();
+  };
+
   return (
     <>
       {/* Login Modal */}
@@ -116,14 +120,9 @@ export function RecipeDetailHeader({ recipe }: RecipeHeaderProps) {
       {/* Header */}
       <div className="bg-white">
         <div className="flex items-center justify-between px-4 py-3">
-          <div className="flex items-center">
-            <BackIcon
-              size={24}
-              color="#212529"
-              onClick={() => router.back()}
-              className="cursor-pointer"
-            />
-          </div>
+          <button className="flex items-center" onClick={handleBack}>
+            <BackIcon size={24} color="#212529" className="cursor-pointer" />
+          </button>
           <div className="flex items-center space-x-2">
             <WebShareButton
               shareData={shareData}

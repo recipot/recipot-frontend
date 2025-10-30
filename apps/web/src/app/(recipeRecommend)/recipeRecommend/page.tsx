@@ -243,14 +243,14 @@ export default function RecipeRecommend() {
   }
 
   return (
-    <>
+    <div className="fixed inset-0 overflow-hidden">
       <RecipeHeader onRefresh={handleRefresh} />
       <Header.Spacer />
       <div
         className={`recipe-recommend-main flex flex-col items-center justify-center overflow-hidden ${getEmotionGradient(userSelectedMood)}`}
       >
         {/* Swiper Cards Effect - 남은 공간 차지 */}
-        <div className="px-6 pt-5 pb-6">
+        <div className="px-6 pb-6">
           <div className="recipe-header-group mb-5">
             {/* Tags - 고정 높이 */}
             <RecipeTags />
@@ -298,6 +298,6 @@ export default function RecipeRecommend() {
       {showTutorial && <TutorialPopup onClose={handleCloseTutorial} />}
 
       <Toast message={message} isVisible={isVisible} />
-    </>
+    </div>
   );
 }

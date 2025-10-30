@@ -1,4 +1,5 @@
 import { memo, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 
 import type { Recipe } from '@/types/recipe.types';
 
@@ -24,13 +25,14 @@ export const RecipeCard = memo(
     onToggleLike,
     recipe,
   }: RecipeCardProps) => {
+    const router = useRouter();
     const handleToggleLike = useCallback(() => {
       onToggleLike(index, recipe.id);
     }, [onToggleLike, index, recipe.id]);
 
     const handleCardClick = useCallback(() => {
       // 레시피 상세 URL로 이동 (외부 링크 또는 API 엔드포인트)
-      window.open(`/recipe/${recipe.id}`, '_blank');
+      router.push(`/recipe/${recipe.id}`);
     }, [recipe.id]);
 
     return (
@@ -64,6 +66,7 @@ export const RecipeCard = memo(
                 <RecipeActions
                   isLiked={isLiked}
                   onToggleLike={handleToggleLike}
+                  recipeId={recipe.id}
                 />
               </div>
             </div>
