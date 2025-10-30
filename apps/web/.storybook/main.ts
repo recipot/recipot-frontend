@@ -1,7 +1,11 @@
 import { createRequire } from 'module';
 import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
 
 import type { StorybookConfig } from '@storybook/nextjs-vite';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 /**
  * This function is used to resolve the absolute path of a package.
@@ -23,7 +27,6 @@ const config: StorybookConfig = {
   },
   staticDirs: ['../public'],
   stories: [
-    '../src/stories/**/*.mdx',
     '../src/components/ui/**/*.stories.@(js|jsx|mjs|ts|tsx)',
     '../src/components/common/**/*.stories.@(js|jsx|mjs|ts|tsx)',
     '../src/components/**/**/*.stories.@(js|jsx|mjs|ts|tsx)',

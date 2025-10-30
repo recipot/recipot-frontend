@@ -1,10 +1,15 @@
 'use client';
 
 import { useState } from 'react';
+<<<<<<< HEAD
 import { useAuth } from '@recipot/contexts';
+=======
+import { useQueryClient } from '@tanstack/react-query';
+>>>>>>> 182f7027f43845e450753af78159f120b39f7c98
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 
+import { COMPLETED_RECIPES_QUERY_KEY } from '@/hooks/useCompletedRecipes';
 import { useCookingOrder } from '@/hooks/useCookingOrder';
 
 import { useCookingOrderNavigation } from '../../../../../../hooks/useCookingOrderNavigation';
@@ -26,6 +31,7 @@ export default function CookingOrderPresenter({
 }: CookingOrderPresenterProps) {
   const { completeStep, error, isLoading, recipe } = useCookingOrder(recipeId);
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const { token } = useAuth();
 
@@ -68,11 +74,21 @@ export default function CookingOrderPresenter({
       } else {
         console.error('해먹기 완료 실패:', response.data);
       }
+<<<<<<< HEAD
     } catch (error) {
       console.error('해먹기 완료 API 호출 실패:', error);
     } finally {
       completeStep(currentStep);
     }
+=======
+    );
+    completeStep(currentStep);
+
+    // 완료한 레시피 캐시 무효화 - 메인 페이지에서 최신 데이터 반영
+    queryClient.invalidateQueries({
+      queryKey: COMPLETED_RECIPES_QUERY_KEY,
+    });
+>>>>>>> 182f7027f43845e450753af78159f120b39f7c98
   };
 
   const handleBack = () => {

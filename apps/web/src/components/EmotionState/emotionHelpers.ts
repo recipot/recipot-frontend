@@ -6,7 +6,7 @@ import {
   EmotionNeutralIcon,
 } from '@/components/Icons';
 
-import type { EmotionColor } from './EmotionState';
+import type { EmotionColor } from './index';
 
 // ============================================================================
 // 색상 설정

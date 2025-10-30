@@ -3,18 +3,17 @@
 import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/common/Button';
-import EmotionState, { type MoodType } from '@/components/EmotionState';
+import {
+  EmotionBackground,
+  EmotionSelector,
+  type MoodType,
+} from '@/components/EmotionState';
 import { useMoodStore } from '@/stores/moodStore';
 
 import { useOnboardingActions, useOnboardingStep } from '../../_hooks';
 import { getSubmitButtonText } from '../../_utils';
 
-interface CookStateStepProps {
-  /** 이미지 표시 여부 */
-  showImage?: boolean;
-}
-
-export default function CookStateStep({ showImage }: CookStateStepProps) {
+export default function CookStateStep() {
   // 온보딩 스텝 로직
   const { handleError, isSubmitting, saveAndProceed } = useOnboardingStep(2);
 
@@ -35,8 +34,9 @@ export default function CookStateStep({ showImage }: CookStateStepProps) {
     }
   }, [isRefreshed, clearRefreshFlag]);
 
-  const handleMoodChange = (mood: MoodType | null) => {
-    setSelectedMood(mood);
+  const handleMoodSelect = (mood: MoodType) => {
+    const newMood = selectedMood === mood ? null : mood;
+    setSelectedMood(newMood);
   };
 
   const handleNext = async () => {
@@ -53,17 +53,19 @@ export default function CookStateStep({ showImage }: CookStateStepProps) {
   };
 
   return (
-    <>
-      <div className="fixed top-0 right-0 left-0 -z-10 h-screen min-h-[500px]">
-        <EmotionState
-          key={selectedMood ?? 'null'} // selectedMood가 변경되면 컴포넌트 리마운트
-          onMoodChange={handleMoodChange}
-          initialMood={selectedMood}
-          className="h-full"
-          showImage={showImage}
+    <div className="relative overflow-hidden">
+      {/* 배경 - 전체 화면 고정 */}
+      <EmotionBackground mood={selectedMood} className="fixed inset-0 -z-10" />
+
+      {/* 기분 선택 버튼 영역 - 화면 중앙 */}
+      <div className="flex h-[calc(100vh-20rem)] items-center justify-center">
+        <EmotionSelector
+          selectedMood={selectedMood}
+          onMoodSelect={handleMoodSelect}
         />
       </div>
 
+      {/* 버튼 영역 - 하단 고정 */}
       <div className="fixed right-0 bottom-0 left-0 flex justify-center px-6 py-[10px]">
         <Button
           onClick={handleNext}
@@ -72,6 +74,6 @@ export default function CookStateStep({ showImage }: CookStateStepProps) {
           {getSubmitButtonText(isSubmitting, 2)}
         </Button>
       </div>
-    </>
+    </div>
   );
 }
