@@ -12,7 +12,7 @@ import {
 } from './emotionHelpers';
 import MoodVariantButton from './MoodVariantButton';
 
-import type { EmotionColor } from './EmotionState';
+import type { EmotionColor } from './index';
 
 // ============================================================================
 // 타입 정의

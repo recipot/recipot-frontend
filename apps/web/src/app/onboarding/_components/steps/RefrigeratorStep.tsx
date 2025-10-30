@@ -14,7 +14,11 @@ import { useSelectedFoodsStore } from '@/stores/selectedFoodsStore';
 
 import { ONBOARDING_CONSTANTS } from '../../_constants';
 import { useOnboardingActions } from '../../_hooks';
-import { getSubmitButtonText, moodToConditionId } from '../../_utils';
+import {
+  getSubmitButtonText,
+  moodToConditionId,
+  onboardingStyles,
+} from '../../_utils';
 
 export default function RefrigeratorStep() {
   const { setUser, user } = useAuth();
@@ -151,7 +155,7 @@ export default function RefrigeratorStep() {
     <>
       <IngredientsSearch onSelectionChange={handleSelectionChange} />
 
-      <div className="fixed right-0 bottom-0 left-0 flex justify-center px-6 py-[10px]">
+      <div className={onboardingStyles.submitButton.wrapper}>
         <Button
           onClick={handleComplete}
           disabled={

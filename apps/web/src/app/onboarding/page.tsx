@@ -49,7 +49,7 @@ function OnboardingContent() {
       case 1:
         return <AllergyStep />;
       case 2:
-        return <CookStateStep showImage={!user.isFirstEntry} />;
+        return <CookStateStep />;
       case 3:
         return <RefrigeratorStep />;
       default:
