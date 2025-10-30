@@ -36,7 +36,10 @@ export const RecipeActions = ({
           <HeartIcon className="h-5 w-5" color="#ffffff" active={isLiked} />
         </Button>
         <Button
-          onClick={() => handleCookingOrder(recipeId)}
+          onClick={e => {
+            e.stopPropagation(); // 이벤트 전파 방지
+            handleCookingOrder(recipeId);
+          }}
           className="h-[52px] flex-1 rounded-full bg-white text-gray-900"
         >
           <CookIcon className="mr-2 h-[18px] w-[18px]" color="#212529" />
