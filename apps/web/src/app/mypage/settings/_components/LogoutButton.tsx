@@ -51,7 +51,9 @@ export default function LogoutButton() {
           <Button
             onClick={handleLogout}
             disabled={isLoading}
-            className="text-14 h-[2.125rem] border border-[#747474] bg-white px-[0.9375rem] py-3 text-black disabled:opacity-50"
+            className="px-5 py-2"
+            size="full"
+            variant="outline"
             shape="square"
           >
             {isLoading ? '로그아웃 중...' : '로그아웃'}
@@ -59,7 +61,8 @@ export default function LogoutButton() {
           <Button
             onClick={() => setIsModalOpen(false)}
             disabled={isLoading}
-            className="text-14b h-[2.125rem] bg-[#747474] px-4 py-3 text-white disabled:opacity-50"
+            className="px-5 py-2"
+            size="full"
             shape="square"
           >
             닫기
