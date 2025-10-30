@@ -23,7 +23,7 @@ export default function UserProfile({ user }: UserProfileProps) {
     <div className="px-1 py-6">
       <div className="flex items-center gap-4">
         <Image
-          src={user.profileImageUrl}
+          src="/mypage/img-userProfile.png"
           alt="사용자 프로필 이미지"
           width={54}
           height={54}

@@ -1,27 +1,32 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { condition } from '@recipot/api';
 import { useAuth } from '@recipot/contexts';
+import { AnimatePresence, motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
-import { condition } from '@recipot/api';
 
 import { Button } from '@/components/common/Button';
+import { Header } from '@/components/common/Header';
 import { LoadingPage } from '@/components/common/Loading';
 import { Toast } from '@/components/common/Toast/Toast';
-import type { MoodType } from '@/components/EmotionState';
-import EmotionState from '@/components/EmotionState';
+import {
+  EmotionBackground,
+  EmotionCharacter,
+  EmotionSelector,
+} from '@/components/EmotionState';
 import UserIcon from '@/components/Icons/UserIcon';
+import { IngredientsSearch } from '@/components/IngredientsSearch';
 import { ReviewRemindBottomSheet } from '@/components/review/ReviewRemindBottomSheet';
 import { useSplash } from '@/contexts/SplashContext';
-import { Header } from '@/components/common/Header';
-import { useMoodStore } from '@/stores/moodStore';
-import { IngredientsSearch } from '@/components/IngredientsSearch';
-import { useSelectedFoodsStore } from '@/stores/selectedFoodsStore';
+import { useCompletedRecipes } from '@/hooks/useCompletedRecipes';
 import { useToast } from '@/hooks/useToast';
+import { useSelectedFoodsStore } from '@/stores/selectedFoodsStore';
 
+import { useMoodSelectionFlow } from './(main)/_hooks/useMoodSelectionFlow';
+import { moodToConditionId } from './onboarding/_utils/conditionMapper';
 import { onboardingStyles } from './onboarding/_utils/onboardingStyles';
 
 const MIN_SELECTED_FOODS = 2;
@@ -30,7 +35,6 @@ export default function Home() {
   const { loading, user } = useAuth();
   const router = useRouter();
   const { isCompleted } = useSplash();
-  const { mood, setMood } = useMoodStore();
   const { selectedFoodIds } = useSelectedFoodsStore();
   const {
     isVisible: isToastVisible,
@@ -38,9 +42,22 @@ export default function Home() {
     showToast,
   } = useToast();
 
-  const [showIngredientsSearch, setShowIngredientsSearch] = useState(false);
+  // 기분 선택 플로우 관리
+  const {
+    flowState,
+    handleBack,
+    handleMoodSelect,
+    handleTypingComplete,
+    mood,
+    showIngredientsSearch,
+  } = useMoodSelectionFlow();
+
   const [selectedCount, setSelectedCount] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // 완료한 레시피 수 조회 (로그인 상태일 때만)
+  // 이 데이터는 EmotionCharacter에서 캐시를 통해 사용됨
+  useCompletedRecipes({ limit: 10, page: 1 });
 
   useEffect(() => {
     // 로딩 중에는 체크하지 않음
@@ -60,44 +77,17 @@ export default function Home() {
     }
   }, [loading, user, router]);
 
-  const handleMoodChange = (mood: MoodType | null) => {
-    setMood(mood);
-
-    // mood 선택 시 재료 검색 화면을 슬라이드로 표시
-    if (mood) {
-      setShowIngredientsSearch(true);
-    }
-  };
-
-  const handleBack = () => {
-    setShowIngredientsSearch(false);
-  };
-
-  // Mood를 Condition ID로 매핑하는 객체
-  const MOOD_TO_CONDITION_ID: Record<string, number> = {
-    bad: 1,
-    neutral: 2,
-    good: 3,
-  };
-
-  const DEFAULT_CONDITION_ID = 2;
-
-  const moodToConditionId = (moodValue: string | null): number => {
-    if (!moodValue) return DEFAULT_CONDITION_ID;
-    return MOOD_TO_CONDITION_ID[moodValue] ?? DEFAULT_CONDITION_ID;
-  };
-
   const handleComplete = async () => {
     try {
       setIsSubmitting(true);
 
       if (!mood) {
         showToast('기분을 먼저 선택해주세요');
-        setShowIngredientsSearch(false);
         return;
       }
 
       console.info('🚀 재료 선택 완료:', {
+        flowState,
         mood,
         selectedFoods: selectedFoodIds,
       });
@@ -148,43 +138,59 @@ export default function Home() {
       <Toast isVisible={isToastVisible} message={toastMessage} />
 
       {/* 메인 화면 - 기분 선택 */}
-      <div className="relative h-full w-full pt-14">
-        <Header className="px-5">
-          <Link href="/">
-            <Image
-              src="/logo.png"
-              alt="한끼부터"
-              width={80}
-              height={30}
-              priority
-              className="object-contain"
-            />
-          </Link>
-          <Link
-            href="/mypage"
-            className="cursor-pointer"
-            aria-label="마이페이지"
-          >
-            <UserIcon size={24} color="#212529" />
-          </Link>
-        </Header>
-
-        {/* Title */}
-        <div className={onboardingStyles.stepHeader.wrapper}>
-          <h2 className={onboardingStyles.stepHeader.title}>
-            요리할 여유가 얼마나있나요?
-          </h2>
-          <p className={onboardingStyles.stepHeader.description}>
-            상태와 재료 딱 두가지만 알려주세요!
-          </p>
+      <div className="relative h-full w-full">
+        {/* 고정 헤더 */}
+        <div className="absolute top-0 right-0 left-0 z-10">
+          <Header className="px-5">
+            <Link href="/">
+              <Image
+                src="/logo.png"
+                alt="한끼부터"
+                width={80}
+                height={30}
+                priority
+                className="object-contain"
+              />
+            </Link>
+            <Link
+              href="/mypage"
+              className="cursor-pointer"
+              aria-label="마이페이지"
+            >
+              <UserIcon size={24} color="#212529" />
+            </Link>
+          </Header>
         </div>
 
-        {/* EmotionState Component */}
-        <EmotionState
-          showImage
-          onMoodChange={handleMoodChange}
-          initialMood={mood}
-        />
+        {/* 배경 - 전체 화면 */}
+        <EmotionBackground mood={mood} className="fixed inset-0 -z-10" />
+
+        {/* 본문 컨텐츠 - 헤더 영역 포함 */}
+        <div className="flex h-full w-full flex-col pt-14">
+          {/* Title */}
+          <div className={onboardingStyles.stepHeader.wrapper}>
+            <h2 className={onboardingStyles.stepHeader.title}>
+              요리할 여유가 얼마나있나요?
+            </h2>
+            <p className={onboardingStyles.stepHeader.description}>
+              상태와 재료 딱 두가지만 알려주세요!
+            </p>
+          </div>
+
+          {/* 기분 선택 버튼 영역 */}
+          <EmotionSelector
+            selectedMood={mood}
+            onMoodSelect={handleMoodSelect}
+          />
+
+          {/* 캐릭터 영역 */}
+          <div className="flex flex-1 items-center justify-center">
+            <EmotionCharacter
+              mood={mood ?? 'default'}
+              onTypingComplete={handleTypingComplete}
+            />
+          </div>
+        </div>
 
         {isCompleted && <ReviewRemindBottomSheet />}
       </div>
@@ -196,40 +202,48 @@ export default function Home() {
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
-            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            transition={{ damping: 30, stiffness: 300, type: 'spring' }}
             className="absolute top-0 left-0 z-50 h-full w-full bg-white"
           >
-            <div className="relative h-screen w-full pt-14">
-              <Header>
-                <Header.Back onClick={handleBack} />
-                <Link
-                  href="/mypage"
-                  className="cursor-pointer"
-                  aria-label="마이페이지"
-                >
-                  <UserIcon size={24} color="#212529" />
-                </Link>
-              </Header>
-
-              <div className={onboardingStyles.stepHeader.wrapper}>
-                <h2 className={onboardingStyles.stepHeader.title}>
-                  현재 냉장고에 어떤 재료를 <br />
-                  가지고 계신가요?
-                </h2>
-                <p className={onboardingStyles.stepHeader.description}>
-                  두 가지만 골라도 요리를 찾아드려요
-                </p>
+            <div className="relative h-screen w-full">
+              {/* 고정 헤더 */}
+              <div className="absolute top-0 right-0 left-0 z-10">
+                <Header>
+                  <Header.Back onClick={handleBack} />
+                  <Link
+                    href="/mypage"
+                    className="cursor-pointer"
+                    aria-label="마이페이지"
+                  >
+                    <UserIcon size={24} color="#212529" />
+                  </Link>
+                </Header>
               </div>
 
-              <IngredientsSearch onSelectionChange={handleSelectionChange} />
+              {/* 본문 컨텐츠 */}
+              <div className="h-full w-full pt-14">
+                <div className={onboardingStyles.stepHeader.wrapper}>
+                  <h2 className={onboardingStyles.stepHeader.title}>
+                    현재 냉장고에 어떤 재료를 <br />
+                    가지고 계신가요?
+                  </h2>
+                  <p className={onboardingStyles.stepHeader.description}>
+                    두 가지만 골라도 요리를 찾아드려요
+                  </p>
+                </div>
 
-              <div className="fixed right-0 bottom-0 left-0 flex justify-center px-6 py-[10px]">
-                <Button
-                  onClick={handleComplete}
-                  disabled={selectedCount < MIN_SELECTED_FOODS || isSubmitting}
-                >
-                  {isSubmitting ? '제출 중...' : '여유에 맞는 요리 추천받기'}
-                </Button>
+                <IngredientsSearch onSelectionChange={handleSelectionChange} />
+
+                <div className="fixed right-0 bottom-0 left-0 flex justify-center px-6 py-[10px]">
+                  <Button
+                    onClick={handleComplete}
+                    disabled={
+                      selectedCount < MIN_SELECTED_FOODS || isSubmitting
+                    }
+                  >
+                    {isSubmitting ? '제출 중...' : '여유에 맞는 요리 추천받기'}
+                  </Button>
+                </div>
               </div>
             </div>
           </motion.div>

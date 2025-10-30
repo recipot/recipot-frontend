@@ -8,6 +8,7 @@ import type { MoodType } from '@/components/EmotionState';
 export const moodToConditionId = (mood: MoodType): number => {
   const moodMap: Record<MoodType, number> = {
     bad: 1,
+    default: 4,
     good: 3,
     neutral: 2,
   };

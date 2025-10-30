@@ -117,12 +117,20 @@
   html {
     /* Native smooth scrolling for in-page anchors */
     scroll-behavior: smooth;
+    /* 사파리에서 상단/하단 바운스 효과 방지 */
+    overscroll-behavior-y: contain;
+    /* iOS Safari에서 스크롤 시 주소창 표시/숨김으로 인한 레이아웃 변화 최소화 */
+    -webkit-overflow-scrolling: touch;
   }
   * {
     @apply border-border font-pretendard;
   }
   body {
     @apply bg-background text-gray-900;
+    /* 사파리에서 상단/하단 바운스 효과 방지 */
+    overscroll-behavior-y: contain;
+    /* 수평 스크롤 방지, 수직 스크롤만 허용 */
+    touch-action: pan-y;
   }
 
   /* Offset anchor targets by sticky header height */

@@ -8,6 +8,7 @@ import type { MoodType } from '@/components/EmotionState';
 export const getEmotionGradient = (mood: MoodType): string => {
   const gradientMap: Record<MoodType, string> = {
     bad: 'emotion-gradient-bad',
+    default: 'emotion-gradient-default',
     good: 'emotion-gradient-good',
     neutral: 'emotion-gradient-neutral',
   };

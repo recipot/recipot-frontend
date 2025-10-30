@@ -11,9 +11,13 @@ interface RecipeHeaderProps {
 const RecipeHeader = ({ onRefresh }: RecipeHeaderProps) => {
   const router = useRouter();
 
+  const handleBack = () => {
+    router.push('/');
+  };
+
   return (
     <Header>
-      <Header.Back onClick={() => router.back()} />
+      <Header.Back onClick={handleBack} />
       <Header.Action onClick={onRefresh} ariaLabel="새로고침">
         <RefreshIcon size={24} />
       </Header.Action>
