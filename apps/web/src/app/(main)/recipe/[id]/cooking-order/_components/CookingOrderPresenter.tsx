@@ -68,10 +68,9 @@ export default function CookingOrderPresenter({
       } else {
         console.error('해먹기 완료 실패:', response.data);
       }
-
-      completeStep(currentStep);
     } catch (error) {
       console.error('해먹기 완료 API 호출 실패:', error);
+    } finally {
       completeStep(currentStep);
     }
   };
