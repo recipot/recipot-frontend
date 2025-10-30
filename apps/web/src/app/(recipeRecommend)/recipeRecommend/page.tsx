@@ -138,7 +138,7 @@ export default function RecipeRecommend() {
 
   useEffect(() => {
     fetchRecommendRecipes();
-  }, [fetchRecommendRecipes]);
+  }, []);
 
   useEffect(() => {
     const fetchProfile = async () => {
