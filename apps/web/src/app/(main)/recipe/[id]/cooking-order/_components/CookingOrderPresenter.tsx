@@ -1,13 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-<<<<<<< HEAD
-import { useAuth } from '@recipot/contexts';
-=======
 import { useQueryClient } from '@tanstack/react-query';
->>>>>>> 182f7027f43845e450753af78159f120b39f7c98
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import { tokenUtils } from 'packages/api/src/auth';
 
 import { COMPLETED_RECIPES_QUERY_KEY } from '@/hooks/useCompletedRecipes';
 import { useCookingOrder } from '@/hooks/useCookingOrder';
@@ -33,7 +30,7 @@ export default function CookingOrderPresenter({
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  const { token } = useAuth();
+  const token = tokenUtils.getToken();
 
   // 모달 상태 통합 관리
   const [activeModal, setActiveModal] = useState<ModalType>(null);
@@ -51,36 +48,17 @@ export default function CookingOrderPresenter({
   const closeModal = () => setActiveModal(null);
 
   const handleCookingComplete = async () => {
-    try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/users/recipes/${recipeId}/complete`,
-        {
-          recipeId,
+    // await completeCooking();
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/users/recipes/${recipeId}/complete`,
+      {
+        recipeId,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      const isSuccess =
-        response.data?.status === 200 || response.data?.data === true;
-
-      if (isSuccess) {
-        const completedRecipeId = Number(recipeId);
-
-        router.push(`/review?completedRecipeId=${completedRecipeId}`);
-      } else {
-        console.error('해먹기 완료 실패:', response.data);
       }
-<<<<<<< HEAD
-    } catch (error) {
-      console.error('해먹기 완료 API 호출 실패:', error);
-    } finally {
-      completeStep(currentStep);
-    }
-=======
     );
     completeStep(currentStep);
 
@@ -88,9 +66,15 @@ export default function CookingOrderPresenter({
     queryClient.invalidateQueries({
       queryKey: COMPLETED_RECIPES_QUERY_KEY,
     });
->>>>>>> 182f7027f43845e450753af78159f120b39f7c98
-  };
 
+    // router.push(`/review?completedRecipeId=${completedRecipeId}`);
+    const isSuccess =
+      response.data.status === 200 || response.data.data === true;
+    if (isSuccess) {
+      const completedRecipeId = recipeId;
+      router.push(`/review?completedRecipeId=${completedRecipeId}`);
+    }
+  };
   const handleBack = () => {
     openModal('warning');
   };
