@@ -58,6 +58,11 @@ function DietaryRestrictionsContent({
     if (!scrollContainer) return;
 
     const handleScroll = () => {
+      if (scrollContainer.scrollTop === 0) {
+        setActiveIndex(0);
+        return;
+      }
+
       let currentActiveSectionId: string | null = null;
       const offset = 150;
 
@@ -97,9 +102,15 @@ function DietaryRestrictionsContent({
     scrollContainer.addEventListener('scroll', handleScroll, {
       passive: true,
     });
-    handleScroll(); // 초기 실행
 
-    return () => scrollContainer.removeEventListener('scroll', handleScroll);
+    const timerId = setTimeout(() => {
+      handleScroll();
+    }, 200);
+
+    return () => {
+      scrollContainer.removeEventListener('scroll', handleScroll);
+      clearTimeout(timerId);
+    };
   }, [scrollContainerRef, setActiveIndex]);
 
   const handleSubmit = async (data: z.infer<typeof AllergyFormSchema>) => {
