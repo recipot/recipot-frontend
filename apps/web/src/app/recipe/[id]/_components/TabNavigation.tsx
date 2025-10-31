@@ -1,11 +1,12 @@
 import React from 'react';
-import Link from 'next/link';
+import { Link as ScrollLink } from 'react-scroll';
 
 import {
   CookOrderIcon,
   CookwareIcon,
   IngredientIcon,
 } from '@/components/Icons';
+import { cn } from '@/lib/utils';
 import type { IconProps } from '@/types/Icon.types';
 
 import type { TabId } from '../types/recipe.types';
@@ -18,58 +19,59 @@ interface Tab {
 
 interface TabNavigationProps {
   activeTab: TabId;
-  gnbRef?: React.RefObject<HTMLUListElement>;
-  onTabClick: (tabId: TabId, e: React.MouseEvent) => void;
-  tabContainerRef: React.RefObject<HTMLDivElement>;
+  offset: number;
+  onTabChange: (tabId: TabId) => void;
 }
+
+const TABS: Tab[] = [
+  { icon: IngredientIcon, id: 'ingredients', label: '재료' },
+  { icon: CookwareIcon, id: 'cookware', label: '조리도구' },
+  { icon: CookOrderIcon, id: 'steps', label: '조리순서' },
+];
 
 export function TabNavigation({
   activeTab,
-  gnbRef,
-  onTabClick,
-  tabContainerRef,
+  offset,
+  onTabChange,
 }: TabNavigationProps) {
-  const tabs: Tab[] = [
-    { icon: IngredientIcon, id: 'ingredients', label: '재료' },
-    { icon: CookwareIcon, id: 'cookware', label: '조리도구' },
-    { icon: CookOrderIcon, id: 'steps', label: '조리순서' },
-  ];
-
-  const handleTabClick = (tabId: TabId, e: React.MouseEvent) => {
-    e.preventDefault();
-    onTabClick(tabId, e);
-  };
-
   return (
-    <div
-      ref={tabContainerRef}
-      className="sticky top-0 z-10 bg-gray-100 px-4 py-3"
-    >
-      <ul ref={gnbRef} className="flex space-x-1">
-        {tabs.map(tab => {
-          const IconComponent = tab.icon;
-          return (
-            <Link
-              key={tab.id}
-              href={`#${tab.id}`}
-              onClick={e => handleTabClick(tab.id, e)}
-              data-section-id={tab.id}
-              className={`flex items-center space-x-2 rounded-[100px] px-3 py-[9px] transition-all duration-200 ${
-                activeTab === tab.id
-                  ? 'bg-gray-900 text-white'
-                  : 'bg-transparent text-gray-600'
-              }`}
-            >
-              <IconComponent
-                className="mr-1"
-                size={20}
-                color={activeTab === tab.id ? '#ffffff' : '#6B7280'}
-              />
-              <p className="text-15">{tab.label}</p>
-            </Link>
-          );
-        })}
-      </ul>
+    <div className="sticky top-14 z-10 bg-gray-100 px-4 py-3">
+      <nav aria-label="레시피 섹션 네비게이션">
+        <ul className="flex space-x-1">
+          {TABS.map(tab => {
+            const IconComponent = tab.icon;
+            const isActive = tab.id === activeTab;
+
+            return (
+              <li key={tab.id}>
+                <ScrollLink
+                  to={tab.id}
+                  smooth
+                  spy
+                  duration={0}
+                  offset={-offset}
+                  onSetActive={to => {
+                    onTabChange(to as TabId);
+                  }}
+                  className={cn(
+                    'flex cursor-pointer items-center gap-2 rounded-[100px] px-3 py-[9px] transition-all duration-200',
+                    isActive
+                      ? 'bg-gray-900 text-white'
+                      : 'bg-transparent text-gray-600'
+                  )}
+                >
+                  <IconComponent
+                    className="mr-1"
+                    size={20}
+                    color={isActive ? '#ffffff' : '#6B7280'}
+                  />
+                  <span className="text-15">{tab.label}</span>
+                </ScrollLink>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
     </div>
   );
 }
