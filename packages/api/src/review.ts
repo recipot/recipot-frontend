@@ -2,7 +2,7 @@ import { createApiInstance } from './createApiInstance';
 
 const reviewReminderApi = createApiInstance({
   apiName: 'ReviewReminder',
-  baseURL: '',
+  baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
 });
 
 export interface PendingReviewItem {
