@@ -17,7 +17,7 @@ export default function CookingOrderHeader({
   recipe,
 }: CookingOrderHeaderProps) {
   return (
-    <div className="flex items-center justify-between border-b px-4 py-3">
+    <div className="flex items-center justify-between px-4 py-3">
       <div className="flex items-center space-x-3">
         <button onClick={onBack} className="p-2">
           <ArrowLeft size={24} className="text-neutral-900" />

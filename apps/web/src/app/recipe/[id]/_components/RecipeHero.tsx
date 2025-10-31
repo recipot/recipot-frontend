@@ -1,6 +1,6 @@
 import Image from 'next/image';
 
-import { CardTimeIcon, CookOrderIcon } from '@/components/Icons';
+import { CardTimeIcon, CookwareIcon } from '@/components/Icons';
 
 import type { Recipe } from '../types/recipe.types';
 
@@ -12,7 +12,9 @@ export function RecipeHero({ recipe }: RecipeHeroProps) {
   return (
     <div className="relative">
       <div className="h-96 bg-cover bg-center">
-        {recipe.images && recipe.images.length > 0 && recipe.images[0]?.imageUrl ? (
+        {recipe.images &&
+        recipe.images.length > 0 &&
+        recipe.images[0]?.imageUrl ? (
           <Image
             key={recipe.id}
             src={recipe.images[0].imageUrl}
@@ -29,14 +31,12 @@ export function RecipeHero({ recipe }: RecipeHeroProps) {
         <div className="absolute top-4 right-4 left-4 flex space-x-2">
           <div className="flex items-center space-x-1 rounded-full px-3 py-1.5">
             <CardTimeIcon size={24} color="#ffffff" />
-            <span className="text-sm font-medium text-white">
-              {recipe.duration}분
-            </span>
+            <span className="text-17 text-white">{recipe.duration}</span>
           </div>
           <div className="flex items-center space-x-1 rounded-full px-3 py-1.5">
-            <CookOrderIcon size={24} color="#ffffff" />
-            <span className="text-sm font-medium text-white">
-              {recipe.condition?.name}
+            <CookwareIcon size={24} color="#ffffff" />
+            <span className="text-17 text-white">
+              {recipe.tools.map(tool => tool.name).join(', ')}
             </span>
           </div>
         </div>

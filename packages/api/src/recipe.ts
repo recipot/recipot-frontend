@@ -27,20 +27,13 @@ export const recipe = {
     return response.data?.data ?? response.data;
   },
 
-  getMeasurementGuides: async () => {
-    const response = await recipeAPI.get(`/v1/measurement-guides`);
-    return (
-      response.data?.data?.data ??
-      response.data?.data ??
-      response.data
-    );
-  },
-
   startCooking: async (recipeId: string | number) => {
     await recipeAPI.post(`/v1/users/recipes/${recipeId}/start`, { recipeId });
   },
 
   completeCooking: async (recipeId: string | number) => {
-    await recipeAPI.post(`/v1/users/recipes/${recipeId}/complete`, { recipeId });
+    await recipeAPI.post(`/v1/users/recipes/${recipeId}/complete`, {
+      recipeId,
+    });
   },
 };

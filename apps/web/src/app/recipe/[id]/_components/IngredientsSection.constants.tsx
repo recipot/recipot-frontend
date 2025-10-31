@@ -31,17 +31,11 @@ export const MEASUREMENT_TABS: MeasurementTab[] = [
     id: 'sauce',
     label: '장류',
   },
-  {
-    icon: <PowderIcon />,
-    id: 'other',
-    label: '그 외',
-  },
 ];
 
 export const MEASUREMENT_GUIDE_LABELS = {
   liquid: '액체류',
   minced: '다진양념류',
-  other: '그 외',
   powder: '가루류',
   sauce: '장류',
 } as const;

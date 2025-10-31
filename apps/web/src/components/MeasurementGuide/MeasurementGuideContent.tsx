@@ -39,7 +39,7 @@ export function MeasurementGuideContent({
                 className="h-full w-full object-cover"
               />
             ) : (
-              <div className="text-gray-400">이미지 없음</div>
+              <div className="text-13 text-gray-400">이미지 준비중</div>
             )}
           </div>
           <div className="mt-3">
