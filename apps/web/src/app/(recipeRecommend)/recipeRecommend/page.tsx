@@ -5,11 +5,12 @@ import 'swiper/css/effect-cards';
 import './styles.css';
 import '@/components/EmotionState/styles.css';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { recipe, storedAPI } from '@recipot/api';
 import { useAuth } from '@recipot/contexts';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import { tokenUtils } from 'packages/api/src/auth';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
 import { moodToConditionId } from '@/app/onboarding/_utils/conditionMapper';
@@ -140,6 +141,7 @@ export default function RecipeRecommend() {
 
   useEffect(() => {
     fetchRecommendRecipes();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

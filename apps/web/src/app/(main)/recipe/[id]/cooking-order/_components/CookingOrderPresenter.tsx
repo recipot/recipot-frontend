@@ -64,13 +64,8 @@ export default function CookingOrderPresenter({
       queryKey: COMPLETED_RECIPES_QUERY_KEY,
     });
 
-    // router.push(`/review?completedRecipeId=${completedRecipeId}`);
-    const isSuccess =
-      response.data.status === 200 || response.data.data === true;
-    if (isSuccess) {
-      const completedRecipeId = recipeId;
-      router.push(`/review?completedRecipeId=${completedRecipeId}`);
-    }
+    const completedRecipeId = recipeId;
+    router.push(`/review?completedRecipeId=${completedRecipeId}`);
   };
   const handleBack = () => {
     openModal('warning');
