@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/common/Button';
 import { ReviewBottomSheet } from '@/components/review/ReviewBottomSheet';
@@ -30,6 +31,7 @@ export default function CookedRecipeList({
   const [selectedRecipe, setSelectedRecipe] = useState<CompletedRecipe | null>(
     null
   );
+  const router = useRouter();
 
   const handleOpenReview = (recipe: CompletedRecipe) => {
     setSelectedRecipe(recipe);
@@ -75,8 +77,7 @@ export default function CookedRecipeList({
               variant="outline"
               className="text-17sb bg-white px-6 py-3 text-gray-900"
               onClick={() => {
-                // TODO: 레시피 추천 페이지로 이동하는 로직
-                console.info('레시피 추천 받으러 가기');
+                router.push('/recipeRecommend');
               }}
             >
               레시피 추천 받으러 가기
