@@ -11,6 +11,8 @@ import type { ReactNode } from 'react';
 interface AllergyNavigationProps {
   children?: ReactNode;
   className?: string;
+  /** 컨테이너 스크롤 모드 여부 (기본값: context 설정 기반) */
+  useContainerScroll?: boolean;
 }
 
 /**
@@ -23,6 +25,7 @@ interface AllergyNavigationProps {
 export default function AllergyNavigation({
   children,
   className = '',
+  useContainerScroll,
 }: AllergyNavigationProps) {
   // 모든 훅은 조건문 이전에 호출
   const { activeIndex, categories, gnbRef, scrollConfig, setActiveIndex } =
@@ -30,6 +33,13 @@ export default function AllergyNavigation({
 
   // 각 탭 요소의 ref를 저장
   const tabRefs = useRef<(HTMLElement | null)[]>([]);
+  // 클릭으로 이동할 목표 인덱스 (스크롤 중간 spy 갱신 무시용)
+  const manualTargetRef = useRef<number | null>(null);
+
+  const isContainerScroll =
+    typeof useContainerScroll === 'boolean'
+      ? useContainerScroll
+      : !scrollConfig.useWindowScroll;
 
   const categoryList = categories.length > 0 ? categories : CATEGORY_METADATA;
 
@@ -39,7 +49,10 @@ export default function AllergyNavigation({
   }
 
   // 네비게이션 탭을 가운데로 스크롤하는 함수
-  const scrollTabToCenter = (element: HTMLElement) => {
+  const scrollTabToCenter = (
+    element: HTMLElement,
+    behavior: ScrollBehavior = 'smooth'
+  ) => {
     const container = gnbRef?.current;
     if (!container) return;
 
@@ -56,7 +69,7 @@ export default function AllergyNavigation({
       container.scrollLeft;
 
     container.scrollTo({
-      behavior: 'smooth',
+      behavior,
       left: scrollLeft,
     });
   };
@@ -64,6 +77,16 @@ export default function AllergyNavigation({
   const containerId = scrollConfig.useWindowScroll
     ? undefined
     : (scrollConfig.containerRef?.current?.id ?? 'allergy-scroll-container');
+
+  const handleTabClick = (index: number) => {
+    manualTargetRef.current = index;
+    setActiveIndex(index);
+
+    const tabElement = tabRefs.current[index];
+    if (tabElement) {
+      scrollTabToCenter(tabElement, isContainerScroll ? 'smooth' : 'auto');
+    }
+  };
 
   return (
     <div
@@ -85,22 +108,43 @@ export default function AllergyNavigation({
           >
             <ScrollLink
               to={sectionId}
-              smooth
+              smooth={isContainerScroll}
               spy
               duration={400}
               offset={-scrollConfig.navigationOffset}
               containerId={containerId}
+              onClick={() => handleTabClick(index)}
               onSetActive={to => {
                 const match = to.match(/allergy-section-(\d+)/);
                 if (match) {
                   const sectionIndex = parseInt(match[1], 10);
                   if (sectionIndex >= 0 && sectionIndex < categoryList.length) {
-                    setActiveIndex(sectionIndex);
+                    const manualTarget = manualTargetRef.current;
+                    if (
+                      manualTarget !== null &&
+                      manualTarget !== sectionIndex
+                    ) {
+                      return;
+                    }
 
-                    // 활성 탭을 가운데로 스크롤
+                    if (activeIndex !== sectionIndex) {
+                      setActiveIndex(sectionIndex);
+                    }
+
                     const tabElement = tabRefs.current[sectionIndex];
                     if (tabElement) {
-                      scrollTabToCenter(tabElement);
+                      scrollTabToCenter(
+                        tabElement,
+                        manualTarget !== null
+                          ? isContainerScroll
+                            ? 'smooth'
+                            : 'auto'
+                          : 'smooth'
+                      );
+                    }
+
+                    if (manualTarget === sectionIndex) {
+                      manualTargetRef.current = null;
                     }
                   }
                 }
