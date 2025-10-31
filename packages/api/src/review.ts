@@ -17,9 +17,7 @@ export interface PendingReviewsResponse {
 
 export const reviewReminder = {
   getPendingReviews: async (): Promise<PendingReviewsResponse> => {
-    const response = await reviewReminderApi.get(
-      `/api/v1/users/pending-reviews`
-    );
+    const response = await reviewReminderApi.get(`/v1/users/pending-reviews`);
     return response.data;
   },
 };
