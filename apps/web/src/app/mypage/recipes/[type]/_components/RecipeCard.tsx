@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 import { Button } from '@/components/common/Button';
 import { Modal } from '@/components/common/Modal/Modal';
@@ -25,7 +25,6 @@ export default function RecipeCard({
   const { isPending: isDeleting, mutate: deleteRecipe } =
     useDeleteStoredRecipe();
   const { isPending: isSaving, mutate: saveRecipe } = usePostStoredRecipe();
-  const router = useRouter();
 
   // saved 타입일 때는 항상 true, 아닐 때는 recipe.isBookmarked 값 사용
   const isBookmarked = isSavedRecipe ? true : (recipe.isBookmarked ?? false);
@@ -53,10 +52,6 @@ export default function RecipeCard({
     });
   };
 
-  const handleMoveRecipeDetail = () => {
-    router.push(`/recipe/${recipe.recipeId}`);
-  };
-
   const isPending = isDeleting || isSaving;
 
   return (
@@ -71,13 +66,13 @@ export default function RecipeCard({
           />
         </div>
         <div className="flex min-w-0 flex-grow flex-col justify-between gap-1">
-          <button
-            onClick={handleMoveRecipeDetail}
+          <Link
+            href={`/recipe/${recipe.recipeId}`}
             className="flex items-center text-left"
           >
             <h3 className="text-17sb text-gray-900">{recipe.recipeTitle}</h3>
             <ArrowIcon size={18} color="hsl(var(--gray-900))" />
-          </button>
+          </Link>
           <p className="text-14 truncate text-gray-600">
             {recipe.recipeDescription}
           </p>
