@@ -24,7 +24,7 @@ export function MeasurementTab({
     }
   };
 
-  const iconToShow = isActive && tab.activeIcon ? tab.activeIcon : tab.icon;
+  const iconToShow = isActive ? (tab.activeIcon ?? tab.icon) : tab.icon;
 
   return (
     <div

@@ -11,11 +11,13 @@ export interface MeasurementTab {
 
 export const MEASUREMENT_TABS: MeasurementTab[] = [
   {
+    activeIcon: <PowderIcon color="#111827" />,
     icon: <PowderIcon />,
     id: 'powder',
     label: '가루류',
   },
   {
+    activeIcon: <WaterIcon color="#111827" />,
     icon: <WaterIcon color="#6B7280" />,
     id: 'liquid',
     label: '액체류',

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import { MEASUREMENT_TABS } from '@/app/recipe/[id]/_components/IngredientsSection.constants';
 
@@ -23,7 +23,17 @@ interface MeasurementGuideProps {
 
 export function MeasurementGuide({ initialActiveTab }: MeasurementGuideProps) {
   const [isOpen, setIsOpen] = useState(true);
-  const [activeTab, setActiveTab] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<string | null>(() => {
+    if (initialActiveTab) {
+      const isValidTab = MEASUREMENT_TABS.some(
+        tab => tab.id === initialActiveTab
+      );
+      if (isValidTab) {
+        return initialActiveTab;
+      }
+    }
+    return MEASUREMENT_TABS.length > 0 ? MEASUREMENT_TABS[0].id : null;
+  });
 
   const handleToggle = () => {
     setIsOpen(!isOpen);
@@ -32,23 +42,6 @@ export function MeasurementGuide({ initialActiveTab }: MeasurementGuideProps) {
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId);
   };
-
-  // 초기 활성 탭 설정 - 첫 번째 탭(powder)을 기본값으로
-  useEffect(() => {
-    if (initialActiveTab) {
-      const isValidTab = MEASUREMENT_TABS.some(
-        tab => tab.id === initialActiveTab
-      );
-      if (isValidTab) {
-        setActiveTab(initialActiveTab);
-        return;
-      }
-    }
-    // 기본값: 첫 번째 탭인 가루류(powder)
-    if (!activeTab && MEASUREMENT_TABS.length > 0) {
-      setActiveTab(MEASUREMENT_TABS[0].id);
-    }
-  }, [initialActiveTab, activeTab]);
 
   // 탭 ID를 한글 라벨로 변환하여 데이터 접근
   const activeTabLabel =
