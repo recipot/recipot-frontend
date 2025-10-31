@@ -8,6 +8,7 @@ const KakaoLoadingFallback = (
   <CallbackSpinner provider="kakao" status="카카오 로그인 처리 중..." />
 );
 
+// TODO: 프로덕션 환경 테스트
 function KakaoCallbackContent() {
   const { status } = useOAuthCallback({ provider: 'kakao' });
   return <CallbackSpinner provider="kakao" status={status} />;

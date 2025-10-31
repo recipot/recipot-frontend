@@ -5,8 +5,8 @@ import 'swiper/css/effect-cards';
 import './styles.css';
 import '@/components/EmotionState/styles.css';
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { recipe } from '@recipot/api';
+import React, { useEffect, useMemo, useState } from 'react';
+import { recipe, storedAPI } from '@recipot/api';
 import { useAuth } from '@recipot/contexts';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
@@ -17,6 +17,7 @@ import { Header } from '@/components/common/Header';
 import { Toast } from '@/components/common/Toast';
 import { RecipeCard } from '@/components/RecipeCard';
 import { useToast } from '@/hooks/useToast';
+import { isProduction } from '@/lib/env';
 import { useMoodStore } from '@/stores/moodStore';
 import { useSelectedFoodsStore } from '@/stores/selectedFoodsStore';
 import type { Recipe, RecommendationItem } from '@/types/recipe.types';
@@ -57,7 +58,8 @@ export default function RecipeRecommend() {
 
   const userSelectedMood = mood ?? 'neutral';
 
-  const { token } = useAuth();
+  const token = tokenUtils.getToken();
+  const useCookieAuth = isProduction;
 
   // condition 객체를 useMemo로 메모이제이션
   const condition = useMemo(
@@ -163,26 +165,26 @@ export default function RecipeRecommend() {
       }
     };
     fetchProfile();
-  }, [token, router]);
+  }, [router]);
 
   // 하트 아이콘 클릭 시 북마크 토글 함수
-  const handleToggleBookmark = async (index: number, recipeId: number) => {
+  const handleToggleBookmark = async (_index: number, recipeId: number) => {
     if (isLoading) return;
 
     setIsLoading(true);
-    const bookmarkURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/users/recipes/bookmarks`;
-    const config = {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
+    if (!useCookieAuth && !token) {
+      console.error('인증 토큰이 없어 북마크를 변경할 수 없습니다.');
+      router.push('/signin');
+      setIsLoading(false);
+      return;
+    }
 
     const isCurrentlyLiked = likedRecipes.has(recipeId);
 
     try {
       if (isCurrentlyLiked) {
         // DELETE 요청
-        await axios.delete(`${bookmarkURL}/${recipeId}`, config);
+        await storedAPI.deleteStoredRecipe(recipeId);
         setLikedRecipes(prev => {
           const newSet = new Set(prev);
           newSet.delete(recipeId);
@@ -190,7 +192,7 @@ export default function RecipeRecommend() {
         });
       } else {
         // POST 요청
-        await axios.post(bookmarkURL, { recipeId }, config);
+        await storedAPI.postStoredRecipe(recipeId);
         setLikedRecipes(prev => new Set(prev).add(recipeId));
 
         showToast('레시피가 저장되었어요!');

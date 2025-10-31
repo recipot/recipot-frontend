@@ -2,11 +2,10 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
-import { useAuth } from '@recipot/contexts';
-import axios from 'axios';
+import { recipe, reviewReminder } from '@recipot/api';
 import { useRouter } from 'next/navigation';
 
-import type { PendingReviewsResponse, Recipe } from '@/types/recipe.types';
+import { isProduction } from '@/lib/env';
 
 import { CloseIcon } from '../Icons';
 import { Drawer, DrawerClose, DrawerContent, DrawerTitle } from '../ui/drawer';
@@ -21,7 +20,8 @@ export function ReviewRemindBottomSheet() {
   const [recipes, setRecipes] = useState<ReviewRecipeData[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const { token } = useAuth();
+  const useCookieAuth = isProduction;
+  const token = tokenUtils.getToken();
 
   // 24시간 경과 여부 체크
   const shouldShowBottomSheet = () => {
@@ -41,13 +41,16 @@ export function ReviewRemindBottomSheet() {
   const loadPendingReviews = useCallback(async () => {
     try {
       setLoading(true);
-      const axiosResponse = await axios.get(`api/v1/users/pending-reviews`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      if (!useCookieAuth && !token) {
+        console.error(
+          '인증 토큰이 없어 리뷰 리마인드 데이터를 불러올 수 없습니다.'
+        );
+        setIsOpen(false);
+        setLoading(false);
+        return;
+      }
 
-      const response: PendingReviewsResponse = axiosResponse.data;
+      const response = await reviewReminder.getPendingReviews();
 
       if (response.data.totalCount === 0) {
         setIsOpen(false);
@@ -58,23 +61,13 @@ export function ReviewRemindBottomSheet() {
       const recipePromises = response.data.completedRecipeIds.map(
         async (id: number) => {
           try {
-            const recipeDetail: { data: { data: Recipe } } = await axios.get(
-              `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/recipes/${id}`,
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              }
-            );
-
+            const recipeDetail = await recipe.getRecipeDetail(id);
             return {
-              alt: `${recipeDetail.data.data.title} 레시피 이미지`,
+              alt: `${recipeDetail.title} 레시피 이미지`,
               description: '레시피 해먹기 완료!',
-              id: recipeDetail.data.data.id,
-              imageUrl:
-                recipeDetail.data.data.images[0]?.imageUrl ??
-                '/recipeImage.png',
-              title: recipeDetail.data.data.title,
+              id: recipeDetail.id,
+              imageUrl: recipeDetail.images[0]?.imageUrl ?? '/recipeImage.png',
+              title: recipeDetail.title,
             };
           } catch (error) {
             console.error(`Failed to load recipe ${id}:`, error);
@@ -96,7 +89,7 @@ export function ReviewRemindBottomSheet() {
     } finally {
       setLoading(false);
     }
-  }, [token]);
+  }, [token, useCookieAuth]);
 
   useEffect(() => {
     loadPendingReviews();

@@ -17,7 +17,7 @@ function CheckboxIcon({ isSelected }: { isSelected: boolean }) {
       <CheckIcon
         size={14}
         color={isSelected ? '#68982D' : '#D7E8C2'}
-        className="relative z-10"
+        className="relative"
       />
     </div>
   );

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import { useAuth } from '@recipot/contexts';
+import { storedAPI } from '@recipot/api';
 import axios from 'axios';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -16,6 +16,7 @@ import {
   ShareIcon,
 } from '@/components/Icons';
 import WebShareButton from '@/components/Share/WebShareButton';
+import { isProduction } from '@/lib/env';
 
 import type { Recipe } from '../types/recipe.types';
 
@@ -25,7 +26,8 @@ interface RecipeHeaderProps {
 
 export function RecipeDetailHeader({ recipe }: RecipeHeaderProps) {
   const router = useRouter();
-  const { token } = useAuth();
+  const token = tokenUtils.getToken();
+  const useCookieAuth = isProduction;
 
   const [isLiked, setIsLiked] = useState(recipe.isBookmarked);
   const [isLoading, setIsLoading] = useState(false);
@@ -66,34 +68,27 @@ export function RecipeDetailHeader({ recipe }: RecipeHeaderProps) {
   }, [recipe]);
 
   const handleToggleBookmark = async (recipeId: number) => {
-    if (token === null) {
+    if (!useCookieAuth && token === null) {
       setShowLoginModal(true);
       return;
     }
     if (isLoading) return;
 
     setIsLoading(true);
-    const bookmarkURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/users/recipes/bookmarks`;
-    const config = {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
-
     try {
       if (isLiked) {
-        // DELETE 요청
-        await axios.delete(`${bookmarkURL}/${recipeId}`, config);
+        await storedAPI.deleteStoredRecipe(recipeId);
         setIsLiked(false);
       } else {
-        // POST 요청
-        await axios.post(bookmarkURL, { recipeId }, config);
+        await storedAPI.postStoredRecipe(recipeId);
         setIsLiked(true);
       }
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        throw new Error(error.message ?? '북마크 처리 중 오류가 발생했습니다.');
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        setShowLoginModal(true);
+        return;
       }
+      console.error('북마크 처리 중 오류가 발생했습니다.', error);
     } finally {
       setIsLoading(false);
     }

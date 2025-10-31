@@ -15,6 +15,8 @@ interface AuthContextType {
   setUser: (user: UserInfo | null) => void;
   setToken: (token: string | null) => void;
   setRefreshToken: (token: string | null) => void;
+  startAutoRefresh: () => void;
+  stopAutoRefresh: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -46,9 +48,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setUser: authStore.setUser,
     setToken: authStore.setToken,
     setRefreshToken: authStore.setRefreshToken,
+    startAutoRefresh: authStore.startAutoRefresh,
+    stopAutoRefresh: authStore.stopAutoRefresh,
   };
 
-  return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
+  );
 }
 
 export const useAuth = (): AuthContextType => {

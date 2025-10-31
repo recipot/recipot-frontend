@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
-import { UserInfo, TokenResponse } from '../../types/src/auth.types';
+import { UserInfo, TokenResponse } from '@recipot/types';
 
 const AUTH_STORAGE_KEY = 'auth-storage';
 const STORAGE_VERSION = 0;
@@ -45,6 +45,15 @@ const storage = {
       version: STORAGE_VERSION,
     };
     localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authStorage));
+
+    // zustand store 동기화를 위한 커스텀 이벤트 발생
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(
+        new CustomEvent('auth-token-updated', {
+          detail: { token, refreshToken },
+        })
+      );
+    }
   },
 
   clear(): void {
@@ -213,15 +222,38 @@ export const authService = {
   },
 
   async refreshToken(refreshToken: string): Promise<TokenResponse> {
-    const response = await authApi.post<TokenResponse>('/v1/auth/refresh', {
+    const response = await authApi.post<{
+      status: number;
+      data: TokenResponse;
+    }>('/v1/auth/refresh', {
       refreshToken,
     });
-    return response.data;
+
+    // axios 인터셉터와 일관성을 위해 data.data 반환
+    if (response.data?.status === 200 && response.data?.data) {
+      return response.data.data;
+    }
+
+    // 레거시 지원: 직접 TokenResponse를 반환하는 경우
+    return response.data as unknown as TokenResponse;
   },
 
   async getUserInfo(): Promise<UserInfo> {
-    const response = await authApi.get('/v1/users/profile/me');
-    return response.data.status === 200 ? response.data.data : response.data;
+    try {
+      const response = await authApi.get('/v1/users/profile/me');
+      return response.data.status === 200 ? response.data.data : response.data;
+    } catch (error: any) {
+      console.error('[getUserInfo] 사용자 정보 조회 실패:', {
+        message: error?.message,
+        status: error?.response?.status,
+        statusText: error?.response?.statusText,
+        data: error?.response?.data,
+        url: error?.config?.url,
+        method: error?.config?.method,
+        error,
+      });
+      throw error;
+    }
   },
 
   async updateProfile(

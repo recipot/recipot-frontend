@@ -1,8 +1,10 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useAuth } from '@recipot/contexts';
-import axios from 'axios';
+import { recipe } from '@recipot/api';
+import { tokenUtils } from 'packages/api/src/auth';
+
+import { isProduction } from '@/lib/env';
 
 import IngredientGroup from './IngredientGroup';
 import {
@@ -39,25 +41,20 @@ export function IngredientsSection({
   const [activeTab, setActiveTab] = useState<string | null>(null);
   const [measurementData, setMeasurementData] = useState<MeasurementData>({});
 
-  const { token } = useAuth();
+  const token = tokenUtils.getToken();
+  const useCookieAuth = isProduction;
 
   // 탭 ID와 API 카테고리명 매핑
 
   // 측정 가이드 데이터 fetch
   useEffect(() => {
     const fetchMeasurementGuide = async () => {
-      if (!token) return;
+      if (!useCookieAuth && !token) return;
 
       try {
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/measurement-guides`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-
-        if (response.data?.data?.data) {
-          setMeasurementData(response.data.data.data);
+        const data = await recipe.getMeasurementGuides();
+        if (data) {
+          setMeasurementData(data);
         }
       } catch (error) {
         console.error('측정 가이드 데이터 fetch 실패:', error);
@@ -65,7 +62,7 @@ export function IngredientsSection({
     };
 
     fetchMeasurementGuide();
-  }, [token]);
+  }, [token, useCookieAuth]);
 
   const handleToggle = () => {
     setIsOpen(prev => !prev);
