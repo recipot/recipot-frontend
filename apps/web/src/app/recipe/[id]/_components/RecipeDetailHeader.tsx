@@ -1,12 +1,11 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
+import { storedAPI } from '@recipot/api';
+import axios from 'axios';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { tokenUtils } from 'packages/api/src/auth';
-import { storedAPI } from '@recipot/api';
-import axios from 'axios';
-import { isProduction } from '@/lib/env';
 
 import { Button } from '@/components/common/Button';
 import { Modal } from '@/components/common/Modal/Modal';
@@ -18,6 +17,7 @@ import {
   ShareIcon,
 } from '@/components/Icons';
 import WebShareButton from '@/components/Share/WebShareButton';
+import { isProduction } from '@/lib/env';
 
 import type { Recipe } from '../types/recipe.types';
 

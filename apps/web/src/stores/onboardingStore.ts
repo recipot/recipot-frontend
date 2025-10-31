@@ -86,6 +86,10 @@ export const useOnboardingStore = create<OnboardingState & OnboardingActions>()(
       return currentStep > 1;
     },
 
+    clearRefreshFlag: () => {
+      set({ isRefreshed: false });
+    },
+
     completeOnboarding: () => {
       // 온보딩 완료 후 필요한 로직은 컴포넌트에서 처리합니다.
       console.info('온보딩이 완료되었습니다.');
@@ -116,10 +120,6 @@ export const useOnboardingStore = create<OnboardingState & OnboardingActions>()(
       set(state => ({
         completedSteps: [...new Set([...state.completedSteps, step])],
       }));
-    },
-
-    clearRefreshFlag: () => {
-      set({ isRefreshed: false });
     },
 
     resetCurrentStep: () => {

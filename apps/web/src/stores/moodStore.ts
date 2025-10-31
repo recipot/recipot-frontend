@@ -50,12 +50,12 @@ export const useMoodStore = create<MoodState & MoodActions>()(
         ...initialState,
 
         // 액션들
-        setMood: (mood: MoodType | null) => {
-          set({ mood }, false, 'setMood');
-        },
-
         clearMood: () => {
           set({ mood: null }, false, 'clearMood');
+        },
+
+        setMood: (mood: MoodType | null) => {
+          set({ mood }, false, 'setMood');
         },
 
         validateUserSession: (currentUserId: string | null) => {

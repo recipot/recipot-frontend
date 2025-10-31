@@ -11,7 +11,6 @@ import { useAuth } from '@recipot/contexts';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { tokenUtils } from 'packages/api/src/auth';
-import { isProduction } from '@/lib/env';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
 import { moodToConditionId } from '@/app/onboarding/_utils/conditionMapper';
@@ -19,6 +18,7 @@ import { Header } from '@/components/common/Header';
 import { Toast } from '@/components/common/Toast';
 import { RecipeCard } from '@/components/RecipeCard';
 import { useToast } from '@/hooks/useToast';
+import { isProduction } from '@/lib/env';
 import { useMoodStore } from '@/stores/moodStore';
 import { useSelectedFoodsStore } from '@/stores/selectedFoodsStore';
 import type { Recipe, RecommendationItem } from '@/types/recipe.types';

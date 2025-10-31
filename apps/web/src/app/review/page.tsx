@@ -1,7 +1,8 @@
 'use client';
 
-import { ReviewBottomSheet } from '@/components/review';
 import React, { useState } from 'react';
+
+import { ReviewBottomSheet } from '@/components/review';
 
 const Home = () => {
   const [isOpen, setIsOpen] = useState(true);
