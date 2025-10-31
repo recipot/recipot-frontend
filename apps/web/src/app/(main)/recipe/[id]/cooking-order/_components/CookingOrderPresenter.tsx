@@ -63,8 +63,10 @@ export default function CookingOrderPresenter({
     queryClient.invalidateQueries({
       queryKey: COMPLETED_RECIPES_QUERY_KEY,
     });
-  };
 
+    const completedRecipeId = recipeId;
+    router.push(`/review?completedRecipeId=${completedRecipeId}`);
+  };
   const handleBack = () => {
     openModal('warning');
   };

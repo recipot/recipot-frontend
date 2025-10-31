@@ -5,7 +5,7 @@ import 'swiper/css/effect-cards';
 import './styles.css';
 import '@/components/EmotionState/styles.css';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { recipe, storedAPI } from '@recipot/api';
 import { useAuth } from '@recipot/contexts';
 import axios from 'axios';
@@ -95,7 +95,7 @@ export default function RecipeRecommend() {
   };
 
   // 레시피 추천 API 호출 공통 함수
-  const fetchRecommendRecipes = async () => {
+  const fetchRecommendRecipes = useCallback(async () => {
     try {
       // selectedFoodIds가 비어있으면 API 호출하지 않음
       if (selectedFoodIds?.length === 0) {
@@ -137,11 +137,12 @@ export default function RecipeRecommend() {
       }
       showToast('레시피를 불러오는데 실패했어요');
     }
-  };
+  }, [userSelectedMood, selectedFoodIds, router, showToast]);
 
   useEffect(() => {
     fetchRecommendRecipes();
-  }, [userSelectedMood, selectedFoodIds]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const fetchProfile = async () => {

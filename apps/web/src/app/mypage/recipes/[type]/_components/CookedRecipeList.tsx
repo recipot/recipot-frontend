@@ -41,12 +41,6 @@ export default function CookedRecipeList({
     setSelectedRecipe(null);
   };
 
-  const handleSubmitReview = (reviewData: any) => {
-    // TODO: 리뷰 제출 API 호출
-    console.log('리뷰 제출:', reviewData);
-    handleCloseReview();
-  };
-
   if (recipes.length === 0) {
     return (
       <div className="relative">
@@ -170,13 +164,7 @@ export default function CookedRecipeList({
         <ReviewBottomSheet
           isOpen={isReviewOpen}
           onClose={handleCloseReview}
-          onSubmit={handleSubmitReview}
-          reviewData={{
-            completionCount: selectedRecipe.isCompleted ?? 0,
-            recipeId: selectedRecipe.recipeId.toString(),
-            recipeImage: selectedRecipe.recipeImages[0],
-            recipeName: selectedRecipe.recipeTitle,
-          }}
+          recipeId={selectedRecipe.recipeId}
         />
       )}
     </div>

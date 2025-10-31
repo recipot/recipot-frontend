@@ -190,9 +190,8 @@ export function WeeklySurveyBottomSheet() {
       };
 
       // API 호출
-      const result: HealthSurveySubmitResponse = await healthSurvey.submit(
-        apiData
-      );
+      const result: HealthSurveySubmitResponse =
+        await healthSurvey.submit(apiData);
 
       if (result.status === 200) {
         handleClose();
