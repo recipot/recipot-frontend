@@ -164,7 +164,7 @@ export function RecipeDetailHeader({ recipe }: RecipeHeaderProps) {
             <div className="flex items-center space-x-1 rounded-full px-3 py-1.5">
               <CardTimeIcon size={24} color="#ffffff" />
               <span className="text-sm font-medium text-white">
-                {recipe.duration}분
+                {recipe.duration}
               </span>
             </div>
             <div className="flex items-center space-x-1 rounded-full px-3 py-1.5">
