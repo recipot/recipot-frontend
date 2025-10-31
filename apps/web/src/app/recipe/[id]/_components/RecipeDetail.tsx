@@ -8,6 +8,7 @@ import { tokenUtils } from 'packages/api/src/auth';
 
 import { Button } from '@/components/common/Button';
 import { CookIcon } from '@/components/Icons';
+import { useViewportBasedPadding } from '@/hooks';
 import { isProduction } from '@/lib/env';
 
 import CookwareSection from './CookwareSection';
@@ -26,7 +27,10 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
   const useCookieAuth = isProduction;
   const [recipeData, setRecipeData] = useState<Recipe | null>(null);
   const [activeTab, setActiveTab] = useState<TabId>('ingredients');
-  const [bottomPadding, setBottomPadding] = useState(500);
+  const bottomPadding = useViewportBasedPadding({
+    ratio: 0.8,
+    minPadding: 400,
+  });
   const router = useRouter();
 
   useEffect(() => {
@@ -41,30 +45,6 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
     };
     fetchRecipe();
   }, [token, recipeId, useCookieAuth]);
-
-  // 브라우저 높이에 따른 하단 여백 계산
-  useEffect(() => {
-    const calculateBottomPadding = () => {
-      if (typeof window === 'undefined') return;
-
-      // 뷰포트 높이를 기준으로 계산 (뷰포트 높이의 대부분 + 여유 공간)
-      // 헤더 + 탭 네비게이션 + 하단 버튼 영역을 제외한 높이
-      const viewportHeight = window.innerHeight;
-      // 최소한 뷰포트 높이만큼은 확보 (최소 400px 이상)
-      const padding = Math.max(viewportHeight * 0.8, 400);
-      setBottomPadding(padding);
-    };
-
-    // 초기 계산
-    calculateBottomPadding();
-
-    // 리사이즈 이벤트 리스너 추가
-    window.addEventListener('resize', calculateBottomPadding);
-
-    return () => {
-      window.removeEventListener('resize', calculateBottomPadding);
-    };
-  }, []);
 
   useEffect(() => {
     if (!recipeData) return;
