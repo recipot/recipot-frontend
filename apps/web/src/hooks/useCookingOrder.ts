@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import { recipe as recipeService } from '@recipot/api';
 import { tokenUtils } from 'packages/api/src/auth';
 
+import { isProduction } from '@/lib/env';
 import type { Recipe } from '@/types/recipe.types';
 
 interface UseCookingOrderReturn {
@@ -18,43 +19,26 @@ export function useCookingOrder(recipeId: string): UseCookingOrderReturn {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
+  const useCookieAuth = isProduction;
 
   useEffect(() => {
     const fetchRecipe = async () => {
       const token = tokenUtils.getToken();
+      if (!useCookieAuth && !token) {
+        setError('로그인이 필요합니다.');
+        setIsLoading(false);
+        return;
+      }
+
       try {
         setIsLoading(true);
         setError(null);
 
         // 요리 시작 API 호출
-        // await recipeAPI.startCooking(recipeId);
-        await axios.post(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/users/recipes/${recipeId}/start`,
-          {
-            recipeId,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        await recipeService.startCooking(recipeId);
 
-        // const fetchedRecipe = await recipeAPI.getRecipe(recipeId);
-        const {
-          data: { data },
-        } = await axios.get(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/recipes/${recipeId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
+        const data = await recipeService.getRecipeDetail(recipeId);
         setRecipe(data);
-
-        // setRecipe(fetchedRecipe);
       } catch (err) {
         console.error('Recipe fetch error:', err);
         setError('레시피를 불러오는 중 오류가 발생했습니다.');
@@ -64,7 +48,7 @@ export function useCookingOrder(recipeId: string): UseCookingOrderReturn {
     };
 
     fetchRecipe();
-  }, [recipeId]);
+  }, [recipeId, useCookieAuth]);
 
   const completeStep = (stepNumber: number) => {
     setCompletedSteps(prev => new Set([...prev, stepNumber]));

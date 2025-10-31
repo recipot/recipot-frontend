@@ -71,6 +71,19 @@ export const useAllergiesStore = create<AllergiesState & AllergiesActions>()(
           );
         },
 
+        clearAllergies: () => {
+          set(
+            { allergies: [], selectedItems: [] },
+            false,
+            'clearAllergies'
+          );
+        },
+
+        isSelected: (allergyId: number) => {
+          const { allergies } = get();
+          return allergies.includes(allergyId);
+        },
+
         removeAllergy: (allergyId: number) => {
           set(
             state => ({
@@ -79,6 +92,14 @@ export const useAllergiesStore = create<AllergiesState & AllergiesActions>()(
             false,
             'removeAllergy'
           );
+        },
+
+        setAllergies: (allergies: number[]) => {
+          set({ allergies }, false, 'setAllergies');
+        },
+
+        setSelectedItems: (items: number[]) => {
+          set({ selectedItems: items }, false, 'setSelectedItems');
         },
 
         toggleAllergy: (allergyId: number) => {
@@ -94,27 +115,6 @@ export const useAllergiesStore = create<AllergiesState & AllergiesActions>()(
             false,
             `toggleAllergy-${isCurrentlySelected ? 'remove' : 'add'}`
           );
-        },
-
-        setAllergies: (allergies: number[]) => {
-          set({ allergies }, false, 'setAllergies');
-        },
-
-        setSelectedItems: (items: number[]) => {
-          set({ selectedItems: items }, false, 'setSelectedItems');
-        },
-
-        clearAllergies: () => {
-          set(
-            { allergies: [], selectedItems: [] },
-            false,
-            'clearAllergies'
-          );
-        },
-
-        isSelected: (allergyId: number) => {
-          const { allergies } = get();
-          return allergies.includes(allergyId);
         },
 
         validateUserSession: (currentUserId: string | null) => {

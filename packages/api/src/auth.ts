@@ -239,8 +239,21 @@ export const authService = {
   },
 
   async getUserInfo(): Promise<UserInfo> {
-    const response = await authApi.get('/v1/users/profile/me');
-    return response.data.status === 200 ? response.data.data : response.data;
+    try {
+      const response = await authApi.get('/v1/users/profile/me');
+      return response.data.status === 200 ? response.data.data : response.data;
+    } catch (error: any) {
+      console.error('[getUserInfo] 사용자 정보 조회 실패:', {
+        message: error?.message,
+        status: error?.response?.status,
+        statusText: error?.response?.statusText,
+        data: error?.response?.data,
+        url: error?.config?.url,
+        method: error?.config?.method,
+        error,
+      });
+      throw error;
+    }
   },
 
   async updateProfile(

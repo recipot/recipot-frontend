@@ -5,6 +5,7 @@
     "outDir": "./dist",
     "noEmit": false,
     "declaration": true,
+    "rootDir": "./src",
     "declarationMap": true,
     "paths": {
       "@recipot/types": ["../types/src"]

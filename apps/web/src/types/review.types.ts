@@ -1,24 +1,43 @@
-export interface ReviewData {
-  recipeId: string;
-  recipeName: string;
-  recipeImage?: string;
-  completionCount: number;
-}
+import type { StaticImageData } from 'next/image';
 
-export interface EmotionRating {
-  taste: 'bad' | 'neutral' | 'good' | null;
-  difficulty: 'hard' | 'medium' | 'easy' | null;
-  experience: 'hard' | 'medium' | 'easy' | null;
+export interface ReviewOption {
+  code: string;
+  codeName: string;
 }
 
 export interface ReviewFormData {
-  emotions: EmotionRating;
-  comment: string;
+  completedRecipeId: number;
+  tasteOption: ReviewOption | null;
+  difficultyOption: ReviewOption | null;
+  experienceOption: ReviewOption | null;
+  content: string;
+}
+
+export interface ReviewSubmitData {
+  completedRecipeId: number;
+  tasteOptions: ReviewOption[];
+  difficultyOptions: ReviewOption[];
+  experienceOptions: ReviewOption[];
+  content: string;
+  completionCount: number;
+  completionMessage: string;
+  recipeImageUrl?: string;
+  recipeName: string;
 }
 
 export interface ReviewBottomSheetProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: ReviewFormData) => void;
-  reviewData: ReviewData;
+  recipeId: number; // 후기 제출 시 completedRecipeId로 사용
+}
+
+export interface ReviewData {
+  recipeId: string;
+  recipeName: string;
+  recipeImageUrl?: string | StaticImageData | undefined;
+  completionCount: number;
+  tasteOptions: ReviewOption[];
+  difficultyOptions: ReviewOption[];
+  experienceOptions: ReviewOption[];
+  completionMessage: string;
 }

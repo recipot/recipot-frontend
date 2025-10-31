@@ -46,6 +46,16 @@ export type {
   CompleteOnboardingData,
 } from './types';
 
+// Health Survey API
+export {
+  healthSurvey,
+  type HealthSurveyEligibilityResponse,
+  type HealthSurveyPreparationResponse,
+  type HealthSurveyPreparationOption,
+  type HealthSurveyRequest,
+  type HealthSurveySubmitResponse,
+} from './healthSurvey';
+
 // Mypage API
 export type {
   CompletedRecipe,
@@ -53,3 +63,10 @@ export type {
   GetCompletedRecipesParams,
 } from './mypageAPI';
 export { recipesAPI, storedAPI, recentAPI } from './mypageAPI';
+
+// Review Reminder API
+export {
+  reviewReminder,
+  type PendingReviewsResponse,
+  type PendingReviewItem,
+} from './review';
