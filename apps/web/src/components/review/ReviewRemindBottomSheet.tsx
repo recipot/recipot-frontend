@@ -2,12 +2,11 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+import { recipe, reviewReminder } from '@recipot/api';
 import { useRouter } from 'next/navigation';
 import { tokenUtils } from 'packages/api/src/auth';
-import { recipe, reviewReminder } from '@recipot/api';
-import { isProduction } from '@/lib/env';
 
-import type { Recipe } from '@/types/recipe.types';
+import { isProduction } from '@/lib/env';
 
 import { CloseIcon } from '../Icons';
 import { Drawer, DrawerClose, DrawerContent, DrawerTitle } from '../ui/drawer';
@@ -44,7 +43,9 @@ export function ReviewRemindBottomSheet() {
     try {
       setLoading(true);
       if (!useCookieAuth && !token) {
-        console.error('인증 토큰이 없어 리뷰 리마인드 데이터를 불러올 수 없습니다.');
+        console.error(
+          '인증 토큰이 없어 리뷰 리마인드 데이터를 불러올 수 없습니다.'
+        );
         setIsOpen(false);
         setLoading(false);
         return;
@@ -66,8 +67,7 @@ export function ReviewRemindBottomSheet() {
               alt: `${recipeDetail.title} 레시피 이미지`,
               description: '레시피 해먹기 완료!',
               id: recipeDetail.id,
-              imageUrl:
-                recipeDetail.images[0]?.imageUrl ?? '/recipeImage.png',
+              imageUrl: recipeDetail.images[0]?.imageUrl ?? '/recipeImage.png',
               title: recipeDetail.title,
             };
           } catch (error) {
