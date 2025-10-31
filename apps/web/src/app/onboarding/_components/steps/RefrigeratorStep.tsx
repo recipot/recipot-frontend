@@ -12,6 +12,7 @@ import { useAllergiesStore } from '@/stores/allergiesStore';
 import { useMoodStore } from '@/stores/moodStore';
 import { useOnboardingStore } from '@/stores/onboardingStore';
 import { useSelectedFoodsStore } from '@/stores/selectedFoodsStore';
+import { useApiErrorModalStore } from '@/stores/apiErrorModalStore';
 
 import { ONBOARDING_CONSTANTS } from '../../_constants';
 import { useOnboardingActions } from '../../_hooks';
@@ -20,6 +21,8 @@ import {
   moodToConditionId,
   onboardingStyles,
 } from '../../_utils';
+
+const MIN_LOADING_DURATION_MS = 1000;
 
 export default function RefrigeratorStep() {
   const { setUser, user } = useAuth();
@@ -69,8 +72,9 @@ export default function RefrigeratorStep() {
   };
 
   const handleComplete = async () => {
+    setIsSubmitting(true);
+    const loadingStart = Date.now();
     try {
-      setIsSubmitting(true);
       // 1. 모든 온보딩 데이터 수집 (각 도메인 스토어에서)
       const { allergies } = useAllergiesStore.getState();
       const { mood } = useMoodStore.getState();
@@ -140,10 +144,16 @@ export default function RefrigeratorStep() {
         error instanceof Error
           ? error.message
           : '알 수 없는 오류가 발생했습니다.';
-      alert(
-        `온보딩 완료 중 오류가 발생했습니다.\n\n${errorMessage}\n\n다시 시도해주세요.`
-      );
+      useApiErrorModalStore.getState().showError({
+        message: `온보딩 완료 중 오류가 발생했습니다.\n\n${errorMessage}\n다시 시도해주세요.`,
+      });
     } finally {
+      const elapsed = Date.now() - loadingStart;
+      if (elapsed < MIN_LOADING_DURATION_MS) {
+        await new Promise(resolve =>
+          setTimeout(resolve, MIN_LOADING_DURATION_MS - elapsed)
+        );
+      }
       setIsSubmitting(false);
     }
   };
