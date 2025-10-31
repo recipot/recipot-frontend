@@ -13,6 +13,7 @@ import { isProduction } from '@/lib/env';
 import CookwareSection from './CookwareSection';
 import IngredientsSection from './IngredientsSection';
 import RecipeDetailHeader from './RecipeDetailHeader';
+import RecipeHero from './RecipeHero';
 import StepSection from './StepSection';
 import TabNavigation from './TabNavigation';
 
@@ -94,14 +95,14 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
       <div className="w-[390px] bg-gray-100">
         <RecipeDetailHeader recipe={recipeData} />
 
+        <RecipeHero recipe={recipeData} />
         <TabNavigation
           activeTab={isInitialState ? 'ingredients' : (activeSection as TabId)}
           gnbRef={gnbRef}
           onTabClick={handleTabClick}
           tabContainerRef={tabContainerRef}
         />
-
-        <div className="px-4 pb-24">
+        <div className="px-4">
           <div className="bg-secondary-light-green border-secondary-soft-green my-4 rounded-2xl border-[1px] px-5 py-4">
             <p className="text-15sb text-primary-pressed">
               {recipeData?.healthPoints.map(point => point.content).join(', ')}
