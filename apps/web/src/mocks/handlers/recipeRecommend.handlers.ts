@@ -6,7 +6,7 @@ const mockRecipes: Recipe[] = [
   {
     id: 1,
     title: '고사리나물\n밥도둑 레시피',
-    duration: 15,
+    duration: '15분',
     tools: [{ id: 1, imageUrl: '/backgroundImage.jpg', name: '냄비' }],
     description: '고사리나물로 만드는 전통 한식 레시피입니다.',
     healthPoints: [
@@ -45,7 +45,7 @@ const mockRecipes: Recipe[] = [
   {
     id: 2,
     title: '김치볶음밥\n5분이면 완성!',
-    duration: 5,
+    duration: '5분',
     tools: [{ id: 1, imageUrl: '/backgroundImage.jpg', name: '프라이팬' }],
     description: '김치볶음밥으로 만드는 간단한 한끼 레시피입니다.',
     healthPoints: [
@@ -75,7 +75,7 @@ const mockRecipes: Recipe[] = [
   {
     id: 3,
     title: '빵 한장에 땅콩버터 바르고\n사과만 얹으면 뚝딱',
-    duration: 3,
+    duration: '3분',
     tools: [
       { id: 1, imageUrl: '/backgroundImage.jpg', name: '조리도구 최소정보' },
     ],
@@ -101,18 +101,6 @@ const mockRecipes: Recipe[] = [
       { orderNum: 2, summary: '사과를 얇게 썰어서 땅콩버터 위에 올려주세요' },
     ],
   },
-];
-
-// 선택된 재료 목록 (동적으로 관리)
-let mockSelectedIngredients = [
-  '땅콩버터',
-  '감자',
-  '김치',
-  '양파',
-  '마늘',
-  '고추장',
-  '된장',
-  '대파',
 ];
 
 // 레시피 추천 핸들러

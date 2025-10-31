@@ -19,10 +19,10 @@ import {
   MyOpenFileIcon,
   RefreshIcon,
   ReviewIcon,
+  SauceIcon,
   SearchIcon,
   SettingsIcon,
   ShareIcon,
-  SourceIcon,
   UserIcon,
 } from '../components/Icons';
 
@@ -133,8 +133,8 @@ export const FunctionIcons: Story = {
         <span className="text-sm text-gray-600">SettingsIcon</span>
       </div>
       <div className="flex flex-col items-center space-y-2">
-        <SourceIcon {...args} />
-        <span className="text-sm text-gray-600">SourceIcon</span>
+        <SauceIcon {...args} />
+        <span className="text-sm text-gray-600">SauceIcon</span>
       </div>
     </div>
   ),
@@ -326,8 +326,8 @@ export const AllIcons: Story = {
             <span className="text-xs text-gray-600">SettingsIcon</span>
           </div>
           <div className="flex flex-col items-center space-y-2">
-            <SourceIcon {...args} />
-            <span className="text-xs text-gray-600">SourceIcon</span>
+            <SauceIcon {...args} />
+            <span className="text-xs text-gray-600">SauceIcon</span>
           </div>
         </div>
       </div>
