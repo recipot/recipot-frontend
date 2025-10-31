@@ -54,7 +54,7 @@ export default function RecipeCard({
   };
 
   const handleMoveRecipeDetail = () => {
-    router.push(`/recipes/${recipe.recipeId}`);
+    router.push(`/recipe/${recipe.recipeId}`);
   };
 
   const isPending = isDeleting || isSaving;
