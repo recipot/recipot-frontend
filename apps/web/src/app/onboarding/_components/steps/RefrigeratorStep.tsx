@@ -6,6 +6,7 @@ import { useAuth } from '@recipot/contexts';
 import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/common/Button';
+import LoadingPage from '@/components/common/Loading/LoadingPage';
 import { IngredientsSearch } from '@/components/IngredientsSearch';
 import { useAllergiesStore } from '@/stores/allergiesStore';
 import { useMoodStore } from '@/stores/moodStore';
@@ -35,6 +36,7 @@ export default function RefrigeratorStep() {
 
   const [selectedCount, setSelectedCount] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const displayName = user?.nickname ?? '회원님';
 
   // 새로고침 버튼을 눌렀을 때만 선택된 재료들 초기화
   useEffect(() => {
@@ -69,7 +71,6 @@ export default function RefrigeratorStep() {
   const handleComplete = async () => {
     try {
       setIsSubmitting(true);
-
       // 1. 모든 온보딩 데이터 수집 (각 도메인 스토어에서)
       const { allergies } = useAllergiesStore.getState();
       const { mood } = useMoodStore.getState();
@@ -150,6 +151,18 @@ export default function RefrigeratorStep() {
   const handleSelectionChange = (count: number) => {
     setSelectedCount(count);
   };
+
+  if (isSubmitting) {
+    return (
+      <LoadingPage>
+        {displayName}님의
+        <br />
+        지금 바로 해먹을 수 있는 요리를
+        <br />
+        찾고 있어요
+      </LoadingPage>
+    );
+  }
 
   return (
     <>
