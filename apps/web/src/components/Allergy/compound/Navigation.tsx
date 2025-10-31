@@ -74,18 +74,69 @@ export default function AllergyNavigation({
     });
   };
 
+  const resolveScrollBehavior = (): ScrollBehavior => 'smooth';
+
   const containerId = scrollConfig.useWindowScroll
     ? undefined
     : (scrollConfig.containerRef?.current?.id ?? 'allergy-scroll-container');
 
-  const handleTabClick = (index: number) => {
-    manualTargetRef.current = index;
-    setActiveIndex(index);
+  const setActiveTab = (index: number) => {
+    if (activeIndex !== index) {
+      setActiveIndex(index);
+    }
 
     const tabElement = tabRefs.current[index];
-    if (tabElement) {
-      scrollTabToCenter(tabElement, isContainerScroll ? 'smooth' : 'auto');
+    if (!tabElement) {
+      return;
     }
+
+    scrollTabToCenter(tabElement, resolveScrollBehavior());
+  };
+
+  const handleTabClick = (index: number) => {
+    manualTargetRef.current = index;
+    setActiveTab(index);
+  };
+
+  const handleSetActive = (to: string) => {
+    const match = to.match(/allergy-section-(\d+)/);
+    if (!match) {
+      return;
+    }
+
+    const sectionIndex = parseInt(match[1], 10);
+    if (
+      Number.isNaN(sectionIndex) ||
+      sectionIndex < 0 ||
+      sectionIndex >= categoryList.length
+    ) {
+      return;
+    }
+
+    const manualTarget = manualTargetRef.current;
+    if (manualTarget !== null && manualTarget !== sectionIndex) {
+      return;
+    }
+
+    setActiveTab(sectionIndex);
+
+    if (manualTarget === sectionIndex) {
+      manualTargetRef.current = null;
+    }
+  };
+
+  const getTabClassName = (tabIndex: number, isActive: boolean) => {
+    const baseClass =
+      'text-15sb h-10 flex-shrink-0 cursor-pointer rounded-full px-4 py-[0.5313rem] transition-colors';
+    const stateClass = isActive
+      ? 'bg-gray-900 text-white'
+      : 'bg-gray-100 text-gray-600';
+    const leftSpacing = tabIndex === 0 ? 'ml-5' : '';
+    const rightSpacing = tabIndex === categoryList.length - 1 ? 'mr-5' : '';
+
+    return [baseClass, stateClass, leftSpacing, rightSpacing]
+      .filter(Boolean)
+      .join(' ');
   };
 
   return (
@@ -114,48 +165,8 @@ export default function AllergyNavigation({
               offset={-scrollConfig.navigationOffset}
               containerId={containerId}
               onClick={() => handleTabClick(index)}
-              onSetActive={to => {
-                const match = to.match(/allergy-section-(\d+)/);
-                if (match) {
-                  const sectionIndex = parseInt(match[1], 10);
-                  if (sectionIndex >= 0 && sectionIndex < categoryList.length) {
-                    const manualTarget = manualTargetRef.current;
-                    if (
-                      manualTarget !== null &&
-                      manualTarget !== sectionIndex
-                    ) {
-                      return;
-                    }
-
-                    if (activeIndex !== sectionIndex) {
-                      setActiveIndex(sectionIndex);
-                    }
-
-                    const tabElement = tabRefs.current[sectionIndex];
-                    if (tabElement) {
-                      scrollTabToCenter(
-                        tabElement,
-                        manualTarget !== null
-                          ? isContainerScroll
-                            ? 'smooth'
-                            : 'auto'
-                          : 'smooth'
-                      );
-                    }
-
-                    if (manualTarget === sectionIndex) {
-                      manualTargetRef.current = null;
-                    }
-                  }
-                }
-              }}
-              className={`text-15sb h-10 flex-shrink-0 cursor-pointer rounded-full px-4 py-[0.5313rem] transition-colors ${
-                isActive
-                  ? 'bg-gray-900 text-white'
-                  : 'bg-gray-100 text-gray-600'
-              } ${index === 0 ? 'ml-5' : ''} ${
-                index === categoryList.length - 1 ? 'mr-5' : ''
-              }`}
+              onSetActive={handleSetActive}
+              className={getTabClassName(index, isActive)}
               aria-label={`${category.title} 섹션으로 이동`}
             >
               {category.title}
