@@ -47,7 +47,7 @@ export function IngredientsList({
               key={`${ingredient.name}-${ingredient.amount}`}
               className="bg-secondary-light-green border-secondary-soft-green flex h-[29px] w-fit max-w-full items-center rounded-md border px-3 py-1.5"
             >
-              <span className="text-15b text-ingredient-green min-w-0 truncate">
+              <span className="text-15b text-ingredient-green mr-[5px] min-w-0 truncate">
                 {ingredient.name}
               </span>{' '}
               <span className="text-15 text-ingredient-green shrink-0">

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { PowderIcon, WaterIcon } from '@/components/Icons';
+import { PowderIcon, SauceIcon, WaterIcon } from '@/components/Icons';
 
 export interface MeasurementTab {
   id: string;
@@ -21,15 +21,10 @@ export const MEASUREMENT_TABS: MeasurementTab[] = [
     label: '액체류',
   },
   {
-    icon: <PowderIcon />,
-    id: 'minced',
-    label: '다진양념류',
-  },
-  {
-    activeIcon: <WaterIcon color="#111827" />,
-    icon: <WaterIcon color="#6B7280" />,
+    activeIcon: <SauceIcon color="#111827" />,
+    icon: <SauceIcon color="#6B7280" />,
     id: 'sauce',
-    label: '장류',
+    label: '장,젓갈류',
   },
 ];
 
