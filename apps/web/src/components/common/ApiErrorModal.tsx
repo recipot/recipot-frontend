@@ -13,14 +13,14 @@ const CONTACT_URL = 'https://slashpage.com/hankki/qpv5x427xr9e1mkyn3dw?e=1';
 export function ApiErrorModal() {
   const router = useRouter();
   const logout = useAuthStore(state => state.logout);
-  const { code, hide, isOpen, message } = useApiErrorModalStore();
+  const { code, hide, isFatal, isOpen, message } = useApiErrorModalStore();
   const closeHandledRef = useRef(false);
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && isFatal) {
       closeHandledRef.current = false;
     }
-  }, [isOpen]);
+  }, [isFatal, isOpen]);
 
   const description = useMemo(
     () => (
@@ -40,38 +40,51 @@ export function ApiErrorModal() {
     }
     closeHandledRef.current = true;
 
-    hide();
-    logout();
+    if (isFatal) {
+      hide();
+      logout();
 
-    if (typeof window !== 'undefined') {
-      try {
-        localStorage.clear();
-      } catch (error) {
-        console.error('Failed to clear localStorage:', error);
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.clear();
+        } catch (error) {
+          console.error('Failed to clear localStorage:', error);
+        }
+
+        try {
+          sessionStorage.clear();
+        } catch (error) {
+          console.error('Failed to clear sessionStorage:', error);
+        }
       }
 
-      try {
-        sessionStorage.clear();
-      } catch (error) {
-        console.error('Failed to clear sessionStorage:', error);
-      }
+      router.replace('/signin');
+      return;
     }
 
-    router.replace('/signin');
-  }, [hide, logout, router]);
+    hide();
+  }, [hide, isFatal, logout, router]);
+
+  const handleDismiss = useCallback(() => {
+    if (isFatal) {
+      clearSessionAndRedirect();
+      return;
+    }
+    hide();
+  }, [clearSessionAndRedirect, hide, isFatal]);
 
   const handleOpenChange = useCallback(
     (open: boolean) => {
       if (!open) {
-        clearSessionAndRedirect();
+        handleDismiss();
       }
     },
-    [clearSessionAndRedirect]
+    [handleDismiss]
   );
 
   const handleClose = useCallback(() => {
-    clearSessionAndRedirect();
-  }, [clearSessionAndRedirect]);
+    handleDismiss();
+  }, [handleDismiss]);
 
   const handleContact = useCallback(() => {
     if (CONTACT_URL.startsWith('mailto:')) {
@@ -80,8 +93,13 @@ export function ApiErrorModal() {
       window.open(CONTACT_URL, '_blank', 'noopener,noreferrer');
     }
 
-    clearSessionAndRedirect();
-  }, [clearSessionAndRedirect]);
+    if (isFatal) {
+      clearSessionAndRedirect();
+      return;
+    }
+
+    hide();
+  }, [clearSessionAndRedirect, hide, isFatal]);
 
   return (
     <Modal

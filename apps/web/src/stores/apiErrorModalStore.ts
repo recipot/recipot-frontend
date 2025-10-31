@@ -4,11 +4,13 @@ import { create } from 'zustand';
 
 interface ShowErrorPayload {
   code?: string | number | null;
+  isFatal?: boolean;
   message?: string;
 }
 
 interface ApiErrorModalState {
   code?: string;
+  isFatal: boolean;
   isOpen: boolean;
   message: string;
   hide: () => void;
@@ -20,16 +22,19 @@ const DEFAULT_ERROR_MESSAGE =
 
 export const useApiErrorModalStore = create<ApiErrorModalState>(set => ({
   code: undefined,
+  isFatal: false,
   isOpen: false,
   message: DEFAULT_ERROR_MESSAGE,
   hide: () =>
     set(state => ({
       ...state,
+      isFatal: false,
       isOpen: false,
     })),
   showError: payload =>
     set(() => ({
       code: payload?.code != null ? String(payload.code) : undefined,
+      isFatal: Boolean(payload?.isFatal),
       isOpen: true,
       message: payload?.message ?? DEFAULT_ERROR_MESSAGE,
     })),

@@ -10,7 +10,7 @@ export default function NotFoundPage() {
     <main className="flex min-h-screen flex-col items-center justify-center gap-8 bg-white px-6 py-12 text-center">
       <div className="flex flex-col items-center gap-6">
         <Image
-          src="/mypage/none-refrigrator.png"
+          src="/mypage/none-refrigerator.png"
           alt="울고있는 밥새"
           width={142}
           height={142}

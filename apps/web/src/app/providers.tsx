@@ -12,6 +12,8 @@ import { useApiErrorModalStore } from '@/stores/apiErrorModalStore';
 
 import type { ReactNode } from 'react';
 
+const FATAL_STATUS_CODES = new Set<number>([401]);
+
 export default function Providers({ children }: { children: ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
 
@@ -58,6 +60,7 @@ export default function Providers({ children }: { children: ReactNode }) {
         code?: string | number;
         message?: string;
         response?: {
+          status?: number;
           data?: {
             code?: string | number;
             errorCode?: string | number;
@@ -68,6 +71,7 @@ export default function Providers({ children }: { children: ReactNode }) {
       };
 
       const responseData = axiosError.response?.data;
+      const status = axiosError.response?.status;
 
       const errorCode =
         responseData?.code ??
@@ -80,9 +84,23 @@ export default function Providers({ children }: { children: ReactNode }) {
         responseData?.errorMessage ??
         axiosError.message;
 
+      const normalizedErrorCode =
+        typeof errorCode === 'number'
+          ? errorCode
+          : typeof errorCode === 'string'
+            ? Number.parseInt(errorCode, 10)
+            : null;
+
+      const isFatal =
+        (status != null && FATAL_STATUS_CODES.has(status)) ||
+        (normalizedErrorCode != null &&
+          !Number.isNaN(normalizedErrorCode) &&
+          FATAL_STATUS_CODES.has(normalizedErrorCode));
+
       showError({
         code: errorCode ?? undefined,
         message: errorMessage,
+        isFatal,
       });
     };
 
