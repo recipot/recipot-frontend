@@ -9,10 +9,10 @@ import { Button } from '@/components/common/Button';
 import LoadingPage from '@/components/common/Loading/LoadingPage';
 import { IngredientsSearch } from '@/components/IngredientsSearch';
 import { useAllergiesStore } from '@/stores/allergiesStore';
+import { useApiErrorModalStore } from '@/stores/apiErrorModalStore';
 import { useMoodStore } from '@/stores/moodStore';
 import { useOnboardingStore } from '@/stores/onboardingStore';
 import { useSelectedFoodsStore } from '@/stores/selectedFoodsStore';
-import { useApiErrorModalStore } from '@/stores/apiErrorModalStore';
 
 import { ONBOARDING_CONSTANTS } from '../../_constants';
 import { useOnboardingActions } from '../../_hooks';
@@ -164,13 +164,15 @@ export default function RefrigeratorStep() {
 
   if (isSubmitting) {
     return (
-      <LoadingPage>
-        {displayName}님의
-        <br />
-        지금 바로 해먹을 수 있는 요리를
-        <br />
-        찾고 있어요
-      </LoadingPage>
+      <div className="fixed top-0 left-0 z-50 h-full w-full">
+        <LoadingPage>
+          {displayName}님의
+          <br />
+          지금 바로 해먹을 수 있는 요리를
+          <br />
+          찾고 있어요
+        </LoadingPage>
+      </div>
     );
   }
 
