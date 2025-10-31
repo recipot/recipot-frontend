@@ -17,8 +17,8 @@ export const RecipeActions = ({
 }: RecipeActionsProps) => {
   const router = useRouter();
 
-  const handleCookingOrder = (recipeId: number) => {
-    router.push(`/recipe/${recipeId}/cooking-order`);
+  const handleRecipeDetail = (recipeId: number) => {
+    router.push(`/recipe/${recipeId}`);
   };
 
   return (
@@ -38,7 +38,7 @@ export const RecipeActions = ({
         <Button
           onClick={e => {
             e.stopPropagation(); // 이벤트 전파 방지
-            handleCookingOrder(recipeId);
+            handleRecipeDetail(recipeId);
           }}
           className="h-[52px] flex-1 rounded-full bg-white text-gray-900"
         >
