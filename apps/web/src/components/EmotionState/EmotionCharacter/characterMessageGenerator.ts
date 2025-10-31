@@ -60,8 +60,8 @@ export const generateCharacterMessage = ({
   mood,
   nickname,
 }: MessageParams): string => {
-  // mood가 default이고 완료한 레시피가 있을 때만 레벨별 메시지 사용
-  if (mood === 'default' && completedRecipesCount > 0) {
+  // mood가 default이고 3회 이상 해먹었을 때만 레벨별 메시지 사용
+  if (mood === 'default' && completedRecipesCount >= 3) {
     return getLevelMessage(completedRecipesCount, nickname);
   }
 
