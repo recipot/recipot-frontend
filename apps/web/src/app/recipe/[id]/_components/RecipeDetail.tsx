@@ -28,8 +28,8 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
   const [recipeData, setRecipeData] = useState<Recipe | null>(null);
   const [activeTab, setActiveTab] = useState<TabId>('ingredients');
   const bottomPadding = useViewportBasedPadding({
-    ratio: 0.8,
     minPadding: 400,
+    ratio: 0.8,
   });
   const router = useRouter();
 
