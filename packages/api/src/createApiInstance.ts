@@ -75,6 +75,7 @@ export const createApiInstance = (
   // - production: 실제 백엔드 + OAuth (baseURL = NEXT_PUBLIC_BACKEND_URL)
   const APP_ENV = process.env.NEXT_PUBLIC_APP_ENV || 'production';
   const shouldUseMock = APP_ENV === 'local';
+  const useCookieAuth = APP_ENV === 'production';
 
   const baseURL =
     customBaseURL ??
@@ -89,6 +90,7 @@ export const createApiInstance = (
       ...headers,
     },
     timeout,
+    withCredentials: useCookieAuth,
   });
 
   // 요청 인터셉터
@@ -96,7 +98,7 @@ export const createApiInstance = (
     config => {
       // Zustand persist에서 토큰을 읽어서 Authorization 헤더에 추가
       const token = getAuthToken();
-      if (token) {
+      if (!useCookieAuth && token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
 

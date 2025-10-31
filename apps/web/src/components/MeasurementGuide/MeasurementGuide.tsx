@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { tokenUtils } from 'packages/api/src/auth';
+import { recipe } from '@recipot/api';
+import { isProduction } from '@/lib/env';
 
 import {
   MeasurementGuideContent,
   MeasurementGuideToggle,
   MeasurementTab,
 } from './index';
-
-import type { MeasurementGuideResponse } from '@recipot/api';
 
 interface MeasurementGuideProps {
   /** 계량 가이드 데이터 (선택사항, API에서 가져옴) */
@@ -43,8 +42,6 @@ export function MeasurementGuide({
     setActiveTab(tab);
   };
 
-  const token = tokenUtils.getToken();
-
   const fetchMeasurementGuides = React.useCallback(async () => {
     if (isLoading) return;
 
@@ -52,20 +49,15 @@ export function MeasurementGuide({
     setError(null);
 
     try {
-      const {
-        data: {
-          data: { data },
-        },
-      }: MeasurementGuideResponse = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/measurement-guides`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const token = tokenUtils.getToken();
+      const useCookieAuth = isProduction;
+      if (!useCookieAuth && !token) {
+        throw new Error('Missing access token');
+      }
+
+      const data = await recipe.getMeasurementGuides();
       setMeasurementData(data);
-      const apiCategories = Object.keys(data);
+      const apiCategories = Object.keys(data ?? {});
       setCategories(apiCategories);
       if (!activeTab && apiCategories.length > 0) {
         setActiveTab(apiCategories[0]);
@@ -79,7 +71,7 @@ export function MeasurementGuide({
     } finally {
       setIsLoading(false);
     }
-  }, [isLoading, activeTab, token]);
+  }, [isLoading, activeTab]);
 
   useEffect(() => {
     if (isOpen && categories.length === 0) {

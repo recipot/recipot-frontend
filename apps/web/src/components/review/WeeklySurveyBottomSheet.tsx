@@ -2,8 +2,14 @@
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
-import axios from 'axios';
 import { tokenUtils } from 'packages/api/src/auth';
+import {
+  healthSurvey,
+  type HealthSurveyPreparationResponse,
+  type HealthSurveyRequest,
+  type HealthSurveySubmitResponse,
+} from '@recipot/api';
+import { isProduction } from '@/lib/env';
 
 import { Button } from '../common/Button';
 import { CloseIcon } from '../Icons';
@@ -33,64 +39,6 @@ type SurveyFormData = {
   healthChange: string;
   improvements: string[];
   additionalFeedback: string;
-};
-
-// API 준비 데이터 타입
-type HealthSurveyPreparationResponse = {
-  persistentIssueOption: {
-    code: string;
-    codeName: string;
-  }[];
-  effectOptions: {
-    code: string;
-    codeName: string;
-  }[];
-};
-
-// API 요청 타입 (실제 API 스펙에 맞게 수정)
-type HealthSurveyRequest = {
-  persistentIssueCode: string; // H01: 건강 변화 선택
-  effectCodes: string[]; // H02: 개선 사항들
-  additionalNote: string; // 추가 피드백
-};
-
-// API 응답 타입
-type HealthSurveyResponse = {
-  status: number;
-  data: {
-    surveyId: number;
-  };
-};
-
-const getEligibilityData = async (token: string) => {
-  const {
-    data: {
-      data: { isEligible, recentCompletionCount },
-    },
-  } = await axios.get(`/v1/health-survey/eligibility`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return { isEligible, recentCompletionCount };
-};
-
-const getHealthSurveyPreparation = async (
-  token: string
-): Promise<HealthSurveyPreparationResponse> => {
-  const { data } = await axios.get(`/v1/health-survey/preparation`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return data;
-};
-
-const submitHealthSurvey = async (
-  data: HealthSurveyRequest,
-  token: string
-): Promise<HealthSurveyResponse> => {
-  const { data: responseData } = await axios.post(`/v1/health-survey`, data, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-
-  return responseData;
 };
 
 // 유틸리티 함수들
@@ -157,6 +105,7 @@ const HealthChangeOptions = ({
 
 export function WeeklySurveyBottomSheet() {
   const token = tokenUtils.getToken();
+  const useCookieAuth = isProduction;
   const [isOpen, setIsOpen] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [preparationData, setPreparationData] =
@@ -168,15 +117,15 @@ export function WeeklySurveyBottomSheet() {
   // 자격 확인 및 준비 데이터 가져오기
   useEffect(() => {
     const initializeData = async () => {
-      if (!token) return;
+      if (!useCookieAuth && !token) return;
 
       try {
         setLoading(true);
 
         // 병렬로 자격 확인과 준비 데이터 가져오기
         const [eligibilityData, preparationData] = await Promise.all([
-          getEligibilityData(token),
-          getHealthSurveyPreparation(token),
+          healthSurvey.getEligibility(),
+          healthSurvey.getPreparation(),
         ]);
 
         setIsEligible(eligibilityData.isEligible);
@@ -190,7 +139,7 @@ export function WeeklySurveyBottomSheet() {
     };
 
     initializeData();
-  }, [token]);
+  }, [token, useCookieAuth]);
 
   const { handleSubmit, register, setValue, watch } = useForm<SurveyFormData>({
     defaultValues: {
@@ -224,7 +173,7 @@ export function WeeklySurveyBottomSheet() {
   };
 
   const onSubmit = async (data: SurveyFormData) => {
-    if (!token) {
+    if (!useCookieAuth && !token) {
       console.error('토큰이 없습니다.');
       return;
     }
@@ -240,7 +189,9 @@ export function WeeklySurveyBottomSheet() {
       };
 
       // API 호출
-      const result = await submitHealthSurvey(apiData, token);
+      const result: HealthSurveySubmitResponse = await healthSurvey.submit(
+        apiData
+      );
 
       if (result.status === 200) {
         handleClose();

@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { tokenUtils } from 'packages/api/src/auth';
+import { recipe } from '@recipot/api';
+import { isProduction } from '@/lib/env';
 
 import { Button } from '@/components/common/Button';
 import { CookIcon } from '@/components/Icons';
@@ -15,31 +16,27 @@ import RecipeDetailHeader from './RecipeDetailHeader';
 import StepSection from './StepSection';
 import TabNavigation from './TabNavigation';
 
-import type { ApiResponse, Recipe, TabId } from '../types/recipe.types';
+import type { Recipe, TabId } from '../types/recipe.types';
 
 export function RecipeDetail({ recipeId }: { recipeId: string }) {
   const tabContainerRef = useRef<HTMLDivElement>(null);
   const token = tokenUtils.getToken();
+  const useCookieAuth = isProduction;
   const [recipeData, setRecipeData] = useState<Recipe | null>(null);
   const router = useRouter();
 
   useEffect(() => {
     const fetchRecipe = async () => {
-      if (!token) return;
+      if (!useCookieAuth && !token) return;
       try {
-        const response = await axios.get<ApiResponse>(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/recipes/${recipeId}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        setRecipeData(response.data.data);
+        const data = await recipe.getRecipeDetail(recipeId);
+        setRecipeData(data);
       } catch (error) {
         console.error('Recipe fetch error:', error);
       }
     };
     fetchRecipe();
-  }, [token, recipeId]);
+  }, [token, recipeId, useCookieAuth]);
 
   // 섹션 ID 배열 생성
   const sectionIds = useMemo(() => ['ingredients', 'cookware', 'steps'], []);

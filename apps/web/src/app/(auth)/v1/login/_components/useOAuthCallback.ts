@@ -3,6 +3,7 @@ import { authService } from '@recipot/api';
 import { useAuth } from '@recipot/contexts';
 import { getCookie } from '@recipot/utils';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { isProduction } from '@/lib/env';
 
 import type { UserInfo } from '@recipot/types';
 
@@ -20,16 +21,24 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { setRefreshToken, setToken, setUser } = useAuth();
+  const useCookieAuth = isProduction;
   const [status, setStatus] = useState(
     `${getProviderName(provider)} 로그인 처리 중...`
   );
 
   const saveTokens = useCallback(
     (accessToken: string, refreshToken: string) => {
+      if (useCookieAuth) {
+        // 프로덕션 쿠키 기반 인증에서는 토큰을 직접 저장하지 않음
+        setToken(null);
+        setRefreshToken(null);
+        return;
+      }
+
       setToken(accessToken);
       setRefreshToken(refreshToken);
     },
-    [setToken, setRefreshToken]
+    [setToken, setRefreshToken, useCookieAuth]
   );
 
   const navigateAfterLogin = useCallback(
@@ -87,6 +96,18 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
   );
 
   const handleTokenFromCookie = useCallback(async () => {
+    if (useCookieAuth) {
+      try {
+        setStatus(`${getProviderName(provider)} 사용자 정보를 가져오는 중...`);
+
+        const userInfo = await authService.getUserInfo();
+        navigateAfterLogin(userInfo);
+      } catch (error) {
+        handleError(error);
+      }
+      return;
+    }
+
     try {
       setStatus(`${getProviderName(provider)} 사용자 정보를 가져오는 중...`);
 
@@ -103,7 +124,7 @@ export function useOAuthCallback({ provider }: UseOAuthCallbackProps) {
     } catch (error) {
       handleError(error);
     }
-  }, [provider, saveTokens, navigateAfterLogin, handleError]);
+  }, [provider, useCookieAuth, navigateAfterLogin, handleError, saveTokens]);
 
   const handleTokenVerification = useCallback(
     async (token: string) => {

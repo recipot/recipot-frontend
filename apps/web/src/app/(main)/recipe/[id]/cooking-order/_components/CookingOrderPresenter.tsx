@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { tokenUtils } from 'packages/api/src/auth';
+import { recipe as recipeService } from '@recipot/api';
+import { isProduction } from '@/lib/env';
 
 import { COMPLETED_RECIPES_QUERY_KEY } from '@/hooks/useCompletedRecipes';
 import { useCookingOrder } from '@/hooks/useCookingOrder';
@@ -31,6 +32,7 @@ export default function CookingOrderPresenter({
   const queryClient = useQueryClient();
 
   const token = tokenUtils.getToken();
+  const useCookieAuth = isProduction;
 
   // 모달 상태 통합 관리
   const [activeModal, setActiveModal] = useState<ModalType>(null);
@@ -49,17 +51,12 @@ export default function CookingOrderPresenter({
 
   const handleCookingComplete = async () => {
     // await completeCooking();
-    await axios.post(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/users/recipes/${recipeId}/complete`,
-      {
-        recipeId,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    if (!useCookieAuth && !token) {
+      router.push('/signin');
+      return;
+    }
+
+    await recipeService.completeCooking(recipeId);
     completeStep(currentStep);
 
     // 완료한 레시피 캐시 무효화 - 메인 페이지에서 최신 데이터 반영
