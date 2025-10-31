@@ -77,17 +77,27 @@ export default function RecipeRecommend() {
   const mapRecommendationToRecipe = (
     item: RecommendationItem
   ): Omit<Recipe, 'ingredients'> => {
+    const {
+      description,
+      duration,
+      imageUrls,
+      isBookmarked,
+      recipeId,
+      title,
+      tools,
+    } = item;
+
     return {
-      description: item.description,
-      duration: parseInt(item.duration),
-      id: item.recipeId,
-      images: item.imageUrls.map((url, index) => ({
+      description,
+      duration,
+      id: recipeId,
+      images: imageUrls.map((url, index) => ({
         id: index + 1,
         imageUrl: url,
       })),
-      isBookmarked: item.isBookmarked,
-      title: item.title,
-      tools: item.tools.map((toolName, index) => ({
+      isBookmarked,
+      title,
+      tools: tools.map((toolName, index) => ({
         id: index + 1,
         name: toolName,
       })),
@@ -128,10 +138,9 @@ export default function RecipeRecommend() {
 
       setLikedRecipes(bookmarkedIds);
     } catch (error) {
-      console.error('레시피 추천 조회 실패:', error);
       // 인증 오류인 경우 로그인 페이지로 리다이렉트
       if (axios.isAxiosError(error) && error.response?.status === 401) {
-        console.info('🔒 인증 오류, 로그인 페이지로 이동');
+        showToast('인증 오류, 로그인 페이지로 이동합니다', 3000);
         router.push('/signin');
         return;
       }
@@ -141,6 +150,7 @@ export default function RecipeRecommend() {
 
   useEffect(() => {
     fetchRecommendRecipes();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userSelectedMood, selectedFoodIds]);
 
   useEffect(() => {
@@ -156,16 +166,17 @@ export default function RecipeRecommend() {
           setShowTutorial(true);
         }
       } catch (error) {
-        console.error('프로필 조회 실패:', error);
+        showToast('프로필 조회 실패', 3000);
         // 인증 오류인 경우 로그인 페이지로 리다이렉트
         if (axios.isAxiosError(error) && error.response?.status === 401) {
-          console.info('🔒 인증 오류, 로그인 페이지로 이동');
+          showToast('인증 오류, 로그인 페이지로 이동합니다', 3000);
           router.push('/signin');
           return;
         }
       }
     };
     fetchProfile();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);
 
   // 하트 아이콘 클릭 시 북마크 토글 함수
@@ -174,7 +185,7 @@ export default function RecipeRecommend() {
 
     setIsLoading(true);
     if (!useCookieAuth && !token) {
-      console.error('인증 토큰이 없어 북마크를 변경할 수 없습니다.');
+      showToast('인증 토큰이 없어 북마크를 변경할 수 없습니다', 3000);
       router.push('/signin');
       setIsLoading(false);
       return;
@@ -199,10 +210,10 @@ export default function RecipeRecommend() {
         showToast('레시피가 저장되었어요!');
       }
     } catch (error: unknown) {
-      console.error('북마크 토글 실패:', error);
+      showToast('북마크 토글 실패', 3000);
       // 인증 오류인 경우 로그인 페이지로 리다이렉트
       if (axios.isAxiosError(error) && error.response?.status === 401) {
-        console.info('🔒 인증 오류, 로그인 페이지로 이동');
+        showToast('인증 오류, 로그인 페이지로 이동합니다', 3000);
         router.push('/signin');
         return;
       }
