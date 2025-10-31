@@ -13,7 +13,6 @@ interface AllergyRootProps {
   scrollConfig?: {
     containerRef?: RefObject<HTMLElement>;
     navigationOffset?: number;
-    scrollSpyOffset?: number;
     useWindowScroll?: boolean;
   };
 }
@@ -30,7 +29,6 @@ interface AllergyRootProps {
  * @param scrollConfig - 스크롤 설정
  *   - containerRef: 스크롤 컨테이너 ref (드로어용)
  *   - navigationOffset: 네비게이션 오프셋
- *   - scrollSpyOffset: ScrollSpy 오프셋
  *   - useWindowScroll: 윈도우 스크롤 사용 여부
  */
 export default function AllergyRoot({
