@@ -49,16 +49,16 @@
   background: #212529;
 }
 
-/* 사파리 모바일 하단 바 대응 */
+/* 사파리 모바일 하단 바 대응 + 고정 헤더(56px) 보정 */
 @supports (height: 100dvh) {
   .recipe-recommend-main {
-    height: 100dvh;
+    min-height: calc(100dvh - 56px);
   }
 }
 
 @supports not (height: 100dvh) {
   .recipe-recommend-main {
-    height: 100vh;
+    min-height: calc(100vh - 56px);
   }
 }
 

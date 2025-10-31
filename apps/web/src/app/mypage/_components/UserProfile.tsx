@@ -8,9 +8,13 @@ import type { User } from '@/types/MyPage.types';
 
 interface UserProfileProps {
   user: User | null;
+  showSettingsButton?: boolean;
 }
 
-export default function UserProfile({ user }: UserProfileProps) {
+export default function UserProfile({
+  showSettingsButton = true,
+  user,
+}: UserProfileProps) {
   const router = useRouter();
 
   const handleNavigateToSettings = () => {
@@ -35,16 +39,18 @@ export default function UserProfile({ user }: UserProfileProps) {
           </span>
           <span className="text-16 truncate text-[#999999]">{user.email}</span>
         </div>
-        <Button
-          variant="default"
-          size="sm"
-          shape="square"
-          className="gap-1 bg-gray-100 px-2 py-[0.1875rem] active:bg-[#E9ECEF]"
-          onClick={handleNavigateToSettings}
-        >
-          <SettingsIcon size={18} />
-          <span className="text-14sb text-gray-600">설정</span>
-        </Button>
+        {showSettingsButton && (
+          <Button
+            variant="default"
+            size="sm"
+            shape="square"
+            className="gap-1 bg-gray-100 px-2 py-[0.1875rem] active:bg-[#E9ECEF]"
+            onClick={handleNavigateToSettings}
+          >
+            <SettingsIcon size={18} />
+            <span className="text-14sb text-gray-600">설정</span>
+          </Button>
+        )}
       </div>
     </div>
   );

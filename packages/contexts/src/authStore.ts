@@ -8,6 +8,7 @@ interface AuthState {
   token: string | null;
   refreshToken: string | null;
   loading: boolean;
+  refreshIntervalId: NodeJS.Timeout | null;
 
   setUser: (user: UserInfo | null) => void;
   setToken: (token: string | null) => void;
@@ -18,6 +19,8 @@ interface AuthState {
   logout: () => void;
   verifyAndRefreshToken: () => Promise<boolean>;
   initializeAuth: () => Promise<void>;
+  startAutoRefresh: () => void;
+  stopAutoRefresh: () => void;
 }
 
 const isProduction = () =>
@@ -37,16 +40,78 @@ export const useAuthStore = create<AuthState>()(
         });
       };
 
+      // axios 인터셉터에서 토큰 갱신 시 zustand store 동기화
+      if (typeof window !== 'undefined') {
+        window.addEventListener('auth-token-updated', ((event: CustomEvent) => {
+          const { token, refreshToken } = event.detail;
+          set({ token, refreshToken });
+        }) as EventListener);
+      }
+
       return {
         user: null,
         token: null,
         refreshToken: null,
         loading: true,
+        refreshIntervalId: null,
 
         setUser: (user: UserInfo | null) => set({ user }),
         setToken: (token: string | null) => set({ token }),
         setRefreshToken: (refreshToken: string | null) => set({ refreshToken }),
         setLoading: (loading: boolean) => set({ loading }),
+
+        // 자동 토큰 갱신 시작 (50분마다 갱신 - 토큰 만료 전에 미리 갱신)
+        startAutoRefresh: () => {
+          const { refreshIntervalId } = get();
+
+          // 이미 실행 중이면 중복 실행 방지
+          if (refreshIntervalId) {
+            return;
+          }
+
+          // 50분(3000초)마다 토큰 갱신 (토큰 유효기간은 보통 1시간)
+          // 토큰 만료 전에 미리 갱신하여 사용자가 로그인 상태를 유지할 수 있도록 함
+          const intervalId = setInterval(
+            async () => {
+              const { refreshToken } = get();
+
+              if (!refreshToken) {
+                return;
+              }
+
+              try {
+                console.log('[Auth] 자동 토큰 갱신 시도...');
+                const tokenResponse =
+                  await authService.refreshToken(refreshToken);
+
+                if (tokenResponse.accessToken && tokenResponse.refreshToken) {
+                  console.log('[Auth] 토큰 자동 갱신 성공');
+                  set({
+                    token: tokenResponse.accessToken,
+                    refreshToken: tokenResponse.refreshToken,
+                  });
+                }
+              } catch (error) {
+                console.error('[Auth] 토큰 자동 갱신 실패:', error);
+                // 갱신 실패 시 로그아웃하지 않고 다음 갱신 시도를 기다림
+                // 완전히 실패한 경우는 axios 인터셉터가 로그아웃 처리
+              }
+            },
+            50 * 60 * 1000
+          ); // 50분
+
+          set({ refreshIntervalId: intervalId });
+        },
+
+        // 자동 토큰 갱신 중지
+        stopAutoRefresh: () => {
+          const { refreshIntervalId } = get();
+
+          if (refreshIntervalId) {
+            clearInterval(refreshIntervalId);
+            set({ refreshIntervalId: null });
+          }
+        },
 
         verifyAndRefreshToken: async () => {
           const { token } = get();
@@ -79,12 +144,16 @@ export const useAuthStore = create<AuthState>()(
 
           if (user) {
             set({ loading: false });
+            // 토큰이 있고 유저 정보가 있으면 자동 갱신 시작
+            get().startAutoRefresh();
             return;
           }
 
           try {
             const userInfo = await authService.getUserInfo();
             set({ user: userInfo });
+            // 유저 정보를 성공적으로 가져온 경우 자동 갱신 시작
+            get().startAutoRefresh();
           } catch (error) {
             console.error('Failed to fetch user info:', error);
           }
@@ -96,6 +165,8 @@ export const useAuthStore = create<AuthState>()(
           try {
             if (!isProduction()) {
               await handleDebugLogin();
+              // 디버그 로그인 성공 시 자동 갱신 시작
+              get().startAutoRefresh();
               return;
             }
 
@@ -110,6 +181,8 @@ export const useAuthStore = create<AuthState>()(
           try {
             if (!isProduction()) {
               await handleDebugLogin();
+              // 디버그 로그인 성공 시 자동 갱신 시작
+              get().startAutoRefresh();
               return;
             }
 
@@ -121,6 +194,8 @@ export const useAuthStore = create<AuthState>()(
         },
 
         logout: () => {
+          // 로그아웃 시 자동 갱신 중지
+          get().stopAutoRefresh();
           set({ user: null, token: null, refreshToken: null });
         },
       };
