@@ -3,6 +3,8 @@
 import React, { useEffect, useRef } from 'react';
 import { allergy } from '@recipot/api';
 
+import { useApiErrorModalStore } from '@/stores/apiErrorModalStore';
+
 import { Allergy, useAllergyContext } from '@/components/Allergy';
 import type { AllergyFormSchema } from '@/components/Allergy/constants/constants';
 import { CloseIcon } from '@/components/Icons';
@@ -120,7 +122,9 @@ function DietaryRestrictionsContent({
       onClose();
     } catch (error) {
       console.error('못 먹는 음식 설정에 실패했습니다: ', error);
-      alert('못 먹는 음식 설정에 실패했습니다. 잠시 후 다시 시도해주세요.');
+      useApiErrorModalStore.getState().showError({
+        message: '못 먹는 음식 설정에 실패했습니다.\n잠시 후 다시 시도해주세요.',
+      });
     }
   };
 

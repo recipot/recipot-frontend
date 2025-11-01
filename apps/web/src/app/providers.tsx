@@ -1,13 +1,18 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { setApiErrorHandler } from '@recipot/api';
 import { AuthProvider, MswProvider } from '@recipot/contexts';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
+import { ApiErrorModal } from '@/components/common/ApiErrorModal';
 import { SplashScreen } from '@/components/common/SplashScreen';
 import { SplashProvider } from '@/contexts/SplashContext';
+import { useApiErrorModalStore } from '@/stores/apiErrorModalStore';
 
 import type { ReactNode } from 'react';
+
+const FATAL_STATUS_CODES = new Set<number>([401]);
 
 export default function Providers({ children }: { children: ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
@@ -38,6 +43,74 @@ export default function Providers({ children }: { children: ReactNode }) {
     }
   }, [shouldUseMSW]);
 
+  useEffect(() => {
+    const handleApiError = (error: unknown) => {
+      const { showError } = useApiErrorModalStore.getState();
+
+      if (
+        typeof error === 'object' &&
+        error !== null &&
+        'code' in error &&
+        (error as { code?: string }).code === 'ERR_CANCELED'
+      ) {
+        return;
+      }
+
+      const axiosError = error as {
+        code?: string | number;
+        message?: string;
+        response?: {
+          status?: number;
+          data?: {
+            code?: string | number;
+            errorCode?: string | number;
+            message?: string;
+            errorMessage?: string;
+          };
+        };
+      };
+
+      const responseData = axiosError.response?.data;
+      const status = axiosError.response?.status;
+
+      const errorCode =
+        responseData?.code ??
+        responseData?.errorCode ??
+        axiosError.code ??
+        null;
+
+      const errorMessage =
+        responseData?.message ??
+        responseData?.errorMessage ??
+        axiosError.message;
+
+      const normalizedErrorCode =
+        typeof errorCode === 'number'
+          ? errorCode
+          : typeof errorCode === 'string'
+            ? Number.parseInt(errorCode, 10)
+            : null;
+
+      const isFatal =
+        (status != null && FATAL_STATUS_CODES.has(status)) ||
+        (normalizedErrorCode != null &&
+          !Number.isNaN(normalizedErrorCode) &&
+          FATAL_STATUS_CODES.has(normalizedErrorCode));
+
+      showError({
+        code: errorCode ?? undefined,
+        message: errorMessage,
+        isFatal,
+      });
+    };
+
+    setApiErrorHandler(handleApiError);
+
+    return () => {
+      setApiErrorHandler(null);
+    };
+  }, []);
+
   // MSW가 준비되지 않았으면 로딩 표시
   if (!mswReady) {
     return (
@@ -57,6 +130,7 @@ export default function Providers({ children }: { children: ReactNode }) {
         <MswProvider mswReady={mswReady}>
           <AuthProvider>{children}</AuthProvider>
         </MswProvider>
+        <ApiErrorModal />
         {/* {isDevelopment ? <ReactQueryDevtools initialIsOpen={false} /> : null} */}
       </QueryClientProvider>
     </SplashProvider>

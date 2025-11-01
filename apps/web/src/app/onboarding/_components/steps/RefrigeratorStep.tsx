@@ -6,8 +6,10 @@ import { useAuth } from '@recipot/contexts';
 import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/common/Button';
+import LoadingPage from '@/components/common/Loading/LoadingPage';
 import { IngredientsSearch } from '@/components/IngredientsSearch';
 import { useAllergiesStore } from '@/stores/allergiesStore';
+import { useApiErrorModalStore } from '@/stores/apiErrorModalStore';
 import { useMoodStore } from '@/stores/moodStore';
 import { useOnboardingStore } from '@/stores/onboardingStore';
 import { useSelectedFoodsStore } from '@/stores/selectedFoodsStore';
@@ -19,6 +21,8 @@ import {
   moodToConditionId,
   onboardingStyles,
 } from '../../_utils';
+
+const MIN_LOADING_DURATION_MS = 1000;
 
 export default function RefrigeratorStep() {
   const { setUser, user } = useAuth();
@@ -35,6 +39,7 @@ export default function RefrigeratorStep() {
 
   const [selectedCount, setSelectedCount] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const displayName = user?.nickname ?? '회원님';
 
   // 새로고침 버튼을 눌렀을 때만 선택된 재료들 초기화
   useEffect(() => {
@@ -67,9 +72,9 @@ export default function RefrigeratorStep() {
   };
 
   const handleComplete = async () => {
+    setIsSubmitting(true);
+    const loadingStart = Date.now();
     try {
-      setIsSubmitting(true);
-
       // 1. 모든 온보딩 데이터 수집 (각 도메인 스토어에서)
       const { allergies } = useAllergiesStore.getState();
       const { mood } = useMoodStore.getState();
@@ -139,10 +144,16 @@ export default function RefrigeratorStep() {
         error instanceof Error
           ? error.message
           : '알 수 없는 오류가 발생했습니다.';
-      alert(
-        `온보딩 완료 중 오류가 발생했습니다.\n\n${errorMessage}\n\n다시 시도해주세요.`
-      );
+      useApiErrorModalStore.getState().showError({
+        message: `온보딩 완료 중 오류가 발생했습니다.\n\n${errorMessage}\n다시 시도해주세요.`,
+      });
     } finally {
+      const elapsed = Date.now() - loadingStart;
+      if (elapsed < MIN_LOADING_DURATION_MS) {
+        await new Promise(resolve =>
+          setTimeout(resolve, MIN_LOADING_DURATION_MS - elapsed)
+        );
+      }
       setIsSubmitting(false);
     }
   };
@@ -150,6 +161,20 @@ export default function RefrigeratorStep() {
   const handleSelectionChange = (count: number) => {
     setSelectedCount(count);
   };
+
+  if (isSubmitting) {
+    return (
+      <div className="fixed top-0 left-0 z-50 h-full w-full">
+        <LoadingPage>
+          {displayName}님의
+          <br />
+          지금 바로 해먹을 수 있는 요리를
+          <br />
+          찾고 있어요
+        </LoadingPage>
+      </div>
+    );
+  }
 
   return (
     <>
