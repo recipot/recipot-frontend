@@ -1,10 +1,10 @@
 import { Button } from '@/components/common/Button';
-import { GoogleIcon, KakaoIcon } from '@/components/Icons';
+import { KakaoIcon } from '@/components/Icons';
 import type { ProfileSectionProps } from '@/types/MyPage.types';
 
 export default function SnsLinkageSection({ user }: ProfileSectionProps) {
   const isKakaoLinked = user.platform === 'kakao';
-  const isGoogleLinked = user.platform === 'google';
+  // const isGoogleLinked = user.platform === 'google';
 
   return (
     <section className="py-6">
@@ -25,7 +25,8 @@ export default function SnsLinkageSection({ user }: ProfileSectionProps) {
               color={isKakaoLinked ? '#9CA3AF' : '#000000'}
             />
           </Button>
-          <Button
+          {/* FIXME - Google 로그인 기능 추가 필요 */}
+          {/* <Button
             size="icon-xl"
             shape="round"
             variant="outline"
@@ -37,7 +38,7 @@ export default function SnsLinkageSection({ user }: ProfileSectionProps) {
                 isGoogleLinked ? 'border-none opacity-50 grayscale' : ''
               }
             />
-          </Button>
+          </Button> */}
         </div>
       </div>
     </section>

@@ -1,11 +1,11 @@
 import { useMemo } from 'react';
 
 import { Button } from '@/components/common/Button/Button';
-import { GoogleIcon, KakaoIcon } from '@/components/Icons';
+import { KakaoIcon } from '@/components/Icons';
 
 export function AuthButtons({
   activeIndex,
-  googleLogin,
+  // googleLogin,
   kakaoLogin,
 }: {
   activeIndex: number;
@@ -23,7 +23,7 @@ export function AuthButtons({
 
   return (
     <div
-      className="fixed bottom-0 left-1/2 z-50 flex w-full -translate-x-1/2 flex-col items-center gap-3 px-6 pt-[36px] pb-[calc(10px+env(safe-area-inset-bottom))]"
+      className="fixed bottom-7 left-1/2 z-50 flex w-full -translate-x-1/2 flex-col items-center gap-3 px-6 pt-[36px] pb-[calc(10px+env(safe-area-inset-bottom))]"
       style={containerStyle}
     >
       <Button
@@ -35,7 +35,8 @@ export function AuthButtons({
         <KakaoIcon size={28} />
         카카오로 시작하기
       </Button>
-      <Button
+      {/* FIXME - Google 로그인 기능 추가 필요 */}
+      {/* <Button
         size="full"
         shape="round"
         variant="outline"
@@ -44,7 +45,7 @@ export function AuthButtons({
       >
         <GoogleIcon />
         Google로 시작하기
-      </Button>
+      </Button> */}
     </div>
   );
 }
