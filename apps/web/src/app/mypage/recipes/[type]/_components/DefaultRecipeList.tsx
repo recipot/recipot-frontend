@@ -16,6 +16,7 @@ export default function DefaultRecipeList({
   const { scrollRef, showGradient } = useScrollGradient([recipes]);
   const router = useRouter();
   const isSavedRecipeList = type === 'saved';
+  const noneRecipeText = type === 'saved' ? '보관한' : '최근 본';
 
   if (recipes.length === 0) {
     return (
@@ -32,7 +33,10 @@ export default function DefaultRecipeList({
           <div className="flex h-full flex-col items-center justify-center gap-6">
             <div className="text-center">
               <p className="text-22sb text-gray-900">
-                앗, 냉장고가 텅 비었어요!
+                아직 {noneRecipeText} 레시피가 없어요
+              </p>
+              <p className="text-22sb text-gray-900">
+                지금부터 하나씩 채워볼까요?
               </p>
             </div>
 
@@ -54,7 +58,7 @@ export default function DefaultRecipeList({
                 router.push('/recipeRecommend');
               }}
             >
-              레시피 추천 받으러 가기
+              레시피 채우러 갈게요
             </Button>
           </div>
         </div>
