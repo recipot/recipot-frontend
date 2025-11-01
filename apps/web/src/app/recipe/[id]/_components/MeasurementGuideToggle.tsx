@@ -19,7 +19,7 @@ export function MeasurementGuideToggle({
       role="button"
       tabIndex={0}
     >
-      <div className="text-15sb text-gray-600">계량가이드</div>
+      <div className="text-15sb text-gray-900">계량 가이드</div>
       <ArrowIcon
         size={20}
         className={`transition-transform duration-200 ${isOpen ? 'rotate-90' : 'rotate-0'}`}

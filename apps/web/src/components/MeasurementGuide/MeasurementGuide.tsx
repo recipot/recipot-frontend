@@ -22,7 +22,7 @@ interface MeasurementGuideProps {
 }
 
 export function MeasurementGuide({ initialActiveTab }: MeasurementGuideProps) {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<string | null>(() => {
     if (initialActiveTab) {
       const isValidTab = MEASUREMENT_TABS.some(
