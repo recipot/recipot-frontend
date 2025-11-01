@@ -65,7 +65,12 @@ export default function RecipeListPage({ type }: { type: PageType }) {
   const recentRecipes = recentRecipesData?.items ?? mockDefaultRecipes;
 
   const queryClient = useQueryClient();
-  const key = type === 'saved' ? 'stored-recipes' : 'recent-recipes';
+  const key =
+    type === 'saved'
+      ? 'stored-recipes'
+      : type === 'recent'
+        ? 'recent-recipes'
+        : 'completed-recipes';
   const defaultRecipe = type === 'saved' ? storedRecipes : recentRecipes;
   const handleToggleSave = () => {
     queryClient.invalidateQueries({

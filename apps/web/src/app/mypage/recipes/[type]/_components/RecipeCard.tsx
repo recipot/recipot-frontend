@@ -16,12 +16,14 @@ interface RecipeCardProps {
   onToggleSave?: () => void;
 }
 
+type ModalType = 'save' | 'unsave' | null;
+
 export default function RecipeCard({
   isSavedRecipe = false,
   onToggleSave,
   recipe,
 }: RecipeCardProps) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalType, setModalType] = useState<ModalType>(null);
   const { isPending: isDeleting, mutate: deleteRecipe } =
     useDeleteStoredRecipe();
   const { isPending: isSaving, mutate: saveRecipe } = usePostStoredRecipe();
@@ -31,28 +33,48 @@ export default function RecipeCard({
 
   const handleHeartClick = () => {
     if (isBookmarked) {
-      // 북마크 해제
-      setIsModalOpen(true);
+      // 북마크 해제 모달
+      setModalType('unsave');
     } else {
-      // 북마크 등록
-      saveRecipe(recipe.recipeId, {
-        onSuccess: () => {
-          onToggleSave?.();
-        },
-      });
+      // 북마크 등록 모달
+      setModalType('save');
     }
+  };
+
+  const handleConfirmSave = () => {
+    saveRecipe(recipe.recipeId, {
+      onSuccess: () => {
+        setModalType(null);
+        onToggleSave?.();
+      },
+    });
   };
 
   const handleConfirmUnsave = () => {
     deleteRecipe(recipe.recipeId, {
       onSuccess: () => {
-        setIsModalOpen(false);
+        setModalType(null);
         onToggleSave?.();
       },
     });
   };
 
   const isPending = isDeleting || isSaving;
+
+  const modalConfig = {
+    save: {
+      confirmText: '보관하기',
+      description: '레시피를 보관하시겠어요?',
+      onConfirm: handleConfirmSave,
+    },
+    unsave: {
+      confirmText: '삭제하기',
+      description: '보관한 레시피에서 삭제하시겠어요?',
+      onConfirm: handleConfirmUnsave,
+    },
+  };
+
+  const currentModalConfig = modalType ? modalConfig[modalType] : null;
 
   return (
     <>
@@ -90,31 +112,35 @@ export default function RecipeCard({
         </button>
       </div>
 
-      <Modal
-        open={isModalOpen}
-        onOpenChange={setIsModalOpen}
-        description="보관한 레시피에서 삭제하시겠어요?"
-        contentGap={24}
-      >
-        <div className="flex items-center justify-end gap-[0.375rem]">
-          <Button
-            className="text-14 h-[2.125rem] border border-[#747474] bg-white px-[0.9375rem] py-3 text-black disabled:opacity-50"
-            shape="square"
-            onClick={handleConfirmUnsave}
-            disabled={isPending}
-          >
-            {isDeleting ? '처리중...' : '해제하기'}
-          </Button>
-          <Button
-            className="text-14b h-[2.125rem] bg-[#747474] px-4 py-3 text-white disabled:opacity-50"
-            shape="square"
-            onClick={() => setIsModalOpen(false)}
-            disabled={isPending}
-          >
-            닫기
-          </Button>
-        </div>
-      </Modal>
+      {currentModalConfig && (
+        <Modal
+          open={modalType !== null}
+          onOpenChange={open => !open && setModalType(null)}
+          description={currentModalConfig.description}
+          contentGap={24}
+        >
+          <div className="flex justify-center space-x-2">
+            <Button
+              variant="outline"
+              size="full"
+              onClick={() => setModalType(null)}
+              disabled={isPending}
+              className="text-15sb h-10 py-[0.5313rem]"
+            >
+              취소
+            </Button>
+            <Button
+              variant="default"
+              size="full"
+              onClick={currentModalConfig.onConfirm}
+              disabled={isPending}
+              className="text-15sb h-10 py-[0.5313rem]"
+            >
+              {isPending ? '처리중...' : currentModalConfig.confirmText}
+            </Button>
+          </div>
+        </Modal>
+      )}
     </>
   );
 }
