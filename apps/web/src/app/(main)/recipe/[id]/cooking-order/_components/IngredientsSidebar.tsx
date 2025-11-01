@@ -24,8 +24,8 @@ export function IngredientsSidebar({
 }: IngredientsSidebarProps) {
   return (
     <SidebarProvider open={isOpen} onOpenChange={onClose}>
-      <Sidebar side="right">
-        <SidebarHeader className="mt-[4.5rem] px-6">
+      <Sidebar side="right" className="flex flex-col">
+        <SidebarHeader className="mt-4 flex-shrink-0 px-6">
           <div className="mb-3 flex items-center justify-between">
             <p className="text-18sb text-gray-900">재료</p>
             <div className="flex items-center space-x-2">
@@ -33,7 +33,7 @@ export function IngredientsSidebar({
             </div>
           </div>
         </SidebarHeader>
-        <SidebarContent className="px-6">
+        <SidebarContent className="min-h-0 flex-1 px-6">
           {/* 보유 재료 */}
           <div className="mb-6">
             <IngredientsList

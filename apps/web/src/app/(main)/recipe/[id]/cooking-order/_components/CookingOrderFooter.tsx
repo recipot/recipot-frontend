@@ -21,7 +21,7 @@ export default function CookingOrderFooter({
   const buttonTextClassName = 'text-17sb';
   const buttonLayoutClassName = 'flex-1 rounded-[100px] px-8 py-[15px]';
   return (
-    <div className="fixed bottom-0 left-1/2 w-full max-w-sm -translate-x-1/2 transform bg-[#FFFFFF]/50">
+    <div className="fixed bottom-0 left-1/2 w-full -translate-x-1/2 transform bg-[#FFFFFF]/50">
       <div className="bg-white/50 px-4 py-4 backdrop-blur-sm">
         {isLastStep ? (
           <Button

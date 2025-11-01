@@ -109,7 +109,7 @@ export default function CookingOrderPresenter({
   }
 
   return (
-    <div className="mx-auto min-h-screen max-w-sm bg-white">
+    <div className="mx-auto min-h-screen bg-white">
       <CookingOrderHeader
         recipe={recipe}
         onBack={handleBack}
