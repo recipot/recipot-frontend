@@ -1,7 +1,7 @@
 import { memo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 
-import type { Recipe } from '@/types/recipe.types';
+import type { Recipe } from '@/app/recipe/[id]/types/recipe.types';
 
 import { CARD_STYLES, GRADIENT_OVERLAY_STYLE } from './constants';
 import { RecipeActions } from './RecipeActions';

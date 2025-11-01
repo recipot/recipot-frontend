@@ -1,6 +1,9 @@
 import React from 'react';
 
-import type { RecipeIngredient, RecipeIngredients } from '@/types/recipe.types';
+import type {
+  RecipeIngredient,
+  RecipeIngredients,
+} from '@/app/recipe/[id]/types/recipe.types';
 
 // 레시피 상세 페이지의 IngredientsGroup 타입과 호환성을 위한 타입
 type IngredientsGroupType = {

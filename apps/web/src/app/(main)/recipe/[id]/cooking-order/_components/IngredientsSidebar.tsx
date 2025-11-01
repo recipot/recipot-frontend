@@ -1,5 +1,6 @@
 'use client';
 
+import type { Recipe } from '@/app/recipe/[id]/types/recipe.types';
 import { IngredientsList } from '@/components/common/IngredientsList';
 import { SeasoningsList } from '@/components/common/SeasoningsList';
 import { MeasurementGuide } from '@/components/MeasurementGuide';
@@ -9,7 +10,6 @@ import {
   SidebarHeader,
   SidebarProvider,
 } from '@/components/ui/sidebar';
-import type { Recipe } from '@/types/recipe.types';
 
 interface IngredientsSidebarProps {
   isOpen: boolean;
