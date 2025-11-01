@@ -170,10 +170,11 @@ export default function Home() {
           {/* Title */}
           <div className={onboardingStyles.stepHeader.wrapper}>
             <h2 className={onboardingStyles.stepHeader.title}>
-              요리할 여유가 얼마나있나요?
+              지금 요리에 에너지를 <br />
+              얼마나 쓰고 싶으신가요?
             </h2>
             <p className={onboardingStyles.stepHeader.description}>
-              상태와 재료 딱 두가지만 알려주세요!
+              에너지에 딱 맞는 요리를 찾아드릴게요
             </p>
           </div>
 
@@ -224,15 +225,18 @@ export default function Home() {
               <div className="h-full w-full pt-14">
                 <div className={onboardingStyles.stepHeader.wrapper}>
                   <h2 className={onboardingStyles.stepHeader.title}>
-                    현재 냉장고에 어떤 재료를 <br />
+                    냉장고에는 어떤 재료를 <br />
                     가지고 계신가요?
                   </h2>
                   <p className={onboardingStyles.stepHeader.description}>
-                    두 가지만 골라도 요리를 찾아드려요
+                    두가지만 골라도 요리를 추천해드릴게요
                   </p>
                 </div>
 
-                <IngredientsSearch onSelectionChange={handleSelectionChange} />
+                <IngredientsSearch
+                  variant="main"
+                  onSelectionChange={handleSelectionChange}
+                />
 
                 <div className="fixed right-0 bottom-0 left-0 flex justify-center px-6 py-[10px]">
                   <Button
@@ -241,7 +245,7 @@ export default function Home() {
                       selectedCount < MIN_SELECTED_FOODS || isSubmitting
                     }
                   >
-                    {isSubmitting ? '제출 중...' : '여유에 맞는 요리 추천받기'}
+                    {isSubmitting ? '제출 중...' : '레시피 추천받을게요'}
                   </Button>
                 </div>
               </div>
