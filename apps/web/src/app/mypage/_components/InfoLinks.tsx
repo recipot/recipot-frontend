@@ -3,8 +3,7 @@ import Link from 'next/link';
 import { ArrowIcon } from '@/components/Icons';
 
 const links = [
-  { href: '/mypage/faq', label: '자주묻는 질문' },
-  { href: '/mypage/feedback', label: '앱 피드백 남기기' },
+  { href: 'https://slashpage.com/hankki/qpv5x427xr9e1mkyn3dw', label: 'FAQ' },
   {
     href: 'https://www.notion.so/21c4ef560994809ba1f7e0ac853f0b24?source=copy_link',
     label: '이용약관',

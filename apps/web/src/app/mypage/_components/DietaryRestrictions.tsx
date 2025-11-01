@@ -57,7 +57,9 @@ export default function DietaryRestrictions({
           onClick={onOpenSheet}
         >
           <AddIcon size={18} />
-          <p className="text-16 text-gray-600">못먹는 음식이 있나요?</p>
+          <p className="text-16 text-gray-600">
+            어떤 재료를 추천에서 빼드릴까요?
+          </p>
         </Button>
       )}
     </div>

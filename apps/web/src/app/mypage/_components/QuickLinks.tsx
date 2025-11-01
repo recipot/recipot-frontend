@@ -14,7 +14,7 @@ const QUICK_LINKS_DATA = [
     href: '/mypage/recipes/saved',
     Icon: MyFileIcon,
     paddingX: 'px-[1.8125rem]',
-    text: '보관한 레시피',
+    text: '내가 찜한 레시피',
   },
   {
     colors: {
