@@ -28,8 +28,9 @@ const IngredientsSearch = forwardRef<
   IngredientsSearchRef,
   {
     onSelectionChange?: (count: number) => void;
+    variant?: 'onboarding' | 'main';
   }
->(({ onSelectionChange }, ref) => {
+>(({ onSelectionChange, variant = 'onboarding' }, ref) => {
   const [value, setValue] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -159,7 +160,11 @@ const IngredientsSearch = forwardRef<
       <div>
         {selectedFoodIds.length !== 0 && (
           <div className="mt-5 mb-3 flex items-center justify-between">
-            <h3 className="text-15sb text-gray-600">내가 선택한 재료</h3>
+            <h3 className="text-15sb text-gray-600">
+              {variant === 'onboarding'
+                ? '내가 선택한 재료'
+                : '지금 내 냉장고에는..'}
+            </h3>
             <Button onClick={() => clearAllFoods()} variant="outline" size="sm">
               전체 삭제
             </Button>

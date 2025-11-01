@@ -1,5 +1,7 @@
 'use client';
 
+import { Element } from 'react-scroll';
+
 import CheckboxIcon from '@/components/common/CheckboxIcon';
 import type { AllergyCategory } from '@/types/allergy.types';
 
@@ -53,36 +55,36 @@ export default function AllergyCheckPresenter({
       {categories.map((category, index) => {
         const categoryItemIds = category.items.map(item => item.id);
         const isFullySelected = isCategoryFullySelected(category);
+        const sectionId = `allergy-section-${index}`;
 
         return (
-          <fieldset key={category.title} className="space-y-4">
-            <div className="flex items-center justify-between">
-              <legend
-                id={`allergy-section-${index}`}
-                className="scroll-mt-20 text-xl font-semibold text-gray-900"
-              >
-                {category.title}
-              </legend>
-              {onCategoryToggle && (
-                <button
-                  type="button"
-                  className="flex cursor-pointer items-center gap-2"
-                  onClick={() => onCategoryToggle(categoryItemIds)}
-                  aria-label="전체선택"
-                >
-                  <CheckboxIcon isSelected={isFullySelected} />
-                  <span className="text-15 text-gray-700">전체선택</span>
-                </button>
-              )}
-            </div>
-            <AllergyCheckItem
-              groupLabel={category.title}
-              items={category.items}
-              selectedItems={selectedItems}
-              useFieldset={false}
-              onItemToggle={onItemToggle}
-            />
-          </fieldset>
+          <Element key={category.title} name={sectionId} id={sectionId}>
+            <fieldset className="space-y-4">
+              <div className="flex items-center justify-between">
+                <legend className="text-xl font-semibold text-gray-900">
+                  {category.title}
+                </legend>
+                {onCategoryToggle && (
+                  <button
+                    type="button"
+                    className="flex cursor-pointer items-center gap-2"
+                    onClick={() => onCategoryToggle(categoryItemIds)}
+                    aria-label="전체선택"
+                  >
+                    <CheckboxIcon isSelected={isFullySelected} />
+                    <span className="text-15 text-gray-700">전체선택</span>
+                  </button>
+                )}
+              </div>
+              <AllergyCheckItem
+                groupLabel={category.title}
+                items={category.items}
+                selectedItems={selectedItems}
+                useFieldset={false}
+                onItemToggle={onItemToggle}
+              />
+            </fieldset>
+          </Element>
         );
       })}
     </form>

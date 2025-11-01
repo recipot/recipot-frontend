@@ -23,13 +23,16 @@ import type { StaticImageData } from 'next/image';
 
 /**
  * 완료한 레시피 개수에 따른 레벨 계산
+ * 레벨 0: 0~2개 (기본 이미지)
+ * 레벨 1: 3~6개
+ * 레벨 2: 7~15개
+ * 레벨 3: 16개 이상
  */
 export const calculateLevel = (completedRecipesCount: number): number => {
   if (completedRecipesCount >= 16) return 3;
-  if (completedRecipesCount >= 7 && completedRecipesCount < 16) return 3;
-  if (completedRecipesCount >= 3 && completedRecipesCount < 7) return 2;
-  if (completedRecipesCount >= 1 && completedRecipesCount < 3) return 1;
-  return 0;
+  if (completedRecipesCount >= 7) return 2;
+  if (completedRecipesCount >= 3) return 1;
+  return 0; // 0~2개는 레벨 0 (기본 이미지)
 };
 
 /**
