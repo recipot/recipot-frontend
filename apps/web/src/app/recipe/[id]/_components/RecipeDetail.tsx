@@ -135,7 +135,7 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
             onClick={handleCookingOrder}
           >
             <CookIcon className="mr-[6px] h-6 w-6" color="#ffffff" />
-            <p className="text-17sb text-white">요리하러 가기</p>
+            <p className="text-17sb text-white">단계별로 요리 시작하기</p>
           </Button>
         </div>
       </div>
