@@ -28,7 +28,11 @@ export const recipe = {
   },
 
   startCooking: async (recipeId: string | number) => {
-    await recipeAPI.post(`/v1/users/recipes/${recipeId}/start`, { recipeId });
+    const response = await recipeAPI.post(
+      `/v1/users/recipes/${recipeId}/start`,
+      { recipeId }
+    );
+    return response.data?.data?.completedRecipeId;
   },
 
   completeCooking: async (recipeId: string | number) => {
