@@ -2,8 +2,7 @@
 
 import type { Recipe } from '@/app/recipe/[id]/types/recipe.types';
 import { IngredientsList } from '@/components/common/IngredientsList';
-import { SeasoningsList } from '@/components/common/SeasoningsList';
-import { MeasurementGuide } from '@/components/MeasurementGuide';
+import { SeasoningsSection } from '@/components/common/SeasoningsSection';
 import {
   Sidebar,
   SidebarContent,
@@ -43,21 +42,11 @@ export function IngredientsSidebar({
           </div>
 
           {/* 양념류 */}
-          <div className="mb-6">
-            <div className="mb-3">
-              <span className="text-14sb text-gray-900">양념류</span>
-            </div>
-            <SeasoningsList
-              seasonings={recipe?.seasonings ?? []}
-              variant="sidebar"
-              showIcon={false}
-            />
-
-            {/* 계량 가이드 */}
-            <div className="mt-5">
-              <MeasurementGuide />
-            </div>
-          </div>
+          <SeasoningsSection
+            seasonings={recipe?.seasonings ?? []}
+            variant="sidebar"
+            showIcon={false}
+          />
         </SidebarContent>
       </Sidebar>
     </SidebarProvider>
