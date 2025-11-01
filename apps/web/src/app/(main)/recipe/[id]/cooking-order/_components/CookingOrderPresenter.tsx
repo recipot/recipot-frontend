@@ -1,16 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { recipe as recipeService } from '@recipot/api';
-import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { tokenUtils } from 'packages/api/src/auth';
 
-import { COMPLETED_RECIPES_QUERY_KEY } from '@/hooks/useCompletedRecipes';
+import { useCompleteCooking } from '@/hooks/useCompleteCooking';
 import { useCookingOrder } from '@/hooks/useCookingOrder';
+import { useCookingOrderNavigation } from '@/hooks/useCookingOrderNavigation';
 import { isProduction } from '@/lib/env';
 
-import { useCookingOrderNavigation } from '../../../../../../hooks/useCookingOrderNavigation';
 import CookingOrderContent from './CookingOrderContent';
 import CookingOrderFooter from './CookingOrderFooter';
 import CookingOrderHeader from './CookingOrderHeader';
@@ -27,9 +25,10 @@ interface CookingOrderPresenterProps {
 export default function CookingOrderPresenter({
   recipeId,
 }: CookingOrderPresenterProps) {
-  const { completeStep, error, isLoading, recipe } = useCookingOrder(recipeId);
+  const { completeStep, error, getCompletedRecipeId, isLoading, recipe } =
+    useCookingOrder(recipeId);
   const router = useRouter();
-  const queryClient = useQueryClient();
+  const completeCookingMutation = useCompleteCooking();
 
   const token = tokenUtils.getToken();
   const useCookieAuth = isProduction;
@@ -50,21 +49,19 @@ export default function CookingOrderPresenter({
   const closeModal = () => setActiveModal(null);
 
   const handleCookingComplete = async () => {
-    // await completeCooking();
     if (!useCookieAuth && !token) {
       router.push('/signin');
       return;
     }
 
-    await recipeService.completeCooking(recipeId);
+    const completedRecipeId = getCompletedRecipeId();
+    if (!completedRecipeId) {
+      console.error('completedRecipeId가 없습니다.');
+      return;
+    }
+
+    await completeCookingMutation.mutateAsync(completedRecipeId);
     completeStep(currentStep);
-
-    // 완료한 레시피 캐시 무효화 - 메인 페이지에서 최신 데이터 반영
-    queryClient.invalidateQueries({
-      queryKey: COMPLETED_RECIPES_QUERY_KEY,
-    });
-
-    const completedRecipeId = recipeId;
     router.push(`/review?completedRecipeId=${completedRecipeId}`);
   };
   const handleBack = () => {
