@@ -14,7 +14,7 @@ export interface Seasoning {
 export interface Cookware {
   id: number;
   name: string;
-  imageUrl: string;
+  imageUrl?: string;
 }
 
 export interface CookingStep {

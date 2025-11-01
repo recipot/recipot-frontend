@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import type { Recipe } from '@/types/recipe.types';
+import type { Recipe } from '@/app/recipe/[id]/types/recipe.types';
 
 export function useCookingOrderNavigation(recipe: Recipe | null) {
   const [currentStep, setCurrentStep] = useState(1);
