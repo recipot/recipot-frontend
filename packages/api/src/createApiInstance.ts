@@ -1,5 +1,13 @@
 import axios, { AxiosInstance } from 'axios';
 
+type ApiErrorHandler = ((error: unknown) => void) | null;
+
+let globalApiErrorHandler: ApiErrorHandler = null;
+
+export const setApiErrorHandler = (handler: ApiErrorHandler) => {
+  globalApiErrorHandler = handler;
+};
+
 // Zustand persist에서 토큰 읽기
 const getAuthToken = (): string | null => {
   if (typeof window !== 'undefined') {
@@ -130,6 +138,13 @@ export const createApiInstance = (
         `[${apiName} API Response Error]`,
         error.response?.data ?? error.message
       );
+      if (globalApiErrorHandler) {
+        try {
+          globalApiErrorHandler(error);
+        } catch (handlerError) {
+          console.error('API error handler execution failed:', handlerError);
+        }
+      }
       return Promise.reject(error);
     }
   );

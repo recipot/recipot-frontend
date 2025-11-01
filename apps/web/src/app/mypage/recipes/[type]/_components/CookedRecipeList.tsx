@@ -64,7 +64,7 @@ export default function CookedRecipeList({
 
             <div className="relative">
               <Image
-                src="/mypage/none-refrigrator.png"
+                src="/mypage/none-refrigerator.png"
                 alt="빈 냉장고"
                 width={142}
                 height={142}

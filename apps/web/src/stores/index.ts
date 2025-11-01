@@ -3,3 +3,4 @@ export * from './allergiesStore';
 export * from './moodStore';
 export * from './onboardingStore';
 export * from './selectedFoodsStore';
+export * from './apiErrorModalStore';
