@@ -1,8 +1,7 @@
 'use client';
 
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useContext, useMemo, useRef, useState } from 'react';
 
-import { useScrollSpy } from '@/hooks';
 import type { AllergyCategory } from '@/types/allergy.types';
 
 import useAllergyCheck from '../hooks/useAllergyCheck';
@@ -18,13 +17,11 @@ interface AllergyContextValue {
   gnbRef: RefObject<HTMLElement> | undefined;
   handleCategoryToggle: (categoryItemIds: number[]) => void;
   handleItemToggle: (id: number) => void;
-  handleTabClick: (index: number) => void;
   isLoading: boolean;
   resetItems: () => void;
   scrollConfig: {
     containerRef?: RefObject<HTMLElement>;
     navigationOffset: number;
-    scrollSpyOffset: number;
     useWindowScroll: boolean;
   };
   selectedItems: number[];
@@ -80,91 +77,14 @@ export function AllergyProvider({
   // 스크롤 설정 (기본값 + 커스텀 설정 병합)
   const scrollConfig: AllergyContextValue['scrollConfig'] = {
     navigationOffset: 130,
-    scrollSpyOffset: 120,
     useWindowScroll: true,
     ...customScrollConfig,
   };
 
-  // 섹션 ID 동적 생성
-  const sectionIds = useMemo(
-    () => categories.map((_, index) => `allergy-section-${index}`),
-    [categories]
-  );
-
-  // ScrollSpy 훅 (윈도우 스크롤 모드)
-  const { activeSection, gnbRef } = useScrollSpy(sectionIds, {
-    offset: scrollConfig.scrollSpyOffset,
-  });
+  // Navigation의 ref (react-scroll의 spy가 사용)
+  const gnbRef = useRef<HTMLElement>(null);
 
   const [activeIndex, setActiveIndex] = useState(0);
-
-  // 활성 섹션에 따라 인덱스 업데이트
-  useEffect(() => {
-    if (activeSection) {
-      const index = sectionIds.findIndex(id => id === activeSection);
-      if (index !== -1) {
-        setActiveIndex(index);
-      }
-    }
-  }, [activeSection, sectionIds]);
-
-  // 탭 클릭 핸들러
-  const handleTabClick = (index: number) => {
-    setActiveIndex(index);
-
-    const sectionId = `allergy-section-${index}`;
-    const section = document.getElementById(sectionId);
-
-    if (!section) return;
-
-    if (scrollConfig.useWindowScroll) {
-      // 윈도우 스크롤 모드 (온보딩)
-      const elementPosition = section.getBoundingClientRect().top;
-      const offsetPosition =
-        elementPosition + window.pageYOffset - scrollConfig.navigationOffset;
-
-      window.scrollTo({
-        behavior: 'smooth',
-        top: Math.max(0, offsetPosition),
-      });
-    } else if (scrollConfig.containerRef?.current) {
-      // 컨테이너 스크롤 모드 (드로어)
-      const scrollContainer = scrollConfig.containerRef.current;
-      const elementPosition = section.getBoundingClientRect().top;
-      const containerPosition = scrollContainer.getBoundingClientRect().top;
-      const targetPosition =
-        elementPosition -
-        containerPosition +
-        scrollContainer.scrollTop -
-        scrollConfig.navigationOffset;
-
-      // 부드러운 스크롤 애니메이션
-      const startPosition = scrollContainer.scrollTop;
-      const distance = targetPosition - startPosition;
-      const duration = 300;
-      let startTime: number | null = null;
-
-      const animation = (currentTime: number) => {
-        startTime ??= currentTime;
-        const timeElapsed = currentTime - startTime;
-        const progress = Math.min(timeElapsed / duration, 1);
-
-        // easeInOutCubic
-        const ease =
-          progress < 0.5
-            ? 4 * progress * progress * progress
-            : 1 - Math.pow(-2 * progress + 2, 3) / 2;
-
-        scrollContainer.scrollTop = startPosition + distance * ease;
-
-        if (progress < 1) {
-          requestAnimationFrame(animation);
-        }
-      };
-
-      requestAnimationFrame(animation);
-    }
-  };
 
   const value: AllergyContextValue = {
     activeIndex,
@@ -174,7 +94,6 @@ export function AllergyProvider({
     gnbRef,
     handleCategoryToggle,
     handleItemToggle,
-    handleTabClick,
     isLoading,
     resetItems,
     scrollConfig,

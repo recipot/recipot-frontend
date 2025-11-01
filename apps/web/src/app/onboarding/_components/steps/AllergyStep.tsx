@@ -5,7 +5,7 @@ import { useEffect, useMemo } from 'react';
 import { Allergy, useAllergyContext } from '@/components/Allergy';
 import { useAllergiesStore } from '@/stores/allergiesStore';
 
-import { ONBOARDING_CONSTANTS, SCROLLBAR_HIDE_STYLE } from '../../_constants';
+import { SCROLLBAR_HIDE_STYLE } from '../../_constants';
 import { useOnboardingActions, useOnboardingStep } from '../../_hooks';
 import { getSubmitButtonText, onboardingStyles } from '../../_utils';
 
@@ -60,7 +60,7 @@ function AllergyStepContent() {
           className={onboardingStyles.navigation.list}
           style={SCROLLBAR_HIDE_STYLE}
         >
-          <Allergy.Navigation variant="default" />
+          <Allergy.Navigation />
         </div>
       </div>
 
@@ -83,7 +83,6 @@ export default function AllergyStep() {
   const scrollConfig = useMemo(
     () => ({
       navigationOffset: 130,
-      scrollSpyOffset: ONBOARDING_CONSTANTS.SCROLL_SPY_OFFSET,
       useWindowScroll: true,
     }),
     []

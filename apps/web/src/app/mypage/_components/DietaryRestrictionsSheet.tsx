@@ -147,11 +147,12 @@ function DietaryRestrictionsContent({
 
       <div
         ref={scrollContainerRef}
+        id="allergy-scroll-container"
         className="flex-grow overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         data-scroll-container
       >
         <div className="sticky top-0 z-50 bg-white py-4">
-          <Allergy.Navigation variant="drawer" />
+          <Allergy.Navigation />
         </div>
 
         <div className="px-6 pt-5">
@@ -185,7 +186,6 @@ export default function DietaryRestrictionsSheet({
     () => ({
       containerRef: scrollContainerRef,
       navigationOffset: 80,
-      scrollSpyOffset: 150,
       useWindowScroll: false,
     }),
     []
