@@ -36,15 +36,16 @@ export default function CookingOrderContent({
       </div>
 
       {/* 설명 */}
-
-      <p className="text-16 px-6 text-[#000]">{currentStepData?.summary}</p>
+      <p className="text-16 max-h-[calc(100vh-450px)] overflow-y-auto px-6 pb-5 text-[#000]">
+        {currentStepData?.summary}
+      </p>
 
       {/* 단계 진행률 */}
-      <div className="mt-[147px] mb-6 flex flex-col items-center">
+      <div className="fixed right-0 bottom-[84px] left-0 flex flex-col items-center bg-white py-5">
         {/* 원형 인디케이터 */}
-        <div className="mb-2 flex items-center justify-center px-6">
+        <div className="mb-2 flex h-auto items-center justify-center px-6">
           {recipe.steps?.map((step, index: number) => (
-            <div key={index} className="mt-[147px] flex items-center">
+            <div key={index} className="flex items-center">
               <div
                 className={`flex h-4 w-4 items-center justify-center rounded-full border-2 ${
                   index < currentStep - 1
