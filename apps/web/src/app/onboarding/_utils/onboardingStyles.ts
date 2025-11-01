@@ -74,5 +74,15 @@ export function getSubmitButtonText(
     return stepNumber === 3 ? '온보딩 완료 중...' : '저장 중...';
   }
 
-  return '여유에 맞는 요리 추천받기';
+  // step별 버튼 텍스트
+  switch (stepNumber) {
+    case 1:
+      return '안 맞는 재료 선택했어요';
+    case 2:
+      return '에너지는 이 정도예요';
+    case 3:
+      return '레시피 추천받을게요';
+    default:
+      return '안 맞는 재료 선택했어요';
+  }
 }

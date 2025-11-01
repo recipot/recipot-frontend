@@ -19,19 +19,19 @@ export const ONBOARDING_CONSTANTS = {
  */
 export const STEP_CONFIG = [
   {
-    description: '제외하고 추천해드릴게요!',
+    description: '알려주시면 그 재료는 빼고 추천해드릴게요',
     id: 1,
-    title: '못먹는 음식을 알려주세요',
+    title: '몸에 안 맞는 재료가 있나요?',
   },
   {
-    description: '상태와 재료 딱 두 가지만 알려주세요!',
+    description: '에너지에 딱 맞는 요리를 찾아드릴게요',
     id: 2,
-    title: '요리할 여유가 얼마나 있나요?',
+    title: '지금 요리에 에너지를 \n얼마나 쓰고 싶으신가요?',
   },
   {
-    description: '두 가지만 골라도 요리를 찾아드려요',
+    description: '두가지만 골라도 요리를 추천해드릴게요',
     id: 3,
-    title: '현재 냉장고에 어떤 재료를 \n가지고 계신가요?',
+    title: '마지막으로 \n냉장고 속 재료, 뭐가 있나요?',
   },
 ] as const;
 
