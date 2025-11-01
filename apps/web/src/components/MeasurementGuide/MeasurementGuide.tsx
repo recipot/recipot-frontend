@@ -1,130 +1,62 @@
-import React, { useEffect, useState } from 'react';
-import { recipe } from '@recipot/api';
-import { tokenUtils } from 'packages/api/src/auth';
+import React, { useState } from 'react';
 
-import { isProduction } from '@/lib/env';
+import { MEASUREMENT_TABS } from '@/app/recipe/[id]/_components/IngredientsSection.constants';
 
+import { MEASUREMENT_GUIDE_DATA } from './constants';
 import {
   MeasurementGuideContent,
   MeasurementGuideToggle,
   MeasurementTab,
 } from './index';
 
+// 탭 ID를 한글 라벨로 매핑
+const TAB_ID_TO_LABEL_MAP: Record<string, string> = {
+  liquid: '액체류',
+  powder: '가루류',
+  sauce: '장,젓갈류',
+};
+
 interface MeasurementGuideProps {
-  /** 계량 가이드 데이터 (선택사항, API에서 가져옴) */
-  measurementData?: Record<
-    string,
-    Array<{
-      standard: string;
-      imageUrl: string;
-      description: string;
-    }>
-  >;
-  /** 초기 활성 탭 (선택사항) */
+  /** 초기 활성 탭 ID (선택사항) */
   initialActiveTab?: string;
 }
 
-export function MeasurementGuide({
-  initialActiveTab,
-  measurementData: propMeasurementData,
-}: MeasurementGuideProps) {
+export function MeasurementGuide({ initialActiveTab }: MeasurementGuideProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [measurementData, setMeasurementData] = useState({});
-  const [categories, setCategories] = useState<string[]>([]);
-  const [activeTab, setActiveTab] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<string | null>(() => {
+    if (initialActiveTab) {
+      const isValidTab = MEASUREMENT_TABS.some(
+        tab => tab.id === initialActiveTab
+      );
+      if (isValidTab) {
+        return initialActiveTab;
+      }
+    }
+    return MEASUREMENT_TABS.length > 0 ? MEASUREMENT_TABS[0].id : null;
+  });
 
   const handleToggle = () => {
     setIsOpen(!isOpen);
   };
 
-  const handleTabChange = (tab: string) => {
-    setActiveTab(tab);
+  const handleTabChange = (tabId: string) => {
+    setActiveTab(tabId);
   };
 
-  const fetchMeasurementGuides = React.useCallback(async () => {
-    if (isLoading) return;
-
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const token = tokenUtils.getToken();
-      const useCookieAuth = isProduction;
-      if (!useCookieAuth && !token) {
-        throw new Error('Missing access token');
-      }
-
-      const data = await recipe.getMeasurementGuides();
-      setMeasurementData(data);
-      const apiCategories = Object.keys(data ?? {});
-      setCategories(apiCategories);
-      if (!activeTab && apiCategories.length > 0) {
-        setActiveTab(apiCategories[0]);
-      }
-    } catch (err) {
-      console.error('계량 가이드 데이터를 가져오는데 실패했습니다:', err);
-      setError('계량 가이드 데이터를 불러올 수 없습니다.');
-      // 에러 발생 시 빈 상태로 설정
-      setCategories([]);
-      setActiveTab(null);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [isLoading, activeTab]);
-
-  useEffect(() => {
-    if (isOpen && categories.length === 0) {
-      fetchMeasurementGuides();
-    }
-  }, [isOpen, categories.length, fetchMeasurementGuides]);
-
-  useEffect(() => {
-    if (propMeasurementData) {
-      setMeasurementData(propMeasurementData);
-      const propCategories = Object.keys(propMeasurementData);
-      setCategories(propCategories);
-      // activeTab이 없거나, 현재 activeTab이 새로운 카테고리 목록에 없는 경우 업데이트
-      if (!activeTab || (activeTab && !propCategories.includes(activeTab))) {
-        if (propCategories.length > 0) {
-          setActiveTab(propCategories[0]);
-        }
-      }
-    }
-  }, [propMeasurementData, activeTab]);
-
-  // initialActiveTab이 prop으로 전달되면 사용
-  useEffect(() => {
-    if (initialActiveTab && !activeTab) {
-      setActiveTab(initialActiveTab);
-    }
-  }, [initialActiveTab, activeTab]);
+  // 탭 ID를 한글 라벨로 변환하여 데이터 접근
+  const activeTabLabel =
+    activeTab && activeTab in TAB_ID_TO_LABEL_MAP
+      ? TAB_ID_TO_LABEL_MAP[activeTab]
+      : null;
 
   return (
     <MeasurementGuideToggle isOpen={isOpen} onToggle={handleToggle}>
       <div className="space-y-3 px-4 pt-3 pb-4">
-        {isLoading ? (
-          <div className="flex items-center justify-center py-4">
-            <div className="text-gray-500">계량 가이드를 불러오는 중...</div>
-          </div>
-        ) : error ? (
-          <div className="flex items-center justify-center py-4">
-            <div className="text-red-500">{error}</div>
-          </div>
-        ) : (
-          <>
-            <MeasurementTab
-              activeTab={activeTab}
-              onTabChange={handleTabChange}
-              categories={categories}
-            />
-            <MeasurementGuideContent
-              activeTab={activeTab}
-              measurementData={measurementData}
-            />
-          </>
-        )}
+        <MeasurementTab activeTab={activeTab} onTabChange={handleTabChange} />
+        <MeasurementGuideContent
+          activeTab={activeTabLabel}
+          measurementData={MEASUREMENT_GUIDE_DATA}
+        />
       </div>
     </MeasurementGuideToggle>
   );

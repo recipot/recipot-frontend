@@ -90,7 +90,7 @@ export function RecipeDetailHeader({ recipe }: RecipeHeaderProps) {
   };
 
   const handleBack = () => {
-    router.back();
+    router.push('/');
   };
 
   return (

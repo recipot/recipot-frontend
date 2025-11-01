@@ -23,7 +23,7 @@ export function MeasurementGuideContent({
   }
 
   return (
-    <div className="no-scrollbar flex w-full flex-nowrap gap-[20px] self-stretch overflow-x-auto rounded-xl px-4 pb-5">
+    <div className="no-scrollbar flex flex-nowrap gap-[20px] overflow-x-auto rounded-xl px-4 pb-5">
       {items.map(item => (
         <div
           key={item.standard}
@@ -39,7 +39,7 @@ export function MeasurementGuideContent({
                 className="h-full w-full object-cover"
               />
             ) : (
-              <div className="text-gray-400">이미지 없음</div>
+              <div className="text-13 text-gray-400">이미지 준비중</div>
             )}
           </div>
           <div className="mt-3">

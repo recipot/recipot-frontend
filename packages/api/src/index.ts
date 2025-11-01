@@ -25,19 +25,10 @@ export type {
 export { createApiInstance, setApiErrorHandler } from './createApiInstance';
 export type { CreateApiInstanceOptions } from './createApiInstance';
 
-// Recipe API
-export { recipe } from './recipe';
-export type {
-  RecipeIngredient,
-  RecipeIngredients,
-  RecipeRecommendResponse,
-  RecipeLikeResponse,
-  MeasurementGuideItem,
-  MeasurementGuideResponse,
-} from './recipeAPI';
-
 // Debug API
 export { debugAuth } from './debug';
+
+export { recipe } from './recipeAPI';
 
 // Types
 export type {

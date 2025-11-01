@@ -14,6 +14,10 @@ import { tokenUtils } from 'packages/api/src/auth';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
 import { moodToConditionId } from '@/app/onboarding/_utils/conditionMapper';
+import type {
+  Recipe,
+  RecommendationItem,
+} from '@/app/recipe/[id]/types/recipe.types';
 import { Header } from '@/components/common/Header';
 import { Toast } from '@/components/common/Toast';
 import { RecipeCard } from '@/components/RecipeCard';
@@ -21,7 +25,6 @@ import { useToast } from '@/hooks/useToast';
 import { isProduction } from '@/lib/env';
 import { useMoodStore } from '@/stores/moodStore';
 import { useSelectedFoodsStore } from '@/stores/selectedFoodsStore';
-import type { Recipe, RecommendationItem } from '@/types/recipe.types';
 import { getEmotionGradient } from '@/utils/emotionGradient';
 
 import RecipeHeader from './_components/RecipeHeader';
@@ -79,18 +82,29 @@ export default function RecipeRecommend() {
   ): Omit<Recipe, 'ingredients'> => {
     return {
       description: item.description,
-      duration: parseInt(item.duration),
+      duration: item.duration,
       id: item.recipeId,
       images: item.imageUrls.map((url, index) => ({
         id: index + 1,
         imageUrl: url,
       })),
       isBookmarked: item.isBookmarked,
+      seasonings: [],
+      steps: [],
       title: item.title,
-      tools: item.tools.map((toolName, index) => ({
-        id: index + 1,
-        name: toolName,
-      })),
+      tools: item.tools.map((tool, index) => {
+        if (typeof tool === 'string') {
+          return {
+            id: index + 1,
+            name: tool,
+          };
+        }
+        return {
+          id: tool.id,
+          name: tool.name,
+          ...(tool.imageUrl && { imageUrl: tool.imageUrl }),
+        };
+      }),
     };
   };
 
@@ -115,6 +129,7 @@ export default function RecipeRecommend() {
 
       // API 응답을 Recipe 타입으로 변환
       const mappedRecipes = items.map(mapRecommendationToRecipe);
+
       setRecipes(mappedRecipes);
 
       // 초기 북마크 상태 설정

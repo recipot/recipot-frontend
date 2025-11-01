@@ -94,55 +94,49 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
   };
 
   return (
-    <div className="flex min-h-screen w-full justify-center bg-gray-100">
-      <div>
-        <RecipeDetailHeader recipe={recipeData} />
+    <div className="w-full bg-gray-100">
+      <RecipeDetailHeader recipe={recipeData} />
 
-        <RecipeHero recipe={recipeData} />
-        <TabNavigation
-          activeTab={activeTab}
-          offset={SCROLL_OFFSET}
-          onTabChange={handleTabChange}
-        />
-        <div className="px-4" style={contentStyle}>
-          <div className="bg-secondary-light-green border-secondary-soft-green my-4 rounded-2xl border-[1px] px-5 py-4">
-            <p className="text-15sb text-primary-pressed">
-              {recipeData?.healthPoints.map(point => point.content).join(', ')}
-            </p>
-          </div>
-
-          <Element
-            name="ingredients"
-            id="ingredients"
-            className="scroll-element"
-          >
-            <IngredientsSection
-              ingredients={recipeData.ingredients}
-              seasonings={recipeData?.seasonings}
-            />
-          </Element>
-
-          <Element name="cookware" id="cookware" className="scroll-element">
-            <CookwareSection cookware={recipeData?.tools} />
-          </Element>
-
-          <Element name="steps" id="steps" className="scroll-element">
-            <StepSection steps={recipeData?.steps} />
-          </Element>
+      <RecipeHero recipe={recipeData} />
+      <TabNavigation
+        activeTab={activeTab}
+        offset={SCROLL_OFFSET}
+        onTabChange={handleTabChange}
+      />
+      <div className="px-4" style={contentStyle}>
+        <div className="bg-secondary-light-green border-secondary-soft-green my-4 rounded-2xl border-[1px] px-5 py-4">
+          <p className="text-15sb text-primary-pressed">
+            {recipeData?.healthPoints?.map(point => point.content).join(', ')}
+          </p>
         </div>
 
-        <div className="fixed right-0 bottom-0 left-0 flex justify-center">
-          <div className="flex w-full bg-gray-100/50 px-[50px] py-[10px]">
-            <Button
-              variant="default"
-              size="full"
-              className="bg-primary px-8 py-[15px]"
-              onClick={handleCookingOrder}
-            >
-              <CookIcon className="mr-[6px] h-6 w-6" color="#ffffff" />
-              <p className="text-17sb text-white">요리하러 가기</p>
-            </Button>
-          </div>
+        <Element name="ingredients" id="ingredients" className="scroll-element">
+          <IngredientsSection
+            ingredients={recipeData.ingredients}
+            seasonings={recipeData?.seasonings}
+          />
+        </Element>
+
+        <Element name="cookware" id="cookware" className="scroll-element">
+          <CookwareSection cookware={recipeData?.tools} />
+        </Element>
+
+        <Element name="steps" id="steps" className="scroll-element">
+          <StepSection steps={recipeData?.steps} />
+        </Element>
+      </div>
+
+      <div className="fixed right-0 bottom-0 left-0 flex justify-center">
+        <div className="flex w-full bg-gray-100/50 px-[50px] py-[10px]">
+          <Button
+            variant="default"
+            size="full"
+            className="bg-primary px-8 py-[15px]"
+            onClick={handleCookingOrder}
+          >
+            <CookIcon className="mr-[6px] h-6 w-6" color="#ffffff" />
+            <p className="text-17sb text-white">단계별로 요리 시작하기</p>
+          </Button>
         </div>
       </div>
     </div>

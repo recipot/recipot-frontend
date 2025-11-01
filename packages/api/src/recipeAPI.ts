@@ -1,43 +1,39 @@
-import { Recipe } from '../../../apps/web/src/types/recipe.types';
-import { createApiInstance } from './createApiInstance';
-import { debugAuth } from './debug/debugAuth';
-import type { DebugTokenRequest } from './debug/types';
+import { createApiInstance } from '@recipot/api';
 
-export interface RecipeIngredient {
-  amount: string;
-  id: number;
-  isAlternative: boolean;
-  name: string;
-}
+const recipeAPI = createApiInstance({ apiName: 'Recipe' });
 
-export interface RecipeIngredients {
-  owned: RecipeIngredient[];
-  notOwned: RecipeIngredient[];
-  alternativeUnavailable: RecipeIngredient[];
-}
+export const recipe = {
+  /**
+   * 레시피 추천
+   * @param conditionId - 조건 ID
+   * @param selectedFoodIds - 선택된 음식 ID 배열
+   * @returns
+   */
+  recipeRecommend: async (conditionId: number, selectedFoodIds: number[]) => {
+    const response = await recipeAPI.post(`/v1/recipes/recommendations`, {
+      conditionId,
+      pantryIds: selectedFoodIds,
+    });
+    return response.data;
+  },
 
-export interface RecipeRecommendResponse {
-  recipes: Recipe[];
-  message: string;
-}
+  getMyProfile: async () => {
+    const response = await recipeAPI.get(`/v1/users/profile/me`);
+    return response.data.data;
+  },
 
-export interface RecipeLikeResponse {
-  recipeId: number;
-  liked: boolean;
-  message: string;
-}
+  getRecipeDetail: async (recipeId: string | number) => {
+    const response = await recipeAPI.get(`/v1/recipes/${recipeId}`);
+    return response.data?.data ?? response.data;
+  },
 
-export interface MeasurementGuideItem {
-  standard: string;
-  imageUrl: string;
-  description: string;
-}
+  startCooking: async (recipeId: string | number) => {
+    await recipeAPI.post(`/v1/users/recipes/${recipeId}/start`, { recipeId });
+  },
 
-export interface MeasurementGuideResponse {
-  status: number;
-  data: {
-    data: {
-      [category: string]: MeasurementGuideItem[];
-    };
-  };
-}
+  completeCooking: async (recipeId: string | number) => {
+    await recipeAPI.post(`/v1/users/recipes/${recipeId}/complete`, {
+      recipeId,
+    });
+  },
+};

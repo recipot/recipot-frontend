@@ -1,5 +1,7 @@
 'use client';
 
+import './styles.css';
+
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
@@ -177,25 +179,27 @@ export function ReviewBottomSheet({
 
   return (
     <Drawer open={isOpen}>
-      <DrawerContent className="mx-auto w-full max-w-[430px]">
-        <form onSubmit={handleSubmit(onFormSubmit)}>
+      <DrawerContent className="mx-auto flex w-full flex-col">
+        <form
+          onSubmit={handleSubmit(onFormSubmit)}
+          className="flex flex-col overflow-y-auto"
+        >
           <VisuallyHidden asChild>
             <DrawerTitle>후기 등록하기</DrawerTitle>
           </VisuallyHidden>
-          <div className="rounded-t-2xl px-4 pb-6">
-            {/* 헤더 - 상단에 고정 */}
-            <div className="sticky top-0 z-10 -mx-4 flex justify-end bg-white px-4">
-              <button
-                type="button"
-                onClick={handleClose}
-                className="rounded-full p-1.5"
-              >
-                <CloseIcon size={24} />
-              </button>
-            </div>
+          <div className="flex flex-col overflow-hidden">
+            <div className="px-4 pb-6">
+              {/* 헤더 - 상단에 고정 */}
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={handleClose}
+                  className="rounded-full p-1.5"
+                >
+                  <CloseIcon size={24} />
+                </button>
+              </div>
 
-            {/* 컨텐츠 영역 */}
-            <div>
               {/* 로딩 및 에러 상태 표시 */}
               {isLoading && (
                 <div className="flex items-center justify-center py-4">
@@ -230,10 +234,13 @@ export function ReviewBottomSheet({
                   </h2>
                 </div>
               </div>
-
+            </div>
+            <div className="mb-6 h-0 border-t border-dashed border-gray-300" />
+            {/* 스크롤 가능한 영역 - 선택 항목 및 의견 작성 */}
+            <div className="overflow-y-auto px-4">
               {/* 감정 선택 섹션 */}
               {reviewData && (
-                <div>
+                <>
                   {[
                     {
                       options: reviewData.tasteOptions,
@@ -265,7 +272,7 @@ export function ReviewBottomSheet({
                       uiTextMapping={UI_TEXT_MAPPING}
                     />
                   ))}
-                </div>
+                </>
               )}
 
               {/* 코멘트 입력 */}
@@ -280,8 +287,13 @@ export function ReviewBottomSheet({
                   maxLength={200}
                 />
               </div>
+            </div>
 
-              {/* 제출 버튼 */}
+            {/* 그라데이션 - 버튼 바로 위 */}
+            <div className="review-bottom-sheet-gradient" />
+
+            {/* 제출 버튼 - 하단 고정 */}
+            <div className="px-4 pt-4 pb-4">
               <Button
                 type="submit"
                 disabled={!isFormValid}

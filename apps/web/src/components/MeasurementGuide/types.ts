@@ -22,5 +22,4 @@ export interface MeasurementGuideToggleProps {
 export interface MeasurementTabProps {
   activeTab: string | null;
   onTabChange: (tab: string) => void;
-  categories: string[];
 }

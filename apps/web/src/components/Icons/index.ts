@@ -15,8 +15,8 @@ export { default as EmotionNeutralIcon } from './EmotionNeutralIcon';
 export { default as CookIcon } from './CookIcon';
 export { default as MyFileIcon } from './MyFileIcon';
 export { default as MyOpenFileIcon } from './MyOpenFileIcon';
+export { default as SauceIcon } from './SauceIcon';
 export { default as SettingsIcon } from './SettingsIcon';
-export { default as SourceIcon } from './SourceIcon';
 
 // 단계 아이콘들
 export { default as CookOrderIcon } from './CookOrderIcon';

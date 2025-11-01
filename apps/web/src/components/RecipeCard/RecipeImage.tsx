@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 import Image from 'next/image';
 
-import type { Recipe } from '@/types/recipe.types';
+import type { Recipe } from '@/app/recipe/[id]/types/recipe.types';
 
 import { CARD_DIMENSIONS } from './constants';
 import { getBackgroundColor } from './utils';

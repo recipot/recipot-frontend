@@ -1,4 +1,7 @@
-import { Recipe, RecipeRecommendResponse } from '@/types/recipe.types';
+import {
+  Recipe,
+  RecipeRecommendResponse,
+} from '@/app/recipe/[id]/types/recipe.types';
 import { http, HttpResponse } from 'msw';
 
 // 목 데이터
@@ -6,7 +9,7 @@ const mockRecipes: Recipe[] = [
   {
     id: 1,
     title: '고사리나물\n밥도둑 레시피',
-    duration: 15,
+    duration: '15분',
     tools: [{ id: 1, imageUrl: '/backgroundImage.jpg', name: '냄비' }],
     description: '고사리나물로 만드는 전통 한식 레시피입니다.',
     healthPoints: [
@@ -34,18 +37,30 @@ const mockRecipes: Recipe[] = [
       alternativeUnavailable: [],
     },
     steps: [
-      { orderNum: 1, summary: '고사리를 깨끗이 씻어 물기를 빼주세요' },
-      { orderNum: 2, summary: '마늘을 다져서 팬에 볶아주세요' },
+      {
+        orderNum: 1,
+        step: 1,
+        summary: '고사리를 깨끗이 씻어 물기를 빼주세요',
+        description: '고사리를 깨끗이 씻어 물기를 빼주세요',
+      },
+      {
+        orderNum: 2,
+        step: 2,
+        summary: '마늘을 다져서 팬에 볶아주세요',
+        description: '마늘을 다져서 팬에 볶아주세요',
+      },
       {
         orderNum: 3,
+        step: 3,
         summary: '고사리를 넣고 볶다가 참기름을 넣어 마무리하세요',
+        description: '고사리를 넣고 볶다가 참기름을 넣어 마무리하세요',
       },
     ],
   },
   {
     id: 2,
     title: '김치볶음밥\n5분이면 완성!',
-    duration: 5,
+    duration: '5분',
     tools: [{ id: 1, imageUrl: '/backgroundImage.jpg', name: '프라이팬' }],
     description: '김치볶음밥으로 만드는 간단한 한끼 레시피입니다.',
     healthPoints: [
@@ -67,15 +82,30 @@ const mockRecipes: Recipe[] = [
       alternativeUnavailable: [],
     },
     steps: [
-      { orderNum: 1, summary: '팬에 식용유를 두르고 김치를 볶아주세요' },
-      { orderNum: 2, summary: '밥을 넣고 김치국물을 넣어 볶아주세요' },
-      { orderNum: 3, summary: '계란을 풀어서 넣고 마무리하세요' },
+      {
+        orderNum: 1,
+        step: 1,
+        summary: '팬에 식용유를 두르고 김치를 볶아주세요',
+        description: '팬에 식용유를 두르고 김치를 볶아주세요',
+      },
+      {
+        orderNum: 2,
+        step: 2,
+        summary: '밥을 넣고 김치국물을 넣어 볶아주세요',
+        description: '밥을 넣고 김치국물을 넣어 볶아주세요',
+      },
+      {
+        orderNum: 3,
+        step: 3,
+        summary: '계란을 풀어서 넣고 마무리하세요',
+        description: '계란을 풀어서 넣고 마무리하세요',
+      },
     ],
   },
   {
     id: 3,
     title: '빵 한장에 땅콩버터 바르고\n사과만 얹으면 뚝딱',
-    duration: 3,
+    duration: '3분',
     tools: [
       { id: 1, imageUrl: '/backgroundImage.jpg', name: '조리도구 최소정보' },
     ],
@@ -97,22 +127,20 @@ const mockRecipes: Recipe[] = [
       alternativeUnavailable: [],
     },
     steps: [
-      { orderNum: 1, summary: '식빵에 땅콩버터를 고르게 발라주세요' },
-      { orderNum: 2, summary: '사과를 얇게 썰어서 땅콩버터 위에 올려주세요' },
+      {
+        orderNum: 1,
+        step: 1,
+        summary: '식빵에 땅콩버터를 고르게 발라주세요',
+        description: '식빵에 땅콩버터를 고르게 발라주세요',
+      },
+      {
+        orderNum: 2,
+        step: 2,
+        summary: '사과를 얇게 썰어서 땅콩버터 위에 올려주세요',
+        description: '사과를 얇게 썰어서 땅콩버터 위에 올려주세요',
+      },
     ],
   },
-];
-
-// 선택된 재료 목록 (동적으로 관리)
-let mockSelectedIngredients = [
-  '땅콩버터',
-  '감자',
-  '김치',
-  '양파',
-  '마늘',
-  '고추장',
-  '된장',
-  '대파',
 ];
 
 // 레시피 추천 핸들러
