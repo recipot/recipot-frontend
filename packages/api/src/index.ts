@@ -22,7 +22,7 @@ export type {
 } from './condition';
 
 // API Instance Creator
-export { createApiInstance } from './createApiInstance';
+export { createApiInstance, setApiErrorHandler } from './createApiInstance';
 export type { CreateApiInstanceOptions } from './createApiInstance';
 
 // Debug API

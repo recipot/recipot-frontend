@@ -16,21 +16,21 @@ import type { PageType } from '@/types/MyPage.types';
 
 const PAGE_CONFIG = {
   cooked: {
-    noneBackImage: '/mypage/none-refrigrator-green.png',
+    noneBackImage: '/mypage/none-refrigerator-green.png',
     overLayColor: '#F4FCE3',
     themeColor: '#F4FCE3',
     title: '내가 만든 요리',
     titleColor: '#66A80F',
   },
   recent: {
-    noneBackImage: '/mypage/none-refrigrator-purple.png',
+    noneBackImage: '/mypage/none-refrigerator-purple.png',
     overLayColor: '#F3F0FF',
     themeColor: '#f3f0ff',
     title: '최근 본 레시피',
     titleColor: '#845ef7',
   },
   saved: {
-    noneBackImage: '/mypage/none-refrigrator-blue.png',
+    noneBackImage: '/mypage/none-refrigerator-blue.png',
     overLayColor: '#CAE9FF',
     themeColor: '#e7f5ff',
     title: '보관한 레시피',
