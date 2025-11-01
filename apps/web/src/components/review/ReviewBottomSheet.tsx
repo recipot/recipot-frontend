@@ -235,7 +235,7 @@ export function ReviewBottomSheet({
                 </div>
               </div>
             </div>
-
+            <div className="mb-6 h-0 border-t border-dashed border-gray-300" />
             {/* 스크롤 가능한 영역 - 선택 항목 및 의견 작성 */}
             <div className="overflow-y-auto px-4">
               {/* 감정 선택 섹션 */}
