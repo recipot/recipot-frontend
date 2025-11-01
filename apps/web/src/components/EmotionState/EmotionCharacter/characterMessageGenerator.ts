@@ -32,24 +32,28 @@ const getLevelMessage = (
   completedRecipesCount: number,
   nickname: string
 ): string => {
-  let firstLine = '';
-  let secondLine = '';
+  // 최초 1회 요리했을 때만 특별한 메시지
+  if (completedRecipesCount === 1) {
+    return `${nickname}님, 드디어 ${completedRecipesCount}번 해먹었네요!\n귀찮음을 이겨버렸어! 완전 최고!`;
+  }
 
+  // 16회 이상 (레벨 3)
   if (completedRecipesCount >= 16) {
-    firstLine = '어멋! 왤케 건강해졌어???';
-  } else if (completedRecipesCount >= 7) {
-    firstLine = '와..넌..정말 대단하고.멋지고.존경해.';
-  } else if (completedRecipesCount >= 3) {
-    firstLine = '와-! 오늘도 해냈다! 잘했어!';
-  } else if (completedRecipesCount >= 1) {
-    secondLine = '귀찮음을 이겨버렸어! 완전 최고!';
+    return `${nickname}님, 지금까지 ${completedRecipesCount}번 해먹었네요!\n어멋! 왤케 건강해졌어???`;
   }
 
-  if (completedRecipesCount >= 3) {
-    return `${nickname}님, 지금까지 ${completedRecipesCount}번 해먹었네요!\n${firstLine}`;
-  } else {
-    return `${nickname}님, 드디어 ${completedRecipesCount}번 해먹었네요!\n${secondLine}`;
+  // 7~15회 (레벨 2)
+  if (completedRecipesCount >= 7) {
+    return `${nickname}님, 지금까지 ${completedRecipesCount}번 해먹었네요!\n와..넌..정말 대단하고.멋지고.존경해.`;
   }
+
+  // 3~6회 (레벨 1)
+  if (completedRecipesCount >= 3) {
+    return `${nickname}님, 지금까지 ${completedRecipesCount}번 해먹었네요!\n와-! 오늘도 해냈다! 잘했어!`;
+  }
+
+  // 0회 또는 2회일 때 (레벨 0) - 여기는 도달하지 않아야 함 (generateCharacterMessage에서 필터링됨)
+  return `${nickname}님, 지금까지 ${completedRecipesCount}번 해먹었네요!`;
 };
 
 /**
@@ -60,8 +64,8 @@ export const generateCharacterMessage = ({
   mood,
   nickname,
 }: MessageParams): string => {
-  // mood가 default이고 3회 이상 해먹었을 때만 레벨별 메시지 사용
-  if (mood === 'default' && completedRecipesCount >= 3) {
+  // mood가 default이고 1회 이상 해먹었을 때 레벨별 메시지 사용
+  if (mood === 'default' && completedRecipesCount >= 1) {
     return getLevelMessage(completedRecipesCount, nickname);
   }
 

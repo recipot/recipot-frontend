@@ -47,13 +47,13 @@ export default function CharacterTestPage() {
   const getLevelRecipeCount = (lvl: 0 | 1 | 2 | 3): number => {
     switch (lvl) {
       case 0:
-        return 0;
+        return 1; // 0~2개 범위의 대표값
       case 1:
-        return 1;
+        return 4; // 3~6개 범위의 대표값
       case 2:
-        return 3;
+        return 10; // 7~15개 범위의 대표값
       case 3:
-        return 7;
+        return 16; // 16개 이상의 대표값
       default:
         return 0;
     }
@@ -97,10 +97,10 @@ export default function CharacterTestPage() {
                     ))}
                   </div>
                   <div className="mt-2 text-xs text-gray-500">
-                    {level === 0 && '• 완료 레시피 0개 (초보 요리사)'}
-                    {level === 1 && '• 완료 레시피 1~2개 (입문 요리사)'}
-                    {level === 2 && '• 완료 레시피 3~6개 (중급 요리사)'}
-                    {level === 3 && '• 완료 레시피 7개 이상 (베테랑 요리사)'}
+                    {level === 0 && '• 완료 레시피 0~2개 (초보 요리사)'}
+                    {level === 1 && '• 완료 레시피 3~6개 (입문 요리사)'}
+                    {level === 2 && '• 완료 레시피 7~15개 (중급 요리사)'}
+                    {level === 3 && '• 완료 레시피 16개 이상 (베테랑 요리사)'}
                   </div>
                 </div>
 
