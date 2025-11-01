@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -41,38 +41,41 @@ export default function RecipeCard({
     }
   };
 
-  const handleConfirmSave = () => {
+  const handleConfirmSave = useCallback(() => {
     saveRecipe(recipe.recipeId, {
       onSuccess: () => {
         setModalType(null);
         onToggleSave?.();
       },
     });
-  };
+  }, [saveRecipe, recipe.recipeId, onToggleSave]);
 
-  const handleConfirmUnsave = () => {
+  const handleConfirmUnsave = useCallback(() => {
     deleteRecipe(recipe.recipeId, {
       onSuccess: () => {
         setModalType(null);
         onToggleSave?.();
       },
     });
-  };
+  }, [deleteRecipe, recipe.recipeId, onToggleSave]);
 
   const isPending = isDeleting || isSaving;
 
-  const modalConfig = {
-    save: {
-      confirmText: '보관하기',
-      description: '레시피를 보관하시겠어요?',
-      onConfirm: handleConfirmSave,
-    },
-    unsave: {
-      confirmText: '삭제하기',
-      description: '보관한 레시피에서 삭제하시겠어요?',
-      onConfirm: handleConfirmUnsave,
-    },
-  };
+  const modalConfig = useMemo(
+    () => ({
+      save: {
+        confirmText: '보관하기',
+        description: '레시피를 보관하시겠어요?',
+        onConfirm: handleConfirmSave,
+      },
+      unsave: {
+        confirmText: '삭제하기',
+        description: '보관한 레시피에서 삭제하시겠어요?',
+        onConfirm: handleConfirmUnsave,
+      },
+    }),
+    [handleConfirmSave, handleConfirmUnsave]
+  );
 
   const currentModalConfig = modalType ? modalConfig[modalType] : null;
 
