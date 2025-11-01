@@ -8,6 +8,7 @@ import { useCompleteCooking } from '@/hooks/useCompleteCooking';
 import { useCookingOrder } from '@/hooks/useCookingOrder';
 import { useCookingOrderNavigation } from '@/hooks/useCookingOrderNavigation';
 import { isProduction } from '@/lib/env';
+import { useApiErrorModalStore } from '@/stores';
 
 import CookingOrderContent from './CookingOrderContent';
 import CookingOrderFooter from './CookingOrderFooter';
@@ -56,10 +57,11 @@ export default function CookingOrderPresenter({
 
     const completedRecipeId = getCompletedRecipeId();
     if (!completedRecipeId) {
-      console.error('completedRecipeId가 없습니다.');
+      useApiErrorModalStore.getState().showError({
+        message: '요리 완료에 실패했습니다.\n잠시 후 다시 시도해주세요.',
+      });
       return;
     }
-
     await completeCookingMutation.mutateAsync(completedRecipeId);
     completeStep(currentStep);
     router.push(`/review?completedRecipeId=${completedRecipeId}`);
