@@ -81,4 +81,9 @@ export const recentAPI = {
     );
     return response.data.data;
   },
+
+  // 최근 본 레시피 추가
+  postRecentRecipe: async (recipeId: number): Promise<void> => {
+    await mypageApi.post(`/v1/users/recipes/recent/${recipeId}`);
+  },
 };
