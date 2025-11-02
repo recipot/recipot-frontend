@@ -2,7 +2,7 @@
 
 import '../styles.css';
 
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useAuth } from '@recipot/contexts';
 import { getCookie } from '@recipot/utils';
 import { useRouter } from 'next/navigation';
@@ -15,6 +15,10 @@ export function SignInMobileView() {
   const { activeIndex, handleSlideChange, intro } = useIntroSlider();
   const { googleLogin, loading, login, token, user } = useAuth();
   const router = useRouter();
+  const navigateWithoutScroll = useCallback(
+    (path: string) => router.push(path, { scroll: false }),
+    [router]
+  );
 
   // 🔍 개발 중 확인용: 로그인 상태 콘솔 출력
   // TODO: 토큰 리스폰스 버전으로 추후 작업
@@ -63,14 +67,14 @@ export function SignInMobileView() {
       if (!user.isFirstEntry) {
         // 온보딩 완료된 사용자는 메인 페이지로 이동
         console.info('✅ 온보딩 완료된 사용자 - 메인 페이지로 이동');
-        router.push('/');
+        navigateWithoutScroll('/');
       } else {
         // 온보딩 미완료 사용자는 온보딩 페이지로 이동
         console.info('📝 온보딩 미완료 사용자 - 온보딩 페이지로 이동');
-        router.push('/onboarding');
+        navigateWithoutScroll('/onboarding');
       }
     }
-  }, [user, loading, router]);
+  }, [user, loading, navigateWithoutScroll]);
 
   return (
     <div className="mx-auto min-h-screen w-full" style={pageStyle}>

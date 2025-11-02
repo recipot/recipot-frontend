@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { condition } from '@recipot/api';
 import { useAuth } from '@recipot/contexts';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -37,6 +37,10 @@ export default function Home() {
   const router = useRouter();
   const { isCompleted } = useSplash();
   const { selectedFoodIds } = useSelectedFoodsStore();
+  const navigateWithoutScroll = useCallback(
+    (path: string) => router.push(path, { scroll: false }),
+    [router]
+  );
   const {
     isVisible: isToastVisible,
     message: toastMessage,
@@ -100,7 +104,7 @@ export default function Home() {
     // 1. 비로그인 사용자 → 로그인 페이지로 이동
     if (!user) {
       if (!isDesktop) {
-        router.push('/signin');
+        navigateWithoutScroll('/signin');
       }
       return;
     }
@@ -108,10 +112,10 @@ export default function Home() {
     // 2. 로그인 + 온보딩 미완료 → 온보딩 페이지로 이동
     if (user.isFirstEntry) {
       if (!isDesktop) {
-        router.push('/onboarding');
+        navigateWithoutScroll('/onboarding');
       }
     }
-  }, [hasMounted, isDesktop, loading, user, router]);
+  }, [hasMounted, isDesktop, loading, user, navigateWithoutScroll]);
 
   const handleComplete = async () => {
     try {
@@ -139,7 +143,7 @@ export default function Home() {
       console.info('✅ 재료 선택 및 컨디션 저장 완료');
 
       // 레시피 추천 페이지로 이동
-      router.push('/recipeRecommend');
+      navigateWithoutScroll('/recipeRecommend');
     } catch (error) {
       console.error('❌ 재료 선택 완료 실패:', error);
 
@@ -190,10 +194,10 @@ export default function Home() {
               <Image
                 src="/logo.png"
                 alt="한끼부터"
-                width={80}
-                height={30}
+                width={352}
+                height={94}
                 priority
-                className="object-contain"
+                className="h-auto w-20 object-contain"
               />
             </Link>
             <Link
