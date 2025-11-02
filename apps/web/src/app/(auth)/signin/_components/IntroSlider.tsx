@@ -3,7 +3,7 @@
 import 'swiper/css';
 import 'swiper/css/pagination';
 
-import { useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import { Autoplay, Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -33,6 +33,42 @@ export function IntroSlider({
 }: Omit<IntroSliderProps, 'current'>) {
   const swiperRef = useRef<SwiperType | null>(null);
   const paginationRef = useRef<HTMLDivElement>(null);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  const renderSlideContent = (
+    item: IntroSliderProps['intro'][number],
+    isPriority: boolean
+  ) => (
+    <>
+      {item.backSrc ? (
+        <Image
+          src={item.backSrc}
+          alt={`${item.alt} 배경`}
+          fill
+          className="object-cover object-center"
+          sizes="100vw"
+          priority={isPriority}
+        />
+      ) : null}
+      <div className="relative z-10 flex h-full w-full items-center justify-center">
+        {item.contentSrc ? (
+          <Image
+            src={item.contentSrc}
+            alt={item.alt}
+            width={390}
+            height={460}
+            className="h-auto w-full max-w-[390px]"
+            sizes="(max-width: 768px) 100vw, 390px"
+            priority={isPriority}
+          />
+        ) : null}
+      </div>
+    </>
+  );
 
   // 페이지네이션 인라인 스타일
   const paginationStyle = useMemo(
@@ -55,47 +91,31 @@ export function IntroSlider({
   return (
     <div className="relative h-screen pb-[calc(128px+env(safe-area-inset-bottom))]">
       <div className="relative h-full">
-        <Swiper
-          pagination={SWIPER_PAGINATION}
-          modules={SWIPER_MODULES}
-          className="intro-swiper h-full"
-          autoplay={SWIPER_AUTOPLAY}
-          onSlideChange={onSlideChange}
-          onSwiper={swiper => {
-            swiperRef.current = swiper;
-          }}
-        >
-          {intro.map(item => (
-            <SwiperSlide
-              key={item.id}
-              className="relative flex h-full items-center justify-center"
-            >
-              <>
-                {/* 배경 이미지 */}
-                <Image
-                  src={item.backSrc ?? ''}
-                  alt={`${item.alt} 배경`}
-                  fill
-                  className="object-cover object-center"
-                  sizes="100vw"
-                  priority={item.id === 1}
-                />
-                {/* 콘텐츠 이미지 */}
-                <div className="relative z-10 flex h-full w-full items-center justify-center">
-                  <Image
-                    src={item.contentSrc ?? ''}
-                    alt={item.alt}
-                    width={390}
-                    height={460}
-                    className="h-auto w-full max-w-[390px]"
-                    sizes="(max-width: 768px) 100vw, 390px"
-                    priority={item.id === 1}
-                  />
-                </div>
-              </>
-            </SwiperSlide>
-          ))}
-        </Swiper>
+        {isMounted ? (
+          <Swiper
+            pagination={SWIPER_PAGINATION}
+            modules={SWIPER_MODULES}
+            className="intro-swiper h-full"
+            autoplay={SWIPER_AUTOPLAY}
+            onSlideChange={onSlideChange}
+            onSwiper={swiper => {
+              swiperRef.current = swiper;
+            }}
+          >
+            {intro.map(item => (
+              <SwiperSlide
+                key={item.id}
+                className="relative flex h-full items-center justify-center"
+              >
+                {renderSlideContent(item, item.id === 1)}
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        ) : intro[0] ? (
+          <div className="relative flex h-full items-center justify-center">
+            {renderSlideContent(intro[0], true)}
+          </div>
+        ) : null}
         <div
           ref={paginationRef}
           className="intro-pagination"
