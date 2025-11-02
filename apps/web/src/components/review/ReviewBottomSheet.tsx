@@ -55,8 +55,6 @@ export function ReviewBottomSheet({
 
   // v1/reviews/preparation API 호출 - 바텀시트가 열릴 때만 데이터 로드
   useEffect(() => {
-    console.log('useEffect 실행:', { isOpen, recipeId, token: !!token });
-
     // isOpen이 false이면 데이터를 초기화하고 리턴
     if (!isOpen) {
       setReviewData(null);
@@ -65,25 +63,20 @@ export function ReviewBottomSheet({
 
     // recipeId가 없으면 리턴
     if (!recipeId) {
-      console.log('조건 불충족: recipeId 없음');
       return;
     }
 
     // 프로덕션 환경에서는 쿠키 인증을 사용하므로 token 체크를 건너뛰고,
     // 개발 환경에서는 token이 필요함
     if (!isProduction && !token) {
-      console.log('조건 불충족: token 없음 (개발 환경)');
       return;
     }
 
     const getReviewData = async () => {
-      console.log('API 호출 시작:', recipeId);
       try {
         const res = await recipe.getCompletedRecipeDetail(recipeId);
-        console.log('API 응답:', res);
         setReviewData(res);
-      } catch (error) {
-        console.error('Failed to load review data:', error);
+      } catch {
         useApiErrorModalStore.getState().showError({
           message: '레시피 상세 정보를 불러올 수 없습니다.',
         });
