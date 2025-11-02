@@ -165,7 +165,12 @@ const IngredientsSearch = forwardRef<
                 ? '내가 선택한 재료'
                 : '지금 내 냉장고에는..'}
             </h3>
-            <Button onClick={() => clearAllFoods()} variant="outline" size="sm">
+            <Button
+              onClick={() => clearAllFoods()}
+              variant="outline"
+              size="sm"
+              shape="square"
+            >
               전체 삭제
             </Button>
           </div>
