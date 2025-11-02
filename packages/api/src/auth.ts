@@ -169,7 +169,7 @@ export const authService = {
 
   async getGoogleLoginUrl(): Promise<string> {
     const response = await authApi.get('/v1/login/google');
-    return response.data.authUrl;
+    return response.data.data;
   },
 
   async getKakaoCallback(code: string): Promise<{ userId: number }> {
