@@ -7,6 +7,7 @@ import { ArrowIcon } from '../Icons';
 
 interface ReviewRecipeData {
   alt: string;
+  completedRecipeId: number;
   description: string;
   id: number;
   imageUrl: string;
