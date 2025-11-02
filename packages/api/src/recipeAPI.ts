@@ -31,7 +31,7 @@ export const recipe = {
     const response = await recipeAPI.get(
       `/v1/reviews/preparation?completedRecipeId=${recipeId}`
     );
-    return response.data?.data ?? response.data;
+    return response.data.data;
   },
 
   startCooking: async (recipeId: string | number) => {
