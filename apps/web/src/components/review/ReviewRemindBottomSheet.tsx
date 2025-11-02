@@ -98,8 +98,8 @@ export function ReviewRemindBottomSheet() {
     loadPendingReviews();
   }, [loadPendingReviews]);
 
-  const handleRecipeClick = (recipe: ReviewRecipeData) => {
-    router.push(`/mypage/recipes/cooked/${recipe.completedRecipeId}`);
+  const handleRecipeClick = () => {
+    router.push(`/mypage/recipes/cooked`);
     handleClose();
   };
 
@@ -158,7 +158,7 @@ export function ReviewRemindBottomSheet() {
                 {recipes.map(recipe => (
                   <ReviewRecipeCard
                     key={recipe.id}
-                    onClick={() => handleRecipeClick(recipe)}
+                    onClick={handleRecipeClick}
                     recipe={recipe}
                   />
                 ))}
