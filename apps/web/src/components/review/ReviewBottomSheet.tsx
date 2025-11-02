@@ -148,7 +148,7 @@ export function ReviewBottomSheet({
     try {
       await recipe.postRecipeReview(submitData);
       queryClient.invalidateQueries({ queryKey: ['completed-recipes'] });
-      onClose(); // 성공 시 모달 닫기
+      setIsCompleteModalOpen(true);
     } catch (error) {
       if (error instanceof AxiosError && error.response?.status === 400) {
         useApiErrorModalStore.getState().showError({
@@ -295,10 +295,7 @@ export function ReviewBottomSheet({
         <ReviewCompleteModal
           open={isCompleteModalOpen}
           onOpenChange={setIsCompleteModalOpen}
-          onConfirm={() => {
-            setIsCompleteModalOpen(false);
-            onClose();
-          }}
+          onConfirm={onClose}
         />
       </DrawerContent>
     </Drawer>
