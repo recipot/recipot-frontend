@@ -7,6 +7,7 @@ import { useForm } from 'react-hook-form';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { recipe } from '@recipot/api';
 import { useAuth } from '@recipot/contexts';
+import { useQueryClient } from '@tanstack/react-query';
 import axios, { AxiosError } from 'axios';
 import Image from 'next/image';
 
@@ -44,6 +45,7 @@ export function ReviewBottomSheet({
   onClose,
   recipeId,
 }: ReviewBottomSheetProps) {
+  const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false);
   const [reviewData, setReviewData] = useState<ReviewData | null>(null);
   const { token } = useAuth();
@@ -150,7 +152,7 @@ export function ReviewBottomSheet({
           },
         }
       );
-
+      queryClient.invalidateQueries({ queryKey: ['completed-recipes'] });
       onClose(); // 성공 시 모달 닫기
     } catch (error) {
       if (error instanceof AxiosError && error.response?.status === 400) {

@@ -168,7 +168,7 @@ export default function CookedRecipeList({
         <ReviewBottomSheet
           isOpen={isReviewOpen}
           onClose={handleCloseReview}
-          recipeId={selectedRecipe.recipeId}
+          recipeId={selectedRecipe.id}
         />
       )}
     </div>
