@@ -314,6 +314,13 @@ export default function RecipeRecommend() {
             </div>
 
             {/* Page Indicator - 카드 바로 아래 */}
+            <div className="mt-5 w-full">
+              <Toast
+                message={message}
+                isVisible={isVisible}
+                position="card-bottom"
+              />
+            </div>
             <div className="recipe-pagination mt-4 flex justify-center gap-1.5" />
           </div>
         </div>
@@ -323,8 +330,6 @@ export default function RecipeRecommend() {
 
       {/* 튜토리얼 팝업 */}
       {showTutorial && <TutorialPopup onClose={handleCloseTutorial} />}
-
-      <Toast message={message} isVisible={isVisible} />
     </div>
   );
 }
