@@ -9,19 +9,20 @@ interface RecipeTitleProps {
 }
 
 const RecipeTitle = ({ condition }: RecipeTitleProps) => {
-  const mood = moodToConditionId(condition?.name as MoodType);
   const getTitleByCondition = (condition: Condition | null | undefined) => {
-    if (!condition) {
+    if (!condition?.name) {
       return '요리할 여유가 그저 그래요'; // 기본값
     }
 
-    switch (mood) {
+    const conditionId = moodToConditionId(condition.name as MoodType);
+    switch (conditionId) {
       case 1:
         return '요리할 여유가 거의...없어요';
       case 2:
         return '요리할 여유가 그저 그래요';
       case 3:
         return '요리할 여유가 충분해요!';
+
       default:
         return '요리할 여유가 그저 그래요';
     }
@@ -29,17 +30,19 @@ const RecipeTitle = ({ condition }: RecipeTitleProps) => {
 
   // 조건에 따른 이모지 매핑 (유니코드 사용)
   const getEmojiByCondition = (condition: Condition | null | undefined) => {
-    if (!condition) {
+    if (!condition?.name) {
       return '\u{1F611}';
     }
 
-    switch (mood) {
+    const conditionId = moodToConditionId(condition.name as MoodType);
+    switch (conditionId) {
       case 1:
         return '\u{1F623}';
       case 2:
         return '\u{1F611}';
       case 3:
         return '\u{1F60A}';
+
       default:
         return '\u{1F611}';
     }
