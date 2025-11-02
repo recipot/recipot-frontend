@@ -62,7 +62,8 @@ export function ReviewRemindBottomSheet() {
       const recipePromises = response.data.completedRecipeIds.map(
         async (completedRecipeId: number) => {
           try {
-            const recipeDetail = await recipe.getRecipeDetail(completedRecipeId);
+            const recipeDetail =
+              await recipe.getRecipeDetail(completedRecipeId);
             return {
               alt: `${recipeDetail.recipeName} 레시피 이미지`,
               completedRecipeId,
