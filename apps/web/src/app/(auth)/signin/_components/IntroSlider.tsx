@@ -11,7 +11,6 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import type { Swiper as SwiperType } from 'swiper';
 
 const SWIPER_MODULES = [Pagination, Autoplay];
-const SWIPER_AUTOPLAY = { delay: 3500, disableOnInteraction: false };
 const SWIPER_PAGINATION = {
   clickable: true,
   el: '.intro-pagination',
@@ -56,15 +55,19 @@ export function IntroSlider({
       ) : null}
       <div className="relative z-10 flex h-full w-full items-center justify-center">
         {item.contentSrc ? (
-          <Image
-            src={item.contentSrc}
-            alt={item.alt}
-            width={390}
-            height={460}
-            className="h-auto w-full max-w-[390px]"
-            sizes="(max-width: 768px) 100vw, 390px"
-            priority={isPriority}
-          />
+          <div className="w-full max-w-[390px] px-4 py-8 sm:py-12">
+            <div className="relative aspect-[390/460] w-full">
+              <Image
+                src={item.contentSrc}
+                alt={item.alt}
+                width={390}
+                height={460}
+                className="h-full w-full object-contain"
+                sizes="(max-width: 768px) 100vw, 390px"
+                priority={isPriority}
+              />
+            </div>
+          </div>
         ) : null}
       </div>
     </>
@@ -96,7 +99,6 @@ export function IntroSlider({
             pagination={SWIPER_PAGINATION}
             modules={SWIPER_MODULES}
             className="intro-swiper h-full"
-            autoplay={SWIPER_AUTOPLAY}
             onSlideChange={onSlideChange}
             onSwiper={swiper => {
               swiperRef.current = swiper;
