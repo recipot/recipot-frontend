@@ -22,7 +22,7 @@ export function TermsOfServiceBottomSheet({
 }: TermsOfServiceModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="flex max-h-[85vh] w-full max-w-3xl flex-col overflow-hidden">
+      <DialogContent className="flex max-h-[85vh] w-full max-w-[calc(100%-2rem)] sm:max-w-3xl flex-col overflow-hidden">
         <VisuallyHidden asChild>
           <DialogTitle>서비스 이용약관</DialogTitle>
         </VisuallyHidden>
@@ -40,7 +40,7 @@ export function TermsOfServiceBottomSheet({
         </header>
 
         {/* 스크롤 가능한 메인 컨텐츠 영역 */}
-        <main className="flex-1 overflow-y-auto px-6 pb-6">
+        <main className="flex-1 overflow-y-auto px-4 pb-6 sm:px-6">
           <div className="prose prose-sm max-w-none">
             <section className="mb-8">
               <h2 className="mb-4 text-xl font-semibold">제1장 총 칙</h2>
