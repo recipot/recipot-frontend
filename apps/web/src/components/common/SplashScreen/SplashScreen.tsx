@@ -12,9 +12,22 @@ import { useSplash } from '@/contexts/SplashContext';
 export default function SplashScreen() {
   const [isVisible, setIsVisible] = useState(true);
   const [shouldRender, setShouldRender] = useState(true);
-  const { markAsCompleted } = useSplash();
+  const { isCompleted, markAsCompleted } = useSplash();
+
+  // 이미 완료된 경우 렌더링하지 않음
+  useEffect(() => {
+    if (isCompleted) {
+      setShouldRender(false);
+      return;
+    }
+  }, [isCompleted]);
 
   useEffect(() => {
+    // 이미 완료된 경우 타이머 설정하지 않음
+    if (isCompleted || !shouldRender) {
+      return;
+    }
+
     // 페이드아웃 시작
     const fadeOutTimer = setTimeout(() => {
       setIsVisible(false);
@@ -30,9 +43,9 @@ export default function SplashScreen() {
       clearTimeout(fadeOutTimer);
       clearTimeout(removeTimer);
     };
-  }, [markAsCompleted]);
+  }, [isCompleted, shouldRender, markAsCompleted]);
 
-  if (!shouldRender) {
+  if (!shouldRender || isCompleted) {
     return null;
   }
 
