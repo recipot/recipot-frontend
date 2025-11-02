@@ -152,12 +152,13 @@ export default function RecipeRecommend() {
       }
       showToast('레시피를 불러오는데 실패했어요');
     }
-  }, [userSelectedMood, selectedFoodIds, router, showToast]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userSelectedMood, selectedFoodIds, router]);
 
   useEffect(() => {
     fetchRecommendRecipes();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [userSelectedMood, selectedFoodIds]);
 
   useEffect(() => {
     const fetchProfile = async () => {
