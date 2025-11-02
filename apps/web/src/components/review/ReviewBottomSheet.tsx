@@ -52,10 +52,15 @@ export function ReviewBottomSheet({
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
   const { token } = useAuth();
 
-  // v1/reviews/preparation API 호출
+  // v1/reviews/preparation API 호출 - 바텀시트가 열릴 때만 데이터 로드
   useEffect(() => {
     const getReviewData = async () => {
-      if (!token || !recipeId) {
+      // isOpen이 false이면 데이터를 로드하지 않음
+      if (!isOpen || !token || !recipeId) {
+        // 바텀시트가 닫히면 데이터 초기화
+        if (!isOpen) {
+          setReviewData(null);
+        }
         return;
       }
 
@@ -69,7 +74,7 @@ export function ReviewBottomSheet({
       }
     };
     getReviewData();
-  }, [token, recipeId]);
+  }, [isOpen, token, recipeId]);
   const { handleSubmit, register, setValue, watch } = useForm<ReviewFormData>({
     defaultValues: {
       completedRecipeId: recipeId,
@@ -186,40 +191,40 @@ export function ReviewBottomSheet({
                 </button>
               </div>
 
-              {/* 로딩 및 에러 상태 표시 */}
-
-              {/* 레시피 정보 */}
-              <div className="flex items-center gap-4">
-                <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gray-100">
-                  {reviewData?.recipeImageUrl ? (
-                    <Image
-                      src={reviewData.recipeImageUrl}
-                      alt={reviewData.recipeName}
-                      width={72}
-                      height={72}
-                      className="h-full w-full object-cover"
-                      priority
-                    />
-                  ) : (
-                    <div className="h-7 w-7 rounded bg-gray-300" />
-                  )}
-                </div>
-                <div className="min-w-0">
-                  <p className="text-15 text-gray-600">
-                    {reviewData?.completionCount}번째 레시피 해먹기 완료!
-                  </p>
-                  <h2 className="text-20 truncate text-gray-900">
-                    {reviewData?.recipeName}
-                  </h2>
-                </div>
-              </div>
-            </div>
-            <div className="mb-6 h-0 border-t border-dashed border-gray-300" />
-            {/* 스크롤 가능한 영역 - 선택 항목 및 의견 작성 */}
-            <div className="overflow-y-auto px-4">
-              {/* 감정 선택 섹션 */}
+              {/* 레시피 정보 - 데이터가 로드된 후에만 표시 */}
               {reviewData && (
-                <>
+                <div className="flex items-center gap-4">
+                  <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gray-100">
+                    {reviewData.recipeImageUrl ? (
+                      <Image
+                        src={reviewData.recipeImageUrl}
+                        alt={reviewData.recipeName}
+                        width={72}
+                        height={72}
+                        className="h-full w-full object-cover"
+                        priority
+                      />
+                    ) : (
+                      <div className="h-7 w-7 rounded bg-gray-300" />
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-15 text-gray-600">
+                      {reviewData.completionCount}번째 레시피 해먹기 완료!
+                    </p>
+                    <h2 className="text-20 truncate text-gray-900">
+                      {reviewData.recipeName}
+                    </h2>
+                  </div>
+                </div>
+              )}
+            </div>
+            {reviewData && (
+              <>
+                <div className="mb-6 h-0 border-t border-dashed border-gray-300" />
+                {/* 스크롤 가능한 영역 - 선택 항목 및 의견 작성 */}
+                <div className="overflow-y-auto px-4">
+                  {/* 감정 선택 섹션 */}
                   {[
                     {
                       options: reviewData.tasteOptions,
@@ -251,37 +256,39 @@ export function ReviewBottomSheet({
                       uiTextMapping={UI_TEXT_MAPPING}
                     />
                   ))}
-                </>
-              )}
 
-              {/* 코멘트 입력 */}
-              <div className="textarea-container mb-[13px]">
-                <p className="text-18sb mb-2 text-gray-900">
-                  기타 의견이 있어요!
-                </p>
-                <textarea
-                  {...register('content')}
-                  placeholder="내용을 입력해 주세요"
-                  className="text-17 w-full rounded-xl border border-gray-300 bg-white p-4 text-gray-900 placeholder:text-gray-400 focus:border-[#68982d] focus:outline-none"
-                  maxLength={200}
-                />
-              </div>
-            </div>
+                  {/* 코멘트 입력 */}
+                  <div className="textarea-container mb-[13px]">
+                    <p className="text-18sb mb-2 text-gray-900">
+                      기타 의견이 있어요!
+                    </p>
+                    <textarea
+                      {...register('content')}
+                      placeholder="내용을 입력해 주세요"
+                      className="text-17 w-full rounded-xl border border-gray-300 bg-white p-4 text-gray-900 placeholder:text-gray-400 focus:border-[#68982d] focus:outline-none"
+                      maxLength={200}
+                    />
+                  </div>
+                </div>
+              </>
+            )}
 
             {/* 그라데이션 - 버튼 바로 위 */}
             <div className="review-bottom-sheet-gradient" />
 
-            {/* 제출 버튼 - 하단 고정 */}
-            <div className="px-4 pt-4 pb-4">
-              <Button
-                type="submit"
-                disabled={!isFormValid}
-                className="px-8 py-[15px]"
-                size="full"
-              >
-                후기 등록하기
-              </Button>
-            </div>
+            {/* 제출 버튼 - 하단 고정 - 데이터가 로드된 후에만 표시 */}
+            {reviewData && (
+              <div className="px-4 pt-4 pb-4">
+                <Button
+                  type="submit"
+                  disabled={!isFormValid}
+                  className="px-8 py-[15px]"
+                  size="full"
+                >
+                  후기 등록하기
+                </Button>
+              </div>
+            )}
           </div>
         </form>
         <ReviewCompleteModal
