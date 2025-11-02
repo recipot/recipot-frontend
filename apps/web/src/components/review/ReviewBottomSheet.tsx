@@ -7,7 +7,8 @@ import { useForm } from 'react-hook-form';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { recipe } from '@recipot/api';
 import { useAuth } from '@recipot/contexts';
-import { AxiosError } from 'axios';
+import { useQueryClient } from '@tanstack/react-query';
+import axios, { AxiosError } from 'axios';
 import Image from 'next/image';
 
 import { useApiErrorModalStore } from '@/stores';
@@ -46,6 +47,7 @@ export function ReviewBottomSheet({
   onClose,
   recipeId,
 }: ReviewBottomSheetProps) {
+  const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false);
   const [reviewData, setReviewData] = useState<ReviewData | null>(null);
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
@@ -144,10 +146,17 @@ export function ReviewBottomSheet({
     };
 
     try {
-      await recipe.postRecipeReiew(submitData);
-
-      // 성공 시 완료 모달 띄우기
-      setIsCompleteModalOpen(true);
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/reviews`,
+        submitData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      queryClient.invalidateQueries({ queryKey: ['completed-recipes'] });
+      onClose(); // 성공 시 모달 닫기
     } catch (error) {
       if (error instanceof AxiosError && error.response?.status === 400) {
         useApiErrorModalStore.getState().showError({

@@ -58,7 +58,10 @@ export default function CookedRecipeList({
           <div className="flex h-full flex-col items-center justify-center">
             <div className="mb-9 text-center">
               <p className="text-22sb text-gray-900">
-                앗, 냉장고가 텅 비었어요!
+                아직 내가 만든 요리가 없어요
+              </p>
+              <p className="text-22sb text-gray-900">
+                지금부터 하나씩 채워볼까요?
               </p>
             </div>
 
@@ -80,7 +83,7 @@ export default function CookedRecipeList({
                 router.push('/recipeRecommend');
               }}
             >
-              레시피 추천 받으러 가기
+              레시피 채우러 갈게요
             </Button>
           </div>
         </div>
@@ -140,7 +143,7 @@ export default function CookedRecipeList({
                             className="text-15sb py-3"
                             onClick={() => handleOpenReview(recipe)}
                           >
-                            맛있게 드셨나요? 후기를 남겨주세요
+                            직접 해먹은 이 레시피! 어땠나요?
                           </Button>
                         </div>
                       )}
@@ -165,7 +168,7 @@ export default function CookedRecipeList({
         <ReviewBottomSheet
           isOpen={isReviewOpen}
           onClose={handleCloseReview}
-          recipeId={selectedRecipe.recipeId}
+          recipeId={selectedRecipe.id}
         />
       )}
     </div>

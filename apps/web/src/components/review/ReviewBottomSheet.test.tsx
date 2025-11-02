@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
@@ -5,6 +6,24 @@ import { vi } from 'vitest';
 import type { ReviewData } from '@/types/review.types';
 
 import { ReviewBottomSheet } from '.';
+
+// QueryClient 생성 함수
+const createTestQueryClient = () =>
+  new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+      },
+    },
+  });
+
+// 테스트용 래퍼 컴포넌트
+const wrapper = ({ children }: { children: React.ReactNode }) => {
+  const queryClient = createTestQueryClient();
+  return (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  );
+};
 
 // axios 모킹
 // vi.hoisted를 사용하여 모킹 함수 내부에서 사용할 수 있는 변수 생성
@@ -146,14 +165,14 @@ describe('ReviewBottomSheet', () => {
   });
 
   it('렌더링되지 않아야 함 (isOpen이 false일 때)', async () => {
-    render(<ReviewBottomSheet {...defaultProps} isOpen={false} />);
+    render(<ReviewBottomSheet {...defaultProps} isOpen={false} />, { wrapper });
     await waitFor(() => {
       expect(screen.queryByText('김치찌개')).not.toBeInTheDocument();
     });
   });
 
   it('올바르게 렌더링되어야 함', async () => {
-    render(<ReviewBottomSheet {...defaultProps} />);
+    render(<ReviewBottomSheet {...defaultProps} />, { wrapper });
 
     await waitFor(() => {
       expect(screen.getByText('김치찌개')).toBeInTheDocument();
@@ -169,7 +188,7 @@ describe('ReviewBottomSheet', () => {
 
   it('닫기 버튼이 작동해야 함', async () => {
     const user = userEvent.setup();
-    render(<ReviewBottomSheet {...defaultProps} />);
+    render(<ReviewBottomSheet {...defaultProps} />, { wrapper });
 
     await waitFor(() => {
       expect(screen.getByText('김치찌개')).toBeInTheDocument();
@@ -191,7 +210,7 @@ describe('ReviewBottomSheet', () => {
 
   it('감정 선택이 작동해야 함', async () => {
     const user = userEvent.setup();
-    render(<ReviewBottomSheet {...defaultProps} />);
+    render(<ReviewBottomSheet {...defaultProps} />, { wrapper });
 
     await waitFor(() => {
       expect(screen.getByText('맛있어요')).toBeInTheDocument();
@@ -204,7 +223,7 @@ describe('ReviewBottomSheet', () => {
 
   it('모든 감정을 선택하고 댓글을 입력해야 제출 버튼이 활성화되어야 함', async () => {
     const user = userEvent.setup();
-    render(<ReviewBottomSheet {...defaultProps} />);
+    render(<ReviewBottomSheet {...defaultProps} />, { wrapper });
 
     await waitFor(() => {
       expect(screen.getByText('맛있어요')).toBeInTheDocument();
@@ -236,7 +255,7 @@ describe('ReviewBottomSheet', () => {
 
   it('댓글 입력이 작동해야 함', async () => {
     const user = userEvent.setup();
-    render(<ReviewBottomSheet {...defaultProps} />);
+    render(<ReviewBottomSheet {...defaultProps} />, { wrapper });
 
     await waitFor(() => {
       expect(
@@ -253,7 +272,7 @@ describe('ReviewBottomSheet', () => {
   // TODO: 백엔드 확인 필요
   // it('완전한 폼 제출이 작동해야 함', async () => {
   //   const user = userEvent.setup();
-  //   render(<ReviewBottomSheet {...defaultProps} />);
+  //   render(<ReviewBottomSheet {...defaultProps} />, { wrapper });
 
   //   // 모든 감정 선택
   //   await user.click(screen.getByText('맛있어요'));
@@ -290,7 +309,9 @@ describe('ReviewBottomSheet', () => {
         },
       },
     });
-    const { rerender } = render(<ReviewBottomSheet {...defaultProps} />);
+    const { rerender } = render(<ReviewBottomSheet {...defaultProps} />, {
+      wrapper,
+    });
 
     await waitFor(() => {
       expect(screen.getByText('김치찌개')).toBeInTheDocument();

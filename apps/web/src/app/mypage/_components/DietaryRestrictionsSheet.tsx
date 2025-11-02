@@ -3,8 +3,6 @@
 import React, { useEffect, useRef } from 'react';
 import { allergy } from '@recipot/api';
 
-import { useApiErrorModalStore } from '@/stores/apiErrorModalStore';
-
 import { Allergy, useAllergyContext } from '@/components/Allergy';
 import type { AllergyFormSchema } from '@/components/Allergy/constants/constants';
 import { CloseIcon } from '@/components/Icons';
@@ -14,6 +12,7 @@ import {
   DrawerContent,
   DrawerTitle,
 } from '@/components/ui/drawer';
+import { useApiErrorModalStore } from '@/stores/apiErrorModalStore';
 
 import type { z } from 'zod';
 
@@ -123,7 +122,8 @@ function DietaryRestrictionsContent({
     } catch (error) {
       console.error('못 먹는 음식 설정에 실패했습니다: ', error);
       useApiErrorModalStore.getState().showError({
-        message: '못 먹는 음식 설정에 실패했습니다.\n잠시 후 다시 시도해주세요.',
+        message:
+          '못 먹는 음식 설정에 실패했습니다.\n잠시 후 다시 시도해주세요.',
       });
     }
   };
@@ -142,7 +142,7 @@ function DietaryRestrictionsContent({
       </div>
 
       <DrawerTitle className="!text-22sb mb-4 px-6 text-gray-900">
-        못먹는 음식 설정
+        몸에 안 맞는 재료
       </DrawerTitle>
 
       <div
@@ -167,7 +167,7 @@ function DietaryRestrictionsContent({
 
         <Allergy.SubmitButton
           className="text-17sb bg-primary h-14 flex-1 text-white"
-          text="못먹는 음식 선택 완료"
+          text="안 맞는 재료 선택했어요"
         />
       </div>
     </>
