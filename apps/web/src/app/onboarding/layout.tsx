@@ -4,7 +4,10 @@ import { useRouter } from 'next/navigation';
 
 import { Header } from '@/components/common/Header';
 import { RefreshIcon } from '@/components/Icons';
+import { useAllergiesStore } from '@/stores/allergiesStore';
+import { useMoodStore } from '@/stores/moodStore';
 import { useOnboardingStore } from '@/stores/onboardingStore';
+import { useSelectedFoodsStore } from '@/stores/selectedFoodsStore';
 
 function OnboardingHeader() {
   const router = useRouter();
@@ -14,6 +17,13 @@ function OnboardingHeader() {
   );
   const goToPreviousStep = useOnboardingStore(state => state.goToPreviousStep);
   const resetCurrentStep = useOnboardingStore(state => state.resetCurrentStep);
+  const hasAllergySelection = useAllergiesStore(
+    state => state.allergies.length > 0 || state.selectedItems.length > 0
+  );
+  const hasMoodSelection = useMoodStore(state => state.mood !== null);
+  const hasFoodSelection = useSelectedFoodsStore(
+    state => state.selectedFoodIds.length > 0
+  );
 
   const handleBackClick = () => {
     if (canGoToPreviousStep()) {
@@ -30,11 +40,18 @@ function OnboardingHeader() {
     console.info('refresh');
   };
 
+  const hasSelection =
+    (currentStep === 1 && hasAllergySelection) ||
+    (currentStep === 2 && hasMoodSelection) ||
+    (currentStep === 3 && hasFoodSelection);
+
+  const refreshIconColor = hasSelection ? 'hsl(var(--gray-900))' : undefined;
+
   return (
     <Header>
       <Header.Back show={currentStep > 1} onClick={handleBackClick} />
       <Header.Action onClick={handleRefreshClick} ariaLabel="새로고침">
-        <RefreshIcon size={24} />
+        <RefreshIcon size={24} color={refreshIconColor} />
       </Header.Action>
     </Header>
   );

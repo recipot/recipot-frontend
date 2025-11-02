@@ -37,6 +37,7 @@ export default function CookStateStep() {
   const handleMoodSelect = (mood: MoodType) => {
     const newMood = selectedMood === mood ? null : mood;
     setSelectedMood(newMood);
+    setMood(newMood);
   };
 
   const handleNext = async () => {
@@ -44,8 +45,6 @@ export default function CookStateStep() {
 
     try {
       // 기분 스토어에 저장
-      setMood(selectedMood);
-
       await saveAndProceed();
     } catch (error) {
       handleError(error as Error);

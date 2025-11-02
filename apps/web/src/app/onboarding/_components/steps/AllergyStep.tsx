@@ -31,6 +31,10 @@ function AllergyStepContent() {
     }
   }, [isRefreshed, resetItems, clearRefreshFlag]);
 
+  useEffect(() => {
+    setSelectedItems(selectedItems);
+  }, [selectedItems, setSelectedItems]);
+
   const handleSubmit = async (data: { items: number[] }) => {
     try {
       // 알러지 스토어에 저장
