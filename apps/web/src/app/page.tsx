@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { condition } from '@recipot/api';
 import { useAuth } from '@recipot/contexts';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -8,6 +8,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+import { DesktopLanding } from '@/app/(auth)/signin/_components/DesktopLanding';
 import { Button } from '@/components/common/Button';
 import { Header } from '@/components/common/Header';
 import { LoadingPage } from '@/components/common/Loading';
@@ -36,6 +37,10 @@ export default function Home() {
   const router = useRouter();
   const { isCompleted } = useSplash();
   const { selectedFoodIds } = useSelectedFoodsStore();
+  const navigateWithoutScroll = useCallback(
+    (path: string) => router.push(path, { scroll: false }),
+    [router]
+  );
   const {
     isVisible: isToastVisible,
     message: toastMessage,
@@ -52,6 +57,8 @@ export default function Home() {
     showIngredientsSearch,
   } = useMoodSelectionFlow();
 
+  const [hasMounted, setHasMounted] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
   const [selectedCount, setSelectedCount] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -60,22 +67,55 @@ export default function Home() {
   useCompletedRecipes({ limit: 10, page: 1 });
 
   useEffect(() => {
+    setHasMounted(true);
+
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const mediaQuery = window.matchMedia('(min-width: 1024px)');
+    const handleChange = (event: MediaQueryListEvent) => {
+      setIsDesktop(event.matches);
+    };
+
+    setIsDesktop(mediaQuery.matches);
+
+    if (typeof mediaQuery.addEventListener === 'function') {
+      mediaQuery.addEventListener('change', handleChange);
+
+      return () => {
+        mediaQuery.removeEventListener('change', handleChange);
+      };
+    }
+
+    mediaQuery.addListener(handleChange);
+
+    return () => {
+      mediaQuery.removeListener(handleChange);
+    };
+  }, []);
+
+  useEffect(() => {
     // 로딩 중에는 체크하지 않음
-    if (loading) {
+    if (!hasMounted || loading) {
       return;
     }
 
     // 1. 비로그인 사용자 → 로그인 페이지로 이동
     if (!user) {
-      router.push('/signin');
+      if (!isDesktop) {
+        navigateWithoutScroll('/signin');
+      }
       return;
     }
 
     // 2. 로그인 + 온보딩 미완료 → 온보딩 페이지로 이동
     if (user.isFirstEntry) {
-      router.push('/onboarding');
+      if (!isDesktop) {
+        navigateWithoutScroll('/onboarding');
+      }
     }
-  }, [loading, user, router]);
+  }, [hasMounted, isDesktop, loading, user, navigateWithoutScroll]);
 
   const handleComplete = async () => {
     try {
@@ -103,7 +143,7 @@ export default function Home() {
       console.info('✅ 재료 선택 및 컨디션 저장 완료');
 
       // 레시피 추천 페이지로 이동
-      router.push('/recipeRecommend');
+      navigateWithoutScroll('/recipeRecommend');
     } catch (error) {
       console.error('❌ 재료 선택 완료 실패:', error);
 
@@ -120,6 +160,14 @@ export default function Home() {
   const handleSelectionChange = (count: number) => {
     setSelectedCount(count);
   };
+
+  if (!hasMounted) {
+    return null;
+  }
+
+  if (isDesktop) {
+    return <DesktopLanding iframeSrc="/signin/mobile" wrapperClassName="py-0" />;
+  }
 
   // 로딩 중일 때 표시할 화면
   if (loading) {
@@ -146,10 +194,10 @@ export default function Home() {
               <Image
                 src="/logo.png"
                 alt="한끼부터"
-                width={80}
-                height={30}
+                width={352}
+                height={94}
                 priority
-                className="object-contain"
+                className="h-auto w-20 object-contain"
               />
             </Link>
             <Link

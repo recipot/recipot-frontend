@@ -36,6 +36,10 @@ export { default as UserIcon } from './UserIcon';
 export { default as GoogleIcon } from './GoogleIcon';
 export { default as KakaoIcon } from './KakaoIcon';
 
+// 소셜 미디어 아이콘들
+export { default as InstagramIcon } from './InstagramIcon';
+export { default as YouTubeIcon } from './YouTubeIcon';
+
 // 찜 아이콘
 export { default as HeartIcon } from './HeartIcon';
 

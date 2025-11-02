@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { condition, onboarding } from '@recipot/api';
 import { useAuth } from '@recipot/contexts';
 import { useRouter } from 'next/navigation';
@@ -27,6 +27,10 @@ const MIN_LOADING_DURATION_MS = 1000;
 export default function RefrigeratorStep() {
   const { setUser, user } = useAuth();
   const router = useRouter();
+  const navigateWithoutScroll = useCallback(
+    (path: string) => router.push(path, { scroll: false }),
+    [router]
+  );
   // 온보딩 액션들
   const { clearRefreshFlag, isRefreshed, markStepCompleted } =
     useOnboardingActions();
@@ -136,7 +140,7 @@ export default function RefrigeratorStep() {
         selectedFoods: completeData.selectedFoods,
       });
 
-      router.push('/recipeRecommend');
+      navigateWithoutScroll('/recipeRecommend');
     } catch (error) {
       console.error('❌ 온보딩 완료 실패:', error);
 
