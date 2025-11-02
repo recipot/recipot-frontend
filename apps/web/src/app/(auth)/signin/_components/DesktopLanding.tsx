@@ -36,6 +36,7 @@ export function DesktopLanding({
                 귀찮은 나를 위한 집밥 루틴 서비스
               </span>
               <h1 className="">
+                <span className="sr-only">한끼부터</span>
                 <Image
                   src="/logo.png"
                   alt="한끼부터"

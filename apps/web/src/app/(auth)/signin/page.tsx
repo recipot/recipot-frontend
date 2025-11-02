@@ -32,10 +32,10 @@ export default function SignInPage() {
       };
     }
 
-    mediaQuery.addListener(handleChange);
+    mediaQuery.addEventListener('change', handleChange);
 
     return () => {
-      mediaQuery.removeListener(handleChange);
+      mediaQuery.removeEventListener('change', handleChange);
     };
   }, []);
 
