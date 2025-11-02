@@ -48,7 +48,6 @@ export function ReviewBottomSheet({
   recipeId,
 }: ReviewBottomSheetProps) {
   const queryClient = useQueryClient();
-  const [isLoading, setIsLoading] = useState(false);
   const [reviewData, setReviewData] = useState<ReviewData | null>(null);
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
   const { token } = useAuth();
@@ -61,12 +60,12 @@ export function ReviewBottomSheet({
       }
 
       try {
-        setIsLoading(true);
-
         const res = await recipe.getCompletedRecipeDetail(recipeId);
         setReviewData(res);
-      } catch (error) {
-        console.error('💥 Reviews preparation API 호출 실패:', error);
+      } catch {
+        useApiErrorModalStore.getState().showError({
+          message: '레시피 상세 정보를 불러올 수 없습니다.',
+        });
       }
     };
     getReviewData();
@@ -188,13 +187,6 @@ export function ReviewBottomSheet({
               </div>
 
               {/* 로딩 및 에러 상태 표시 */}
-              {isLoading && (
-                <div className="flex items-center justify-center py-4">
-                  <div className="text-sm text-gray-500">
-                    데이터를 불러오는 중...
-                  </div>
-                </div>
-              )}
 
               {/* 레시피 정보 */}
               <div className="flex items-center gap-4">
