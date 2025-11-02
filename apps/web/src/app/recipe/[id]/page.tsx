@@ -1,11 +1,12 @@
+import { use } from 'react';
+
 import RecipeDetail from './_components/RecipeDetail';
 
 interface RecipePageProps {
-  params: {
-    id: string;
-  };
+  params: Promise<{ id: string }>;
 }
 
 export default function RecipePage({ params }: RecipePageProps) {
-  return <RecipeDetail recipeId={params.id} />;
+  const { id } = use(params);
+  return <RecipeDetail recipeId={id} />;
 }

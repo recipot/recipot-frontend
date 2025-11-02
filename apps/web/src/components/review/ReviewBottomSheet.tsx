@@ -8,9 +8,10 @@ import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { recipe } from '@recipot/api';
 import { useAuth } from '@recipot/contexts';
 import { useQueryClient } from '@tanstack/react-query';
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import Image from 'next/image';
 
+import { useApiErrorModalStore } from '@/stores';
 import type {
   ReviewBottomSheetProps,
   ReviewData,
@@ -21,6 +22,7 @@ import { Button } from '../common/Button';
 import { CloseIcon } from '../Icons';
 import { Drawer, DrawerContent, DrawerTitle } from '../ui/drawer';
 import { EmotionSection } from './EmotionSection';
+import ReviewCompleteModal from './ReviewCompleteModal';
 
 // UI용 매핑 객체 - 이미지 디자인에 맞는 텍스트로 변환
 const UI_TEXT_MAPPING: Record<string, string> = {
@@ -46,8 +48,8 @@ export function ReviewBottomSheet({
   recipeId,
 }: ReviewBottomSheetProps) {
   const queryClient = useQueryClient();
-  const [isLoading, setIsLoading] = useState(false);
   const [reviewData, setReviewData] = useState<ReviewData | null>(null);
+  const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
   const { token } = useAuth();
 
   // v1/reviews/preparation API 호출
@@ -58,12 +60,12 @@ export function ReviewBottomSheet({
       }
 
       try {
-        setIsLoading(true);
-
         const res = await recipe.getCompletedRecipeDetail(recipeId);
         setReviewData(res);
-      } catch (error) {
-        console.error('💥 Reviews preparation API 호출 실패:', error);
+      } catch {
+        useApiErrorModalStore.getState().showError({
+          message: '레시피 상세 정보를 불러올 수 없습니다.',
+        });
       }
     };
     getReviewData();
@@ -143,22 +145,15 @@ export function ReviewBottomSheet({
     };
 
     try {
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/reviews`,
-        submitData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await recipe.postRecipeReview(submitData);
       queryClient.invalidateQueries({ queryKey: ['completed-recipes'] });
-      onClose(); // 성공 시 모달 닫기
+      setIsCompleteModalOpen(true);
     } catch (error) {
       if (error instanceof AxiosError && error.response?.status === 400) {
-        console.log(
-          error.message ?? '레시피 완료 후에만 후기를 작성할 수 있습니다.'
-        );
+        useApiErrorModalStore.getState().showError({
+          message:
+            error.message ?? '레시피 완료 후에만 후기를 작성할 수 있습니다.',
+        });
       }
     }
   };
@@ -192,13 +187,6 @@ export function ReviewBottomSheet({
               </div>
 
               {/* 로딩 및 에러 상태 표시 */}
-              {isLoading && (
-                <div className="flex items-center justify-center py-4">
-                  <div className="text-sm text-gray-500">
-                    데이터를 불러오는 중...
-                  </div>
-                </div>
-              )}
 
               {/* 레시피 정보 */}
               <div className="flex items-center gap-4">
@@ -296,6 +284,11 @@ export function ReviewBottomSheet({
             </div>
           </div>
         </form>
+        <ReviewCompleteModal
+          open={isCompleteModalOpen}
+          onOpenChange={setIsCompleteModalOpen}
+          onConfirm={onClose}
+        />
       </DrawerContent>
     </Drawer>
   );

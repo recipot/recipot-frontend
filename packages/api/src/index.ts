@@ -35,6 +35,9 @@ export type {
   Food,
   FoodListApiResponse,
   CompleteOnboardingData,
+  ReviewData,
+  ReviewOption,
+  ReviewSubmitData,
 } from './types';
 
 // Health Survey API
