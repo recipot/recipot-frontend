@@ -60,18 +60,20 @@ export function ReviewRemindBottomSheet() {
 
       // 각 레시피 ID로 상세 정보 조회
       const recipePromises = response.data.completedRecipeIds.map(
-        async (id: number) => {
+        async (completedRecipeId: number) => {
           try {
-            const recipeDetail = await recipe.getRecipeDetail(id);
+            const recipeDetail =
+              await recipe.getRecipeDetail(completedRecipeId);
             return {
               alt: `${recipeDetail.recipeName} 레시피 이미지`,
+              completedRecipeId,
               description: `${recipeDetail.completionCount}번째 레시피 해먹기 완료!`,
               id: recipeDetail.id,
               imageUrl: recipeDetail.recipeImageUrl ?? '/recipeImage.png',
               title: recipeDetail.recipeName,
             };
           } catch (error) {
-            console.error(`Failed to load recipe ${id}:`, error);
+            console.error(`Failed to load recipe ${completedRecipeId}:`, error);
             return null;
           }
         }
@@ -96,8 +98,8 @@ export function ReviewRemindBottomSheet() {
     loadPendingReviews();
   }, [loadPendingReviews]);
 
-  const handleRecipeClick = (recipeId: number) => {
-    router.push(`/mypage/recipes/cooked/${recipeId}`);
+  const handleRecipeClick = (recipe: ReviewRecipeData) => {
+    router.push(`/mypage/recipes/cooked/${recipe.completedRecipeId}`);
     handleClose();
   };
 
@@ -156,7 +158,7 @@ export function ReviewRemindBottomSheet() {
                 {recipes.map(recipe => (
                   <ReviewRecipeCard
                     key={recipe.id}
-                    onClick={() => handleRecipeClick(recipe.id)}
+                    onClick={() => handleRecipeClick(recipe)}
                     recipe={recipe}
                   />
                 ))}
