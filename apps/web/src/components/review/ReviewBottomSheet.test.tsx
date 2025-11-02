@@ -26,17 +26,50 @@ const wrapper = ({ children }: { children: React.ReactNode }) => {
 };
 
 // axios 모킹
-const mockAxiosGet = vi.fn();
-const mockAxiosPost = vi.fn();
+// vi.hoisted를 사용하여 모킹 함수 내부에서 사용할 수 있는 변수 생성
+const { mockAxiosGet, mockAxiosPost, mockInstanceGet, mockInstancePost } =
+  vi.hoisted(() => {
+    // 인스턴스용 mock 함수들 (createApiInstance에서 생성되는 인스턴스의 get/post용)
+    const instanceGet = vi.fn();
+    const instancePost = vi.fn();
 
-vi.mock('axios', () => ({
-  default: {
-    get: (...args: unknown[]) => mockAxiosGet(...args),
+    // 일반 axios 함수들 (직접 axios.get/post 호출 시 사용)
+    const axiosGet = vi.fn();
+    const axiosPost = vi.fn();
+
+    return {
+      mockAxiosGet: axiosGet,
+      mockAxiosPost: axiosPost,
+      mockInstanceGet: instanceGet,
+      mockInstancePost: instancePost,
+    };
+  });
+
+vi.mock('axios', () => {
+  // axios 인스턴스 모킹 (createApiInstance에서 사용)
+  const mockAxiosInstance = {
+    get: mockInstanceGet,
+    interceptors: {
+      request: {
+        use: vi.fn(),
+      },
+      response: {
+        use: vi.fn(),
+      },
+    },
+    post: mockInstancePost,
+  };
+
+  return {
+    default: {
+      create: vi.fn(() => mockAxiosInstance),
+      get: mockAxiosGet,
+      isAxiosError: (error: unknown) => error instanceof Error,
+      post: mockAxiosPost,
+    },
     isAxiosError: (error: unknown) => error instanceof Error,
-    post: (...args: unknown[]) => mockAxiosPost(...args),
-  },
-  isAxiosError: (error: unknown) => error instanceof Error,
-}));
+  };
+});
 
 // useAuth 모킹
 vi.mock('@recipot/contexts', () => ({
@@ -119,6 +152,12 @@ const defaultProps = {
 describe('ReviewBottomSheet', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // createApiInstance를 통해 생성된 인스턴스의 get/post 메서드 설정
+    mockInstanceGet.mockResolvedValue({
+      data: { data: mockReviewData },
+    });
+    mockInstancePost.mockResolvedValue({ data: { success: true } });
+    // 직접 axios 호출용 (현재는 사용하지 않지만 호환성을 위해)
     mockAxiosGet.mockResolvedValue({
       data: { data: mockReviewData },
     });
@@ -262,7 +301,7 @@ describe('ReviewBottomSheet', () => {
 
   it('다양한 reviewData에 따라 올바르게 렌더링되어야 함', async () => {
     // 이미지가 없을 때
-    mockAxiosGet.mockResolvedValueOnce({
+    mockInstanceGet.mockResolvedValueOnce({
       data: {
         data: {
           ...mockReviewData,
@@ -279,7 +318,7 @@ describe('ReviewBottomSheet', () => {
     });
 
     // 첫 번째 완료일 때
-    mockAxiosGet.mockResolvedValueOnce({
+    mockInstanceGet.mockResolvedValueOnce({
       data: {
         data: {
           ...mockReviewData,
@@ -293,7 +332,7 @@ describe('ReviewBottomSheet', () => {
     });
 
     // 긴 레시피 이름일 때
-    mockAxiosGet.mockResolvedValueOnce({
+    mockInstanceGet.mockResolvedValueOnce({
       data: {
         data: {
           ...mockReviewData,

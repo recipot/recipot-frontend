@@ -5,6 +5,7 @@ import './styles.css';
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+import { recipe } from '@recipot/api';
 import { useAuth } from '@recipot/contexts';
 import { useQueryClient } from '@tanstack/react-query';
 import axios, { AxiosError } from 'axios';
@@ -59,26 +60,14 @@ export function ReviewBottomSheet({
       try {
         setIsLoading(true);
 
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/reviews/preparation?completedRecipeId=${recipeId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        setReviewData(res.data.data);
+        const res = await recipe.getCompletedRecipeDetail(recipeId);
+        setReviewData(res);
       } catch (error) {
         console.error('💥 Reviews preparation API 호출 실패:', error);
-      } finally {
-        setIsLoading(false);
       }
     };
-
     getReviewData();
   }, [token, recipeId]);
-
   const { handleSubmit, register, setValue, watch } = useForm<ReviewFormData>({
     defaultValues: {
       completedRecipeId: recipeId,
