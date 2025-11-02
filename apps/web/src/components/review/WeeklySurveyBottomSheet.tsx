@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import {
@@ -114,33 +114,61 @@ export function WeeklySurveyBottomSheet() {
   const [loading, setLoading] = useState(true);
   const [isEligible, setIsEligible] = useState(false);
   const [recentCompletionCount, setRecentCompletionCount] = useState(0);
+  const isFetchingRef = useRef(false);
 
   // 자격 확인 및 준비 데이터 가져오기
+  const initializeData = useCallback(async () => {
+    if (isFetchingRef.current) return;
+
+    if (!useCookieAuth && !token) {
+      setLoading(false);
+      return;
+    }
+
+    isFetchingRef.current = true;
+
+    try {
+      setLoading(true);
+
+      const [eligibilityData, preparation] = await Promise.all([
+        healthSurvey.getEligibility(),
+        healthSurvey.getPreparation(),
+      ]);
+
+      setIsEligible(eligibilityData.isEligible);
+      setRecentCompletionCount(eligibilityData.recentCompletionCount);
+      setPreparationData(preparation);
+    } catch (error) {
+      console.error('데이터 초기화 실패:', error);
+    } finally {
+      setLoading(false);
+      isFetchingRef.current = false;
+    }
+  }, [token, useCookieAuth]);
+
   useEffect(() => {
-    const initializeData = async () => {
-      if (!useCookieAuth && !token) return;
+    void initializeData();
+  }, [initializeData]);
 
-      try {
-        setLoading(true);
-
-        // 병렬로 자격 확인과 준비 데이터 가져오기
-        const [eligibilityData, preparationData] = await Promise.all([
-          healthSurvey.getEligibility(),
-          healthSurvey.getPreparation(),
-        ]);
-
-        setIsEligible(eligibilityData.isEligible);
-        setRecentCompletionCount(eligibilityData.recentCompletionCount);
-        setPreparationData(preparationData);
-      } catch (error) {
-        console.error('데이터 초기화 실패:', error);
-      } finally {
-        setLoading(false);
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        void initializeData();
       }
     };
 
-    initializeData();
-  }, [token, useCookieAuth]);
+    const handleWindowFocus = () => {
+      void initializeData();
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleWindowFocus);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleWindowFocus);
+    };
+  }, [initializeData]);
 
   const { handleSubmit, register, setValue, watch } = useForm<SurveyFormData>({
     defaultValues: {
