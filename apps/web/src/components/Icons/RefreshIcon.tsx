@@ -3,7 +3,7 @@ import React from 'react';
 import type { IconProps } from '@/types/Icon.types';
 
 const RefreshIcon: React.FC<IconProps> = ({
-  color = '#868E96',
+  color = '#CED4DA',
   size = 24,
   ...props
 }) => {

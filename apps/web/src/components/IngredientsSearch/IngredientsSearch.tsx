@@ -104,6 +104,9 @@ const IngredientsSearch = forwardRef<
     } else {
       console.info(`${food?.name}이(가) 추가되었습니다.`);
     }
+
+    // 재료를 선택하거나 해제한 뒤 검색창 초기화
+    handleClearSearch();
   };
 
   const handleSelectedFoodRemove = (foodId: number) => {
@@ -165,7 +168,12 @@ const IngredientsSearch = forwardRef<
                 ? '내가 선택한 재료'
                 : '지금 내 냉장고에는..'}
             </h3>
-            <Button onClick={() => clearAllFoods()} variant="outline" size="sm">
+            <Button
+              onClick={() => clearAllFoods()}
+              variant="outline"
+              size="sm"
+              shape="square"
+            >
               전체 삭제
             </Button>
           </div>
