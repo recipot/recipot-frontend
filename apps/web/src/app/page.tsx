@@ -17,6 +17,7 @@ import {
   EmotionBackground,
   EmotionCharacter,
   EmotionSelector,
+  type MoodType,
 } from '@/components/EmotionState';
 import UserIcon from '@/components/Icons/UserIcon';
 import { IngredientsSearch } from '@/components/IngredientsSearch';
@@ -24,6 +25,7 @@ import { ReviewRemindBottomSheet } from '@/components/review/ReviewRemindBottomS
 import { useSplash } from '@/contexts/SplashContext';
 import { useCompletedRecipes } from '@/hooks/useCompletedRecipes';
 import { useToast } from '@/hooks/useToast';
+import { useMoodStore } from '@/stores/moodStore';
 import { useSelectedFoodsStore } from '@/stores/selectedFoodsStore';
 
 import { useMoodSelectionFlow } from './(main)/_hooks/useMoodSelectionFlow';
@@ -51,11 +53,21 @@ export default function Home() {
   const {
     flowState,
     handleBack,
-    handleMoodSelect,
+    handleMoodSelect: originalHandleMoodSelect,
     handleTypingComplete,
-    mood,
+    mood: localMood,
     showIngredientsSearch,
   } = useMoodSelectionFlow();
+
+  // moodStore와 동기화
+  const setMoodStore = useMoodStore(state => state.setMood);
+  const mood = useMoodStore(state => state.mood) ?? localMood;
+
+  // mood 선택 시 store도 업데이트
+  const handleMoodSelect = useCallback((selectedMood: MoodType) => {
+    originalHandleMoodSelect(selectedMood);
+    setMoodStore(selectedMood);
+  }, [originalHandleMoodSelect, setMoodStore]);
 
   const [hasMounted, setHasMounted] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);

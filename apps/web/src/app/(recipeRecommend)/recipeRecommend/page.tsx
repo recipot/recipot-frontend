@@ -62,17 +62,25 @@ export default function RecipeRecommend() {
 
   const userSelectedMood = mood ?? 'neutral';
 
+  console.log(
+    'RecipeRecommend - mood:',
+    mood,
+    'userSelectedMood:',
+    userSelectedMood
+  );
+
   const token = tokenUtils.getToken();
   const useCookieAuth = isProduction;
 
   // condition 객체를 useMemo로 메모이제이션
-  const condition = useMemo(
-    () => ({
+  const condition = useMemo(() => {
+    const cond = {
       id: moodToConditionId(userSelectedMood),
       name: userSelectedMood,
-    }),
-    [userSelectedMood]
-  );
+    };
+    console.log('RecipeRecommend - condition 생성:', cond);
+    return cond;
+  }, [userSelectedMood]);
 
   const [showTutorial, setShowTutorial] = useState(false);
 
