@@ -63,19 +63,14 @@ export default function RecipeListPage({ type }: { type: PageType }) {
   const cookedRecipes = completedRecipesData?.items ?? mockCookedRecipes;
   const storedRecipes = storedRecipesData?.items ?? mockDefaultRecipes;
   const recentRecipes = recentRecipesData?.items ?? mockDefaultRecipes;
+  const defaultRecipe = type === 'saved' ? storedRecipes : recentRecipes;
 
   const queryClient = useQueryClient();
 
-  const queryKeyMap: Record<PageType, string> = {
-    cooked: 'completed-recipes',
-    recent: 'recent-recipes',
-    saved: 'stored-recipes',
-  };
-  const key = queryKeyMap[type];
-  const defaultRecipe = type === 'saved' ? storedRecipes : recentRecipes;
   const handleToggleSave = () => {
-    queryClient.invalidateQueries({
-      queryKey: [key],
+    const queryKeys = ['completed-recipes', 'stored-recipes', 'recent-recipes'];
+    queryKeys.forEach(key => {
+      queryClient.invalidateQueries({ queryKey: [key] });
     });
   };
 

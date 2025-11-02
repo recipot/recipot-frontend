@@ -9,6 +9,7 @@ import { tokenUtils } from 'packages/api/src/auth';
 import { Button } from '@/components/common/Button';
 import { CookIcon } from '@/components/Icons';
 import { useViewportBasedPadding } from '@/hooks';
+import { usePostRecentRecipe } from '@/hooks/usePostRecentRecipe';
 import { isProduction } from '@/lib/env';
 
 import CookwareSection from './CookwareSection';
@@ -32,6 +33,7 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
     ratio: 0.8,
   });
   const router = useRouter();
+  const { mutate: postRecentRecipe } = usePostRecentRecipe();
 
   useEffect(() => {
     const fetchRecipe = async () => {
@@ -39,12 +41,13 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
       try {
         const data = await recipe.getRecipeDetail(recipeId);
         setRecipeData(data);
+        postRecentRecipe(Number(recipeId));
       } catch (error) {
         console.error('Recipe fetch error:', error);
       }
     };
     fetchRecipe();
-  }, [token, recipeId, useCookieAuth]);
+  }, [token, recipeId, useCookieAuth, postRecentRecipe]);
 
   useEffect(() => {
     if (!recipeData) return;
