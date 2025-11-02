@@ -7,9 +7,10 @@ import { useForm } from 'react-hook-form';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { recipe } from '@recipot/api';
 import { useAuth } from '@recipot/contexts';
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import Image from 'next/image';
 
+import { useApiErrorModalStore } from '@/stores';
 import type {
   ReviewBottomSheetProps,
   ReviewData,
@@ -20,6 +21,7 @@ import { Button } from '../common/Button';
 import { CloseIcon } from '../Icons';
 import { Drawer, DrawerContent, DrawerTitle } from '../ui/drawer';
 import { EmotionSection } from './EmotionSection';
+import ReviewCompleteModal from './ReviewCompleteModal';
 
 // UI용 매핑 객체 - 이미지 디자인에 맞는 텍스트로 변환
 const UI_TEXT_MAPPING: Record<string, string> = {
@@ -46,6 +48,7 @@ export function ReviewBottomSheet({
 }: ReviewBottomSheetProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [reviewData, setReviewData] = useState<ReviewData | null>(null);
+  const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
   const { token } = useAuth();
 
   // v1/reviews/preparation API 호출
@@ -141,22 +144,16 @@ export function ReviewBottomSheet({
     };
 
     try {
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/reviews`,
-        submitData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await recipe.postRecipeReiew(submitData);
 
-      onClose(); // 성공 시 모달 닫기
+      // 성공 시 완료 모달 띄우기
+      setIsCompleteModalOpen(true);
     } catch (error) {
       if (error instanceof AxiosError && error.response?.status === 400) {
-        console.log(
-          error.message ?? '레시피 완료 후에만 후기를 작성할 수 있습니다.'
-        );
+        useApiErrorModalStore.getState().showError({
+          message:
+            error.message ?? '레시피 완료 후에만 후기를 작성할 수 있습니다.',
+        });
       }
     }
   };
@@ -294,6 +291,14 @@ export function ReviewBottomSheet({
             </div>
           </div>
         </form>
+        <ReviewCompleteModal
+          open={isCompleteModalOpen}
+          onOpenChange={setIsCompleteModalOpen}
+          onConfirm={() => {
+            setIsCompleteModalOpen(false);
+            onClose();
+          }}
+        />
       </DrawerContent>
     </Drawer>
   );

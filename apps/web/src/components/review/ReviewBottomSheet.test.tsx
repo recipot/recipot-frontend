@@ -114,7 +114,7 @@ const mockReviewData: ReviewData = {
     { code: 'R05002', codeName: '적당해요' },
     { code: 'R05003', codeName: '간단해요' },
   ],
-  recipeId: 'recipe-1',
+  recipeId: 1,
   recipeImageUrl: '/recipeImage.png',
   recipeName: '김치찌개',
   tasteOptions: [

@@ -1,5 +1,7 @@
 import { createApiInstance } from '@recipot/api';
 
+import type { ReviewSubmitData } from './types';
+
 const recipeAPI = createApiInstance({ apiName: 'Recipe' });
 
 export const recipe = {
@@ -25,6 +27,10 @@ export const recipe = {
   getRecipeDetail: async (recipeId: string | number) => {
     const response = await recipeAPI.get(`/v1/recipes/${recipeId}`);
     return response.data.data;
+  },
+
+  postRecipeReiew: async (data: ReviewSubmitData) => {
+    return await recipeAPI.post(`/v1/reviews`, data);
   },
 
   getCompletedRecipeDetail: async (recipeId: string | number) => {

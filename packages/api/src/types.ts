@@ -25,3 +25,30 @@ export interface CompleteOnboardingData {
   selectedFoods: number[];
   sessionId?: string; // Optional: not currently used
 }
+
+// Review API Types
+export interface ReviewOption {
+  code: string;
+  codeName: string;
+}
+
+export interface ReviewData {
+  recipeId: number;
+  recipeName: string;
+  recipeImageUrl?: string;
+  completionCount: number;
+  tasteOptions: ReviewOption[];
+  difficultyOptions: ReviewOption[];
+  experienceOptions: ReviewOption[];
+  completionMessage: string;
+}
+
+export interface ReviewSubmitData {
+  completedRecipeId: number;
+  completionCount: number;
+  completionMessage: string;
+  content: string;
+  difficultyCode?: string;
+  experienceCode?: string;
+  tasteCode?: string;
+}

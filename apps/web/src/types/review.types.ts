@@ -1,9 +1,6 @@
-import type { StaticImageData } from 'next/image';
+import type { ReviewOption } from '@recipot/api';
 
-export interface ReviewOption {
-  code: string;
-  codeName: string;
-}
+export type { ReviewData, ReviewOption } from '@recipot/api';
 
 export interface ReviewFormData {
   completedRecipeId: number;
@@ -13,31 +10,9 @@ export interface ReviewFormData {
   content: string;
 }
 
-export interface ReviewSubmitData {
-  completedRecipeId: number;
-  tasteOptions: ReviewOption[];
-  difficultyOptions: ReviewOption[];
-  experienceOptions: ReviewOption[];
-  content: string;
-  completionCount: number;
-  completionMessage: string;
-  recipeImageUrl?: string;
-  recipeName: string;
-}
-
+// 컴포넌트 props 타입
 export interface ReviewBottomSheetProps {
   isOpen: boolean;
   onClose: () => void;
   recipeId: number; // 후기 제출 시 completedRecipeId로 사용
-}
-
-export interface ReviewData {
-  recipeId: string;
-  recipeName: string;
-  recipeImageUrl?: string | StaticImageData | undefined;
-  completionCount: number;
-  tasteOptions: ReviewOption[];
-  difficultyOptions: ReviewOption[];
-  experienceOptions: ReviewOption[];
-  completionMessage: string;
 }
