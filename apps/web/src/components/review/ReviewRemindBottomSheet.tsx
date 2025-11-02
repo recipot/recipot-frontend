@@ -64,11 +64,11 @@ export function ReviewRemindBottomSheet() {
           try {
             const recipeDetail = await recipe.getRecipeDetail(id);
             return {
-              alt: `${recipeDetail.title} 레시피 이미지`,
-              description: '레시피 해먹기 완료!',
+              alt: `${recipeDetail.recipeName} 레시피 이미지`,
+              description: `${recipeDetail.completionCount}번째 레시피 해먹기 완료!`,
               id: recipeDetail.id,
-              imageUrl: recipeDetail.images[0]?.imageUrl ?? '/recipeImage.png',
-              title: recipeDetail.title,
+              imageUrl: recipeDetail.recipeImageUrl ?? '/recipeImage.png',
+              title: recipeDetail.recipeName,
             };
           } catch (error) {
             console.error(`Failed to load recipe ${id}:`, error);
