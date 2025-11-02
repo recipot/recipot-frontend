@@ -1,3 +1,4 @@
+import '../utils/setupConsole';
 import './globals.css';
 
 import localFont from 'next/font/local';
