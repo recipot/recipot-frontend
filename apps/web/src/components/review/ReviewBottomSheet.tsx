@@ -8,7 +8,7 @@ import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { recipe } from '@recipot/api';
 import { useAuth } from '@recipot/contexts';
 import { useQueryClient } from '@tanstack/react-query';
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import Image from 'next/image';
 
 import { useApiErrorModalStore } from '@/stores';
@@ -146,15 +146,7 @@ export function ReviewBottomSheet({
     };
 
     try {
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/reviews`,
-        submitData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await recipe.postRecipeReiew(submitData);
       queryClient.invalidateQueries({ queryKey: ['completed-recipes'] });
       onClose(); // 성공 시 모달 닫기
     } catch (error) {
