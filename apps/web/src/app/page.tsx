@@ -64,10 +64,15 @@ export default function Home() {
   const mood = useMoodStore(state => state.mood) ?? localMood;
 
   // mood 선택 시 store도 업데이트
-  const handleMoodSelect = useCallback((selectedMood: MoodType) => {
-    originalHandleMoodSelect(selectedMood);
-    setMoodStore(selectedMood);
-  }, [originalHandleMoodSelect, setMoodStore]);
+  const handleMoodSelect = useCallback(
+    (selectedMood: MoodType) => {
+      const nextMood = mood === selectedMood ? null : selectedMood;
+
+      originalHandleMoodSelect(selectedMood);
+      setMoodStore(nextMood);
+    },
+    [mood, originalHandleMoodSelect, setMoodStore]
+  );
 
   const [hasMounted, setHasMounted] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
