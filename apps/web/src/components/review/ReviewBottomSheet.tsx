@@ -11,6 +11,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import Image from 'next/image';
 
+import { isProduction } from '@/lib/env';
 import { useApiErrorModalStore } from '@/stores';
 import type {
   ReviewBottomSheetProps,
@@ -62,9 +63,16 @@ export function ReviewBottomSheet({
       return;
     }
 
-    // 바텀시트가 열렸을 때만 데이터 로드 (token과 recipeId 확인)
-    if (!token || !recipeId) {
-      console.log('조건 불충족:', { recipeId, token: !!token });
+    // recipeId가 없으면 리턴
+    if (!recipeId) {
+      console.log('조건 불충족: recipeId 없음');
+      return;
+    }
+
+    // 프로덕션 환경에서는 쿠키 인증을 사용하므로 token 체크를 건너뛰고,
+    // 개발 환경에서는 token이 필요함
+    if (!isProduction && !token) {
+      console.log('조건 불충족: token 없음 (개발 환경)');
       return;
     }
 
@@ -84,6 +92,7 @@ export function ReviewBottomSheet({
 
     getReviewData();
   }, [isOpen, token, recipeId]);
+
   const { handleSubmit, register, setValue, watch } = useForm<ReviewFormData>({
     defaultValues: {
       completedRecipeId: recipeId,
