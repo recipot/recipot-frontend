@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { recipe, reviewReminder } from '@recipot/api';
 import { useRouter } from 'next/navigation';
@@ -20,6 +20,7 @@ export function ReviewRemindBottomSheet() {
   const [isOpen, setIsOpen] = useState(false);
   const [recipes, setRecipes] = useState<ReviewRecipeData[]>([]);
   const [loading, setLoading] = useState(true);
+  const isFetchingRef = useRef(false);
 
   const useCookieAuth = isProduction;
   const token = tokenUtils.getToken();
@@ -40,6 +41,9 @@ export function ReviewRemindBottomSheet() {
 
   // API에서 데이터 로드
   const loadPendingReviews = useCallback(async () => {
+    if (isFetchingRef.current) return;
+    isFetchingRef.current = true;
+
     try {
       setLoading(true);
       if (!useCookieAuth && !token) {
@@ -91,11 +95,32 @@ export function ReviewRemindBottomSheet() {
       setIsOpen(false);
     } finally {
       setLoading(false);
+      isFetchingRef.current = false;
     }
   }, [token, useCookieAuth]);
 
   useEffect(() => {
-    loadPendingReviews();
+    void loadPendingReviews();
+  }, [loadPendingReviews]);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        void loadPendingReviews();
+      }
+    };
+
+    const handleWindowFocus = () => {
+      void loadPendingReviews();
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleWindowFocus);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleWindowFocus);
+    };
   }, [loadPendingReviews]);
 
   const handleRecipeClick = () => {
