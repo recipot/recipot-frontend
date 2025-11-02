@@ -18,7 +18,6 @@ export default function SplashScreen() {
   useEffect(() => {
     if (isCompleted) {
       setShouldRender(false);
-      return;
     }
   }, [isCompleted]);
 
