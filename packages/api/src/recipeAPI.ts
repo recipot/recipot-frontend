@@ -29,7 +29,7 @@ export const recipe = {
     return response.data.data;
   },
 
-  postRecipeReiew: async (data: ReviewSubmitData) => {
+  postRecipeReview: async (data: ReviewSubmitData) => {
     return await recipeAPI.post(`/v1/reviews`, data);
   },
 

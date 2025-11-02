@@ -146,7 +146,7 @@ export function ReviewBottomSheet({
     };
 
     try {
-      await recipe.postRecipeReiew(submitData);
+      await recipe.postRecipeReview(submitData);
       queryClient.invalidateQueries({ queryKey: ['completed-recipes'] });
       onClose(); // 성공 시 모달 닫기
     } catch (error) {
