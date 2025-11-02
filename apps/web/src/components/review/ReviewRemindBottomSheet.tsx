@@ -63,7 +63,7 @@ export function ReviewRemindBottomSheet() {
         async (completedRecipeId: number) => {
           try {
             const recipeDetail =
-              await recipe.getRecipeDetail(completedRecipeId);
+              await recipe.getCompletedRecipeDetail(completedRecipeId);
             return {
               alt: `${recipeDetail.recipeName} 레시피 이미지`,
               completedRecipeId,

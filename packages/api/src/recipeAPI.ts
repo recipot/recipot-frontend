@@ -23,6 +23,11 @@ export const recipe = {
   },
 
   getRecipeDetail: async (recipeId: string | number) => {
+    const response = await recipeAPI.get(`/v1/recipes/${recipeId}`);
+    return response.data.data;
+  },
+
+  getCompletedRecipeDetail: async (recipeId: string | number) => {
     const response = await recipeAPI.get(
       `/v1/reviews/preparation?completedRecipeId=${recipeId}`
     );
