@@ -9,9 +9,6 @@ import { SCROLLBAR_HIDE_STYLE } from '../../_constants';
 import { useOnboardingActions, useOnboardingStep } from '../../_hooks';
 import { getSubmitButtonText, onboardingStyles } from '../../_utils';
 
-// 온보딩에서는 초기값이 빈 배열이어야 함
-const EMPTY_INITIAL_ITEMS: number[] = [];
-
 function AllergyStepContent() {
   // 온보딩 스텝 로직
   const { handleError, isSubmitting, saveAndProceed } = useOnboardingStep(1);
@@ -80,6 +77,15 @@ function AllergyStepContent() {
 }
 
 export default function AllergyStep() {
+  const persistedSelectedItems = useAllergiesStore(
+    state => state.selectedItems
+  );
+
+  const initialSelectedItems = useMemo(
+    () => [...persistedSelectedItems],
+    [persistedSelectedItems]
+  );
+
   const scrollConfig = useMemo(
     () => ({
       navigationOffset: 130,
@@ -91,7 +97,7 @@ export default function AllergyStep() {
   return (
     <Allergy
       formId="allergy-form"
-      initialSelectedItems={EMPTY_INITIAL_ITEMS}
+      initialSelectedItems={initialSelectedItems}
       isOnboarding
       scrollConfig={scrollConfig}
     >

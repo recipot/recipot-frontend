@@ -60,15 +60,18 @@ export function AllergyProvider({
   const { categories, error, initialSelectedIds, isLoading } = useAllergyData();
 
   // 초기값 결정 - 메모이제이션으로 무한 렌더링 방지
-  // 온보딩 모드: 항상 빈 배열 (백엔드 초기값 무시)
+  // 온보딩 모드: 외부에서 전달한 값 사용 (백엔드 초기값 무시)
   // 일반 모드: props > 백엔드 초기값 > 빈 배열
   const initialItems = useMemo(() => {
     if (isOnboarding) {
-      return [];
+      return initialSelectedItems;
     }
-    return initialSelectedItems.length > 0
-      ? initialSelectedItems
-      : (initialSelectedIds ?? []);
+
+    if (initialSelectedItems.length > 0) {
+      return initialSelectedItems;
+    }
+
+    return initialSelectedIds ?? [];
   }, [isOnboarding, initialSelectedItems, initialSelectedIds]);
 
   const { handleCategoryToggle, handleItemToggle, resetItems, selectedItems } =
