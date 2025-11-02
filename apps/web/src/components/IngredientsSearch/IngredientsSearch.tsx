@@ -104,6 +104,9 @@ const IngredientsSearch = forwardRef<
     } else {
       console.info(`${food?.name}이(가) 추가되었습니다.`);
     }
+
+    // 재료를 선택하거나 해제한 뒤 검색창 초기화
+    handleClearSearch();
   };
 
   const handleSelectedFoodRemove = (foodId: number) => {
