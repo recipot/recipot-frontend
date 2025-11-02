@@ -52,6 +52,8 @@ export function ReviewBottomSheet({
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
   const { token } = useAuth();
 
+  console.log(reviewData, '데이터 확인');
+
   // v1/reviews/preparation API 호출 - 바텀시트가 열릴 때만 데이터 로드
   useEffect(() => {
     // isOpen이 false이면 데이터를 초기화하고 리턴
