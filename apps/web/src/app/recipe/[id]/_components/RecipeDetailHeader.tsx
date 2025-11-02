@@ -108,7 +108,7 @@ export function RecipeDetailHeader({ recipe }: RecipeHeaderProps) {
       </Modal>
 
       {/* Header */}
-      <Header className="static px-4 py-3">
+      <Header className="px-4 py-3">
         <Header.Back onClick={handleBack} />
         <div className="flex items-center space-x-2">
           <WebShareButton
