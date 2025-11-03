@@ -31,6 +31,13 @@ const CATEGORY_NAME_TO_UI_CATEGORY: Record<string, UICategory> = {
   소스류: 'others',
 };
 
+const normalizeIngredientLabel = (name: string): string => {
+  // 괄호 및 괄호 안의 내용을 제거하고 앞뒤 공백을 정리
+  const normalized = name.replace(/\s*\(.*?\)\s*/g, ' ').replace(/\s+/g, ' ');
+  const trimmed = normalized.trim();
+  return trimmed.length > 0 ? trimmed : name.trim();
+};
+
 const mapCategoryNameToUICategory = (
   categoryName: string
 ): UICategory | null => {
@@ -54,13 +61,39 @@ export const groupIngredientsByCategory = (
     seafood: [],
   };
 
+  const groupIndex: Record<UICategory, Record<string, number>> = {
+    dairy: {},
+    grains: {},
+    meat: {},
+    nuts: {},
+    others: {},
+    seafood: {},
+  };
+
   ingredients.forEach(ingredient => {
     const category = mapCategoryNameToUICategory(ingredient.categoryName);
     if (!category) return;
+    const normalizedLabel = normalizeIngredientLabel(ingredient.name);
+    const categoryLookup = groupIndex[category];
+
+    if (normalizedLabel in categoryLookup) {
+      const existingIndex = categoryLookup[normalizedLabel];
+      const existingItem = grouped[category][existingIndex];
+      if (!existingItem.linkedIngredientIds.includes(ingredient.id)) {
+        existingItem.linkedIngredientIds.push(ingredient.id);
+      }
+      if (ingredient.isUserRestricted) {
+        existingItem.isUserRestricted = true;
+      }
+      return;
+    }
+
+    categoryLookup[normalizedLabel] = grouped[category].length;
     grouped[category].push({
       id: ingredient.id,
       isUserRestricted: ingredient.isUserRestricted,
-      label: ingredient.name,
+      label: normalizedLabel,
+      linkedIngredientIds: [ingredient.id],
     });
   });
 
@@ -105,10 +138,16 @@ export const mapIngredientsToCategories = (
 export const extractInitialSelectedIds = (
   ingredients: RestrictedIngredient[]
 ): number[] => {
-  return ingredients
-    .filter(ingredient => {
-      const category = mapCategoryNameToUICategory(ingredient.categoryName);
-      return category && ingredient.isUserRestricted;
-    })
-    .map(ingredient => ingredient.id);
+  const grouped = groupIngredientsByCategory(ingredients);
+  const initialIds: number[] = [];
+
+  Object.values(grouped).forEach(items => {
+    items.forEach(item => {
+      if (item.isUserRestricted) {
+        initialIds.push(...item.linkedIngredientIds);
+      }
+    });
+  });
+
+  return Array.from(new Set(initialIds));
 };

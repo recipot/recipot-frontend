@@ -17,7 +17,7 @@ const dynamicHeightStyle = {
  * AllergyCheckPresenter
  * @param categories - 카테고리별 알레르기 항목 배열
  * @param selectedItems - 선택된 항목 ID 배열
- * @param onItemToggle - 항목 토글 함수
+ * @param onItemToggle - 항목 토글 함수 (연관된 모든 재료 ID를 전달)
  * @param onCategoryToggle - 카테고리 전체 선택/해제 함수
  * @param onSubmit - 폼 제출 함수
  * @param formId - form의 고유 ID (외부 버튼에서 사용)
@@ -34,14 +34,16 @@ export default function AllergyCheckPresenter({
   categories: AllergyCategory[];
   formId: string;
   onCategoryToggle?: (categoryItemIds: number[]) => void;
-  onItemToggle: (itemId: number) => void;
+  onItemToggle: (ingredientIds: number[]) => void;
   onSubmit: (e: React.FormEvent) => void;
   selectedItems: number[];
 }) {
   // 카테고리의 모든 아이템이 선택되어 있는지 확인
   const isCategoryFullySelected = (category: AllergyCategory) => {
     if (category.items.length === 0) return false;
-    return category.items.every(item => selectedItems.includes(item.id));
+    return category.items.every(item =>
+      item.linkedIngredientIds.every(id => selectedItems.includes(id))
+    );
   };
 
   return (
@@ -53,7 +55,10 @@ export default function AllergyCheckPresenter({
       onSubmit={onSubmit}
     >
       {categories.map((category, index) => {
-        const categoryItemIds = category.items.map(item => item.id);
+        const categoryItemIds = category.items.flatMap(
+          item => item.linkedIngredientIds
+        );
+        const uniqueCategoryItemIds = Array.from(new Set(categoryItemIds));
         const isFullySelected = isCategoryFullySelected(category);
         const sectionId = `allergy-section-${index}`;
 
@@ -68,7 +73,7 @@ export default function AllergyCheckPresenter({
                   <button
                     type="button"
                     className="flex cursor-pointer items-center gap-2"
-                    onClick={() => onCategoryToggle(categoryItemIds)}
+                    onClick={() => onCategoryToggle(uniqueCategoryItemIds)}
                     aria-label="전체선택"
                   >
                     <CheckboxIcon isSelected={isFullySelected} />

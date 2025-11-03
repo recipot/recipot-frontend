@@ -35,6 +35,7 @@ export interface RestrictedIngredientsResponse {
 export interface AllergyCheckItem {
   id: number;
   label: string;
+  linkedIngredientIds: number[];
   isUserRestricted?: boolean;
 }
 

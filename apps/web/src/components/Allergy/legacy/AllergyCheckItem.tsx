@@ -10,7 +10,7 @@ import type { AllergyCheckItem } from '@/types/allergy.types';
  * AllergyCheckItem
  * @param items - AllergyCheckItem[]
  * @param selectedItems - number[]
- * @param onItemToggle - (itemId: number) => void
+ * @param onItemToggle - (ingredientIds: number[]) => void
  * @param groupLabel - 그룹의 라벨 (접근성용, 선택적)
  * @param useFieldset - fieldset/legend 사용 여부 (기본값: true)
  * @returns AllergyCheckItem component
@@ -24,26 +24,33 @@ function AllergyCheckItem({
 }: {
   groupLabel?: string;
   items: AllergyCheckItem[];
-  onItemToggle: (itemId: number) => void;
+  onItemToggle: (ingredientIds: number[]) => void;
   selectedItems: number[];
   useFieldset?: boolean;
 }) {
   const StyleActive =
     'border-secondary-soft-green bg-secondary-light-green text-primary';
 
-  const buttonElements = items.map(item => (
-    <Button
-      key={item.id}
-      className={cn('h-10', selectedItems.includes(item.id) ? StyleActive : '')}
-      shape="square"
-      size="full"
-      type="button"
-      variant="outline"
-      onClick={() => onItemToggle(item.id)}
-    >
-      {item.label}
-    </Button>
-  ));
+  const buttonElements = items.map(item => {
+    const hasAnySelected = item.linkedIngredientIds.some(id =>
+      selectedItems.includes(id)
+    );
+
+    return (
+      <Button
+        key={item.id}
+        aria-pressed={hasAnySelected}
+        className={cn('h-10', hasAnySelected ? StyleActive : '')}
+        shape="square"
+        size="full"
+        type="button"
+        variant="outline"
+        onClick={() => onItemToggle(item.linkedIngredientIds)}
+      >
+        {item.label}
+      </Button>
+    );
+  });
 
   // fieldset을 사용하지 않는 경우 (AllergyCheckPresenter에서 이미 fieldset으로 감싸진 경우)
   if (!useFieldset) {

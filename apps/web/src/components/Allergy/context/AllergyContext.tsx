@@ -16,7 +16,7 @@ interface AllergyContextValue {
   formId: string;
   gnbRef: RefObject<HTMLElement> | undefined;
   handleCategoryToggle: (categoryItemIds: number[]) => void;
-  handleItemToggle: (id: number) => void;
+  handleItemToggle: (ingredientIds: number[]) => void;
   isLoading: boolean;
   resetItems: () => void;
   scrollConfig: {
