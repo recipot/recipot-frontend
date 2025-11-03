@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 /**
  * useAllergyCheck
@@ -9,7 +9,9 @@ import { useCallback, useEffect, useRef, useState } from 'react';
  * @description 알레르기 항목 선택 핸들러와 선택된 항목 목록, 초기화 함수를 반환합니다.
  */
 export default function useAllergyCheck(initialItems: number[] = []) {
-  const [selectedItems, setSelectedItems] = useState<number[]>(initialItems);
+  const [selectedSet, setSelectedSet] = useState<Set<number>>(
+    () => new Set(initialItems)
+  );
   const initialItemsRef = useRef(initialItems);
   const prevInitialItemsRef = useRef<number[]>(initialItems);
   const hasUserInteractedRef = useRef(false);
@@ -20,12 +22,15 @@ export default function useAllergyCheck(initialItems: number[] = []) {
     if (hasUserInteractedRef.current) return;
 
     const prevItems = prevInitialItemsRef.current;
-    const prevItemsStr = JSON.stringify([...prevItems].sort());
-    const currentItemsStr = JSON.stringify([...initialItems].sort());
+    const prevSet = new Set(prevItems);
+    const currentSet = new Set(initialItems);
+    const isSameSize = prevSet.size === currentSet.size;
+    const isSameItems =
+      isSameSize && [...currentSet].every(item => prevSet.has(item));
 
     // 이전 값과 현재 값이 다를 때만 업데이트 (순서 무관)
-    if (prevItemsStr !== currentItemsStr) {
-      setSelectedItems(initialItems);
+    if (!isSameItems) {
+      setSelectedSet(new Set(initialItems));
       prevInitialItemsRef.current = initialItems;
     }
   }, [initialItems]);
@@ -35,54 +40,53 @@ export default function useAllergyCheck(initialItems: number[] = []) {
 
   const handleItemToggle = useCallback((ingredientIds: number[]) => {
     hasUserInteractedRef.current = true;
-    setSelectedItems(prev => {
-      const allSelected = ingredientIds.every(id => prev.includes(id));
+    setSelectedSet(prevSet => {
+      const nextSet = new Set(prevSet);
+      const allSelected = ingredientIds.every(id => nextSet.has(id));
 
       if (allSelected) {
-        return prev.filter(id => !ingredientIds.includes(id));
+        ingredientIds.forEach(id => nextSet.delete(id));
+      } else {
+        ingredientIds.forEach(id => nextSet.add(id));
       }
 
-      const newItems = [...prev];
-      ingredientIds.forEach(id => {
-        if (!newItems.includes(id)) {
-          newItems.push(id);
-        }
-      });
-      return newItems;
+      return nextSet;
     });
   }, []);
 
   const handleCategoryToggle = useCallback((categoryItemIds: number[]) => {
     hasUserInteractedRef.current = true;
-    setSelectedItems(prev => {
+    setSelectedSet(prevSet => {
+      const nextSet = new Set(prevSet);
       // 카테고리의 모든 아이템이 선택되어 있는지 확인
-      const allSelected = categoryItemIds.every(id => prev.includes(id));
+      const allSelected = categoryItemIds.every(id => nextSet.has(id));
 
       if (allSelected) {
         // 모두 선택되어 있으면 전체 해제
-        return prev.filter(id => !categoryItemIds.includes(id));
+        categoryItemIds.forEach(id => nextSet.delete(id));
       } else {
         // 하나라도 선택 안 되어 있으면 전체 선택
-        const newItems = [...prev];
-        categoryItemIds.forEach(id => {
-          if (!newItems.includes(id)) {
-            newItems.push(id);
-          }
-        });
-        return newItems;
+        categoryItemIds.forEach(id => nextSet.add(id));
       }
+
+      return nextSet;
     });
   }, []);
 
   const resetItems = useCallback(() => {
     hasUserInteractedRef.current = false;
-    setSelectedItems([]);
+    setSelectedSet(new Set());
   }, []);
 
   const resetToInitial = useCallback(() => {
     hasUserInteractedRef.current = false;
-    setSelectedItems(initialItemsRef.current);
+    setSelectedSet(new Set(initialItemsRef.current));
   }, []);
+
+  const selectedItems = useMemo(
+    () => Array.from(selectedSet),
+    [selectedSet]
+  );
 
   return {
     handleCategoryToggle,
