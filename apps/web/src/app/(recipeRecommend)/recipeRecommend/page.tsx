@@ -338,8 +338,6 @@ export default function RecipeRecommend() {
   if (hasFetched && recipes.length === 0) {
     return (
       <div className="fixed inset-0 overflow-hidden">
-        <RecipeHeader onRefresh={handleRefresh} disabled />
-        <Header.Spacer />
         <ExploreComplete />
       </div>
     );
