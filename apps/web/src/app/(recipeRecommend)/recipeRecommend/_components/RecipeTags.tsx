@@ -29,14 +29,16 @@ const RecipeTags = () => {
         {displayedFoods.map(ingredient => (
           <div
             key={ingredient}
-            className="bg-secondary-light-green border-secondary-soft-green rounded-[6px] border px-2 py-[2px] text-[#53880A]"
+            className="bg-secondary-light-green border-secondary-soft-green flex-shrink-0 rounded-[6px] border px-2 py-[2px] text-[#53880A]"
           >
-            <p className="text-14b">{ingredient}</p>
+            <p className="text-14b whitespace-nowrap">
+              {ingredient.slice(0, 13)}
+            </p>
           </div>
         ))}
         {remainingCount > 0 && (
-          <div className="bg-secondary-light-green border-secondary-soft-green rounded-[6px] border px-2 py-[2px] text-[#53880A]">
-            <p className="text-14b">+{remainingCount}</p>
+          <div className="bg-secondary-light-green border-secondary-soft-green flex-shrink-0 rounded-[6px] border px-2 py-[2px] text-[#53880A]">
+            <p className="text-14b whitespace-nowrap">+{remainingCount}</p>
           </div>
         )}
       </div>
