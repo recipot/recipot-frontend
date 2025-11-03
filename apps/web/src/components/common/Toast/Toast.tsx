@@ -11,20 +11,16 @@ const TOAST_STYLE: React.CSSProperties = {
   background: '#5A616DCC',
 };
 
-const POSITION_CLASSES: Record<'top' | 'bottom' | 'card-bottom', string> = {
-  bottom: 'absolute bottom-5 left-1/2 z-50 -translate-x-1/2 transform',
-  'card-bottom': 'flex justify-center',
-  top: 'fixed top-24 left-1/2 z-50 -translate-x-1/2 transform',
+const POSITION_CLASSES: Record<'card-bottom', string> = {
+  // bottom: 'absolute bottom-5 left-1/2 z-50 -translate-x-1/2 transform',
+  'card-bottom': 'fixed bottom-5 left-1/2 z-50 -translate-x-1/2 transform',
+  // top: 'fixed top-24 left-1/2 z-50 -translate-x-1/2 transform',
 };
 
-export const Toast = ({
-  isVisible,
-  message,
-  position = 'top',
-}: ToastProps & { position?: 'top' | 'bottom' | 'card-bottom' }) => {
+export const Toast = ({ isVisible, message }: ToastProps) => {
   if (!isVisible) return null;
 
-  const positionClass = POSITION_CLASSES[position];
+  const positionClass = POSITION_CLASSES['card-bottom'];
 
   return (
     <div className={positionClass}>

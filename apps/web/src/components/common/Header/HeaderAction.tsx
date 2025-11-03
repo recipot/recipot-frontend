@@ -26,7 +26,7 @@ export function HeaderAction({
   return (
     <button
       className={`flex size-10 items-center justify-center ${
-        disabled ? 'cursor-not-allowed opacity-50' : ''
+        disabled ? 'cursor-not-allowed text-gray-500' : ''
       } ${className}`}
       onClick={disabled ? undefined : onClick}
       aria-label={ariaLabel}
