@@ -5,6 +5,7 @@ interface HeaderActionProps {
   onClick?: () => void;
   ariaLabel: NonNullable<React.ComponentProps<'button'>['aria-label']>;
   className?: string;
+  disabled?: boolean;
 }
 
 /**
@@ -13,18 +14,23 @@ interface HeaderActionProps {
  * @param onClick - 클릭 핸들러
  * @param ariaLabel - 접근성 라벨
  * @param className - 추가 스타일
+ * @param disabled - 비활성화 여부
  */
 export function HeaderAction({
   ariaLabel = '액션 버튼',
   children,
   className = '',
+  disabled = false,
   onClick,
 }: HeaderActionProps) {
   return (
     <button
-      className={`flex size-10 items-center justify-center ${className}`}
-      onClick={onClick}
+      className={`flex size-10 items-center justify-center ${
+        disabled ? 'cursor-not-allowed opacity-50' : ''
+      } ${className}`}
+      onClick={disabled ? undefined : onClick}
       aria-label={ariaLabel}
+      disabled={disabled}
     >
       {children}
     </button>

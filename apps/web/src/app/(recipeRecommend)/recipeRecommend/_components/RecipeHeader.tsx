@@ -6,9 +6,10 @@ import { RefreshIcon } from '@/components/Icons';
 
 interface RecipeHeaderProps {
   onRefresh: () => void;
+  disabled?: boolean;
 }
 
-const RecipeHeader = ({ onRefresh }: RecipeHeaderProps) => {
+const RecipeHeader = ({ disabled = false, onRefresh }: RecipeHeaderProps) => {
   const router = useRouter();
 
   const handleBack = () => {
@@ -18,7 +19,11 @@ const RecipeHeader = ({ onRefresh }: RecipeHeaderProps) => {
   return (
     <Header>
       <Header.Back onClick={handleBack} />
-      <Header.Action onClick={onRefresh} ariaLabel="새로고침">
+      <Header.Action
+        onClick={onRefresh}
+        ariaLabel="새로고침"
+        disabled={disabled}
+      >
         <RefreshIcon size={24} />
       </Header.Action>
     </Header>
