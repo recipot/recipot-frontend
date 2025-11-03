@@ -137,7 +137,7 @@ const IngredientsSearch = forwardRef<
 
       {/* 검색된 재료 리스트 */}
       {value && filteredFoodList.length > 0 && (
-        <div className="absolute top-[84px] left-0 grid w-full grid-cols-3 gap-3 bg-white px-8 py-5">
+        <div className="absolute top-[84px] left-0 flex w-full flex-wrap gap-3 bg-white px-8 py-5">
           {filteredFoodList.map(food => (
             <Button
               key={food.id}
