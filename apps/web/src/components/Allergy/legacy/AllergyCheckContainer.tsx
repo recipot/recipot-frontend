@@ -25,7 +25,7 @@ export default function AllergyCheckContainer({
 }: {
   categories: AllergyCategory[];
   formId: string;
-  onItemToggle: (id: number) => void;
+  onItemToggle: (ingredientIds: number[]) => void;
   onSubmit: (data: z.infer<typeof AllergyFormSchema>) => void;
   selectedItems: number[];
 }) {

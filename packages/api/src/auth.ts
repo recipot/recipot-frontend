@@ -116,77 +116,80 @@ const createAuthApiInstance = (): AxiosInstance => {
     error => Promise.reject(error)
   );
 
-  instance.interceptors.response.use(response => response, async error => {
-    if (error.response?.status !== 401) {
-      return Promise.reject(error);
-    }
-
-    const originalRequest = error.config ?? {};
-    const requestUrl = originalRequest.url ?? '';
-
-    if (requestUrl.includes('/v1/auth/refresh')) {
-      storage.clear();
-      redirectToSignIn();
-      return Promise.reject(error);
-    }
-
-    if (originalRequest._retry) {
-      storage.clear();
-      redirectToSignIn();
-      return Promise.reject(error);
-    }
-
-    const storedRefreshToken = storage.getRefreshToken();
-    const hasStoredCredentials = Boolean(storedRefreshToken);
-
-    originalRequest._retry = true;
-
-    try {
-      const response = await instance.post(
-        '/v1/auth/refresh',
-        hasStoredCredentials ? { refreshToken: storedRefreshToken } : {}
-      );
-
-      const responseStatus =
-        typeof response.data?.status === 'number'
-          ? response.data.status
-          : response.status;
-      const responseData = response.data?.data ?? response.data;
-      const newAccessToken = responseData?.accessToken;
-      const newRefreshToken = responseData?.refreshToken;
-
-      if (hasStoredCredentials) {
-        if (!newAccessToken) {
-          throw new Error('No access token returned from refresh.');
-        }
-
-        // zustand store 동기화를 위해 저장
-        storage.saveTokens(
-          newAccessToken,
-          newRefreshToken ?? storedRefreshToken ?? ''
-        );
-        originalRequest.headers = originalRequest.headers ?? {};
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-      } else {
-        const isSuccessful =
-          typeof responseStatus === 'number' && responseStatus === 200;
-
-        if (!isSuccessful) {
-          throw new Error('Cookie-based refresh failed.');
-        }
-
-        if (originalRequest.headers?.Authorization) {
-          delete originalRequest.headers.Authorization;
-        }
+  instance.interceptors.response.use(
+    response => response,
+    async error => {
+      if (error.response?.status !== 401) {
+        return Promise.reject(error);
       }
 
-      return instance.request(originalRequest);
-    } catch (refreshError) {
-      storage.clear();
-      redirectToSignIn();
-      return Promise.reject(refreshError);
+      const originalRequest = error.config ?? {};
+      const requestUrl = originalRequest.url ?? '';
+
+      if (requestUrl.includes('/v1/auth/refresh')) {
+        storage.clear();
+        redirectToSignIn();
+        return Promise.reject(error);
+      }
+
+      if (originalRequest._retry) {
+        storage.clear();
+        redirectToSignIn();
+        return Promise.reject(error);
+      }
+
+      const storedRefreshToken = storage.getRefreshToken();
+      const hasStoredCredentials = Boolean(storedRefreshToken);
+
+      originalRequest._retry = true;
+
+      try {
+        const response = await instance.post(
+          '/v1/auth/refresh',
+          hasStoredCredentials ? { refreshToken: storedRefreshToken } : {}
+        );
+
+        const responseStatus =
+          typeof response.data?.status === 'number'
+            ? response.data.status
+            : response.status;
+        const responseData = response.data?.data ?? response.data;
+        const newAccessToken = responseData?.accessToken;
+        const newRefreshToken = responseData?.refreshToken;
+
+        if (hasStoredCredentials) {
+          if (!newAccessToken) {
+            throw new Error('No access token returned from refresh.');
+          }
+
+          // zustand store 동기화를 위해 저장
+          storage.saveTokens(
+            newAccessToken,
+            newRefreshToken ?? storedRefreshToken ?? ''
+          );
+          originalRequest.headers = originalRequest.headers ?? {};
+          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        } else {
+          const isSuccessful =
+            typeof responseStatus === 'number' && responseStatus === 200;
+
+          if (!isSuccessful) {
+            throw new Error('Cookie-based refresh failed.');
+          }
+
+          if (originalRequest.headers?.Authorization) {
+            delete originalRequest.headers.Authorization;
+          }
+        }
+
+        return instance.request(originalRequest);
+      } catch (refreshError) {
+        storage.clear();
+        redirectToSignIn();
+        return Promise.reject(refreshError);
+      }
     }
-  });
+  );
 
   return instance;
 };
@@ -331,5 +334,7 @@ export const authService = {
 export const tokenUtils = {
   getToken: () => storage.getToken(),
   getRefreshToken: () => storage.getRefreshToken(),
+  saveTokens: (token: string, refreshToken: string) =>
+    storage.saveTokens(token, refreshToken),
   clearTokens: () => storage.clear(),
 };

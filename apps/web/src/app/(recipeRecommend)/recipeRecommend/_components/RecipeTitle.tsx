@@ -10,19 +10,11 @@ interface RecipeTitleProps {
 
 const RecipeTitle = ({ condition }: RecipeTitleProps) => {
   const getTitleByCondition = (condition: Condition | null | undefined) => {
-    console.log('RecipeTitle - condition:', condition);
     if (!condition?.name) {
-      console.log('RecipeTitle - condition.name이 없음');
       return '요리할 여유가 그저 그래요'; // 기본값
     }
 
     const conditionId = moodToConditionId(condition.name as MoodType);
-    console.log(
-      'RecipeTitle - conditionId:',
-      conditionId,
-      'condition.name:',
-      condition.name
-    );
     switch (conditionId) {
       case 1:
         return '요리할 여유가 거의...없어요';
