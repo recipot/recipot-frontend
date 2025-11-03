@@ -88,36 +88,44 @@ export default function RecipeRecommend() {
 
   // API 응답을 Recipe 타입으로 변환하는 함수
   const mapRecommendationToRecipe = (item: RecommendationItem): Recipe => {
+    // imageUrls가 배열이 아니거나 undefined인 경우 빈 배열로 처리
+    const imageUrls = Array.isArray(item.imageUrls) ? item.imageUrls : [];
+    const images = imageUrls.map((url, index) => ({
+      id: index + 1,
+      imageUrl: url,
+    }));
+
+    // tools가 배열이 아니거나 undefined인 경우 빈 배열로 처리
+    const toolsArray = Array.isArray(item.tools) ? item.tools : [];
+    const tools = toolsArray.map((tool, index) => {
+      if (typeof tool === 'string') {
+        return {
+          id: index + 1,
+          name: tool,
+        };
+      }
+      return {
+        id: tool.id,
+        name: tool.name,
+        ...(tool.imageUrl && { imageUrl: tool.imageUrl }),
+      };
+    });
+
     return {
-      description: item.description,
-      duration: item.duration,
+      description: item.description ?? '',
+      duration: item.duration ?? '',
       id: item.recipeId,
-      images: item.imageUrls.map((url, index) => ({
-        id: index + 1,
-        imageUrl: url,
-      })),
+      images,
       ingredients: {
         alternativeUnavailable: [],
         notOwned: [],
         owned: [],
       },
-      isBookmarked: item.isBookmarked,
+      isBookmarked: item.isBookmarked ?? false,
       seasonings: [],
       steps: [],
-      title: item.title,
-      tools: item.tools.map((tool, index) => {
-        if (typeof tool === 'string') {
-          return {
-            id: index + 1,
-            name: tool,
-          };
-        }
-        return {
-          id: tool.id,
-          name: tool.name,
-          ...(tool.imageUrl && { imageUrl: tool.imageUrl }),
-        };
-      }),
+      title: item.title ?? '',
+      tools,
     };
   };
 
