@@ -32,15 +32,15 @@ function AllergyCheckItem({
     'border-secondary-soft-green bg-secondary-light-green text-primary';
 
   const buttonElements = items.map(item => {
-    const hasAnySelected = item.linkedIngredientIds.some(id =>
+    const isFullySelected = item.linkedIngredientIds.every(id =>
       selectedItems.includes(id)
     );
 
     return (
       <Button
         key={item.id}
-        aria-pressed={hasAnySelected}
-        className={cn('h-10', hasAnySelected ? StyleActive : '')}
+        aria-pressed={isFullySelected}
+        className={cn('h-10', isFullySelected ? StyleActive : '')}
         shape="square"
         size="full"
         type="button"
