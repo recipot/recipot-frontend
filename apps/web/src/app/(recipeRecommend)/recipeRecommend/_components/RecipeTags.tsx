@@ -14,7 +14,6 @@ const RecipeTags = () => {
       .filter((name): name is string => name !== undefined);
   }, [selectedFoodIds, foodList]);
 
-  // 최대 5개만 표시
   const displayedFoods = selectedFoodNames.slice(0, 3);
   const remainingCount = selectedFoodNames.length - 3;
 
