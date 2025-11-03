@@ -10,26 +10,35 @@ import type {
  * 백엔드 카테고리명을 UI 카테고리 키로 매핑
  * 새로운 카테고리가 추가되면 여기에서만 매핑을 업데이트하면 됩니다.
  */
-const CATEGORY_NAME_TO_UI_CATEGORY: Record<string, UICategory> = {
-  기타: 'others',
-  곡류: 'grains',
-  곡물류: 'grains',
-  과일류: 'others',
-  견과류: 'nuts',
-  육류: 'meat',
-  '육류/계란': 'meat',
-  '육류 및 계란': 'meat',
-  계란류: 'meat',
-  난류: 'meat',
-  어패류: 'seafood',
-  해산물류: 'seafood',
-  젓갈류: 'seafood',
-  '젓갈 및 발효식품': 'seafood',
-  유제품: 'dairy',
-  양념류: 'others',
-  '양념/소스': 'others',
-  소스류: 'others',
-};
+const CATEGORY_NAME_TO_UI_CATEGORY = new Map<string, UICategory>([
+  ['계란류', 'meat'],
+  ['견과류', 'nuts'],
+  ['과일류', 'others'],
+  ['곡류', 'grains'],
+  ['곡물류', 'grains'],
+  ['기타', 'others'],
+  ['난류', 'meat'],
+  ['소스류', 'others'],
+  ['어패류', 'seafood'],
+  ['양념/소스', 'others'],
+  ['양념류', 'others'],
+  ['유제품', 'dairy'],
+  ['육류', 'meat'],
+  ['육류/계란', 'meat'],
+  ['육류 및 계란', 'meat'],
+  ['젓갈류', 'seafood'],
+  ['젓갈 및 발효식품', 'seafood'],
+  ['해산물류', 'seafood'],
+]);
+
+const UI_CATEGORY_ORDER: readonly UICategory[] = [
+  'dairy',
+  'grains',
+  'meat',
+  'nuts',
+  'others',
+  'seafood',
+] as const;
 
 const normalizeIngredientLabel = (name: string): string => {
   // 괄호 및 괄호 안의 내용을 제거하고 앞뒤 공백을 정리
@@ -40,9 +49,7 @@ const normalizeIngredientLabel = (name: string): string => {
 
 const mapCategoryNameToUICategory = (
   categoryName: string
-): UICategory | null => {
-  return CATEGORY_NAME_TO_UI_CATEGORY[categoryName] ?? null;
-};
+): UICategory | null => CATEGORY_NAME_TO_UI_CATEGORY.get(categoryName) ?? null;
 
 /**
  * 백엔드 재료 데이터를 UI 카테고리별로 그룹화
@@ -52,33 +59,30 @@ const mapCategoryNameToUICategory = (
 export const groupIngredientsByCategory = (
   ingredients: RestrictedIngredient[]
 ): Record<UICategory, AllergyCheckItem[]> => {
-  const grouped: Record<UICategory, AllergyCheckItem[]> = {
-    dairy: [],
-    grains: [],
-    meat: [],
-    nuts: [],
-    others: [],
-    seafood: [],
-  };
+  const itemsByCategory = new Map<UICategory, AllergyCheckItem[]>();
+  const labelIndexByCategory = new Map<UICategory, Map<string, number>>();
 
-  const groupIndex: Record<UICategory, Record<string, number>> = {
-    dairy: {},
-    grains: {},
-    meat: {},
-    nuts: {},
-    others: {},
-    seafood: {},
-  };
+  UI_CATEGORY_ORDER.forEach(category => {
+    itemsByCategory.set(category, []);
+    labelIndexByCategory.set(category, new Map());
+  });
 
   ingredients.forEach(ingredient => {
     const category = mapCategoryNameToUICategory(ingredient.categoryName);
     if (!category) return;
-    const normalizedLabel = normalizeIngredientLabel(ingredient.name);
-    const categoryLookup = groupIndex[category];
 
-    if (normalizedLabel in categoryLookup) {
-      const existingIndex = categoryLookup[normalizedLabel];
-      const existingItem = grouped[category][existingIndex];
+    const normalizedLabel = normalizeIngredientLabel(ingredient.name);
+    const categoryItems = itemsByCategory.get(category);
+    const labelIndex = labelIndexByCategory.get(category);
+
+    if (!categoryItems || !labelIndex) {
+      return;
+    }
+
+    const existingIndex = labelIndex.get(normalizedLabel);
+
+    if (existingIndex !== undefined) {
+      const existingItem = categoryItems[existingIndex];
       if (!existingItem.linkedIngredientIds.includes(ingredient.id)) {
         existingItem.linkedIngredientIds.push(ingredient.id);
       }
@@ -88,8 +92,8 @@ export const groupIngredientsByCategory = (
       return;
     }
 
-    categoryLookup[normalizedLabel] = grouped[category].length;
-    grouped[category].push({
+    labelIndex.set(normalizedLabel, categoryItems.length);
+    categoryItems.push({
       id: ingredient.id,
       isUserRestricted: ingredient.isUserRestricted,
       label: normalizedLabel,
@@ -97,7 +101,14 @@ export const groupIngredientsByCategory = (
     });
   });
 
-  return grouped;
+  return {
+    dairy: itemsByCategory.get('dairy') ?? [],
+    grains: itemsByCategory.get('grains') ?? [],
+    meat: itemsByCategory.get('meat') ?? [],
+    nuts: itemsByCategory.get('nuts') ?? [],
+    others: itemsByCategory.get('others') ?? [],
+    seafood: itemsByCategory.get('seafood') ?? [],
+  };
 };
 
 /**
@@ -110,21 +121,28 @@ export const mapIngredientsToCategories = (
   ingredients: RestrictedIngredient[],
   categoryMetadata: CategoryMetadata[]
 ): AllergyCategory[] => {
-  const grouped = groupIngredientsByCategory(ingredients);
-  const categoryTitles: Partial<Record<UICategory, string>> = {};
+  const groupedRecord = groupIngredientsByCategory(ingredients);
+  const grouped = new Map<UICategory, AllergyCheckItem[]>([
+    ['dairy', groupedRecord.dairy],
+    ['grains', groupedRecord.grains],
+    ['meat', groupedRecord.meat],
+    ['nuts', groupedRecord.nuts],
+    ['others', groupedRecord.others],
+    ['seafood', groupedRecord.seafood],
+  ]);
+
+  const categoryTitles = new Map<UICategory, string>();
 
   ingredients.forEach(ingredient => {
     const category = mapCategoryNameToUICategory(ingredient.categoryName);
-    if (!category) return;
-    if (!categoryTitles[category]) {
-      categoryTitles[category] = ingredient.categoryName;
-    }
+    if (!category || categoryTitles.has(category)) return;
+    categoryTitles.set(category, ingredient.categoryName);
   });
 
   return categoryMetadata
     .map(meta => ({
-      items: grouped[meta.type] || [],
-      title: categoryTitles[meta.type] ?? meta.title,
+      items: grouped.get(meta.type) ?? [],
+      title: categoryTitles.get(meta.type) ?? meta.title,
       type: meta.type,
     }))
     .filter(category => category.items.length > 0);
@@ -139,15 +157,22 @@ export const extractInitialSelectedIds = (
   ingredients: RestrictedIngredient[]
 ): number[] => {
   const grouped = groupIngredientsByCategory(ingredients);
-  const initialIds: number[] = [];
+  const initialIds = new Set<number>();
 
-  Object.values(grouped).forEach(items => {
+  [
+    grouped.dairy,
+    grouped.grains,
+    grouped.meat,
+    grouped.nuts,
+    grouped.others,
+    grouped.seafood,
+  ].forEach(items => {
     items.forEach(item => {
       if (item.isUserRestricted) {
-        initialIds.push(...item.linkedIngredientIds);
+        item.linkedIngredientIds.forEach(id => initialIds.add(id));
       }
     });
   });
 
-  return Array.from(new Set(initialIds));
+  return Array.from(initialIds);
 };
