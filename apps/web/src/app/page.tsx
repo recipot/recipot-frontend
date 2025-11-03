@@ -183,7 +183,9 @@ export default function Home() {
   }
 
   if (isDesktop) {
-    return <DesktopLanding iframeSrc="/signin/mobile" wrapperClassName="py-0" />;
+    return (
+      <DesktopLanding iframeSrc="/signin/mobile" wrapperClassName="py-0" />
+    );
   }
 
   // 로딩 중일 때 표시할 화면

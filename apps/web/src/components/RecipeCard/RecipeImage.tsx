@@ -14,10 +14,18 @@ interface RecipeImageProps {
 
 export const RecipeImage = memo(
   ({ index, isMainCard, recipe }: RecipeImageProps) => {
+    const imageUrl = recipe.images[0]?.imageUrl;
+
+    if (!imageUrl) {
+      return (
+        <div className="absolute inset-0" style={getBackgroundColor(index)} />
+      );
+    }
+
     return (
       <div className="absolute inset-0" style={getBackgroundColor(index)}>
         <Image
-          src={recipe.images[0].imageUrl}
+          src={imageUrl}
           alt={recipe.title}
           width={CARD_DIMENSIONS.width}
           height={CARD_DIMENSIONS.height}

@@ -20,8 +20,8 @@ export function ExploreComplete() {
 
   const router = useRouter();
 
-  const handleGoToRecipeRecommend = () => {
-    router.push('/recipeRecommend');
+  const handleGoToMain = () => {
+    router.push('/');
   };
 
   return (
@@ -48,9 +48,9 @@ export function ExploreComplete() {
         </h3>
       </section>
       <div className="mt-[30px]">
-        <Button onClick={handleGoToRecipeRecommend}>
+        <Button onClick={handleGoToMain}>
           <CookIcon size={18} color="#ffffff" />
-          다시 선택하러 가기
+          좋아요, 볼게요
         </Button>
       </div>
     </div>

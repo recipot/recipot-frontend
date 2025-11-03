@@ -13,6 +13,7 @@ import { Drawer, DrawerClose, DrawerContent, DrawerTitle } from '../ui/drawer';
 import { ReviewRecipeCard, type ReviewRecipeData } from './ReviewRecipeCard';
 
 const STORAGE_KEY = 'reviewRemindLastShown';
+const DISMISSED_KEY = 'reviewRemindDismissed';
 
 export function ReviewRemindBottomSheet() {
   const router = useRouter();
@@ -25,9 +26,18 @@ export function ReviewRemindBottomSheet() {
   const useCookieAuth = isProduction;
   const token = tokenUtils.getToken();
 
+  // 사용자가 일부러 닫았는지 확인
+  const isDismissed = () => {
+    if (typeof window === 'undefined') return false;
+    return localStorage.getItem(DISMISSED_KEY) === 'true';
+  };
+
   // 24시간 경과 여부 체크
   const shouldShowBottomSheet = () => {
     if (typeof window === 'undefined') return false;
+
+    // 사용자가 일부러 닫았다면 표시하지 않음
+    if (isDismissed()) return false;
 
     const lastShown = localStorage.getItem(STORAGE_KEY);
     if (!lastShown) return true;
@@ -130,8 +140,18 @@ export function ReviewRemindBottomSheet() {
 
   const handleClose = () => {
     setIsOpen(false);
-    // 현재 시간을 localStorage에 저장
+    // 현재 시간을 localStorage에 저장 (24시간 후 다시 표시하기 위함)
     if (typeof window !== 'undefined') {
+      localStorage.setItem(STORAGE_KEY, new Date().toISOString());
+    }
+  };
+
+  // 사용자가 일부러 닫기 버튼을 클릭했을 때
+  const handleDismiss = () => {
+    setIsOpen(false);
+    // 사용자가 일부러 닫았다는 플래그 저장 (재접속 시 다시 표시하지 않음)
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(DISMISSED_KEY, 'true');
       localStorage.setItem(STORAGE_KEY, new Date().toISOString());
     }
   };
@@ -142,7 +162,14 @@ export function ReviewRemindBottomSheet() {
   }
 
   return (
-    <Drawer open={isOpen} onOpenChange={handleClose}>
+    <Drawer
+      open={isOpen}
+      onOpenChange={open => {
+        if (!open) {
+          handleDismiss();
+        }
+      }}
+    >
       <DrawerContent className="mx-auto w-full max-w-[430px]">
         <VisuallyHidden asChild>
           <DrawerTitle>어제 드신 메뉴 어떠셨나요?</DrawerTitle>

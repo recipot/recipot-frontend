@@ -56,7 +56,7 @@ export const RecipeCard = memo(
 
             <div className="flex size-full flex-col justify-between">
               {/* 상단 메타 정보 */}
-              <div className="recipe-card-meta flex w-full justify-center py-5">
+              <div className="recipe-card-meta w-full py-5">
                 <RecipeMetaInfo recipe={recipe} />
               </div>
 
@@ -80,8 +80,8 @@ export const RecipeCard = memo(
     return (
       prevProps.recipe.id === nextProps.recipe.id &&
       prevProps.recipe.title === nextProps.recipe.title &&
-      prevProps.recipe.images[0].imageUrl ===
-        nextProps.recipe.images[0].imageUrl &&
+      prevProps.recipe.images[0]?.imageUrl ===
+        nextProps.recipe.images[0]?.imageUrl &&
       prevProps.isLiked === nextProps.isLiked &&
       prevProps.isMainCard === nextProps.isMainCard &&
       prevProps.index === nextProps.index
