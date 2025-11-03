@@ -334,5 +334,7 @@ export const authService = {
 export const tokenUtils = {
   getToken: () => storage.getToken(),
   getRefreshToken: () => storage.getRefreshToken(),
+  saveTokens: (token: string, refreshToken: string) =>
+    storage.saveTokens(token, refreshToken),
   clearTokens: () => storage.clear(),
 };
