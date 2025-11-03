@@ -76,7 +76,7 @@ export default function RecipeRecommend() {
 
   // condition 객체를 useMemo로 메모이제이션
   const condition = useMemo(() => {
-    return {
+    const cond = {
       id: moodToConditionId(userSelectedMood),
       name: userSelectedMood,
     };
@@ -87,9 +87,7 @@ export default function RecipeRecommend() {
   const [showTutorial, setShowTutorial] = useState(false);
 
   // API 응답을 Recipe 타입으로 변환하는 함수
-  const mapRecommendationToRecipe = (
-    item: RecommendationItem
-  ): Omit<Recipe, 'ingredients'> => {
+  const mapRecommendationToRecipe = (item: RecommendationItem): Recipe => {
     return {
       description: item.description,
       duration: item.duration,
@@ -98,6 +96,11 @@ export default function RecipeRecommend() {
         id: index + 1,
         imageUrl: url,
       })),
+      ingredients: {
+        alternativeUnavailable: [],
+        notOwned: [],
+        owned: [],
+      },
       isBookmarked: item.isBookmarked,
       seasonings: [],
       steps: [],
@@ -135,11 +138,34 @@ export default function RecipeRecommend() {
         selectedFoodIds
       );
 
-      // API 응답에서 items 추출
-      const { items } = data;
+      // API 응답 구조 확인 및 디버깅
+      console.info('레시피 추천 API 응답:', data);
+
+      // API 응답에서 items 추출 (data.data.items 또는 data.items 형태 모두 처리)
+      const items =
+        data?.data?.items ??
+        data?.items ??
+        (Array.isArray(data?.data) ? data.data : []);
+
+      // items가 배열인지 확인
+      if (!Array.isArray(items)) {
+        console.error('레시피 추천 API 응답: items가 배열이 아닙니다.', items);
+        setRecipes([]);
+        setHasFetched(true);
+        return;
+      }
+
+      console.info('추출된 items:', items, 'items 길이:', items.length);
 
       // API 응답을 Recipe 타입으로 변환
       const mappedRecipes = items.map(mapRecommendationToRecipe);
+
+      console.info(
+        '변환된 레시피:',
+        mappedRecipes,
+        '레시피 개수:',
+        mappedRecipes.length
+      );
 
       setRecipes(mappedRecipes);
       setHasFetched(true);
@@ -156,13 +182,25 @@ export default function RecipeRecommend() {
       setLikedRecipes(bookmarkedIds);
     } catch (error) {
       console.error('레시피 추천 조회 실패:', error);
-      setHasFetched(true);
+
+      // 에러 발생 시 상세 정보 로깅
+      if (axios.isAxiosError(error)) {
+        console.error('에러 응답:', error.response?.data);
+        console.error('에러 상태:', error.response?.status);
+      }
+
       // 인증 오류인 경우 로그인 페이지로 리다이렉트
       if (axios.isAxiosError(error) && error.response?.status === 401) {
         console.info('🔒 인증 오류, 로그인 페이지로 이동');
         router.push('/signin');
         return;
       }
+
+      // 에러 발생 시에도 상태를 올바르게 관리 (탐험완료 페이지가 표시되지 않도록)
+      // 에러는 실제 빈 배열과 구분하기 위해 hasFetched는 true로 설정하되
+      // recipes는 빈 배열로 설정하지 않음 (기존 레시피 유지 또는 로딩 상태 유지)
+      // 단, 실제 빈 배열 반환과 구분하기 위해 이전 recipes 상태 유지
+      setHasFetched(false);
       showToast('레시피를 불러오는데 실패했어요');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
