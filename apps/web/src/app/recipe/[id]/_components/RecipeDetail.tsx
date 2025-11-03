@@ -96,8 +96,6 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
     setActiveTab(tabId);
   };
 
-  console.log(recipeData?.healthPoint, 'recipeData?.healthPoint?.[0]');
-
   return (
     <div className="w-full bg-gray-100">
       <RecipeDetailHeader recipe={recipeData} />
