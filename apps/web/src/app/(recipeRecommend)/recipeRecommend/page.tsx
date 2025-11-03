@@ -20,6 +20,7 @@ import type {
 } from '@/app/recipe/[id]/types/recipe.types';
 import { Header } from '@/components/common/Header';
 import { Toast } from '@/components/common/Toast';
+import { ExploreComplete } from '@/components/ExploreComplete';
 import { RecipeCard } from '@/components/RecipeCard';
 import { useToast } from '@/hooks/useToast';
 import { isProduction } from '@/lib/env';
@@ -43,6 +44,7 @@ export default function RecipeRecommend() {
   const [isLoading, setIsLoading] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [hasFetched, setHasFetched] = useState(false);
   const { isVisible, message, showToast } = useToast();
 
   // 인증 상태 확인 및 리다이렉트
@@ -62,6 +64,13 @@ export default function RecipeRecommend() {
 
   const userSelectedMood = mood ?? 'neutral';
 
+  console.info(
+    'RecipeRecommend - mood:',
+    mood,
+    'userSelectedMood:',
+    userSelectedMood
+  );
+
   const token = tokenUtils.getToken();
   const useCookieAuth = isProduction;
 
@@ -71,6 +80,8 @@ export default function RecipeRecommend() {
       id: moodToConditionId(userSelectedMood),
       name: userSelectedMood,
     };
+    console.info('RecipeRecommend - condition 생성:', cond);
+    return cond;
   }, [userSelectedMood]);
 
   const [showTutorial, setShowTutorial] = useState(false);
@@ -113,6 +124,7 @@ export default function RecipeRecommend() {
       // selectedFoodIds가 비어있으면 API 호출하지 않음
       if (selectedFoodIds?.length === 0) {
         console.warn('선택된 재료가 없어서 레시피 추천을 건너뜁니다.');
+        setHasFetched(false);
         return;
       }
 
@@ -130,6 +142,7 @@ export default function RecipeRecommend() {
       const mappedRecipes = items.map(mapRecommendationToRecipe);
 
       setRecipes(mappedRecipes);
+      setHasFetched(true);
 
       // 초기 북마크 상태 설정
       const bookmarkedRecipe = mappedRecipes.filter(
@@ -143,6 +156,7 @@ export default function RecipeRecommend() {
       setLikedRecipes(bookmarkedIds);
     } catch (error) {
       console.error('레시피 추천 조회 실패:', error);
+      setHasFetched(true);
       // 인증 오류인 경우 로그인 페이지로 리다이렉트
       if (axios.isAxiosError(error) && error.response?.status === 401) {
         console.info('🔒 인증 오류, 로그인 페이지로 이동');
@@ -167,8 +181,14 @@ export default function RecipeRecommend() {
         // localStorage 확인 - 이미 튜토리얼을 닫은 적이 있는지 체크
         const tutorialClosed = localStorage.getItem(TUTORIAL_CLOSED_KEY);
 
-        // 첫 진입이고, 아직 튜토리얼을 닫은 적이 없을 때만 표시
-        if (userInfo.isFirstEntry && !tutorialClosed) {
+        // 첫 진입이고, 아직 튜토리얼을 닫은 적이 없고, 레시피가 있을 때만 표시
+        // (탐험완료 상태에서는 표시하지 않음)
+        if (
+          userInfo.isFirstEntry &&
+          !tutorialClosed &&
+          hasFetched &&
+          recipes.length > 0
+        ) {
           setShowTutorial(true);
         }
       } catch (error) {
@@ -182,7 +202,7 @@ export default function RecipeRecommend() {
       }
     };
     fetchProfile();
-  }, [router]);
+  }, [router, hasFetched, recipes.length]);
 
   // 하트 아이콘 클릭 시 북마크 토글 함수
   const handleToggleBookmark = async (_index: number, recipeId: number) => {
@@ -260,6 +280,17 @@ export default function RecipeRecommend() {
     return null;
   }
 
+  // API 호출 완료 후 레시피가 빈 배열인 경우 탐험완료 컴포넌트 표시
+  if (hasFetched && recipes.length === 0) {
+    return (
+      <div className="fixed inset-0 overflow-hidden">
+        <RecipeHeader onRefresh={handleRefresh} disabled />
+        <Header.Spacer />
+        <ExploreComplete />
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 overflow-hidden">
       <RecipeHeader onRefresh={handleRefresh} />
@@ -305,6 +336,13 @@ export default function RecipeRecommend() {
             </div>
 
             {/* Page Indicator - 카드 바로 아래 */}
+            <div className="mt-5 w-full">
+              <Toast
+                message={message}
+                isVisible={isVisible}
+                position="card-bottom"
+              />
+            </div>
             <div className="recipe-pagination mt-4 flex justify-center gap-1.5" />
           </div>
         </div>
@@ -314,8 +352,6 @@ export default function RecipeRecommend() {
 
       {/* 튜토리얼 팝업 */}
       {showTutorial && <TutorialPopup onClose={handleCloseTutorial} />}
-
-      <Toast message={message} isVisible={isVisible} />
     </div>
   );
 }

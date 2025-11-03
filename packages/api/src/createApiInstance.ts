@@ -1,5 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 
+import { tokenUtils } from './auth';
+
 type ApiErrorHandler = ((error: unknown) => void) | null;
 
 let globalApiErrorHandler: ApiErrorHandler = null;
@@ -133,19 +135,102 @@ export const createApiInstance = (
       }
       return response;
     },
-    error => {
+    async error => {
       console.error(
         `[${apiName} API Response Error]`,
         error.response?.data ?? error.message
       );
-      if (globalApiErrorHandler) {
-        try {
-          globalApiErrorHandler(error);
-        } catch (handlerError) {
-          console.error('API error handler execution failed:', handlerError);
+
+      if (error.response?.status !== 401) {
+        if (globalApiErrorHandler) {
+          try {
+            globalApiErrorHandler(error);
+          } catch (handlerError) {
+            console.error('API error handler execution failed:', handlerError);
+          }
         }
+        return Promise.reject(error);
       }
-      return Promise.reject(error);
+
+      const originalRequest: any = error.config ?? {};
+      const requestUrl = originalRequest.url ?? '';
+
+      if (
+        requestUrl.includes('/v1/auth/refresh') ||
+        requestUrl.includes('/v1/login')
+      ) {
+        if (globalApiErrorHandler) {
+          try {
+            globalApiErrorHandler(error);
+          } catch (handlerError) {
+            console.error('API error handler execution failed:', handlerError);
+          }
+        }
+        return Promise.reject(error);
+      }
+
+      if (originalRequest._retry) {
+        tokenUtils.clearTokens();
+        if (globalApiErrorHandler) {
+          try {
+            globalApiErrorHandler(error);
+          } catch (handlerError) {
+            console.error('API error handler execution failed:', handlerError);
+          }
+        }
+        return Promise.reject(error);
+      }
+
+      originalRequest._retry = true;
+
+      const storedRefreshToken = tokenUtils.getRefreshToken();
+      const hasStoredCredentials =
+        typeof storedRefreshToken === 'string' && storedRefreshToken.length > 0;
+
+      try {
+        const refreshResponse = await instance.post(
+          '/v1/auth/refresh',
+          hasStoredCredentials ? { refreshToken: storedRefreshToken } : {}
+        );
+
+        const responseData =
+          refreshResponse.data?.data ?? refreshResponse.data ?? {};
+
+        const newAccessToken = responseData?.accessToken;
+        const newRefreshToken = responseData?.refreshToken;
+
+        if (hasStoredCredentials) {
+          if (!newAccessToken) {
+            throw new Error('No access token returned from refresh.');
+          }
+
+          tokenUtils.saveTokens(
+            newAccessToken,
+            newRefreshToken ?? storedRefreshToken ?? ''
+          );
+          originalRequest.headers = originalRequest.headers ?? {};
+          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        } else if (originalRequest.headers?.Authorization) {
+          delete originalRequest.headers.Authorization;
+        }
+
+        return instance.request(originalRequest);
+      } catch (refreshError) {
+        tokenUtils.clearTokens();
+
+        if (globalApiErrorHandler) {
+          try {
+            globalApiErrorHandler(refreshError);
+          } catch (handlerError) {
+            console.error(
+              'API error handler execution failed:',
+              handlerError
+            );
+          }
+        }
+
+        return Promise.reject(refreshError);
+      }
     }
   );
 

@@ -42,7 +42,6 @@
   opacity: 1;
   transition: all 0.3s ease;
   border-radius: 50%;
-  /* margin: 0 4px; */
 }
 
 .recipe-pagination .swiper-pagination-bullet-active {
@@ -76,7 +75,31 @@
   }
 }
 
-/* 작은 화면 높이 대응 (670px 이하) */
+/* iPhone SE 등 매우 작은 화면 높이 대응 (568px 이하) */
+@media (max-height: 568px) {
+  /* 헤더 그룹 간격 줄이기 */
+  .recipe-header-group {
+    margin-bottom: 0.25rem; /* mb-5 → mb-1 */
+  }
+
+  /* 태그 간격 줄이기 */
+  .recipe-tags {
+    margin-top: 0.5rem; /* mt-5 → mt-2 */
+    margin-bottom: 0.25rem; /* mb-4 → mb-1 */
+  }
+
+  /* 페이지네이션 간격 줄이기 */
+  .recipe-pagination {
+    margin-top: 0.25rem; /* mt-4 → mt-1 */
+  }
+
+  /* 카드 최대 높이 조정 */
+  .recipe-card-wrapper {
+    max-height: 320px;
+  }
+}
+
+/* 작은 화면 높이 대응 (600px 이하) */
 @media (max-height: 600px) {
   /* 헤더 그룹 간격 줄이기 */
   .recipe-header-group {
@@ -98,4 +121,10 @@
   .recipe-card-wrapper {
     max-height: 380px;
   }
+}
+
+/* 토스트가 잘리지 않도록 overflow 조정 */
+.recipe-recommend-main {
+  overflow-y: auto;
+  overflow-x: hidden;
 }
