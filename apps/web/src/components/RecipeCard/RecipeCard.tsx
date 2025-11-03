@@ -80,8 +80,8 @@ export const RecipeCard = memo(
     return (
       prevProps.recipe.id === nextProps.recipe.id &&
       prevProps.recipe.title === nextProps.recipe.title &&
-      prevProps.recipe.images[0].imageUrl ===
-        nextProps.recipe.images[0].imageUrl &&
+      prevProps.recipe.images[0]?.imageUrl ===
+        nextProps.recipe.images[0]?.imageUrl &&
       prevProps.isLiked === nextProps.isLiked &&
       prevProps.isMainCard === nextProps.isMainCard &&
       prevProps.index === nextProps.index

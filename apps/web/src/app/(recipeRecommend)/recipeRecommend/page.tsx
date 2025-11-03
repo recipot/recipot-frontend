@@ -87,34 +87,41 @@ export default function RecipeRecommend() {
   const [showTutorial, setShowTutorial] = useState(false);
 
   // API 응답을 Recipe 타입으로 변환하는 함수
-  const mapRecommendationToRecipe = (
-    item: RecommendationItem
-  ): Omit<Recipe, 'ingredients'> => {
+  const mapRecommendationToRecipe = (item: RecommendationItem): Recipe => {
+    const images = (item.imageUrls ?? []).map((url, index) => ({
+      id: index + 1,
+      imageUrl: url,
+    }));
+
+    const tools = (item.tools ?? []).map((tool, index) => {
+      if (typeof tool === 'string') {
+        return {
+          id: index + 1,
+          name: tool,
+        };
+      }
+      return {
+        id: tool.id ?? index + 1,
+        name: tool.name ?? '',
+        ...(tool.imageUrl && { imageUrl: tool.imageUrl }),
+      };
+    });
+
     return {
-      description: item.description,
-      duration: item.duration,
+      description: item.description ?? '',
+      duration: item.duration ?? '',
       id: item.recipeId,
-      images: item.imageUrls.map((url, index) => ({
-        id: index + 1,
-        imageUrl: url,
-      })),
-      isBookmarked: item.isBookmarked,
+      images,
+      ingredients: {
+        alternativeUnavailable: [],
+        notOwned: [],
+        owned: [],
+      },
+      isBookmarked: item.isBookmarked ?? false,
       seasonings: [],
       steps: [],
-      title: item.title,
-      tools: item.tools.map((tool, index) => {
-        if (typeof tool === 'string') {
-          return {
-            id: index + 1,
-            name: tool,
-          };
-        }
-        return {
-          id: tool.id,
-          name: tool.name,
-          ...(tool.imageUrl && { imageUrl: tool.imageUrl }),
-        };
-      }),
+      title: item.title ?? '',
+      tools,
     };
   };
 
@@ -135,11 +142,25 @@ export default function RecipeRecommend() {
         selectedFoodIds
       );
 
-      // API 응답에서 items 추출
-      const { items } = data;
+      // API 응답에서 items 추출 (data.data.items 또는 data.items 구조)
+      const items = data?.data?.items ?? data?.items ?? [];
+
+      // items가 배열이 아니거나 빈 배열인 경우에만 탐험완료 표시
+      if (!Array.isArray(items) || items.length === 0) {
+        setRecipes([]);
+        setHasFetched(true);
+        return;
+      }
 
       // API 응답을 Recipe 타입으로 변환
       const mappedRecipes = items.map(mapRecommendationToRecipe);
+
+      // 변환된 레시피가 빈 배열인 경우도 탐험완료로 처리
+      if (mappedRecipes.length === 0) {
+        setRecipes([]);
+        setHasFetched(true);
+        return;
+      }
 
       setRecipes(mappedRecipes);
       setHasFetched(true);
@@ -156,13 +177,25 @@ export default function RecipeRecommend() {
       setLikedRecipes(bookmarkedIds);
     } catch (error) {
       console.error('레시피 추천 조회 실패:', error);
-      setHasFetched(true);
+
+      // 에러 발생 시 상세 정보 로깅
+      if (axios.isAxiosError(error)) {
+        console.error('에러 응답:', error.response?.data);
+        console.error('에러 상태:', error.response?.status);
+      }
+
       // 인증 오류인 경우 로그인 페이지로 리다이렉트
       if (axios.isAxiosError(error) && error.response?.status === 401) {
         console.info('🔒 인증 오류, 로그인 페이지로 이동');
         router.push('/signin');
         return;
       }
+
+      // 에러 발생 시에도 상태를 올바르게 관리 (탐험완료 페이지가 표시되지 않도록)
+      // 에러는 실제 빈 배열과 구분하기 위해 hasFetched는 true로 설정하되
+      // recipes는 빈 배열로 설정하지 않음 (기존 레시피 유지 또는 로딩 상태 유지)
+      // 단, 실제 빈 배열 반환과 구분하기 위해 이전 recipes 상태 유지
+      setHasFetched(false);
       showToast('레시피를 불러오는데 실패했어요');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -265,12 +298,12 @@ export default function RecipeRecommend() {
 
   // 이미지 사전 로딩
   useEffect(() => {
-    if (recipes?.length && recipes.length > 0) {
-      // 현재 카드와 다음 2개 카드의 이미지를 미리 로딩
-      const preloadImages = recipes.slice(activeIndex, activeIndex + 3);
-      preloadImages.forEach(recipe => {
-        const img = new Image();
-        img.src = recipe.images[0].imageUrl;
+    if (recipes.length > 0) {
+      recipes.slice(activeIndex, activeIndex + 3).forEach(recipe => {
+        if (recipe.images?.[0]?.imageUrl) {
+          const img = new Image();
+          img.src = recipe.images[0].imageUrl;
+        }
       });
     }
   }, [activeIndex, recipes]);

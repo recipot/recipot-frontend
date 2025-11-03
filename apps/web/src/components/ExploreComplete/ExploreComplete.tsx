@@ -6,6 +6,7 @@ import React from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
+import RecipeTags from '@/app/(recipeRecommend)/recipeRecommend/_components/RecipeTags';
 import { Button } from '@/components/common/Button';
 import { CookIcon } from '@/components/Icons';
 import { useMoodStore } from '@/stores/moodStore';
@@ -27,8 +28,9 @@ export function ExploreComplete() {
     <div
       className={`flex h-screen w-screen flex-col items-center justify-center ${getEmotionGradient(userSelectedMood)}`}
     >
+      <RecipeTags />
       <h2 className="text-22sb text-center text-gray-900">
-        재료 조합 탐험 완료!
+        레시피 탐험이 끝났어요!
         <span className="text-24 ml-[2px]">&#x1F50D;</span>
       </h2>
       <Image
@@ -40,8 +42,9 @@ export function ExploreComplete() {
       />
       <section className="mt-[34px]">
         <h3 className="text-22sb text-center text-gray-900">
-          새로운 조합을 찾아 레시피를
-          <br />더 추천받아 보세요
+          요리할 힘 살짝만 올려서
+          <br />
+          새로운 요리를 추천해 드릴게요
         </h3>
       </section>
       <div className="mt-[30px]">
