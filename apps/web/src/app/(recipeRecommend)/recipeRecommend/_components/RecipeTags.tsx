@@ -31,9 +31,7 @@ const RecipeTags = () => {
             key={ingredient}
             className="bg-secondary-light-green border-secondary-soft-green flex-shrink-0 rounded-[6px] border px-2 py-[2px] text-[#53880A]"
           >
-            <p className="text-14b whitespace-nowrap">
-              {ingredient.slice(0, 13)}
-            </p>
+            <p className="text-14b whitespace-nowrap">{ingredient}</p>
           </div>
         ))}
         {remainingCount > 0 && (
