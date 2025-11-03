@@ -88,16 +88,12 @@ export default function RecipeRecommend() {
 
   // API 응답을 Recipe 타입으로 변환하는 함수
   const mapRecommendationToRecipe = (item: RecommendationItem): Recipe => {
-    // imageUrls가 배열이 아니거나 undefined인 경우 빈 배열로 처리
-    const imageUrls = Array.isArray(item.imageUrls) ? item.imageUrls : [];
-    const images = imageUrls.map((url, index) => ({
+    const images = (item.imageUrls ?? []).map((url, index) => ({
       id: index + 1,
       imageUrl: url,
     }));
 
-    // tools가 배열이 아니거나 undefined인 경우 빈 배열로 처리
-    const toolsArray = Array.isArray(item.tools) ? item.tools : [];
-    const tools = toolsArray.map((tool, index) => {
+    const tools = (item.tools ?? []).map((tool, index) => {
       if (typeof tool === 'string') {
         return {
           id: index + 1,
@@ -105,8 +101,8 @@ export default function RecipeRecommend() {
         };
       }
       return {
-        id: tool.id,
-        name: tool.name,
+        id: tool.id ?? index + 1,
+        name: tool.name ?? '',
         ...(tool.imageUrl && { imageUrl: tool.imageUrl }),
       };
     });
@@ -146,55 +142,18 @@ export default function RecipeRecommend() {
         selectedFoodIds
       );
 
-      // API 응답 구조 확인 및 디버깅
-      console.info('레시피 추천 API 응답:', data);
+      // API 응답에서 items 추출 (data.data.items 구조)
+      const items = data?.data?.items ?? [];
 
-      // API 응답에서 items 추출 (data.data.items 또는 data.items 형태 모두 처리)
-      let items: RecommendationItem[] | undefined;
-
-      // 1. data.data.items 확인
-      const { data: responseData } = data ?? {};
-      if (responseData?.items && Array.isArray(responseData.items)) {
-        const { items: responseItems } = responseData;
-        items = responseItems;
-      }
-      // 2. data.items 확인
-      else if (Array.isArray(data?.items)) {
-        const { items: dataItems } = data;
-        items = dataItems;
-      }
-      // 3. data.data가 배열인지 확인
-      else if (Array.isArray(responseData)) {
-        items = responseData;
-      }
-
-      // items가 배열이 아니거나 undefined인 경우
-      if (!items || !Array.isArray(items)) {
-        console.error(
-          '레시피 추천 API 응답: items를 찾을 수 없거나 배열이 아닙니다.',
-          {
-            'data?.data': responseData,
-            'data?.data?.items': responseData?.items,
-            'data?.items': data?.items,
-            전체응답: data,
-          }
-        );
+      if (!Array.isArray(items)) {
+        console.error('레시피 추천 API 응답: items가 배열이 아닙니다.', data);
         setRecipes([]);
         setHasFetched(true);
         return;
       }
 
-      console.info('추출된 items:', items, 'items 길이:', items.length);
-
       // API 응답을 Recipe 타입으로 변환
       const mappedRecipes = items.map(mapRecommendationToRecipe);
-
-      console.info(
-        '변환된 레시피:',
-        mappedRecipes,
-        '레시피 개수:',
-        mappedRecipes.length
-      );
 
       setRecipes(mappedRecipes);
       setHasFetched(true);
@@ -332,12 +291,12 @@ export default function RecipeRecommend() {
 
   // 이미지 사전 로딩
   useEffect(() => {
-    if (recipes?.length && recipes.length > 0) {
-      // 현재 카드와 다음 2개 카드의 이미지를 미리 로딩
-      const preloadImages = recipes.slice(activeIndex, activeIndex + 3);
-      preloadImages.forEach(recipe => {
-        const img = new Image();
-        img.src = recipe.images[0].imageUrl;
+    if (recipes.length > 0) {
+      recipes.slice(activeIndex, activeIndex + 3).forEach(recipe => {
+        if (recipe.images?.[0]?.imageUrl) {
+          const img = new Image();
+          img.src = recipe.images[0].imageUrl;
+        }
       });
     }
   }, [activeIndex, recipes]);
