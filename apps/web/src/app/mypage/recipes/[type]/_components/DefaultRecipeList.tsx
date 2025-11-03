@@ -55,7 +55,7 @@ export default function DefaultRecipeList({
               variant="outline"
               className="text-17sb bg-white px-6 py-3 text-gray-900"
               onClick={() => {
-                router.push('/recipeRecommend');
+                router.push('/');
               }}
             >
               레시피 채우러 갈게요
