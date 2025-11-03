@@ -227,11 +227,14 @@ export const authService = {
     return response.data.data;
   },
 
-  async verifyToken(
-    token?: string
-  ): Promise<{ success: boolean; data: UserInfo; message: string }> {
+  async verifyToken(token?: string): Promise<{
+    success: boolean;
+    data: UserInfo;
+    message: string;
+  }> {
     if (token) {
-      storage.saveTokens(token, '');
+      const storedRefreshToken = storage.getRefreshToken() ?? '';
+      storage.saveTokens(token, storedRefreshToken);
     }
 
     const response = await authApi.post('/v1/auth/verify', {});
