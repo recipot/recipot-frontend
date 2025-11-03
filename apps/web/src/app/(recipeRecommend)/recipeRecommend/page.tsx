@@ -137,28 +137,22 @@ export default function RecipeRecommend() {
 
       const conditionId = moodToConditionId(userSelectedMood);
 
-      const { data } = await recipe.recipeRecommend(
+      const response = await recipe.recipeRecommend(
         conditionId,
         selectedFoodIds
       );
 
-      // API 응답 구조 확인
-      console.info('레시피 추천 API 응답:', data);
-      console.info('data?.data?.items:', data?.data?.items);
-      console.info('data?.items:', data?.items);
+      // API 응답 구조: recipe.recipeRecommend()는 response.data를 반환
+      // axios response.data = { status: 200, data: { items: [...] } }
+      // 따라서 response.data.items로 접근
+      const items = response?.data?.items ?? [];
 
-      // API 응답에서 items 추출 (data.data.items 구조)
-      const items = data?.data?.items ?? [];
-
-      console.info('추출된 items:', items, '길이:', items.length);
-
-      // items가 배열이 아니거나 빈 배열인 경우
+      // items가 배열이 아니거나 빈 배열인 경우에만 탐험완료 표시
       if (!Array.isArray(items) || items.length === 0) {
-        if (items.length === 0) {
-          console.info('레시피 추천 결과가 빈 배열입니다.');
-        } else {
-          console.error('레시피 추천 API 응답: items가 배열이 아닙니다.', data);
-        }
+        console.error(
+          '⚠️ 레시피 추천 결과가 빈 배열입니다. API 응답:',
+          response
+        );
         setRecipes([]);
         setHasFetched(true);
         return;
