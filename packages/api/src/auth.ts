@@ -1,4 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
+
+import { getCookie } from '@recipot/utils';
 import { UserInfo, TokenResponse } from '@recipot/types';
 
 const AUTH_STORAGE_KEY = 'auth-storage';
@@ -30,7 +32,16 @@ const storage = {
   },
 
   getRefreshToken(): string | null {
-    return this.getAuthStorage()?.state?.refreshToken ?? null;
+    const stored = this.getAuthStorage()?.state?.refreshToken ?? null;
+    if (stored && stored.length > 0) {
+      return stored;
+    }
+
+    if (typeof document !== 'undefined') {
+      return getCookie('refreshToken');
+    }
+
+    return null;
   },
 
   saveTokens(token: string, refreshToken: string): void {
@@ -75,7 +86,12 @@ const redirectToSignIn = (): void => {
 const shouldAddAuthHeader = (url?: string): boolean => {
   if (!url) return false;
 
-  const publicEndpoints = ['/v1/login/', '/v1/auth/debug', '/v1/health'];
+  const publicEndpoints = [
+    '/v1/login/',
+    '/v1/auth/debug',
+    '/v1/health',
+    '/v1/auth/refresh',
+  ];
   return !publicEndpoints.some(endpoint => url.includes(endpoint));
 };
 
