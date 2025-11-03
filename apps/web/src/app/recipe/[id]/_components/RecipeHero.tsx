@@ -31,7 +31,7 @@ export function RecipeHero({ recipe }: RecipeHeroProps) {
       <div className="absolute top-4 right-4 left-4 flex space-x-2">
         <div className="flex items-center space-x-1 rounded-full px-3 py-1.5">
           <CardTimeIcon size={24} color="#ffffff" />
-          <span className="text-17 text-white">{recipe.duration}</span>
+          <span className="text-17 text-white">{recipe.duration}분</span>
         </div>
         <div className="flex items-center space-x-1 rounded-full px-3 py-1.5">
           <CookwareIcon size={24} color="#ffffff" />

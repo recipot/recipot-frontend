@@ -56,7 +56,7 @@ export const RecipeCard = memo(
 
             <div className="flex size-full flex-col justify-between">
               {/* 상단 메타 정보 */}
-              <div className="recipe-card-meta w-full py-5">
+              <div className="recipe-card-meta w-full px-5 pt-5 pb-3">
                 <RecipeMetaInfo recipe={recipe} />
               </div>
 

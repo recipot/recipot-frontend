@@ -61,7 +61,7 @@ export interface ApiResponse {
 export interface Recipe {
   description: string;
   duration: string;
-  healthPoints?: HealthPoint[];
+  healthPoint?: HealthPoint;
   images: {
     id: number;
     imageUrl: string;

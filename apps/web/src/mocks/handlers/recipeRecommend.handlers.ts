@@ -12,10 +12,7 @@ const mockRecipes: Recipe[] = [
     duration: '15분',
     tools: [{ id: 1, imageUrl: '/backgroundImage.jpg', name: '냄비' }],
     description: '고사리나물로 만드는 전통 한식 레시피입니다.',
-    healthPoints: [
-      { content: '비타민 A가 풍부해 눈 건강에 좋아요' },
-      { content: '식이섬유가 많아 소화에 도움이 돼요' },
-    ],
+    healthPoint: { content: '비타민 A가 풍부해 눈 건강에 좋아요' },
     images: [
       { id: 1, imageUrl: '/recipeImage.png' },
       { id: 2, imageUrl: '/backgroundImage.jpg' },
@@ -63,10 +60,7 @@ const mockRecipes: Recipe[] = [
     duration: '5분',
     tools: [{ id: 1, imageUrl: '/backgroundImage.jpg', name: '프라이팬' }],
     description: '김치볶음밥으로 만드는 간단한 한끼 레시피입니다.',
-    healthPoints: [
-      { content: '김치의 유산균이 장 건강에 좋아요' },
-      { content: '탄수화물과 단백질이 균형있게 들어있어요' },
-    ],
+    healthPoint: { content: '김치의 유산균이 장 건강에 좋아요' },
     images: [{ id: 1, imageUrl: '/recipeImage.png' }],
     seasonings: [
       { id: 1, name: '김치국물', amount: '2큰술' },
@@ -110,10 +104,7 @@ const mockRecipes: Recipe[] = [
       { id: 1, imageUrl: '/backgroundImage.jpg', name: '조리도구 최소정보' },
     ],
     description: '빵 한장에 땅콩버터 바르고 사과만 얹으면 뚝딱 완성!',
-    healthPoints: [
-      { content: '땅콩의 단백질이 풍부해요' },
-      { content: '사과의 비타민 C가 면역력 향상에 도움이 돼요' },
-    ],
+    healthPoint: { content: '땅콩의 단백질이 풍부해요' },
     images: [{ id: 1, imageUrl: '/recipeImage.png' }],
     seasonings: [],
     isBookmarked: false,
