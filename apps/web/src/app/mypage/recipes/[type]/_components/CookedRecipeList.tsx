@@ -79,9 +79,7 @@ export default function CookedRecipeList({
               shape="round"
               variant="outline"
               className="text-17sb bg-white px-6 py-3 text-gray-900"
-              onClick={() => {
-                router.push('/');
-              }}
+              onClick={() => router.push('/')}
             >
               레시피 채우러 갈게요
             </Button>
