@@ -1,14 +1,16 @@
 {
   "extends": "../../.config/tsconfig.base.json",
   "compilerOptions": {
-    "baseUrl": ".",
+    "baseUrl": "../../",
+    "rootDir": "../../",
     "outDir": "./dist",
     "noEmit": false,
     "declaration": true,
-    "rootDir": "./src",
     "declarationMap": true,
+    "skipLibCheck": true,
     "paths": {
-      "@recipot/types": ["../types/src"]
+      "@recipot/types": ["./packages/types/src"],
+      "@recipot/utils": ["./packages/utils/src"]
     }
   },
   "include": ["src/**/*"],
