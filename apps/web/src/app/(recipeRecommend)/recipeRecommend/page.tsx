@@ -142,14 +142,35 @@ export default function RecipeRecommend() {
       console.info('레시피 추천 API 응답:', data);
 
       // API 응답에서 items 추출 (data.data.items 또는 data.items 형태 모두 처리)
-      const items =
-        data?.data?.items ??
-        data?.items ??
-        (Array.isArray(data?.data) ? data.data : []);
+      let items: RecommendationItem[] | undefined;
 
-      // items가 배열인지 확인
-      if (!Array.isArray(items)) {
-        console.error('레시피 추천 API 응답: items가 배열이 아닙니다.', items);
+      // 1. data.data.items 확인
+      const { data: responseData } = data ?? {};
+      if (responseData?.items && Array.isArray(responseData.items)) {
+        const { items: responseItems } = responseData;
+        items = responseItems;
+      }
+      // 2. data.items 확인
+      else if (Array.isArray(data?.items)) {
+        const { items: dataItems } = data;
+        items = dataItems;
+      }
+      // 3. data.data가 배열인지 확인
+      else if (Array.isArray(responseData)) {
+        items = responseData;
+      }
+
+      // items가 배열이 아니거나 undefined인 경우
+      if (!items || !Array.isArray(items)) {
+        console.error(
+          '레시피 추천 API 응답: items를 찾을 수 없거나 배열이 아닙니다.',
+          {
+            'data?.data': responseData,
+            'data?.data?.items': responseData?.items,
+            'data?.items': data?.items,
+            전체응답: data,
+          }
+        );
         setRecipes([]);
         setHasFetched(true);
         return;
