@@ -15,6 +15,7 @@ export type UICategory =
 export interface RestrictedIngredient {
   id: number;
   name: string;
+  categoryName: string;
   isUserRestricted: boolean;
 }
 
@@ -34,6 +35,7 @@ export interface RestrictedIngredientsResponse {
 export interface AllergyCheckItem {
   id: number;
   label: string;
+  linkedIngredientIds: number[];
   isUserRestricted?: boolean;
 }
 
