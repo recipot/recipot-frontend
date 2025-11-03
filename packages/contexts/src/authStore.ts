@@ -27,6 +27,8 @@ const isProduction = () =>
   process.env.NEXT_PUBLIC_APP_ENV !== 'development' &&
   process.env.NEXT_PUBLIC_APP_ENV !== 'local';
 
+const isCookieAuthMode = () => isProduction();
+
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => {
@@ -115,15 +117,29 @@ export const useAuthStore = create<AuthState>()(
 
         verifyAndRefreshToken: async () => {
           const { token } = get();
+          const cookieAuth = isCookieAuthMode();
 
           if (!token) {
+            if (cookieAuth) {
+              try {
+                const verified = await authService.verifyToken();
+                set({ user: verified.data ?? null });
+                return true;
+              } catch (error) {
+                console.error('[Auth] 쿠키 기반 토큰 검증 실패:', error);
+                get().logout();
+                return false;
+              }
+            }
+
             get().logout();
             return false;
           }
 
           try {
             // 토큰 검증 API 호출 - 만료 시 axios 인터셉터가 자동으로 재발급 처리
-            await authService.verifyToken(token);
+            const verified = await authService.verifyToken(token);
+            set({ user: verified.data ?? null });
             return true;
           } catch (error) {
             // axios 인터셉터에서 재발급을 시도했지만 실패한 경우 (예: refreshToken도 만료)
@@ -136,8 +152,21 @@ export const useAuthStore = create<AuthState>()(
           set({ loading: true });
 
           const { token, user } = get();
+          const cookieAuth = isCookieAuthMode();
 
           if (!token) {
+            if (cookieAuth) {
+              try {
+                const verified = await authService.verifyToken();
+                set({ user: verified.data ?? null });
+              } catch (error) {
+                console.error('[Auth] 쿠키 기반 초기화 실패:', error);
+              } finally {
+                set({ loading: false });
+              }
+              return;
+            }
+
             set({ loading: false });
             return;
           }
