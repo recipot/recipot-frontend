@@ -15,6 +15,7 @@ export type UICategory =
 export interface RestrictedIngredient {
   id: number;
   name: string;
+  categoryName: string;
   isUserRestricted: boolean;
 }
 

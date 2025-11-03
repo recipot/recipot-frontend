@@ -7,78 +7,34 @@ import type {
 } from '@/types/allergy.types';
 
 /**
- * 재료명 → UI 카테고리 맵핑 테이블
- * 백엔드에 새 재료가 추가되면 여기에도 추가해야 합니다
+ * 백엔드 카테고리명을 UI 카테고리 키로 매핑
+ * 새로운 카테고리가 추가되면 여기에서만 매핑을 업데이트하면 됩니다.
  */
-export const INGREDIENT_TO_CATEGORY_MAP: Record<string, UICategory> = {
-  // 어패류
-  고등어: 'seafood',
-  굴: 'seafood',
-  멸치: 'seafood',
-  명란젓: 'seafood',
-  바지락: 'seafood',
-  새우: 'seafood',
-  새우젓: 'seafood',
-  액젓: 'seafood',
-  연어: 'seafood',
-  오징어: 'seafood',
+const CATEGORY_NAME_TO_UI_CATEGORY: Record<string, UICategory> = {
+  기타: 'others',
+  곡류: 'grains',
+  곡물류: 'grains',
+  과일류: 'others',
+  견과류: 'nuts',
+  육류: 'meat',
+  '육류/계란': 'meat',
+  '육류 및 계란': 'meat',
+  계란류: 'meat',
+  난류: 'meat',
+  어패류: 'seafood',
+  해산물류: 'seafood',
   젓갈류: 'seafood',
-  참치: 'seafood',
-  홍합: 'seafood',
-
-  // 육류/계란
-  가공육: 'meat',
-  계란: 'meat',
-  닭고기: 'meat',
-  돼지고기: 'meat',
-  메추리알: 'meat',
-  베이컨: 'meat',
-  소시지: 'meat',
-  쇠고기: 'meat',
-  오리고기: 'meat',
-  햄: 'meat',
-
-  // 견과류
-  땅콩: 'nuts',
-  잣: 'nuts',
-  캐슈넛: 'nuts',
-  피스타치오: 'nuts',
-  호두: 'nuts',
-
-  // 곡류
-  국수면: 'grains',
-  만두: 'grains',
-  메밀가루: 'grains',
-  메밀면: 'grains',
-  밀가루: 'grains',
-  부침가루: 'grains',
-  빵: 'grains',
-  파스타면: 'grains',
-
-  // 유제품
-  버터: 'dairy',
-  요거트: 'dairy',
-  우유: 'dairy',
-  치즈: 'dairy',
-
-  // 기타
-  게맛살: 'others',
-  땅콩버터: 'others',
-  마라: 'others',
-  마요네즈: 'others',
-  배: 'others',
-  복숭아: 'others',
-  사과: 'others',
-  어묵: 'others',
+  '젓갈 및 발효식품': 'seafood',
+  유제품: 'dairy',
+  양념류: 'others',
+  '양념/소스': 'others',
+  소스류: 'others',
 };
 
-/**
- * 재료명을 UI 카테고리로 맵핑
- * @param ingredientName - 재료명
- * @returns UI 카테고리 타입
- */
-export const mapIngredientToCategory = (ingredientName: string): UICategory => {
-  return INGREDIENT_TO_CATEGORY_MAP[ingredientName] || 'others';
+const mapCategoryNameToUICategory = (
+  categoryName: string
+): UICategory | null => {
+  return CATEGORY_NAME_TO_UI_CATEGORY[categoryName] ?? null;
 };
 
 /**
@@ -99,7 +55,8 @@ export const groupIngredientsByCategory = (
   };
 
   ingredients.forEach(ingredient => {
-    const category = mapIngredientToCategory(ingredient.name);
+    const category = mapCategoryNameToUICategory(ingredient.categoryName);
+    if (!category) return;
     grouped[category].push({
       id: ingredient.id,
       isUserRestricted: ingredient.isUserRestricted,
@@ -121,12 +78,23 @@ export const mapIngredientsToCategories = (
   categoryMetadata: CategoryMetadata[]
 ): AllergyCategory[] => {
   const grouped = groupIngredientsByCategory(ingredients);
+  const categoryTitles: Partial<Record<UICategory, string>> = {};
 
-  return categoryMetadata.map(meta => ({
-    items: grouped[meta.type] || [],
-    title: meta.title,
-    type: meta.type,
-  }));
+  ingredients.forEach(ingredient => {
+    const category = mapCategoryNameToUICategory(ingredient.categoryName);
+    if (!category) return;
+    if (!categoryTitles[category]) {
+      categoryTitles[category] = ingredient.categoryName;
+    }
+  });
+
+  return categoryMetadata
+    .map(meta => ({
+      items: grouped[meta.type] || [],
+      title: categoryTitles[meta.type] ?? meta.title,
+      type: meta.type,
+    }))
+    .filter(category => category.items.length > 0);
 };
 
 /**
@@ -138,6 +106,9 @@ export const extractInitialSelectedIds = (
   ingredients: RestrictedIngredient[]
 ): number[] => {
   return ingredients
-    .filter(ingredient => ingredient.isUserRestricted)
+    .filter(ingredient => {
+      const category = mapCategoryNameToUICategory(ingredient.categoryName);
+      return category && ingredient.isUserRestricted;
+    })
     .map(ingredient => ingredient.id);
 };

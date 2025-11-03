@@ -8,7 +8,7 @@ import type { CategoryMetadata } from '@/types/allergy.types';
  * 실제 재료 목록은 백엔드 API에서 가져옵니다.
  */
 export const CATEGORY_METADATA: CategoryMetadata[] = [
-  { title: '어패류', type: 'seafood' },
+  { title: '해산물류', type: 'seafood' },
   { title: '육류/계란', type: 'meat' },
   { title: '견과류', type: 'nuts' },
   { title: '곡류', type: 'grains' },
