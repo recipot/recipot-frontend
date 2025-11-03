@@ -142,11 +142,23 @@ export default function RecipeRecommend() {
         selectedFoodIds
       );
 
+      // API 응답 구조 확인
+      console.info('레시피 추천 API 응답:', data);
+      console.info('data?.data?.items:', data?.data?.items);
+      console.info('data?.items:', data?.items);
+
       // API 응답에서 items 추출 (data.data.items 구조)
       const items = data?.data?.items ?? [];
 
-      if (!Array.isArray(items)) {
-        console.error('레시피 추천 API 응답: items가 배열이 아닙니다.', data);
+      console.info('추출된 items:', items, '길이:', items.length);
+
+      // items가 배열이 아니거나 빈 배열인 경우
+      if (!Array.isArray(items) || items.length === 0) {
+        if (items.length === 0) {
+          console.info('레시피 추천 결과가 빈 배열입니다.');
+        } else {
+          console.error('레시피 추천 API 응답: items가 배열이 아닙니다.', data);
+        }
         setRecipes([]);
         setHasFetched(true);
         return;
@@ -154,6 +166,16 @@ export default function RecipeRecommend() {
 
       // API 응답을 Recipe 타입으로 변환
       const mappedRecipes = items.map(mapRecommendationToRecipe);
+
+      console.info('변환된 레시피 개수:', mappedRecipes.length);
+
+      // 변환된 레시피가 빈 배열인 경우도 탐험완료로 처리
+      if (mappedRecipes.length === 0) {
+        console.info('변환된 레시피가 빈 배열입니다.');
+        setRecipes([]);
+        setHasFetched(true);
+        return;
+      }
 
       setRecipes(mappedRecipes);
       setHasFetched(true);
