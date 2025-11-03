@@ -13,7 +13,7 @@ const TOAST_STYLE: React.CSSProperties = {
 
 const POSITION_CLASSES: Record<'card-bottom', string> = {
   // bottom: 'absolute bottom-5 left-1/2 z-50 -translate-x-1/2 transform',
-  'card-bottom': 'fixed bottom-5 left-1/2 z-50 -translate-x-1/2 transform',
+  'card-bottom': 'fixed bottom-2 left-1/2 z-50 -translate-x-1/2 transform',
   // top: 'fixed top-24 left-1/2 z-50 -translate-x-1/2 transform',
 };
 

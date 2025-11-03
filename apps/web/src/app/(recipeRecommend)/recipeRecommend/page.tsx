@@ -269,10 +269,22 @@ export default function RecipeRecommend() {
           newSet.delete(recipeId);
           return newSet;
         });
+        // recipes 배열의 isBookmarked 상태도 업데이트
+        setRecipes(prev =>
+          prev.map(recipe =>
+            recipe.id === recipeId ? { ...recipe, isBookmarked: false } : recipe
+          )
+        );
       } else {
         // POST 요청
         await storedAPI.postStoredRecipe(recipeId);
         setLikedRecipes(prev => new Set(prev).add(recipeId));
+        // recipes 배열의 isBookmarked 상태도 업데이트
+        setRecipes(prev =>
+          prev.map(recipe =>
+            recipe.id === recipeId ? { ...recipe, isBookmarked: true } : recipe
+          )
+        );
 
         showToast('레시피가 저장되었어요!');
       }

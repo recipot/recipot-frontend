@@ -96,6 +96,8 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
     setActiveTab(tabId);
   };
 
+  console.log(recipeData?.healthPoint, 'recipeData?.healthPoint?.[0]');
+
   return (
     <div className="w-full bg-gray-100">
       <RecipeDetailHeader recipe={recipeData} />
@@ -109,7 +111,7 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
       <div className="px-4" style={contentStyle}>
         <div className="bg-secondary-light-green border-secondary-soft-green my-4 rounded-2xl border-[1px] px-5 py-4">
           <p className="text-15sb text-primary-pressed">
-            {recipeData?.healthPoints?.map(point => point.content).join(', ')}
+            {recipeData?.healthPoint?.content}
           </p>
         </div>
 
