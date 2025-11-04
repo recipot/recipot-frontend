@@ -18,8 +18,16 @@ pnpm build        # 빌드
 ```
 feat/<domain>/<task>  # 예: feat/auth/kakao-login
 ↓
-PR: task → domain → dev → main
+PR: task → domain → dev → main (태그: v1.0.x)
 ```
+
+### 릴리즈 프로세스
+
+1. `dev` → `main` PR 머지
+2. `main` 브랜치에서 버전 태그 생성 (`v1.0.1`, `v1.1.0` 등)
+3. 자동 배포 (Vercel/EAS)
+
+자세한 내용은 [Deployment Guide](./deployment.md) 참고
 
 ---
 

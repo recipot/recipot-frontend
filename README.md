@@ -34,11 +34,18 @@
   - 작업 PR: `feat/<도메인>/<작업>` → `feat/<도메인>`
     - 예) `feat/auth/login` → `feat/auth`
   - 도메인 통합 PR: `feat/<도메인>` → dev
+  - 릴리즈 PR: `dev` → `main`
 
 - 권장 규칙
   - 한 PR은 한 작업 단위로 작게 유지(리뷰 용이)
   - PR 제목: `[<앱>] <도메인>: <작업>` (예: `[web] auth: 로그인 페이지 마크업`)
   - PR 설명: 변경 요약, 스크린샷/동작 GIF, 테스트 노트
+
+### 버전 관리
+
+- 현재 버전: **v1.0.0**
+- 버전 태그는 `main` 브랜치에 릴리즈 시 생성
+- 자세한 내용은 [Deployment Guide](./docs/deployment.md) 참고
 
 ### 기타
 
