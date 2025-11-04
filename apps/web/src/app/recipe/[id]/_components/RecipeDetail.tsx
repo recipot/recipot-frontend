@@ -7,14 +7,15 @@ import { useRouter } from 'next/navigation';
 import { tokenUtils } from 'packages/api/src/auth';
 
 import { Button } from '@/components/common/Button';
+import { Toast } from '@/components/common/Toast';
 import { CookIcon } from '@/components/Icons';
-import { useViewportBasedPadding } from '@/hooks';
+import { useToast, useViewportBasedPadding } from '@/hooks';
 import { usePostRecentRecipe } from '@/hooks/usePostRecentRecipe';
 import { isProduction } from '@/lib/env';
 
 import CookwareSection from './CookwareSection';
 import IngredientsSection from './IngredientsSection';
-import RecipeDetailHeader from './RecipeDetailHeader';
+import { RecipeDetailHeader } from './RecipeDetailHeader';
 import RecipeHero from './RecipeHero';
 import StepSection from './StepSection';
 import TabNavigation from './TabNavigation';
@@ -34,6 +35,7 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
   });
   const router = useRouter();
   const { mutate: postRecentRecipe } = usePostRecentRecipe();
+  const { isVisible, message, showToast } = useToast();
 
   useEffect(() => {
     const fetchRecipe = async () => {
@@ -66,7 +68,7 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
     }
 
     return () => clearTimeout(timer);
-  }, [recipeData]);
+  }, [recipeData, activeTab]);
 
   // 컴포넌트 마운트 및 데이터 로드 후 scrollSpy 초기화
   useEffect(() => {
@@ -104,7 +106,7 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
 
   return (
     <div className="w-full bg-gray-100">
-      <RecipeDetailHeader recipe={recipeData} />
+      <RecipeDetailHeader recipe={recipeData} showToast={showToast} />
 
       <RecipeHero recipe={recipeData} />
       <TabNavigation
@@ -151,6 +153,7 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
           </Button>
         </div>
       </div>
+      <Toast message={message} isVisible={isVisible} position="card-bottom" />
     </div>
   );
 }

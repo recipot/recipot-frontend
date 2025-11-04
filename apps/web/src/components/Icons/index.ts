@@ -15,7 +15,7 @@ export { default as EmotionNeutralIcon } from './EmotionNeutralIcon';
 export { default as CookIcon } from './CookIcon';
 export { default as MyFileIcon } from './MyFileIcon';
 export { default as MyOpenFileIcon } from './MyOpenFileIcon';
-export { default as SauceIcon } from './SauceIcon';
+export { default as SauceIcon } from './seasonings/SauceIcon';
 export { default as SettingsIcon } from './SettingsIcon';
 
 // 단계 아이콘들
@@ -44,5 +44,20 @@ export { default as YouTubeIcon } from './YouTubeIcon';
 export { default as HeartIcon } from './HeartIcon';
 
 // 재료 아이콘들
-export { default as PowderIcon } from './PowderIcon';
-export { default as WaterIcon } from './WaterIcon';
+export { default as PowderIcon } from './seasonings/PowderIcon';
+export { default as WaterIcon } from './seasonings/WaterIcon';
+
+// 양념류 아이콘들
+export { default as OilIcon } from './seasonings/OilIcon';
+export { default as EtcIcon } from './seasonings/EtcIcon';
+
+// 조리도구 아이콘들
+export { default as OnepanIcon } from './tools/OnepanIcon';
+export { default as OnepotIcon } from './tools/OnepotIcon';
+export { default as MultiPanIcon } from './tools/MultiPanIcon';
+export { default as MultipotIcon } from './tools/MultipotIcon';
+export { default as MicroWaveIcon } from './tools/MicroWaveIcon';
+export { default as AirFryerIcon } from './tools/AirFryerIcon';
+export { default as CutIcon } from './tools/CutIcon';
+export { default as ScissorIcon } from './tools/ScissorIcon';
+export { default as RiceCookerIcon } from './tools/RiceCookerIcon';

@@ -2,7 +2,7 @@ import React from 'react';
 
 import type { IconProps } from '@/types/Icon.types';
 
-const PowderIcon: React.FC<IconProps> = ({ color = '#68982D', size = 20 }) => {
+const PowderIcon = ({ color = '#68982D', size = 20 }: IconProps) => {
   return (
     <svg
       width={size}

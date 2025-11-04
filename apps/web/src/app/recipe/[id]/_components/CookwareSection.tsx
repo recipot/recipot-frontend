@@ -1,6 +1,7 @@
 import React from 'react';
 
 import CookWareTransparentIcon from '@/components/Icons/CookWareTransparentIcon';
+import { getToolIcon } from '@/utils/iconMatcher';
 
 import type { Cookware } from '../types/recipe.types';
 
@@ -20,12 +21,21 @@ export function CookwareSection({ cookware }: CookwareSectionProps) {
         <span className="text-18sb text-primary">{cookware?.length}</span>
       </div>
       <div className="grid grid-cols-3 gap-4">
-        {cookware?.map(item => (
-          <div key={item.id} className="flex flex-col items-center">
-            <CookWareTransparentIcon size={40} />
-            <span className="text-15">{item.name}</span>
-          </div>
-        ))}
+        {cookware?.map(item => {
+          const IconComponent = getToolIcon(item.name);
+          // CookWareTransparentIcon만 props를 받을 수 있음
+          const isDefaultIcon = IconComponent === CookWareTransparentIcon;
+          return (
+            <div key={item.id} className="flex flex-col items-center">
+              {isDefaultIcon ? (
+                <CookWareTransparentIcon size={40} />
+              ) : (
+                <IconComponent />
+              )}
+              <span className="text-15">{item.name}</span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

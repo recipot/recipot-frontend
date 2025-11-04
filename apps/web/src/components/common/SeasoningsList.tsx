@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { PowderIcon } from '@/components/Icons';
+import { getSeasoningIcon } from '@/utils/iconMatcher';
 
 // Seasoning 타입 정의 (Recipe.seasonings와 호환)
 type Seasoning = {
@@ -31,20 +31,30 @@ export function SeasoningsList({
   if (variant === 'detail') {
     return (
       <div className="w-full space-y-0 rounded-xl bg-gray-50 px-4 py-5">
-        {seasonings.map(seasoning => (
-          <div className="flex items-center py-3" key={seasoning.id}>
-            <div className="flex min-w-0 flex-shrink-0 items-center">
-              {showIcon && <PowderIcon />}
-              <span className="text-15sb max-w-[120px] truncate text-gray-700">
-                {seasoning.name}
+        {seasonings.map(seasoning => {
+          const IconComponent = getSeasoningIcon(seasoning.name);
+          return (
+            <div className="flex items-center py-3" key={seasoning.id}>
+              <div className="flex min-w-0 flex-shrink-0 items-center gap-2">
+                {showIcon && (
+                  <div className="flex items-center">
+                    {React.createElement(IconComponent, {
+                      color: '#68982D',
+                      size: 20,
+                    })}
+                  </div>
+                )}
+                <span className="text-15sb max-w-[120px] truncate text-gray-700">
+                  {seasoning.name}
+                </span>
+              </div>
+              <div className="mx-[18px] h-1 flex-1 border-b border-dashed border-gray-200" />
+              <span className="text-15sb max-w-[100px] flex-shrink-0 truncate text-gray-700">
+                {seasoning.amount}
               </span>
             </div>
-            <div className="mx-[18px] h-1 flex-1 border-b border-dashed border-gray-200" />
-            <span className="text-15sb max-w-[100px] flex-shrink-0 truncate text-gray-700">
-              {seasoning.amount}
-            </span>
-          </div>
-        ))}
+          );
+        })}
       </div>
     );
   }
