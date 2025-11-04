@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import { cva, type VariantProps } from "class-variance-authority"
 import { X } from "lucide-react"
 
@@ -106,6 +107,14 @@ const Sidebar = React.forwardRef<
       className={cn(sidebarVariants({ side }), className)}
       {...props}
     >
+      <VisuallyHidden asChild>
+        <DialogPrimitive.Title>사이드바</DialogPrimitive.Title>
+      </VisuallyHidden>
+      <VisuallyHidden asChild>
+        <DialogPrimitive.Description>
+          사이드바 내용
+        </DialogPrimitive.Description>
+      </VisuallyHidden>
       {children}
     </DialogPrimitive.Content>
   </DialogPrimitive.Portal>
