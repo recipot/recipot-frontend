@@ -265,11 +265,19 @@ export const authService = {
       storage.saveTokens(token, storedRefreshToken);
     }
 
-    // 프로덕션 환경에서 쿠키 기반 인증 사용 시 요청 본문 없이 호출
+    // 프로덕션 환경에서 쿠키 기반 인증 사용 시 /v1/auth/verify 호출 생략
+    // getUserInfo() 호출만으로도 인증 검증이 가능 (인증 실패 시 axios 인터셉터가 자동 처리)
     const useCookieAuth = isProduction();
-    const requestBody = useCookieAuth ? undefined : {};
 
-    const response = await authApi.post('/v1/auth/verify', requestBody);
+    if (useCookieAuth) {
+      // 프로덕션: verify 엔드포인트 호출 없이 바로 사용자 정보 조회
+      // getUserInfo가 실패하면 이미 인증이 유효하지 않은 것이므로 자동으로 처리됨
+      const userInfo = await this.getUserInfo();
+      return { success: true, data: userInfo, message: 'Token verified' };
+    }
+
+    // 개발 환경: 기존 로직 유지 (verify 엔드포인트 호출)
+    const response = await authApi.post('/v1/auth/verify', {});
 
     if (response.data?.status === 200 && response.data?.data?.isValid) {
       const userInfo = await this.getUserInfo();
