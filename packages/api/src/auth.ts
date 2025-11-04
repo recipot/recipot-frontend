@@ -309,15 +309,19 @@ export const authService = {
       const response = await authApi.get('/v1/users/profile/me');
       return response.data.status === 200 ? response.data.data : response.data;
     } catch (error: any) {
-      console.error('[getUserInfo] 사용자 정보 조회 실패:', {
-        message: error?.message,
-        status: error?.response?.status,
-        statusText: error?.response?.statusText,
-        data: error?.response?.data,
-        url: error?.config?.url,
-        method: error?.config?.method,
-        error,
-      });
+      // 401 에러는 로그인하지 않은 사용자의 정상적인 플로우이므로 조용히 처리
+      const status = error?.response?.status;
+      if (status !== 401) {
+        console.error('[getUserInfo] 사용자 정보 조회 실패:', {
+          message: error?.message,
+          status: error?.response?.status,
+          statusText: error?.response?.statusText,
+          data: error?.response?.data,
+          url: error?.config?.url,
+          method: error?.config?.method,
+          error,
+        });
+      }
       throw error;
     }
   },

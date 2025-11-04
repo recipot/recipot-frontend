@@ -125,8 +125,12 @@ export const useAuthStore = create<AuthState>()(
                 const verified = await authService.verifyToken();
                 set({ user: verified.data ?? null });
                 return true;
-              } catch (error) {
-                console.error('[Auth] 쿠키 기반 토큰 검증 실패:', error);
+              } catch (error: any) {
+                // 401 에러는 로그인하지 않은 사용자의 정상적인 플로우이므로 조용히 처리
+                const status = error?.response?.status;
+                if (status !== 401) {
+                  console.error('[Auth] 쿠키 기반 토큰 검증 실패:', error);
+                }
                 get().logout();
                 return false;
               }
@@ -159,8 +163,12 @@ export const useAuthStore = create<AuthState>()(
               try {
                 const verified = await authService.verifyToken();
                 set({ user: verified.data ?? null });
-              } catch (error) {
-                console.error('[Auth] 쿠키 기반 초기화 실패:', error);
+              } catch (error: any) {
+                // 401 에러는 로그인하지 않은 사용자의 정상적인 플로우이므로 조용히 처리
+                const status = error?.response?.status;
+                if (status !== 401) {
+                  console.error('[Auth] 쿠키 기반 초기화 실패:', error);
+                }
               } finally {
                 set({ loading: false });
               }
@@ -183,8 +191,12 @@ export const useAuthStore = create<AuthState>()(
             set({ user: userInfo });
             // 유저 정보를 성공적으로 가져온 경우 자동 갱신 시작
             get().startAutoRefresh();
-          } catch (error) {
-            console.error('Failed to fetch user info:', error);
+          } catch (error: any) {
+            // 401 에러는 로그인하지 않은 사용자의 정상적인 플로우이므로 조용히 처리
+            const status = error?.response?.status;
+            if (status !== 401) {
+              console.error('Failed to fetch user info:', error);
+            }
           }
 
           set({ loading: false });
