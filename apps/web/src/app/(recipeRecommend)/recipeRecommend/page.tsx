@@ -45,6 +45,9 @@ import type { Swiper as SwiperType } from 'swiper';
 // localStorage 키 상수
 const TUTORIAL_CLOSED_KEY = 'recipe-recommend-tutorial-closed';
 
+// 최소 로딩 시간 (ms)
+const MIN_LOADING_TIME = 1500;
+
 export default function RecipeRecommend() {
   const { loading, user } = useAuth();
   const router = useRouter();
@@ -139,16 +142,21 @@ export default function RecipeRecommend() {
   // 레시피 추천 API 호출 공통 함수
   const fetchRecommendRecipes = useCallback(
     async (page: number = 1) => {
-      try {
-        // selectedFoodIds가 비어있으면 API 호출하지 않음
-        if (selectedFoodIds?.length === 0) {
-          console.warn('선택된 재료가 없어서 레시피 추천을 건너뜁니다.');
-          setHasFetched(false);
-          return;
-        }
+      // selectedFoodIds가 비어있으면 API 호출하지 않음
+      if (selectedFoodIds?.length === 0) {
+        console.warn('선택된 재료가 없어서 레시피 추천을 건너뜁니다.');
+        setHasFetched(false);
+        return;
+      }
 
+      // 로딩 시작 시간 기록 및 로딩 상태 설정
+      const startTime = Date.now();
+      setIsLoading(true);
+
+      try {
         const conditionId = moodToConditionId(userSelectedMood);
 
+        // API 호출
         const response = await recipe.recipeRecommend(
           conditionId,
           selectedFoodIds,
@@ -223,6 +231,15 @@ export default function RecipeRecommend() {
         // 단, 실제 빈 배열 반환과 구분하기 위해 이전 recipes 상태 유지
         setHasFetched(false);
         showToast('레시피를 불러오는데 실패했어요');
+      } finally {
+        // 최소 로딩 시간이 지나지 않았다면 추가로 대기
+        const elapsed = Date.now() - startTime;
+        if (elapsed < MIN_LOADING_TIME) {
+          await new Promise(resolve =>
+            setTimeout(resolve, MIN_LOADING_TIME - elapsed)
+          );
+        }
+        setIsLoading(false);
       }
     },
     [userSelectedMood, selectedFoodIds, router]
@@ -369,6 +386,11 @@ export default function RecipeRecommend() {
 
   // 로딩 중이거나 비로그인 사용자인 경우 빈 화면 표시
   if (loading || !user) {
+    return null;
+  }
+
+  // 초기 로딩 중일 때는 빈 화면 표시 (메인 페이지에서 이미 오버레이를 보여줌)
+  if (isLoading || !hasFetched) {
     return null;
   }
 

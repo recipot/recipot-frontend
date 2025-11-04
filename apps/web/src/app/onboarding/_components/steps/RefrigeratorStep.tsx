@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { condition, onboarding } from '@recipot/api';
 import { useAuth } from '@recipot/contexts';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/common/Button';
@@ -22,7 +23,9 @@ import {
   onboardingStyles,
 } from '../../_utils';
 
-const MIN_LOADING_DURATION_MS = 1000;
+const MIN_LOADING_DURATION_MS = 2500; // 최소 로딩 시간 (ms) - 온보딩은 조금 더 길게
+const FADE_OUT_DURATION = 300; // fade out 애니메이션 시간 (ms)
+const FADE_TRANSITION = { duration: 0.3 }; // fade in/out 애니메이션 설정
 
 export default function RefrigeratorStep() {
   const { setUser, user } = useAuth();
@@ -43,6 +46,7 @@ export default function RefrigeratorStep() {
 
   const [selectedCount, setSelectedCount] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingRecipes, setIsLoadingRecipes] = useState(false);
   const displayName = user?.nickname ?? '회원님';
 
   // 새로고침 버튼을 눌렀을 때만 선택된 재료들 초기화
@@ -78,6 +82,10 @@ export default function RefrigeratorStep() {
   const handleComplete = async () => {
     setIsSubmitting(true);
     const loadingStart = Date.now();
+
+    // 로딩 오버레이 표시
+    setIsLoadingRecipes(true);
+
     try {
       // 1. 모든 온보딩 데이터 수집 (각 도메인 스토어에서)
       const { allergies } = useAllergiesStore.getState();
@@ -140,9 +148,35 @@ export default function RefrigeratorStep() {
         selectedFoods: completeData.selectedFoods,
       });
 
+      // 최소 로딩 시간이 지나지 않았다면 추가로 대기
+      const elapsed = Date.now() - loadingStart;
+      if (elapsed < MIN_LOADING_DURATION_MS) {
+        await new Promise(resolve =>
+          setTimeout(resolve, MIN_LOADING_DURATION_MS - elapsed)
+        );
+      }
+
+      // 로딩 오버레이 숨기기 (fade out 애니메이션)
+      setIsLoadingRecipes(false);
+
+      // fade out 애니메이션이 완료된 후 페이지 이동
+      await new Promise(resolve => setTimeout(resolve, FADE_OUT_DURATION));
+
+      setIsSubmitting(false);
       navigateWithoutScroll('/recipeRecommend');
     } catch (error) {
       console.error('❌ 온보딩 완료 실패:', error);
+
+      // 에러 발생 시에도 최소 로딩 시간 보장
+      const elapsed = Date.now() - loadingStart;
+      if (elapsed < MIN_LOADING_DURATION_MS) {
+        await new Promise(resolve =>
+          setTimeout(resolve, MIN_LOADING_DURATION_MS - elapsed)
+        );
+      }
+
+      setIsLoadingRecipes(false);
+      setIsSubmitting(false);
 
       const errorMessage =
         error instanceof Error
@@ -151,34 +185,12 @@ export default function RefrigeratorStep() {
       useApiErrorModalStore.getState().showError({
         message: `온보딩 완료 중 오류가 발생했습니다.\n\n${errorMessage}\n다시 시도해주세요.`,
       });
-    } finally {
-      const elapsed = Date.now() - loadingStart;
-      if (elapsed < MIN_LOADING_DURATION_MS) {
-        await new Promise(resolve =>
-          setTimeout(resolve, MIN_LOADING_DURATION_MS - elapsed)
-        );
-      }
-      setIsSubmitting(false);
     }
   };
 
   const handleSelectionChange = (count: number) => {
     setSelectedCount(count);
   };
-
-  if (isSubmitting) {
-    return (
-      <div className="fixed top-0 left-0 z-50 h-full w-full">
-        <LoadingPage>
-          {displayName}님의
-          <br />
-          지금 바로 해먹을 수 있는 요리를
-          <br />
-          찾고 있어요
-        </LoadingPage>
-      </div>
-    );
-  }
 
   return (
     <>
@@ -195,6 +207,27 @@ export default function RefrigeratorStep() {
           {getSubmitButtonText(isSubmitting, 3)}
         </Button>
       </div>
+
+      {/* 로딩 오버레이 - fade in/out 애니메이션 */}
+      <AnimatePresence>
+        {isLoadingRecipes && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={FADE_TRANSITION}
+            className="fixed inset-0 z-[100]"
+          >
+            <LoadingPage>
+              {displayName}님의
+              <br />
+              지금 바로 해먹을 수 있는 요리를
+              <br />
+              찾고 있어요
+            </LoadingPage>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

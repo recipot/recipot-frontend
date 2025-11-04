@@ -33,6 +33,7 @@ import { moodToConditionId } from './onboarding/_utils/conditionMapper';
 import { onboardingStyles } from './onboarding/_utils/onboardingStyles';
 
 const MIN_SELECTED_FOODS = 2;
+const MIN_LOADING_TIME = 1500; // 최소 로딩 시간 (ms)
 
 export default function Home() {
   const { loading, user } = useAuth();
@@ -78,6 +79,8 @@ export default function Home() {
   const [isDesktop, setIsDesktop] = useState(false);
   const [selectedCount, setSelectedCount] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingRecipes, setIsLoadingRecipes] = useState(false);
+  const displayName = user?.nickname ?? '회원님';
 
   // 완료한 레시피 수 조회 (로그인 상태일 때만)
   // 이 데이터는 EmotionCharacter에서 캐시를 통해 사용됨
@@ -159,6 +162,18 @@ export default function Home() {
 
       console.info('✅ 재료 선택 및 컨디션 저장 완료');
 
+      // 로딩 오버레이 표시
+      setIsLoadingRecipes(true);
+
+      // 최소 로딩 시간 보장을 위한 대기
+      await new Promise(resolve => setTimeout(resolve, MIN_LOADING_TIME));
+
+      // 로딩 오버레이 숨기기 (fade out 애니메이션)
+      setIsLoadingRecipes(false);
+
+      // fade out 애니메이션이 완료된 후 페이지 이동
+      await new Promise(resolve => setTimeout(resolve, 300));
+
       // 레시피 추천 페이지로 이동
       navigateWithoutScroll('/recipeRecommend');
     } catch (error) {
@@ -169,6 +184,7 @@ export default function Home() {
           ? error.message
           : '알 수 없는 오류가 발생했습니다';
       showToast(`재료 선택 완료 중 오류가 발생했습니다: ${errorMessage}`);
+      setIsLoadingRecipes(false);
     } finally {
       setIsSubmitting(false);
     }
@@ -262,6 +278,26 @@ export default function Home() {
 
         {isCompleted && <ReviewRemindBottomSheet />}
       </div>
+
+      {/* 로딩 오버레이 - fade in/out 애니메이션 */}
+      <AnimatePresence>
+        {isLoadingRecipes && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-[100]"
+          >
+            <LoadingPage>
+              {displayName}님의
+              <br />
+              지금 바로 해먹을 수 있는 요리를
+              <br /> 찾고 있어요
+            </LoadingPage>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* 재료 검색 화면 - 슬라이드 애니메이션 */}
       <AnimatePresence>
