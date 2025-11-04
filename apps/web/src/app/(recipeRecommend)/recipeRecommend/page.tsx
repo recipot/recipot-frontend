@@ -5,7 +5,13 @@ import 'swiper/css/effect-cards';
 import './styles.css';
 import '@/components/EmotionState/styles.css';
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { recipe, storedAPI } from '@recipot/api';
 import { useAuth } from '@recipot/contexts';
 import axios from 'axios';
@@ -46,6 +52,7 @@ export default function RecipeRecommend() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [hasFetched, setHasFetched] = useState(false);
   const { isVisible, message, showToast } = useToast();
+  const lastFetchKeyRef = useRef<string | null>(null);
 
   // 인증 상태 확인 및 리다이렉트
   useEffect(() => {
@@ -211,9 +218,30 @@ export default function RecipeRecommend() {
   }, [userSelectedMood, selectedFoodIds, router]);
 
   useEffect(() => {
+    if (loading || !user) {
+      return;
+    }
+
+    if (!Array.isArray(selectedFoodIds) || selectedFoodIds.length === 0) {
+      lastFetchKeyRef.current = null;
+      return;
+    }
+
+    const fetchKey = `${userSelectedMood}:${selectedFoodIds.join(',')}`;
+
+    if (lastFetchKeyRef.current === fetchKey) {
+      return;
+    }
+
+    lastFetchKeyRef.current = fetchKey;
     fetchRecommendRecipes();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userSelectedMood, selectedFoodIds]);
+  }, [
+    fetchRecommendRecipes,
+    loading,
+    selectedFoodIds,
+    user,
+    userSelectedMood,
+  ]);
 
   useEffect(() => {
     const fetchProfile = async () => {
