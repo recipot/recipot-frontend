@@ -36,14 +36,7 @@ export function SeasoningsList({
           return (
             <div className="flex items-center py-3" key={seasoning.id}>
               <div className="flex min-w-0 flex-shrink-0 items-center gap-2">
-                {showIcon && (
-                  <div className="flex items-center">
-                    {React.createElement(IconComponent, {
-                      color: '#68982D',
-                      size: 20,
-                    })}
-                  </div>
-                )}
+                {showIcon && <IconComponent color="#68982D" size={20} />}
                 <span className="text-15sb max-w-[120px] truncate text-gray-700">
                   {seasoning.name}
                 </span>
@@ -62,19 +55,25 @@ export function SeasoningsList({
   // 사이드바 스타일
   return (
     <div className="space-y-2 rounded-lg bg-gray-50 p-3">
-      {seasonings.map(seasoning => (
-        <div key={seasoning.id} className="flex items-center gap-3">
-          <div className="flex flex-1 items-center justify-between">
-            <span className="text-15sb mr-2 text-gray-900">
-              {seasoning.name}
-            </span>
-            <div className="mx-[18px] h-1 flex-1 border-b border-dashed border-gray-200" />
-            <span className="text-15 ml-2 text-gray-700">
-              {seasoning.amount}
-            </span>
+      {seasonings.map(seasoning => {
+        const IconComponent = getSeasoningIcon(seasoning.name);
+        return (
+          <div key={seasoning.id} className="flex items-center gap-3">
+            <div className="flex flex-1 items-center justify-between">
+              <div className="flex min-w-0 flex-shrink-0 items-center gap-2">
+                {showIcon && <IconComponent color="#68982D" size={20} />}
+                <span className="text-15sb mr-2 text-gray-900">
+                  {seasoning.name}
+                </span>
+              </div>
+              <div className="mx-[18px] h-1 flex-1 border-b border-dashed border-gray-200" />
+              <span className="text-15 ml-2 text-gray-700">
+                {seasoning.amount}
+              </span>
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
