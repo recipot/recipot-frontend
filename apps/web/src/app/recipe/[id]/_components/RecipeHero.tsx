@@ -52,7 +52,7 @@ export function RecipeHero({ recipe }: RecipeHeroProps) {
         className="pointer-events-none absolute inset-x-0 bottom-0 h-[60%]"
         style={gradientOverlayStyle}
       />
-      <div className="relative z-10 mt-auto px-6 pb-8">
+      <div className="relative mt-auto px-6 pb-8">
         <h2 className="text-17 mb-3 text-white">{recipe.title}</h2>
         <p className="text-24 text-white">{recipe.description}</p>
       </div>
