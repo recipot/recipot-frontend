@@ -9,6 +9,10 @@ interface CookwareSectionProps {
 }
 
 export function CookwareSection({ cookware }: CookwareSectionProps) {
+  if (!cookware || cookware.length === 0) {
+    return null;
+  }
+
   return (
     <div id="cookware" className="mt-6 rounded-2xl bg-white p-6">
       <div className="mb-4 flex items-center">

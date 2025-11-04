@@ -21,6 +21,7 @@ interface TabNavigationProps {
   activeTab: TabId;
   offset: number;
   onTabChange: (tabId: TabId) => void;
+  hasTools?: boolean;
 }
 
 const TABS: Tab[] = [
@@ -33,12 +34,17 @@ export function TabNavigation({
   activeTab,
   offset,
   onTabChange,
+  hasTools = true,
 }: TabNavigationProps) {
+  const filteredTabs = TABS.filter(
+    tab => tab.id !== 'cookware' || hasTools
+  );
+
   return (
     <div className="sticky top-14 z-10 bg-gray-100 px-4 py-3">
       <nav aria-label="레시피 섹션 네비게이션">
         <ul className="flex space-x-1">
-          {TABS.map(tab => {
+          {filteredTabs.map(tab => {
             const IconComponent = tab.icon;
             const isActive = tab.id === activeTab;
 

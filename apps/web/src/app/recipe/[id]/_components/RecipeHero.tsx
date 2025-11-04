@@ -33,12 +33,14 @@ export function RecipeHero({ recipe }: RecipeHeroProps) {
           <CardTimeIcon size={24} color="#ffffff" />
           <span className="text-17 text-white">{recipe.duration}분</span>
         </div>
-        <div className="flex items-center space-x-1 rounded-full px-3 py-1.5">
-          <CookwareIcon size={24} color="#ffffff" />
-          <span className="text-17 text-white">
-            {recipe.tools.map(tool => tool.name).join(', ')}
-          </span>
-        </div>
+        {recipe.tools && recipe.tools.length > 0 && (
+          <div className="flex items-center space-x-1 rounded-full px-3 py-1.5">
+            <CookwareIcon size={24} color="#ffffff" />
+            <span className="text-17 text-white">
+              {recipe.tools.map(tool => tool.name).join(', ')}
+            </span>
+          </div>
+        )}
       </div>
       <div className="absolute right-4 bottom-4 left-4">
         <h2 className="text-17 mb-3 text-white">{recipe.title}</h2>

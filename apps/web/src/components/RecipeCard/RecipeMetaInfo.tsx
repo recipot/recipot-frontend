@@ -17,12 +17,14 @@ export const RecipeMetaInfo = memo(({ recipe }: RecipeMetaInfoProps) => {
           {recipe.duration}
         </span>
       </div>
-      <div className="flex h-[32px] items-center gap-1 px-3">
-        <CookwareIcon className="h-[22px] w-[22px]" color="#FFFFFF" />
-        <span className="text-17 whitespace-nowrap text-white">
-          {recipe.tools.map(tool => tool.name).join(', ')}
-        </span>
-      </div>
+      {recipe.tools && recipe.tools.length > 0 && (
+        <div className="flex h-[32px] items-center gap-1 px-3">
+          <CookwareIcon className="h-[22px] w-[22px]" color="#FFFFFF" />
+          <span className="text-17 whitespace-nowrap text-white">
+            {recipe.tools.map(tool => tool.name).join(', ')}
+          </span>
+        </div>
+      )}
     </div>
   );
 });

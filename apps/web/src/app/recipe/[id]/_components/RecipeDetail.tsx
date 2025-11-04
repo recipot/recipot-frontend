@@ -57,7 +57,13 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
       scrollSpy.update();
     }, 300);
 
-    setActiveTab('ingredients');
+    // tools가 없고 activeTab이 cookware인 경우 ingredients로 변경
+    if (
+      (!recipeData.tools || recipeData.tools.length === 0) &&
+      activeTab === 'cookware'
+    ) {
+      setActiveTab('ingredients');
+    }
 
     return () => clearTimeout(timer);
   }, [recipeData]);
@@ -105,6 +111,7 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
         activeTab={activeTab}
         offset={SCROLL_OFFSET}
         onTabChange={handleTabChange}
+        hasTools={!!(recipeData?.tools && recipeData.tools.length > 0)}
       />
       <div className="px-4" style={contentStyle}>
         <div className="bg-secondary-light-green border-secondary-soft-green my-4 rounded-2xl border-[1px] px-5 py-4">
@@ -120,9 +127,11 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
           />
         </Element>
 
-        <Element name="cookware" id="cookware" className="scroll-element">
-          <CookwareSection cookware={recipeData?.tools} />
-        </Element>
+        {recipeData?.tools && recipeData.tools.length > 0 && (
+          <Element name="cookware" id="cookware" className="scroll-element">
+            <CookwareSection cookware={recipeData.tools} />
+          </Element>
+        )}
 
         <Element name="steps" id="steps" className="scroll-element">
           <StepSection steps={recipeData?.steps} />
