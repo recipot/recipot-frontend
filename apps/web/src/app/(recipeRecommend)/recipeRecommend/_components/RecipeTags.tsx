@@ -23,7 +23,7 @@ const RecipeTags = () => {
   }
 
   return (
-    <div className="recipe-tags mb-4 px-4">
+    <div className="recipe-tags mb-4">
       <div className="no-scrollbar flex flex-nowrap items-center gap-[6px] overflow-x-auto">
         {displayedFoods.map(ingredient => (
           <div
