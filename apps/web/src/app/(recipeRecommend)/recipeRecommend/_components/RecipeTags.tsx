@@ -6,8 +6,8 @@ import React, {
   useState,
 } from 'react';
 
-import { cn } from '@/lib/utils';
 import { useFoodList } from '@/hooks/useFoodList';
+import { cn } from '@/lib/utils';
 import { useSelectedFoodsStore } from '@/stores/selectedFoodsStore';
 
 const RecipeTags = () => {
@@ -86,8 +86,10 @@ const RecipeTags = () => {
     <div
       ref={containerRef}
       className={cn(
-        'recipe-tags no-scrollbar mb-4 mx-auto flex w-full flex-nowrap items-center overflow-x-hidden',
-        isOverflowing ? 'justify-start overflow-x-auto' : 'max-w-[310px] justify-center'
+        'recipe-tags no-scrollbar mx-auto mb-4 flex w-full flex-nowrap items-center overflow-x-hidden',
+        isOverflowing
+          ? 'justify-start overflow-x-auto'
+          : 'max-w-[310px] justify-center'
       )}
       onPointerDown={stopPointerPropagation}
       onPointerMove={stopPointerPropagation}
@@ -104,8 +106,10 @@ const RecipeTags = () => {
             key={ingredient}
             className={cn(
               'bg-secondary-light-green border-secondary-soft-green flex-shrink-0 rounded-[6px] border px-3 py-[3px] text-[#53880A]',
-              index === 0 && 'ml-[50px]',
-              index === selectedFoodNames.length - 1 && 'mr-[50px]'
+              isOverflowing && index === 0 && 'ml-[50px]',
+              isOverflowing &&
+                index === selectedFoodNames.length - 1 &&
+                'mr-[50px]'
             )}
           >
             <p className="text-14b whitespace-nowrap">{ingredient}</p>
