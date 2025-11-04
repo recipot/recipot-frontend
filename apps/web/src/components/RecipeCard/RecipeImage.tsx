@@ -1,8 +1,8 @@
 import React, { memo } from 'react';
 import Image from 'next/image';
 
-import type { MoodType } from '@/components/EmotionState';
 import type { Recipe } from '@/app/recipe/[id]/types/recipe.types';
+import type { MoodType } from '@/components/EmotionState';
 
 import { CARD_DIMENSIONS } from './constants';
 import { getBackgroundColor } from './utils';
@@ -15,7 +15,7 @@ interface RecipeImageProps {
 }
 
 export const RecipeImage = memo(
-  ({ index, isMainCard, recipe, mood = 'neutral' }: RecipeImageProps) => {
+  ({ index, isMainCard, mood = 'neutral', recipe }: RecipeImageProps) => {
     const imageUrl = recipe.images[0]?.imageUrl;
 
     if (!imageUrl) {
