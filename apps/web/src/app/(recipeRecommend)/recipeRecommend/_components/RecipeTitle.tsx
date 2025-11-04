@@ -52,7 +52,7 @@ const RecipeTitle = ({ condition }: RecipeTitleProps) => {
   const emoji = getEmojiByCondition(condition);
 
   return (
-    <div className="flex w-full items-center justify-center self-stretch">
+    <div className="mb-5 flex w-full items-center justify-center self-stretch">
       <h2 className="text-22 mr-[2px]">{title}</h2>
       <div className="text-24 flex h-6 w-6 items-center justify-center">
         <span className="text-2xl">{emoji}</span>

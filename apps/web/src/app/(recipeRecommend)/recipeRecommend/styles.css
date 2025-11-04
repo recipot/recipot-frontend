@@ -128,3 +128,14 @@
   overflow-y: auto;
   overflow-x: hidden;
 }
+
+/* 태그 영역은 가로 스크롤 가능하도록 */
+.recipe-header-group {
+  overflow-x: visible;
+}
+
+.recipe-tags {
+  touch-action: pan-x;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}

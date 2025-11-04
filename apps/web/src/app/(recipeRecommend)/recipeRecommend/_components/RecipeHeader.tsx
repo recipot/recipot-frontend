@@ -5,11 +5,11 @@ import { Header } from '@/components/common/Header';
 import { RefreshIcon } from '@/components/Icons';
 
 interface RecipeHeaderProps {
-  onRefresh: () => void;
+  onRefresh?: () => void;
   disabled?: boolean;
 }
 
-const RecipeHeader = ({ disabled = false, onRefresh }: RecipeHeaderProps) => {
+const RecipeHeader = ({ disabled, onRefresh }: RecipeHeaderProps) => {
   const router = useRouter();
 
   const handleBack = () => {
@@ -24,7 +24,7 @@ const RecipeHeader = ({ disabled = false, onRefresh }: RecipeHeaderProps) => {
         ariaLabel="새로고침"
         disabled={disabled}
       >
-        <RefreshIcon size={24} />
+        <RefreshIcon size={24} color={disabled ? '#CED4DA' : '#212529'} />
       </Header.Action>
     </Header>
   );

@@ -366,29 +366,25 @@ export default function RecipeRecommend() {
   if (hasFetched && recipes.length === 0) {
     return (
       <div className="fixed inset-0 overflow-hidden">
-        <RecipeHeader onRefresh={handleRefresh} disabled />
-        <Header.Spacer />
         <ExploreComplete />
       </div>
     );
   }
 
   return (
-    <div className="fixed inset-0 overflow-hidden">
+    <div className="overflow-hidden">
       <RecipeHeader onRefresh={handleRefresh} />
       <Header.Spacer />
       <div
-        className={`recipe-recommend-main flex flex-col items-center justify-center overflow-hidden ${getEmotionGradient(userSelectedMood)}`}
+        className={`recipe-recommend-main flex flex-col items-center justify-center ${getEmotionGradient(
+          userSelectedMood
+        )}`}
       >
         {/* Swiper Cards Effect - 남은 공간 차지 */}
-        <div className="px-6 pb-6">
-          <div className="recipe-header-group mb-5">
-            {/* Tags - 고정 높이 */}
-            <RecipeTags />
-
-            {/* Title - 고정 높이 */}
-            <RecipeTitle condition={condition} />
-          </div>
+        <RecipeTags />
+        <RecipeTitle condition={condition} />
+        <div className="size-full px-6 pb-6">
+          {/* Title - 고정 높이 */}
 
           <div className="flex h-full w-full flex-col items-center">
             {/* 반응형 컨테이너 - 화면에 맞춰 축소 */}
@@ -416,21 +412,14 @@ export default function RecipeRecommend() {
                 ))}
               </Swiper>
             </div>
-
-            {/* Page Indicator - 카드 바로 아래 */}
-            <div className="mt-5 w-full">
-              <Toast
-                message={message}
-                isVisible={isVisible}
-                position="card-bottom"
-              />
-            </div>
             <div className="recipe-pagination mt-4 flex justify-center gap-1.5" />
           </div>
         </div>
 
         {/* 전역 토스트 */}
       </div>
+      {/* Page Indicator - 카드 바로 아래 */}
+      <Toast message={message} isVisible={isVisible} position="card-bottom" />
 
       {/* 튜토리얼 팝업 */}
       {showTutorial && <TutorialPopup onClose={handleCloseTutorial} />}
