@@ -33,7 +33,7 @@ const PAGE_CONFIG = {
     noneBackImage: '/mypage/none-refrigerator-blue.png',
     overLayColor: '#CAE9FF',
     themeColor: '#e7f5ff',
-    title: '보관한 레시피',
+    title: '내가 찜한 레시피',
     titleColor: '#228be6',
   },
 };
