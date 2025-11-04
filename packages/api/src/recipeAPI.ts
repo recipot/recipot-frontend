@@ -9,12 +9,18 @@ export const recipe = {
    * 레시피 추천
    * @param conditionId - 조건 ID
    * @param selectedFoodIds - 선택된 음식 ID 배열
+   * @param page - 페이지 번호 (기본값: 1)
    * @returns
    */
-  recipeRecommend: async (conditionId: number, selectedFoodIds: number[]) => {
+  recipeRecommend: async (
+    conditionId: number,
+    selectedFoodIds: number[],
+    page: number = 1
+  ) => {
     const response = await recipeAPI.post(`/v1/recipes/recommendations`, {
       conditionId,
       pantryIds: selectedFoodIds,
+      page,
     });
     return response.data;
   },

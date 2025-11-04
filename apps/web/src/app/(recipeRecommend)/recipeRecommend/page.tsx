@@ -40,6 +40,8 @@ import RecipeTitle from './_components/RecipeTitle';
 import TutorialPopup from './_components/TutorialPopup';
 import { SWIPER_CONFIG, SWIPER_MODULES, swiperStyles } from '../constants';
 
+import type { Swiper as SwiperType } from 'swiper';
+
 // localStorage 키 상수
 const TUTORIAL_CLOSED_KEY = 'recipe-recommend-tutorial-closed';
 
@@ -51,8 +53,10 @@ export default function RecipeRecommend() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [hasFetched, setHasFetched] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
   const { isVisible, message, showToast } = useToast();
   const lastFetchKeyRef = useRef<string | null>(null);
+  const swiperRef = useRef<SwiperType | null>(null);
 
   // 인증 상태 확인 및 리다이렉트
   useEffect(() => {
@@ -133,89 +137,96 @@ export default function RecipeRecommend() {
   };
 
   // 레시피 추천 API 호출 공통 함수
-  const fetchRecommendRecipes = useCallback(async () => {
-    try {
-      // selectedFoodIds가 비어있으면 API 호출하지 않음
-      if (selectedFoodIds?.length === 0) {
-        console.warn('선택된 재료가 없어서 레시피 추천을 건너뜁니다.');
-        setHasFetched(false);
-        return;
-      }
+  const fetchRecommendRecipes = useCallback(
+    async (page: number = 1) => {
+      try {
+        // selectedFoodIds가 비어있으면 API 호출하지 않음
+        if (selectedFoodIds?.length === 0) {
+          console.warn('선택된 재료가 없어서 레시피 추천을 건너뜁니다.');
+          setHasFetched(false);
+          return;
+        }
 
-      const conditionId = moodToConditionId(userSelectedMood);
+        const conditionId = moodToConditionId(userSelectedMood);
 
-      const response = await recipe.recipeRecommend(
-        conditionId,
-        selectedFoodIds
-      );
-
-      // API 응답 구조: recipe.recipeRecommend()는 response.data를 반환
-      // axios response.data = { status: 200, data: { items: [...] } }
-      // 따라서 response.data.items로 접근
-      const items = response?.data?.items ?? [];
-
-      // items가 배열이 아니거나 빈 배열인 경우에만 탐험완료 표시
-      if (!Array.isArray(items) || items.length === 0) {
-        console.error(
-          '⚠️ 레시피 추천 결과가 빈 배열입니다. API 응답:',
-          response
+        const response = await recipe.recipeRecommend(
+          conditionId,
+          selectedFoodIds,
+          page
         );
-        setRecipes([]);
+
+        // API 응답 구조: recipe.recipeRecommend()는 response.data를 반환
+        // axios response.data = { status: 200, data: { items: [...] } }
+        // 따라서 response.data.items로 접근
+        const items = response?.data?.items ?? [];
+        const responseCurrentPage = response?.data?.currentPage ?? page;
+
+        // items가 배열이 아니거나 빈 배열인 경우에만 탐험완료 표시
+        if (!Array.isArray(items) || items.length === 0) {
+          console.error(
+            '⚠️ 레시피 추천 결과가 빈 배열입니다. API 응답:',
+            response
+          );
+          setRecipes([]);
+          setHasFetched(true);
+          setCurrentPage(responseCurrentPage);
+          return;
+        }
+
+        // API 응답을 Recipe 타입으로 변환
+        const mappedRecipes = items.map(mapRecommendationToRecipe);
+
+        console.info('변환된 레시피 개수:', mappedRecipes.length);
+
+        // 변환된 레시피가 빈 배열인 경우도 탐험완료로 처리
+        if (mappedRecipes.length === 0) {
+          console.info('변환된 레시피가 빈 배열입니다.');
+          setRecipes([]);
+          setHasFetched(true);
+          setCurrentPage(responseCurrentPage);
+          return;
+        }
+
+        setRecipes(mappedRecipes);
         setHasFetched(true);
-        return;
+        setCurrentPage(responseCurrentPage);
+
+        // 초기 북마크 상태 설정
+        const bookmarkedRecipe = mappedRecipes.filter(
+          (recipe: Recipe) => recipe.isBookmarked
+        );
+
+        const bookmarkedIds = new Set<number>(
+          bookmarkedRecipe.map((recipe: Recipe) => recipe.id)
+        );
+
+        setLikedRecipes(bookmarkedIds);
+      } catch (error) {
+        console.error('레시피 추천 조회 실패:', error);
+
+        // 에러 발생 시 상세 정보 로깅
+        if (axios.isAxiosError(error)) {
+          console.error('에러 응답:', error.response?.data);
+          console.error('에러 상태:', error.response?.status);
+        }
+
+        // 인증 오류인 경우 로그인 페이지로 리다이렉트
+        if (axios.isAxiosError(error) && error.response?.status === 401) {
+          console.info('🔒 인증 오류, 로그인 페이지로 이동');
+          router.push('/signin');
+          return;
+        }
+
+        // 에러 발생 시에도 상태를 올바르게 관리 (탐험완료 페이지가 표시되지 않도록)
+        // 에러는 실제 빈 배열과 구분하기 위해 hasFetched는 true로 설정하되
+        // recipes는 빈 배열로 설정하지 않음 (기존 레시피 유지 또는 로딩 상태 유지)
+        // 단, 실제 빈 배열 반환과 구분하기 위해 이전 recipes 상태 유지
+        setHasFetched(false);
+        showToast('레시피를 불러오는데 실패했어요');
       }
-
-      // API 응답을 Recipe 타입으로 변환
-      const mappedRecipes = items.map(mapRecommendationToRecipe);
-
-      console.info('변환된 레시피 개수:', mappedRecipes.length);
-
-      // 변환된 레시피가 빈 배열인 경우도 탐험완료로 처리
-      if (mappedRecipes.length === 0) {
-        console.info('변환된 레시피가 빈 배열입니다.');
-        setRecipes([]);
-        setHasFetched(true);
-        return;
-      }
-
-      setRecipes(mappedRecipes);
-      setHasFetched(true);
-
-      // 초기 북마크 상태 설정
-      const bookmarkedRecipe = mappedRecipes.filter(
-        (recipe: Recipe) => recipe.isBookmarked
-      );
-
-      const bookmarkedIds = new Set<number>(
-        bookmarkedRecipe.map((recipe: Recipe) => recipe.id)
-      );
-
-      setLikedRecipes(bookmarkedIds);
-    } catch (error) {
-      console.error('레시피 추천 조회 실패:', error);
-
-      // 에러 발생 시 상세 정보 로깅
-      if (axios.isAxiosError(error)) {
-        console.error('에러 응답:', error.response?.data);
-        console.error('에러 상태:', error.response?.status);
-      }
-
-      // 인증 오류인 경우 로그인 페이지로 리다이렉트
-      if (axios.isAxiosError(error) && error.response?.status === 401) {
-        console.info('🔒 인증 오류, 로그인 페이지로 이동');
-        router.push('/signin');
-        return;
-      }
-
-      // 에러 발생 시에도 상태를 올바르게 관리 (탐험완료 페이지가 표시되지 않도록)
-      // 에러는 실제 빈 배열과 구분하기 위해 hasFetched는 true로 설정하되
-      // recipes는 빈 배열로 설정하지 않음 (기존 레시피 유지 또는 로딩 상태 유지)
-      // 단, 실제 빈 배열 반환과 구분하기 위해 이전 recipes 상태 유지
-      setHasFetched(false);
-      showToast('레시피를 불러오는데 실패했어요');
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userSelectedMood, selectedFoodIds, router]);
+    },
+    [userSelectedMood, selectedFoodIds, router]
+  );
 
   useEffect(() => {
     if (loading || !user) {
@@ -234,14 +245,9 @@ export default function RecipeRecommend() {
     }
 
     lastFetchKeyRef.current = fetchKey;
-    fetchRecommendRecipes();
-  }, [
-    fetchRecommendRecipes,
-    loading,
-    selectedFoodIds,
-    user,
-    userSelectedMood,
-  ]);
+    setCurrentPage(1); // 새로운 조건으로 검색 시 페이지 초기화
+    fetchRecommendRecipes(1);
+  }, [fetchRecommendRecipes, loading, selectedFoodIds, user, userSelectedMood]);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -335,7 +341,11 @@ export default function RecipeRecommend() {
   };
 
   const handleRefresh = async () => {
-    await fetchRecommendRecipes();
+    const nextPage = currentPage + 1;
+    // 새로고침 시 첫 번째 슬라이드로 이동
+    swiperRef.current?.slideTo(0);
+    setActiveIndex(0);
+    await fetchRecommendRecipes(nextPage);
     showToast('새로운 레시피가 추천되었어요');
   };
 
@@ -394,6 +404,9 @@ export default function RecipeRecommend() {
                 {...SWIPER_CONFIG}
                 className="recipe-swiper h-full w-full"
                 style={swiperStyles}
+                onSwiper={swiper => {
+                  swiperRef.current = swiper;
+                }}
                 onSlideChange={swiper => setActiveIndex(swiper.activeIndex)}
               >
                 {recipes?.map((recipe, index) => (
