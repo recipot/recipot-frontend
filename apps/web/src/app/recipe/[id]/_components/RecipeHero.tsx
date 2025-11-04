@@ -8,9 +8,14 @@ interface RecipeHeroProps {
   recipe: Recipe;
 }
 
+const gradientOverlayStyle = {
+  background:
+    'linear-gradient(to bottom, rgba(26, 26, 26, 0), rgba(26, 26, 26, 1))',
+} as const;
+
 export function RecipeHero({ recipe }: RecipeHeroProps) {
   return (
-    <div className="relative h-96 bg-cover bg-center">
+    <div className="relative flex h-96 flex-col bg-cover bg-center">
       {recipe.images &&
       recipe.images.length > 0 &&
       recipe.images[0]?.imageUrl ? (
@@ -45,12 +50,9 @@ export function RecipeHero({ recipe }: RecipeHeroProps) {
       {/* 하단 그라데이션 오버레이 */}
       <div
         className="pointer-events-none absolute inset-x-0 bottom-0 h-[60%]"
-        style={{
-          background:
-            'linear-gradient(to bottom, rgba(26, 26, 26, 0), rgba(26, 26, 26, 1))',
-        }}
+        style={gradientOverlayStyle}
       />
-      <div className="absolute right-4 bottom-4 left-4 z-10">
+      <div className="relative z-10 mt-auto px-6 pb-8">
         <h2 className="text-17 mb-3 text-white">{recipe.title}</h2>
         <p className="text-24 text-white">{recipe.description}</p>
       </div>
