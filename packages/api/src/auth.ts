@@ -265,7 +265,11 @@ export const authService = {
       storage.saveTokens(token, storedRefreshToken);
     }
 
-    const response = await authApi.post('/v1/auth/verify', {});
+    // 프로덕션 환경에서 쿠키 기반 인증 사용 시 요청 본문 없이 호출
+    const useCookieAuth = isProduction();
+    const requestBody = useCookieAuth ? undefined : {};
+
+    const response = await authApi.post('/v1/auth/verify', requestBody);
 
     if (response.data?.status === 200 && response.data?.data?.isValid) {
       const userInfo = await this.getUserInfo();
