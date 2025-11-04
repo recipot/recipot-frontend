@@ -22,6 +22,7 @@ export interface CookingStep {
   orderNum: number;
   step: number;
   summary: string;
+  imageUrl?: string | null;
 }
 
 export interface HealthPoint {

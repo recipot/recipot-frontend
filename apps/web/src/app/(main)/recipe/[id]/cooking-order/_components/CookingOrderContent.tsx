@@ -20,9 +20,9 @@ export default function CookingOrderContent({
     <div className="px-4 py-6">
       {/* 이미지 */}
       <div className="mb-4 aspect-video overflow-hidden bg-gray-100">
-        {recipe?.images?.[currentStep - 1]?.imageUrl ? (
+        {currentStepData?.imageUrl ? (
           <Image
-            src={recipe?.images?.[currentStep - 1]?.imageUrl}
+            src={currentStepData.imageUrl}
             alt={recipe?.title}
             width={400}
             height={225}
