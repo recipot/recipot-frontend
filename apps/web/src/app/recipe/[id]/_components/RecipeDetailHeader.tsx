@@ -12,14 +12,16 @@ import { Modal } from '@/components/common/Modal/Modal';
 import { HeartIcon, ShareIcon } from '@/components/Icons';
 import WebShareButton from '@/components/Share/WebShareButton';
 import { isProduction } from '@/lib/env';
+import { useApiErrorModalStore } from '@/stores';
 
 import type { Recipe } from '../types/recipe.types';
 
-interface RecipeHeaderProps {
+export interface RecipeHeaderProps {
   recipe: Recipe;
+  showToast: (message: string, duration?: number) => void;
 }
 
-export function RecipeDetailHeader({ recipe }: RecipeHeaderProps) {
+export function RecipeDetailHeader({ recipe, showToast }: RecipeHeaderProps) {
   const router = useRouter();
   const token = tokenUtils.getToken();
   const useCookieAuth = isProduction;
@@ -70,20 +72,25 @@ export function RecipeDetailHeader({ recipe }: RecipeHeaderProps) {
     if (isLoading) return;
 
     setIsLoading(true);
+    const isCurrentlyLiked = isLiked;
     try {
-      if (isLiked) {
+      if (isCurrentlyLiked) {
         await storedAPI.deleteStoredRecipe(recipeId);
         setIsLiked(false);
       } else {
         await storedAPI.postStoredRecipe(recipeId);
         setIsLiked(true);
+        showToast('레시피가 저장되었어요!');
       }
     } catch (error: unknown) {
       if (axios.isAxiosError(error) && error.response?.status === 401) {
         setShowLoginModal(true);
         return;
       }
-      console.error('북마크 처리 중 오류가 발생했습니다.', error);
+      useApiErrorModalStore.getState().showError({
+        message:
+          '북마크 처리 중 오류가 발생했어요.\n잠시 후 다시 시도해주세요.',
+      });
     } finally {
       setIsLoading(false);
     }

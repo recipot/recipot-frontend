@@ -1,13 +1,17 @@
 'use client';
 
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+
 import type { Recipe } from '@/app/recipe/[id]/types/recipe.types';
 import { IngredientsList } from '@/components/common/IngredientsList';
 import { SeasoningsSection } from '@/components/common/SeasoningsSection';
 import {
   Sidebar,
   SidebarContent,
+  SidebarDescription,
   SidebarHeader,
   SidebarProvider,
+  SidebarTitle,
 } from '@/components/ui/sidebar';
 
 interface IngredientsSidebarProps {
@@ -33,6 +37,14 @@ export function IngredientsSidebar({
           </div>
         </SidebarHeader>
         <SidebarContent className="min-h-0 flex-1 px-6">
+          <VisuallyHidden asChild>
+            <SidebarTitle>재료</SidebarTitle>
+          </VisuallyHidden>
+          <VisuallyHidden asChild>
+            <SidebarDescription>
+              레시피에 필요한 재료와 양념류 목록을 확인할 수 있습니다.
+            </SidebarDescription>
+          </VisuallyHidden>
           {/* 보유 재료 */}
           <div className="mb-6">
             <IngredientsList
@@ -45,7 +57,7 @@ export function IngredientsSidebar({
           <SeasoningsSection
             seasonings={recipe?.seasonings ?? []}
             variant="sidebar"
-            showIcon={false}
+            showIcon
           />
         </SidebarContent>
       </Sidebar>

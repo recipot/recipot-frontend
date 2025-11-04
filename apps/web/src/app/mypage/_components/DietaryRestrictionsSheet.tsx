@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { allergy } from '@recipot/api';
 
 import { Allergy, useAllergyContext } from '@/components/Allergy';
@@ -10,6 +11,7 @@ import {
   Drawer,
   DrawerClose,
   DrawerContent,
+  DrawerDescription,
   DrawerTitle,
 } from '@/components/ui/drawer';
 import { useApiErrorModalStore } from '@/stores/apiErrorModalStore';
@@ -144,6 +146,11 @@ function DietaryRestrictionsContent({
       <DrawerTitle className="!text-22sb mb-4 px-6 text-gray-900">
         몸에 안 맞는 재료
       </DrawerTitle>
+      <VisuallyHidden asChild>
+        <DrawerDescription>
+          몸에 안 맞는 재료를 선택하여 레시피 추천에서 제외할 수 있습니다.
+        </DrawerDescription>
+      </VisuallyHidden>
 
       <div
         ref={scrollContainerRef}

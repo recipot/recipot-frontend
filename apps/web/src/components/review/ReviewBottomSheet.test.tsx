@@ -115,6 +115,9 @@ vi.mock('../ui/drawer', () => ({
   DrawerContent: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="drawer-content">{children}</div>
   ),
+  DrawerDescription: ({ children }: { children: React.ReactNode }) => (
+    <p data-testid="drawer-description">{children}</p>
+  ),
   DrawerTitle: ({ children }: { children: React.ReactNode }) => (
     <h2 data-testid="drawer-title">{children}</h2>
   ),
