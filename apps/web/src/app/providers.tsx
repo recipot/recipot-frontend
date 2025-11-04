@@ -1,5 +1,7 @@
 'use client';
 
+import '../utils/setupConsole';
+
 import { useEffect, useState } from 'react';
 import { setApiErrorHandler } from '@recipot/api';
 import { AuthProvider, MswProvider } from '@recipot/contexts';
@@ -38,8 +40,11 @@ export default function Providers({ children }: { children: ReactNode }) {
           setMswReady(true); // 에러가 있어도 앱은 계속 실행
         });
     } else {
+      // 프로덕션에서는 로그 출력하지 않음 (setupConsole.ts에서 처리)
       const env = process.env.NEXT_PUBLIC_APP_ENV ?? 'production';
-      console.info(`✅ [${env}] 실제 API를 사용합니다`);
+      if (env === 'development') {
+        console.info(`✅ [${env}] 실제 API를 사용합니다`);
+      }
     }
   }, [shouldUseMSW]);
 
@@ -99,8 +104,8 @@ export default function Providers({ children }: { children: ReactNode }) {
 
       showError({
         code: errorCode ?? undefined,
-        message: errorMessage,
         isFatal,
+        message: errorMessage,
       });
     };
 
