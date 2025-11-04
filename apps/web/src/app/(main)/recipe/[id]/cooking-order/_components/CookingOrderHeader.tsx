@@ -31,7 +31,9 @@ export default function CookingOrderHeader({
         className="flex items-center space-x-2 rounded-md bg-gray-100 px-3 py-1.5"
       >
         <IngredientIcon size={18} color="#868E96" />
-        <span className="text-sm font-bold text-gray-600">재료확인</span>
+        <span className="text-sm font-bold text-nowrap text-gray-600">
+          재료확인
+        </span>
       </button>
     </div>
   );

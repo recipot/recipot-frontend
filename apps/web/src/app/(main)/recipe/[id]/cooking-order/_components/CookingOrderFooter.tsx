@@ -24,12 +24,18 @@ export default function CookingOrderFooter({
     <div className="fixed bottom-0 left-1/2 w-full -translate-x-1/2 transform bg-[#FFFFFF]/50">
       <div className="bg-white/50 px-4 py-4 backdrop-blur-sm">
         {isLastStep ? (
-          <Button
-            onClick={onStepComplete}
-            className="bg-primary w-full rounded-full py-3 text-white"
-          >
-            <p className={buttonTextClassName}>다 만들었어요!</p>
-          </Button>
+          <div className="flex space-x-3">
+            <Button onClick={onPrevStep} className={cn('bg-gray-600')}>
+              <p className={buttonTextClassName}>뒤로</p>
+            </Button>
+            <Button
+              size="full"
+              onClick={onStepComplete}
+              className={cn('bg-primary', buttonLayoutClassName)}
+            >
+              <p className={buttonTextClassName}>다 만들었어요!</p>
+            </Button>
+          </div>
         ) : isFirstStep ? (
           <Button
             onClick={onNextStep}
