@@ -24,7 +24,9 @@ import type React from 'react';
  * @param toolName 조리도구 이름
  * @returns 아이콘 컴포넌트
  */
-export function getToolIcon(toolName: string): React.ComponentType {
+export function getToolIcon(
+  toolName: string
+): React.ComponentType<{ color?: string; size?: number }> {
   const normalizedName = toolName.toLowerCase().trim();
 
   // 원팬 (실제 데이터에서 확인: "원팬", "원팬,가위", "원팬,칼", "원팬,원팟,칼")

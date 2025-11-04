@@ -21,7 +21,7 @@ export interface RecipeHeaderProps {
   showToast: (message: string, duration?: number) => void;
 }
 
-const RecipeDetailHeader = ({ recipe, showToast }: RecipeHeaderProps) => {
+export function RecipeDetailHeader({ recipe, showToast }: RecipeHeaderProps) {
   const router = useRouter();
   const token = tokenUtils.getToken();
   const useCookieAuth = isProduction;
@@ -149,7 +149,6 @@ const RecipeDetailHeader = ({ recipe, showToast }: RecipeHeaderProps) => {
       <Header.Spacer />
     </>
   );
-};
+}
 
 export default RecipeDetailHeader;
-export { RecipeDetailHeader };
