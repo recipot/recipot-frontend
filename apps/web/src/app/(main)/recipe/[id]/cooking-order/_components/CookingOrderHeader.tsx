@@ -28,7 +28,7 @@ export default function CookingOrderHeader({
       </div>
       <button
         onClick={onShowIngredients}
-        className="flex items-center space-x-2 rounded-md bg-gray-100 px-3 py-1.5"
+        className="flex flex-shrink-0 flex-wrap items-center space-x-2 rounded-md bg-gray-100 px-3 py-1.5"
       >
         <IngredientIcon size={18} color="#868E96" />
         <span className="text-sm font-bold text-gray-600">재료확인</span>
