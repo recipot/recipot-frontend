@@ -2,8 +2,10 @@ import { memo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 
 import type { Recipe } from '@/app/recipe/[id]/types/recipe.types';
+import type { MoodType } from '@/components/EmotionState';
+import { getEmotionGradientOverlay } from '@/utils/emotionGradient';
 
-import { CARD_STYLES, GRADIENT_OVERLAY_STYLE } from './constants';
+import { CARD_STYLES } from './constants';
 import { RecipeActions } from './RecipeActions';
 import { RecipeContent } from './RecipeContent';
 import { RecipeImage } from './RecipeImage';
@@ -15,6 +17,7 @@ interface RecipeCardProps {
   isLiked?: boolean;
   onToggleLike: (index: number, recipeId: number) => void;
   isMainCard?: boolean;
+  mood?: MoodType;
 }
 
 export const RecipeCard = memo(
@@ -22,6 +25,7 @@ export const RecipeCard = memo(
     index,
     isLiked,
     isMainCard = false,
+    mood = 'neutral',
     onToggleLike,
     recipe,
   }: RecipeCardProps) => {
@@ -33,7 +37,9 @@ export const RecipeCard = memo(
     const handleCardClick = useCallback(() => {
       // 레시피 상세 URL로 이동 (외부 링크 또는 API 엔드포인트)
       router.push(`/recipe/${recipe.id}`);
-    }, [recipe.id]);
+    }, [recipe.id, router]);
+
+    const gradientOverlayStyle = getEmotionGradientOverlay(mood);
 
     return (
       <div style={CARD_STYLES.container} onClick={handleCardClick}>
@@ -42,7 +48,12 @@ export const RecipeCard = memo(
           style={CARD_STYLES.card}
         >
           {/* 배경 이미지 */}
-          <RecipeImage index={index} isMainCard={isMainCard} recipe={recipe} />
+          <RecipeImage
+            index={index}
+            isMainCard={isMainCard}
+            recipe={recipe}
+            mood={mood}
+          />
 
           {/* 메인 카드 전용 요소들 - 항상 렌더링하되 CSS로 표시/숨김 처리 */}
           <div
@@ -51,7 +62,7 @@ export const RecipeCard = memo(
             {/* 하단 그라데이션 오버레이 */}
             <div
               className="pointer-events-none absolute inset-x-0 bottom-0 h-[60%]"
-              style={GRADIENT_OVERLAY_STYLE}
+              style={gradientOverlayStyle}
             />
 
             <div className="flex size-full flex-col justify-between">
@@ -84,7 +95,8 @@ export const RecipeCard = memo(
         nextProps.recipe.images[0]?.imageUrl &&
       prevProps.isLiked === nextProps.isLiked &&
       prevProps.isMainCard === nextProps.isMainCard &&
-      prevProps.index === nextProps.index
+      prevProps.index === nextProps.index &&
+      prevProps.mood === nextProps.mood
     );
   }
 );

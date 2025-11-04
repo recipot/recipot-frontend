@@ -1,6 +1,7 @@
 import React, { memo } from 'react';
 import Image from 'next/image';
 
+import type { MoodType } from '@/components/EmotionState';
 import type { Recipe } from '@/app/recipe/[id]/types/recipe.types';
 
 import { CARD_DIMENSIONS } from './constants';
@@ -10,20 +11,24 @@ interface RecipeImageProps {
   index: number;
   isMainCard: boolean;
   recipe: Recipe;
+  mood?: MoodType;
 }
 
 export const RecipeImage = memo(
-  ({ index, isMainCard, recipe }: RecipeImageProps) => {
+  ({ index, isMainCard, recipe, mood = 'neutral' }: RecipeImageProps) => {
     const imageUrl = recipe.images[0]?.imageUrl;
 
     if (!imageUrl) {
       return (
-        <div className="absolute inset-0" style={getBackgroundColor(index)} />
+        <div
+          className="absolute inset-0"
+          style={getBackgroundColor(index, mood)}
+        />
       );
     }
 
     return (
-      <div className="absolute inset-0" style={getBackgroundColor(index)}>
+      <div className="absolute inset-0" style={getBackgroundColor(index, mood)}>
         <Image
           src={imageUrl}
           alt={recipe.title}

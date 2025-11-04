@@ -420,6 +420,7 @@ export default function RecipeRecommend() {
                       onToggleLike={handleToggleBookmark}
                       isLiked={likedRecipes.has(recipe.id)}
                       isMainCard={index === activeIndex}
+                      mood={userSelectedMood}
                     />
                   </SwiperSlide>
                 ))}
