@@ -22,7 +22,9 @@ export default function CookingOrderHeader({
         <button onClick={onBack} className="p-2">
           <ArrowLeft size={24} className="text-neutral-900" />
         </button>
-        <h1 className="text-18 text-neutral-900">{recipe?.title}</h1>
+        <h1 className="text-18 max-w-[200px] truncate text-neutral-900">
+          {recipe?.title}
+        </h1>
       </div>
       <button
         onClick={onShowIngredients}
