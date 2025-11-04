@@ -12,6 +12,7 @@ import { Modal } from '@/components/common/Modal/Modal';
 import { HeartIcon, ShareIcon } from '@/components/Icons';
 import WebShareButton from '@/components/Share/WebShareButton';
 import { isProduction } from '@/lib/env';
+import { useApiErrorModalStore } from '@/stores';
 
 import type { Recipe } from '../types/recipe.types';
 
@@ -86,12 +87,10 @@ const RecipeDetailHeader = ({ recipe, showToast }: RecipeHeaderProps) => {
         setShowLoginModal(true);
         return;
       }
-      console.error('북마크 처리 중 오류가 발생했습니다.', error);
-      showToast(
-        isCurrentlyLiked
-          ? '북마크 제거에 실패했어요'
-          : '북마크 추가에 실패했어요'
-      );
+      useApiErrorModalStore.getState().showError({
+        message:
+          '북마크 처리 중 오류가 발생했어요.\n잠시 후 다시 시도해주세요.',
+      });
     } finally {
       setIsLoading(false);
     }
