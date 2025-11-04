@@ -83,20 +83,33 @@ export default function RecipeCard({
     <>
       <div className="flex items-center gap-3 rounded-2xl bg-white py-3 pr-5 pl-3">
         <div className="relative h-[3.75rem] w-[3.75rem] flex-shrink-0">
-          <Image
-            src={recipe.recipeImages[0] ?? '/placeholder-image.png'}
-            alt={recipe.recipeTitle ?? '레시피 이미지'}
-            fill
-            className="rounded-xl object-cover"
-          />
+          {recipe.recipeImages[0] ? (
+            <Image
+              src={recipe.recipeImages[0]}
+              alt={recipe.recipeTitle ?? '레시피 이미지'}
+              fill
+              sizes="60px"
+              className="rounded-xl object-cover"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center rounded-xl bg-gray-200">
+              <span className="text-12 text-gray-400">이미지 없음</span>
+            </div>
+          )}
         </div>
         <div className="flex min-w-0 flex-grow flex-col justify-between gap-1">
           <Link
             href={`/recipe/${recipe.recipeId}`}
-            className="flex items-center text-left"
+            className="flex min-w-0 items-center gap-1 text-left"
           >
-            <h3 className="text-17sb text-gray-900">{recipe.recipeTitle}</h3>
-            <ArrowIcon size={18} color="hsl(var(--gray-900))" />
+            <h3 className="text-17sb min-w-0 flex-1 truncate text-gray-900">
+              {recipe.recipeTitle}
+            </h3>
+            <ArrowIcon
+              size={18}
+              color="hsl(var(--gray-900))"
+              className="flex-shrink-0"
+            />
           </Link>
           <p className="text-14 truncate text-gray-600">
             {recipe.recipeDescription}
