@@ -21,7 +21,12 @@ import type {
 
 import { Button } from '../common/Button';
 import { CloseIcon } from '../Icons';
-import { Drawer, DrawerContent, DrawerTitle } from '../ui/drawer';
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerTitle,
+} from '../ui/drawer';
 import { EmotionSection } from './EmotionSection';
 import ReviewCompleteModal from './ReviewCompleteModal';
 
@@ -188,6 +193,11 @@ export function ReviewBottomSheet({
         >
           <VisuallyHidden asChild>
             <DrawerTitle>후기 등록하기</DrawerTitle>
+          </VisuallyHidden>
+          <VisuallyHidden asChild>
+            <DrawerDescription>
+              레시피에 대한 맛, 난이도, 경험 등을 평가하고 의견을 남겨주세요.
+            </DrawerDescription>
           </VisuallyHidden>
           <div className="flex flex-col overflow-hidden">
             <div className="px-4 pb-6">

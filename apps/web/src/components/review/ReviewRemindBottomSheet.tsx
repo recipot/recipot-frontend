@@ -9,7 +9,13 @@ import { tokenUtils } from 'packages/api/src/auth';
 import { isProduction } from '@/lib/env';
 
 import { CloseIcon } from '../Icons';
-import { Drawer, DrawerClose, DrawerContent, DrawerTitle } from '../ui/drawer';
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerTitle,
+} from '../ui/drawer';
 import { ReviewRecipeCard, type ReviewRecipeData } from './ReviewRecipeCard';
 
 const STORAGE_KEY = 'reviewRemindLastShown';
@@ -173,6 +179,11 @@ export function ReviewRemindBottomSheet() {
       <DrawerContent className="mx-auto w-full max-w-[430px]">
         <VisuallyHidden asChild>
           <DrawerTitle>어제 드신 메뉴 어떠셨나요?</DrawerTitle>
+        </VisuallyHidden>
+        <VisuallyHidden asChild>
+          <DrawerDescription>
+            완료한 레시피에 대한 리뷰를 작성해 보세요.
+          </DrawerDescription>
         </VisuallyHidden>
         <div>
           <div className="overflow-y-auto px-6 pb-6">

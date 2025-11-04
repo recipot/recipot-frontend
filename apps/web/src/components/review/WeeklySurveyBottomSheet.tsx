@@ -14,7 +14,13 @@ import { isProduction } from '@/lib/env';
 
 import { Button } from '../common/Button';
 import { CloseIcon } from '../Icons';
-import { Drawer, DrawerClose, DrawerContent, DrawerTitle } from '../ui/drawer';
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerTitle,
+} from '../ui/drawer';
 import { ImprovementOptions } from './ImprovementOptions';
 
 // API에서 가져온 데이터로 대체될 예정이므로 임시로 유지
@@ -261,6 +267,11 @@ export function WeeklySurveyBottomSheet() {
       <DrawerContent className="mx-auto w-full max-w-[430px]">
         <VisuallyHidden asChild>
           <DrawerTitle>어제 드신 메뉴 어떠셨나요?</DrawerTitle>
+        </VisuallyHidden>
+        <VisuallyHidden asChild>
+          <DrawerDescription>
+            집밥을 챙겨 먹은 후 건강에 어떤 변화가 있었는지 알려주세요.
+          </DrawerDescription>
         </VisuallyHidden>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="overflow-y-auto px-6">
