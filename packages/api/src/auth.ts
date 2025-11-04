@@ -83,14 +83,23 @@ const redirectToSignIn = (): void => {
   }
 };
 
+const isProduction = () => {
+  const env = process.env.NEXT_PUBLIC_APP_ENV || 'production';
+  return env === 'production';
+};
+
 const shouldAddAuthHeader = (url?: string): boolean => {
   if (!url) return false;
+
+  // 프로덕션에서 쿠키 기반 인증 사용 시 verify 엔드포인트는 Authorization 헤더 추가 안 함
+  const useCookieAuth = isProduction();
 
   const publicEndpoints = [
     '/v1/login/',
     '/v1/auth/debug',
     '/v1/health',
     '/v1/auth/refresh',
+    ...(useCookieAuth ? ['/v1/auth/verify'] : []),
   ];
   return !publicEndpoints.some(endpoint => url.includes(endpoint));
 };
