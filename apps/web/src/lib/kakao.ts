@@ -109,6 +109,15 @@ export const shareKakao = async (shareData: KakaoShareData): Promise<void> => {
   };
 
   const shareOptions: KakaoShareOptions = {
+    buttons: [
+      {
+        link: {
+          mobileWebUrl: shareData.url,
+          webUrl: shareData.url,
+        },
+        title: '시작해보기',
+      },
+    ],
     content: {
       description: shareData.description,
       imageHeight: 400,
