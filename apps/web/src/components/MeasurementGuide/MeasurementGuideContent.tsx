@@ -23,13 +23,13 @@ export function MeasurementGuideContent({
   }
 
   return (
-    <div className="no-scrollbar flex flex-nowrap gap-[20px] overflow-x-auto rounded-xl px-4 pb-5">
+    <div className="no-scrollbar flex flex-nowrap gap-5 overflow-x-auto rounded-xl">
       {items.map(item => (
         <div
           key={item.standard}
-          className="flex flex-shrink-0 flex-col items-center justify-center"
+          className="flex flex-shrink-0 flex-col justify-center"
         >
-          <div className="flex h-[125px] w-[125px] items-center justify-center overflow-hidden rounded-lg bg-gray-100">
+          <div className="mb-3 flex h-[125px] w-[125px] items-center justify-center overflow-hidden rounded-lg bg-gray-100">
             {item.imageUrl ? (
               <Image
                 src={item.imageUrl}
@@ -42,13 +42,11 @@ export function MeasurementGuideContent({
               <div className="text-13 text-gray-400">이미지 준비중</div>
             )}
           </div>
-          <div className="mt-3">
-            <div className="text-14sb mb-2 text-center text-gray-700">
-              {item.standard}
-            </div>
-            <div className="flex w-full items-center justify-center rounded-lg bg-gray-100 px-2 py-[2px]">
-              <p className="text-13">{item.description ?? '상세 설명'}</p>
-            </div>
+          <div>
+            <p className="text-14sb mb-2 text-gray-700">{item.standard}</p>
+            <span className="text-13 inline-block rounded-lg bg-gray-100 px-2 py-[2px] text-gray-600">
+              {item.description ?? '상세 설명'}
+            </span>
           </div>
         </div>
       ))}
