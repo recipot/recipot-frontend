@@ -193,8 +193,14 @@ const WebShareButton: React.FC<WebShareButtonProps> = ({
   };
 
   const handleWebShare = async () => {
+    // 디버깅: 함수 진입 확인
+    alert(
+      `[디버그] handleWebShare 함수 진입\n\n카카오톡 인앱 브라우저: ${isKakaoTalkInAppBrowser()}\nonKakaoInAppClick 존재: ${!!onKakaoInAppClick}`
+    );
+
     // 카카오톡 인앱 브라우저에서 접속한 경우 로그인 모달 표시
     if (onKakaoInAppClick && isKakaoTalkInAppBrowser()) {
+      alert(`[디버그] 카카오톡 인앱 브라우저로 감지되어 로그인 모달 표시`);
       onKakaoInAppClick();
       return;
     }
@@ -220,27 +226,18 @@ const WebShareButton: React.FC<WebShareButtonProps> = ({
         }
       }
 
-      // 모바일에서도 확인할 수 있도록 디버깅 정보를 alert로 표시
-      const isDev =
-        process.env.NODE_ENV === 'development' ||
-        process.env.NEXT_PUBLIC_APP_ENV === 'local';
-
-      // 개발 모드에서 모바일일 때 alert로 디버깅 정보 표시 (모바일에서도 확인 가능)
-      if (isDev && isMobile) {
-        alert(
-          `[디버그] 공유 시작\n\n모바일 감지: ${isMobile}\nWeb Share 지원: ${webShareSupported}\n화면 크기: ${typeof window !== 'undefined' ? window.innerWidth : 'unknown'}px\nUser-Agent: ${typeof navigator !== 'undefined' ? navigator.userAgent.substring(0, 60) : 'unknown'}...`
-        );
-      }
+      // 모바일에서도 확인할 수 있도록 디버깅 정보를 alert로 표시 (항상 표시)
+      alert(
+        `[디버그] 공유 시작\n\n모바일 감지: ${isMobile}\nWeb Share 지원: ${webShareSupported}\n화면 크기: ${typeof window !== 'undefined' ? window.innerWidth : 'unknown'}px\nUser-Agent: ${typeof navigator !== 'undefined' ? navigator.userAgent.substring(0, 80) : 'unknown'}...`
+      );
 
       // 모바일 기기: Web Share API만 사용 (시스템 공유 모달)
       // 모바일 감지를 더 엄격하게 체크
       if (isMobile) {
-        // 모바일에서 디버깅: 모바일 분기 진입 확인
-        if (isDev) {
-          alert(
-            `[디버그] 모바일 분기 진입\n\nWeb Share 지원: ${webShareSupported}`
-          );
-        }
+        // 모바일에서 디버깅: 모바일 분기 진입 확인 (항상 표시)
+        alert(
+          `[디버그] 모바일 분기 진입\n\nWeb Share 지원: ${webShareSupported}`
+        );
         if (webShareSupported) {
           try {
             console.info('[WebShareButton] 모바일: Web Share API 호출 시도:', {
@@ -277,12 +274,10 @@ const WebShareButton: React.FC<WebShareButtonProps> = ({
             // 모바일에서도 확인할 수 있도록 에러 메시지에 상세 정보 포함
             const errorMessage = `공유에 실패했습니다.\n\n에러: ${errorInfo.errorName}\n${errorInfo.errorMessage}\n\n모바일에서는 시스템 공유만 사용합니다.\n\n디버그 정보:\n- 모바일 감지: ${isMobile}\n- Web Share 지원: ${webShareSupported}`;
 
-            // 개발 모드에서 추가 alert 표시 (모바일에서도 확인 가능)
-            if (isDev) {
-              alert(
-                `[디버그] Web Share API 실패\n\n에러: ${errorInfo.errorName}\n${errorInfo.errorMessage}\n\n모바일 감지: ${isMobile}\nWeb Share 지원: ${webShareSupported}`
-              );
-            }
+            // alert 표시 (모바일에서도 확인 가능)
+            alert(
+              `[디버그] Web Share API 실패\n\n에러: ${errorInfo.errorName}\n${errorInfo.errorMessage}\n\n모바일 감지: ${isMobile}\nWeb Share 지원: ${webShareSupported}`
+            );
 
             useApiErrorModalStore.getState().showError({
               isFatal: false,
@@ -310,12 +305,10 @@ const WebShareButton: React.FC<WebShareButtonProps> = ({
           // 모바일에서도 확인할 수 있도록 상세 정보 포함
           const errorMessage = `공유 기능을 사용할 수 없습니다.\n\n시스템 공유 기능이 지원되지 않는 환경입니다.\n\n디버그 정보:\n- navigator.share 존재: ${debugInfo.hasNavigatorShare}\n- 보안 컨텍스트: ${debugInfo.isSecureContext}\n- 프로토콜: ${debugInfo.protocol}\n- 호스트: ${debugInfo.hostname}`;
 
-          // 개발 모드에서 추가 alert 표시 (모바일에서도 확인 가능)
-          if (isDev) {
-            alert(
-              `[디버그] Web Share API 미지원\n\n모바일 감지: ${isMobile}\nnavigator.share 존재: ${debugInfo.hasNavigatorShare}\n보안 컨텍스트: ${debugInfo.isSecureContext}\n프로토콜: ${debugInfo.protocol}\n호스트: ${debugInfo.hostname}`
-            );
-          }
+          // alert 표시 (모바일에서도 확인 가능)
+          alert(
+            `[디버그] Web Share API 미지원\n\n모바일 감지: ${isMobile}\nnavigator.share 존재: ${debugInfo.hasNavigatorShare}\n보안 컨텍스트: ${debugInfo.isSecureContext}\n프로토콜: ${debugInfo.protocol}\n호스트: ${debugInfo.hostname}`
+          );
 
           useApiErrorModalStore.getState().showError({
             isFatal: false,
@@ -326,6 +319,11 @@ const WebShareButton: React.FC<WebShareButtonProps> = ({
       }
 
       // 데스크톱: 기존 로직 유지 (Web Share API → 카카오톡 공유 → 클립보드 복사)
+      // 데스크톱 분기 진입 확인 (항상 표시)
+      alert(
+        `[디버그] 데스크톱 분기 진입\n\n모바일 감지: ${isMobile}\nWeb Share 지원: ${webShareSupported}\n이 분기로 진입하면 카카오톡 공유로 넘어갑니다.`
+      );
+
       // 만약 모바일인데 여기로 왔다면 에러 표시하고 종료 (이론적으로는 발생하지 않아야 함)
       if (isMobile) {
         const debugInfo = {
@@ -344,15 +342,10 @@ const WebShareButton: React.FC<WebShareButtonProps> = ({
         // 모바일에서도 확인할 수 있도록 상세 정보 포함
         const errorMessage = `공유 오류 발생\n\n모바일로 감지되었지만 데스크톱 분기로 진입했습니다.\n\n디버그 정보:\n- 모바일 감지: ${isMobile}\n- Web Share 지원: ${webShareSupported}\n- 화면 크기: ${debugInfo.windowWidth}px\n- User-Agent: ${debugInfo.userAgent.substring(0, 80)}...`;
 
-        // 개발 모드에서 추가 alert 표시 (모바일에서도 확인 가능)
-        const isDev =
-          process.env.NODE_ENV === 'development' ||
-          process.env.NEXT_PUBLIC_APP_ENV === 'local';
-        if (isDev) {
-          alert(
-            `[디버그] 분기 오류!\n\n모바일로 감지되었지만 데스크톱 분기로 진입했습니다.\n\n모바일 감지: ${isMobile}\nWeb Share 지원: ${webShareSupported}\n화면 크기: ${debugInfo.windowWidth}px\nUser-Agent: ${debugInfo.userAgent.substring(0, 100)}...`
-          );
-        }
+        // alert 표시 (모바일에서도 확인 가능)
+        alert(
+          `[디버그] 분기 오류!\n\n모바일로 감지되었지만 데스크톱 분기로 진입했습니다.\n\n모바일 감지: ${isMobile}\nWeb Share 지원: ${webShareSupported}\n화면 크기: ${debugInfo.windowWidth}px\nUser-Agent: ${debugInfo.userAgent.substring(0, 100)}...`
+        );
 
         useApiErrorModalStore.getState().showError({
           isFatal: false,
@@ -396,9 +389,13 @@ const WebShareButton: React.FC<WebShareButtonProps> = ({
 
       // 2. Web Share API 미지원 또는 실패 시 카카오톡 공유 시도
       if (enableKakao && kakaoSDKReady) {
+        alert(
+          `[디버그] 카카오톡 공유 시도\n\nenableKakao: ${enableKakao}\nkakaoSDKReady: ${kakaoSDKReady}`
+        );
         try {
           console.info('[WebShareButton] 데스크톱: 카카오톡 공유 시도');
           await handleKakaoShare();
+          alert(`[디버그] 카카오톡 공유 성공`);
           console.info('[WebShareButton] 데스크톱: 카카오톡 공유 성공');
           return;
         } catch (kakaoError) {
