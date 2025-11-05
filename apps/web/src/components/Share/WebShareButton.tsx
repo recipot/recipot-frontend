@@ -41,15 +41,61 @@ const WebShareButton: React.FC<WebShareButtonProps> = ({
   shareData,
 }) => {
   const [isSharing, setIsSharing] = useState(false);
-  const [isSupported, setIsSupported] = useState(false);
   const [isAndroid, setIsAndroid] = useState(false);
   const [kakaoSDKReady, setKakaoSDKReady] = useState(false);
+
+  // Web Share API 지원 여부를 정확하게 체크하는 함수
+  const checkWebShareSupport = (): boolean => {
+    // 클라이언트 환경이 아니면 false
+    if (typeof navigator === 'undefined' || typeof window === 'undefined') {
+      return false;
+    }
+
+    // navigator.share가 존재하는지 확인
+    if (!('share' in navigator)) {
+      return false;
+    }
+
+    // navigator.share가 실제 함수인지 확인
+    if (typeof navigator.share !== 'function') {
+      return false;
+    }
+
+    // HTTPS 또는 localhost 환경인지 확인 (Web Share API는 안전한 컨텍스트에서만 동작)
+    const isSecureContext =
+      window.isSecureContext ||
+      location.protocol === 'https:' ||
+      location.hostname === 'localhost' ||
+      location.hostname === '127.0.0.1';
+
+    if (!isSecureContext) {
+      return false;
+    }
+
+    return true;
+  };
 
   // 클라이언트에서만 브라우저 정보 확인
   useEffect(() => {
     if (typeof navigator !== 'undefined') {
-      setIsSupported('share' in navigator);
+      const supported = checkWebShareSupport();
       setIsAndroid(/Android/i.test(navigator.userAgent));
+
+      // 디버깅 로그
+      const isSecureContext =
+        window.isSecureContext ||
+        location.protocol === 'https:' ||
+        location.hostname === 'localhost' ||
+        location.hostname === '127.0.0.1';
+
+      console.info('[WebShareButton] Web Share API 지원 여부:', {
+        hasNavigatorShare: 'share' in navigator,
+        hostname: location.hostname,
+        isFunction: typeof navigator.share === 'function',
+        isSecureContext,
+        protocol: location.protocol,
+        supported,
+      });
     }
   }, []);
 
@@ -75,8 +121,9 @@ const WebShareButton: React.FC<WebShareButtonProps> = ({
     }
   }, [enableKakao]);
 
-  const isWebShareSupported = () => {
-    return isSupported;
+  const isWebShareSupported = (): boolean => {
+    // 실제 호출 시점에 다시 한번 확인
+    return checkWebShareSupport();
   };
 
   const handleKakaoShare = async () => {
@@ -108,27 +155,45 @@ const WebShareButton: React.FC<WebShareButtonProps> = ({
 
     try {
       // 1. Web Share API 먼저 시도 (시스템 공유 모달)
-      if (isWebShareSupported()) {
+      // 실제 호출 시점에 다시 한번 지원 여부 확인
+      const webShareSupported = isWebShareSupported();
+      console.info('[WebShareButton] 공유 시도 시작:', {
+        enableKakao,
+        kakaoSDKReady,
+        webShareSupported,
+      });
+
+      if (webShareSupported) {
         try {
+          console.info('[WebShareButton] Web Share API 호출 시도:', shareData);
           await navigator.share(shareData);
+          console.info('[WebShareButton] Web Share API 성공');
           return; // 성공 시 종료
         } catch (shareError) {
           // 사용자가 공유를 취소한 경우 (AbortError)는 그대로 종료
           if (shareError instanceof Error && shareError.name === 'AbortError') {
+            console.info('[WebShareButton] 사용자가 공유 취소');
             return;
           }
           // 다른 에러인 경우 카카오톡 공유로 폴백
+          console.warn('[WebShareButton] Web Share API 실패:', shareError);
           useApiErrorModalStore.getState().showError({
             isFatal: false,
             message: '공유에 실패했습니다. 다시 시도해주세요.',
           });
         }
+      } else {
+        console.info(
+          '[WebShareButton] Web Share API 미지원, 카카오톡 공유로 진행'
+        );
       }
 
       // 2. Web Share API 미지원 또는 실패 시 카카오톡 공유 시도
       if (enableKakao && kakaoSDKReady) {
         try {
+          console.info('[WebShareButton] 카카오톡 공유 시도');
           await handleKakaoShare();
+          console.info('[WebShareButton] 카카오톡 공유 성공');
           return;
         } catch (kakaoError) {
           console.warn(
@@ -140,9 +205,10 @@ const WebShareButton: React.FC<WebShareButtonProps> = ({
       }
 
       // 3. 최종 폴백: 클립보드 복사
+      console.info('[WebShareButton] 클립보드 복사로 폴백');
       handleFallbackShare();
     } catch (error) {
-      console.error('공유 중 오류 발생:', error);
+      console.error('[WebShareButton] 공유 중 오류 발생:', error);
     } finally {
       setIsSharing(false);
     }
