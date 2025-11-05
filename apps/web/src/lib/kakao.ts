@@ -2,6 +2,8 @@
  * 카카오 SDK 관련 유틸리티 함수들
  */
 
+import { isProduction } from './env';
+
 // 카카오 SDK 타입 정의
 declare global {
   interface Window {
@@ -104,11 +106,23 @@ export const shareKakao = async (shareData: KakaoShareData): Promise<void> => {
     if (url.startsWith('http://') || url.startsWith('https://')) {
       return url;
     }
-    // 상대 경로인 경우 도메인 추가
-    return `https://dev.hankkibuteo.com${url.startsWith('/') ? url : `/${url}`}`;
+    // 상대 경로인 경우 환경에 따라 도메인 추가
+    const baseUrl = isProduction
+      ? 'https://hankkibuteo.com'
+      : 'https://dev.hankkibuteo.com';
+    return `${baseUrl}${url.startsWith('/') ? url : `/${url}`}`;
   };
 
   const shareOptions: KakaoShareOptions = {
+    buttons: [
+      {
+        link: {
+          mobileWebUrl: shareData.url,
+          webUrl: shareData.url,
+        },
+        title: '시작해보기',
+      },
+    ],
     content: {
       description: shareData.description,
       imageHeight: 400,
@@ -158,4 +172,17 @@ export const isKakaoTalkInstalled = (): boolean => {
  */
 export const isKakaoSDKLoaded = (): boolean => {
   return typeof window !== 'undefined' && !!window.Kakao;
+};
+
+/**
+ * 카카오톡 인앱 브라우저에서 접속했는지 확인
+ */
+export const isKakaoTalkInAppBrowser = (): boolean => {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  const { userAgent } = navigator;
+  // 카카오톡 인앱 브라우저는 User-Agent에 "KAKAOTALK" 또는 "KakaoTalk" 포함
+  return /KAKAOTALK|KakaoTalk/i.test(userAgent);
 };

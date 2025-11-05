@@ -11,6 +11,7 @@ import { Header } from '@/components/common/Header';
 import { Modal } from '@/components/common/Modal/Modal';
 import { HeartIcon, ShareIcon } from '@/components/Icons';
 import WebShareButton from '@/components/Share/WebShareButton';
+import { useIsKakaoInApp } from '@/hooks/useIsKakaoInApp';
 import { isProduction } from '@/lib/env';
 import { useApiErrorModalStore } from '@/stores';
 
@@ -29,12 +30,16 @@ export function RecipeDetailHeader({ recipe, showToast }: RecipeHeaderProps) {
   const [isLiked, setIsLiked] = useState(recipe.isBookmarked);
   const [isLoading, setIsLoading] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const isKakaoInApp = useIsKakaoInApp();
 
   const shareData = useMemo(() => {
+    const baseUrl = isProduction
+      ? 'https://hankkibuteo.com'
+      : 'https://dev.hankkibuteo.com';
     return {
       text: recipe.description,
       title: recipe.title,
-      url: `https://dev.hankkibuteo.com/recipe/${recipe.id}`,
+      url: `${baseUrl}/recipe/${recipe.id}`,
     };
   }, [recipe]);
 
@@ -42,7 +47,9 @@ export function RecipeDetailHeader({ recipe, showToast }: RecipeHeaderProps) {
     const recipeImageUrl = recipe.images?.[0]?.imageUrl;
 
     const getImageUrl = (url: string | undefined) => {
-      const baseUrl = 'https://dev.hankkibuteo.com';
+      const baseUrl = isProduction
+        ? 'https://hankkibuteo.com'
+        : 'https://dev.hankkibuteo.com';
 
       if (!url) return `${baseUrl}/recipeImage.png`;
 
@@ -65,6 +72,12 @@ export function RecipeDetailHeader({ recipe, showToast }: RecipeHeaderProps) {
   }, [recipe]);
 
   const handleToggleBookmark = async (recipeId: number) => {
+    // 카카오톡 인앱 브라우저에서 접속한 경우 로그인 모달 표시
+    if (isKakaoInApp) {
+      setShowLoginModal(true);
+      return;
+    }
+
     if (!useCookieAuth && token === null) {
       setShowLoginModal(true);
       return;
@@ -107,7 +120,11 @@ export function RecipeDetailHeader({ recipe, showToast }: RecipeHeaderProps) {
         open={showLoginModal}
         onOpenChange={setShowLoginModal}
         title="로그인이 필요합니다."
-        description="로그인하면 북마크 기능을 사용할 수 있어요."
+        description={
+          isKakaoInApp
+            ? '로그인하면 더 많은 기능을 사용할 수 있어요.'
+            : '로그인하면 북마크 기능을 사용할 수 있어요.'
+        }
       >
         <Button variant="default" onClick={() => router.push('/signin')}>
           로그인
@@ -123,6 +140,9 @@ export function RecipeDetailHeader({ recipe, showToast }: RecipeHeaderProps) {
             kakaoShareData={kakaoShareData}
             enableKakao
             className="p-2"
+            onKakaoInAppClick={
+              isKakaoInApp ? () => setShowLoginModal(true) : undefined
+            }
           >
             <ShareIcon className="h-6 w-6" color="#212529" />
           </WebShareButton>
