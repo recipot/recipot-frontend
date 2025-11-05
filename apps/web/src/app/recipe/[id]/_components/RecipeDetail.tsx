@@ -12,6 +12,7 @@ import { CookIcon } from '@/components/Icons';
 import { useToast, useViewportBasedPadding } from '@/hooks';
 import { usePostRecentRecipe } from '@/hooks/usePostRecentRecipe';
 import { isProduction } from '@/lib/env';
+import { useApiErrorModalStore } from '@/stores';
 
 import CookwareSection from './CookwareSection';
 import IngredientsSection from './IngredientsSection';
@@ -44,8 +45,11 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
         const data = await recipe.getRecipeDetail(recipeId);
         setRecipeData(data);
         postRecentRecipe(Number(recipeId));
-      } catch (error) {
-        console.error('Recipe fetch error:', error);
+      } catch {
+        useApiErrorModalStore.getState().showError({
+          message:
+            '레시피를 불러오는 중 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.',
+        });
       }
     };
     fetchRecipe();
