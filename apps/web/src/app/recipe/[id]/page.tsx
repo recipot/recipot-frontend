@@ -134,6 +134,7 @@ export async function generateMetadata({
           width: 1200,
         },
       ],
+      locale: 'ko_KR',
       siteName: '한끼부터',
       title,
       type: 'website',
@@ -145,6 +146,12 @@ export async function generateMetadata({
       description,
       images: [imageUrl],
       title,
+    },
+    // 카카오톡이 메타 태그를 올바르게 읽을 수 있도록 추가 메타데이터
+    other: {
+      'og:image:height': '630',
+      'og:image:type': 'image/jpeg',
+      'og:image:width': '1200',
     },
   };
 }
