@@ -44,8 +44,22 @@ const WebShareButton: React.FC<WebShareButtonProps> = ({
   const [isAndroid, setIsAndroid] = useState(false);
   const [kakaoSDKReady, setKakaoSDKReady] = useState(false);
 
+  // 모바일 환경인지 확인하는 함수
+  const isMobileDevice = (): boolean => {
+    if (typeof navigator === 'undefined') {
+      return false;
+    }
+    const { userAgent } = navigator;
+    return (
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        userAgent
+      ) ||
+      (typeof window !== 'undefined' && window.innerWidth <= 768)
+    );
+  };
+
   // Web Share API 지원 여부를 정확하게 체크하는 함수
-  const checkWebShareSupport = (): boolean => {
+  const checkWebShareSupport = (data?: ShareData): boolean => {
     // 클라이언트 환경이 아니면 false
     if (typeof navigator === 'undefined' || typeof window === 'undefined') {
       return false;
@@ -72,6 +86,21 @@ const WebShareButton: React.FC<WebShareButtonProps> = ({
       return false;
     }
 
+    // navigator.canShare()가 존재하면 실제 공유 가능 여부를 확인
+    if (
+      data &&
+      'canShare' in navigator &&
+      typeof navigator.canShare === 'function'
+    ) {
+      try {
+        return navigator.canShare(data);
+      } catch (error) {
+        // canShare() 호출 실패 시 false 반환
+        console.warn('[WebShareButton] canShare() 호출 실패:', error);
+        return false;
+      }
+    }
+
     return true;
   };
 
@@ -88,10 +117,15 @@ const WebShareButton: React.FC<WebShareButtonProps> = ({
         location.hostname === 'localhost' ||
         location.hostname === '127.0.0.1';
 
+      const hasCanShare =
+        'canShare' in navigator && typeof navigator.canShare === 'function';
+
       console.info('[WebShareButton] Web Share API 지원 여부:', {
+        hasCanShare,
         hasNavigatorShare: 'share' in navigator,
         hostname: location.hostname,
         isFunction: typeof navigator.share === 'function',
+        isMobile: isMobileDevice(),
         isSecureContext,
         protocol: location.protocol,
         supported,
@@ -121,9 +155,9 @@ const WebShareButton: React.FC<WebShareButtonProps> = ({
     }
   }, [enableKakao]);
 
-  const isWebShareSupported = (): boolean => {
-    // 실제 호출 시점에 다시 한번 확인
-    return checkWebShareSupport();
+  const isWebShareSupported = (data?: ShareData): boolean => {
+    // 실제 호출 시점에 다시 한번 확인 (공유 데이터 포함)
+    return checkWebShareSupport(data);
   };
 
   const handleKakaoShare = async () => {
@@ -155,15 +189,33 @@ const WebShareButton: React.FC<WebShareButtonProps> = ({
 
     try {
       // 1. Web Share API 먼저 시도 (시스템 공유 모달)
-      // 실제 호출 시점에 다시 한번 지원 여부 확인
-      const webShareSupported = isWebShareSupported();
+      // 실제 호출 시점에 다시 한번 지원 여부 확인 (공유 데이터 포함)
+      const webShareSupported = isWebShareSupported(shareData);
+      const isMobile = isMobileDevice();
+
+      // canShare 체크 결과
+      let canShareResult = false;
+      if (
+        typeof navigator !== 'undefined' &&
+        'canShare' in navigator &&
+        typeof navigator.canShare === 'function'
+      ) {
+        try {
+          canShareResult = navigator.canShare(shareData);
+        } catch (error) {
+          console.warn('[WebShareButton] canShare() 호출 중 오류:', error);
+        }
+      }
+
       console.info('[WebShareButton] 공유 시도 시작:', {
+        canShare: canShareResult,
         enableKakao,
+        isMobile,
         kakaoSDKReady,
         webShareSupported,
       });
 
-      if (webShareSupported) {
+      if (webShareSupported && canShareResult) {
         try {
           console.info('[WebShareButton] Web Share API 호출 시도:', shareData);
           await navigator.share(shareData);
@@ -176,16 +228,27 @@ const WebShareButton: React.FC<WebShareButtonProps> = ({
             return;
           }
           // 다른 에러인 경우 카카오톡 공유로 폴백
-          console.warn('[WebShareButton] Web Share API 실패:', shareError);
+          console.warn('[WebShareButton] Web Share API 실패:', {
+            error: shareError,
+            errorMessage:
+              shareError instanceof Error
+                ? shareError.message
+                : String(shareError),
+            errorName:
+              shareError instanceof Error ? shareError.name : 'Unknown',
+          });
           useApiErrorModalStore.getState().showError({
             isFatal: false,
             message: '공유에 실패했습니다. 다시 시도해주세요.',
           });
         }
       } else {
-        console.info(
-          '[WebShareButton] Web Share API 미지원, 카카오톡 공유로 진행'
-        );
+        const reason = !webShareSupported
+          ? 'Web Share API 미지원'
+          : !canShareResult
+            ? 'canShare() 결과 false'
+            : '알 수 없는 이유';
+        console.info(`[WebShareButton] ${reason}, 카카오톡 공유로 진행`);
       }
 
       // 2. Web Share API 미지원 또는 실패 시 카카오톡 공유 시도
