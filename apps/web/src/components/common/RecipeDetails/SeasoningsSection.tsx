@@ -18,42 +18,22 @@ interface SeasoningsSectionProps {
 export function SeasoningsSection({
   seasonings,
   showIcon = false,
-  variant = 'detail',
 }: SeasoningsSectionProps) {
   if (seasonings?.length === 0) {
     return null;
   }
 
-  if (variant === 'detail') {
-    return (
-      <div className="space-y-5">
-        <Title title="양념류" />
-
-        <SeasoningsList
-          seasonings={seasonings}
-          variant="detail"
-          showIcon={showIcon}
-        />
-
-        <MeasurementGuide />
-      </div>
-    );
-  }
-
   return (
-    <div className="mb-6">
+    <div className="space-y-5">
       <Title title="양념류" />
 
       <SeasoningsList
         seasonings={seasonings}
-        variant="sidebar"
+        variant="detail"
         showIcon={showIcon}
       />
 
-      {/* 계량 가이드 */}
-      <div className="mt-5">
-        <MeasurementGuide />
-      </div>
+      <MeasurementGuide />
     </div>
   );
 }

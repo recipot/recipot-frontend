@@ -19,10 +19,7 @@ interface IngredientsListProps {
   variant?: 'detail' | 'sidebar';
 }
 
-export function IngredientsList({
-  ingredients,
-  variant = 'detail',
-}: IngredientsListProps) {
+export function IngredientsList({ ingredients }: IngredientsListProps) {
   // 모든 재료를 통합 (owned, notOwned, alternativeUnavailable)
   const allIngredients = [
     ...(ingredients?.owned ?? []),
@@ -40,43 +37,21 @@ export function IngredientsList({
     return null;
   }
 
-  // 레시피 상세 페이지 스타일
-  if (variant === 'detail') {
-    return (
-      <div className="flex flex-wrap gap-2">
-        {uniqueIngredients.map((ingredient: RecipeIngredient) => (
-          <div
-            key={ingredient.id}
-            className="bg-secondary-light-green border-secondary-soft-green flex h-[29px] w-fit max-w-full items-center gap-[5px] rounded-md border px-3"
-          >
-            <span className="text-15b text-ingredient-green min-w-0 truncate">
-              {ingredient.name}
-            </span>
-            {ingredient.amount && (
-              <span className="text-15 text-ingredient-green shrink-0">
-                {ingredient.amount}
-              </span>
-            )}
-          </div>
-        ))}
-      </div>
-    );
-  }
-
-  // 사이드바 스타일
   return (
     <div className="flex flex-wrap gap-2">
       {uniqueIngredients.map((ingredient: RecipeIngredient) => (
         <div
           key={ingredient.id}
-          className="border-secondary-soft-green bg-secondary-light-green flex h-[29px] w-fit max-w-full items-center rounded-md border px-3 py-2"
+          className="bg-secondary-light-green border-secondary-soft-green flex h-[29px] w-fit max-w-full items-center gap-[5px] rounded-md border px-3"
         >
-          <span className="text-15b mr-[5px] min-w-0 truncate text-[#53880A]">
+          <span className="text-15b text-ingredient-green min-w-0 truncate">
             {ingredient.name}
           </span>
-          <span className="text-15 shrink-0 text-[#53880A]">
-            {ingredient.amount}
-          </span>
+          {ingredient.amount && (
+            <span className="text-15 text-ingredient-green shrink-0">
+              {ingredient.amount}
+            </span>
+          )}
         </div>
       ))}
     </div>
