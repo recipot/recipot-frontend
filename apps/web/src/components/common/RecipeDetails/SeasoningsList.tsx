@@ -34,11 +34,7 @@ export function SeasoningsList({
           <div className="flex items-center" key={seasoning.id}>
             <div className="flex min-w-0 flex-shrink-0 items-center gap-3">
               {showIcon && <IconComponent color="#68982D" size={20} />}
-              <span className="text-15sb text-gray-700">
-                {seasoning.name.length > 8
-                  ? `${seasoning.name.slice(0, 8)}...`
-                  : seasoning.name}
-              </span>
+              <span className="text-15sb text-gray-700">{seasoning.name}</span>
             </div>
             <div className="mx-2 h-1 flex-1 border-b border-dashed border-gray-200" />
             <span className="text-15 flex-shrink-0 text-gray-700">
