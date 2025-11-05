@@ -33,14 +33,36 @@ export function RecipeDetailHeader({ recipe, showToast }: RecipeHeaderProps) {
   const isKakaoInApp = useIsKakaoInApp();
 
   const shareData = useMemo(() => {
-    const baseUrl = isProduction
-      ? 'https://hankkibuteo.com'
-      : 'https://dev.hankkibuteo.com';
-    return {
-      text: recipe.description,
-      title: recipe.title,
-      url: `${baseUrl}/recipe/${recipe.id}`,
+    // 현재 페이지의 origin을 사용하여 환경에 맞는 URL 자동 감지
+    const baseUrl =
+      typeof window !== 'undefined' && window.location.origin
+        ? window.location.origin
+        : isProduction
+          ? 'https://hankkibuteo.com'
+          : 'https://dev.hankkibuteo.com';
+
+    const shareUrl = `${baseUrl}/recipe/${recipe.id}`;
+    const shareTitle = recipe.title || '한끼부터 레시피';
+    const shareText = recipe.description || '맛있는 레시피를 확인해보세요!';
+
+    const data = {
+      text: shareText,
+      title: shareTitle,
+      url: shareUrl,
     };
+
+    // 디버깅 로그
+    console.info('[RecipeDetailHeader] shareData 생성:', {
+      baseUrl,
+      hasDescription: !!recipe.description,
+      hasTitle: !!recipe.title,
+      recipeId: recipe.id,
+      shareText,
+      shareTitle,
+      shareUrl,
+    });
+
+    return data;
   }, [recipe]);
 
   const kakaoShareData = useMemo(() => {
