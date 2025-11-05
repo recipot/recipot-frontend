@@ -50,12 +50,39 @@ const WebShareButton: React.FC<WebShareButtonProps> = ({
       return false;
     }
     const { userAgent } = navigator;
-    return (
-      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+
+    // User-Agent 기반 모바일 감지 (더 엄격하게)
+    const isMobileUA =
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(
         userAgent
-      ) ||
-      (typeof window !== 'undefined' && window.innerWidth <= 768)
-    );
+      );
+
+    // 화면 크기 기반 감지 (추가 확인)
+    const isSmallScreen =
+      typeof window !== 'undefined' && window.innerWidth <= 768;
+
+    // 터치 이벤트 지원 여부 (추가 확인)
+    const hasTouchSupport =
+      typeof window !== 'undefined' &&
+      ('ontouchstart' in window ||
+        navigator.maxTouchPoints > 0 ||
+        // @ts-expect-error - 일부 브라우저에서 지원
+        navigator.msMaxTouchPoints > 0);
+
+    // 모바일로 판단: User-Agent가 모바일이거나 (작은 화면이고 터치 지원)
+    const result = isMobileUA || (isSmallScreen && hasTouchSupport);
+
+    console.info('[WebShareButton] 모바일 감지 결과:', {
+      hasTouchSupport,
+      isMobileUA,
+      isSmallScreen,
+      result,
+      userAgent,
+      windowWidth:
+        typeof window !== 'undefined' ? window.innerWidth : 'unknown',
+    });
+
+    return result;
   };
 
   // Web Share API 지원 여부를 정확하게 체크하는 함수
@@ -193,16 +220,27 @@ const WebShareButton: React.FC<WebShareButtonProps> = ({
         }
       }
 
-      console.info('[WebShareButton] 공유 시도 시작:', {
-        canShare: canShareResult,
-        enableKakao,
-        isMobile,
-        kakaoSDKReady,
-        webShareSupported,
-      });
+      // 모바일에서도 확인할 수 있도록 디버깅 정보를 alert로 표시
+      const isDev =
+        process.env.NODE_ENV === 'development' ||
+        process.env.NEXT_PUBLIC_APP_ENV === 'local';
+
+      // 개발 모드에서 모바일일 때 alert로 디버깅 정보 표시 (모바일에서도 확인 가능)
+      if (isDev && isMobile) {
+        alert(
+          `[디버그] 공유 시작\n\n모바일 감지: ${isMobile}\nWeb Share 지원: ${webShareSupported}\n화면 크기: ${typeof window !== 'undefined' ? window.innerWidth : 'unknown'}px\nUser-Agent: ${typeof navigator !== 'undefined' ? navigator.userAgent.substring(0, 60) : 'unknown'}...`
+        );
+      }
 
       // 모바일 기기: Web Share API만 사용 (시스템 공유 모달)
+      // 모바일 감지를 더 엄격하게 체크
       if (isMobile) {
+        // 모바일에서 디버깅: 모바일 분기 진입 확인
+        if (isDev) {
+          alert(
+            `[디버그] 모바일 분기 진입\n\nWeb Share 지원: ${webShareSupported}`
+          );
+        }
         if (webShareSupported) {
           try {
             console.info('[WebShareButton] 모바일: Web Share API 호출 시도:', {
@@ -222,7 +260,7 @@ const WebShareButton: React.FC<WebShareButtonProps> = ({
               return;
             }
             // 다른 에러인 경우 에러만 표시 (카카오톡 공유로 폴백하지 않음)
-            console.warn('[WebShareButton] 모바일: Web Share API 실패:', {
+            const errorInfo = {
               error: shareError,
               errorMessage:
                 shareError instanceof Error
@@ -230,25 +268,99 @@ const WebShareButton: React.FC<WebShareButtonProps> = ({
                   : String(shareError),
               errorName:
                 shareError instanceof Error ? shareError.name : 'Unknown',
-            });
+            };
+            console.warn(
+              '[WebShareButton] 모바일: Web Share API 실패:',
+              errorInfo
+            );
+
+            // 모바일에서도 확인할 수 있도록 에러 메시지에 상세 정보 포함
+            const errorMessage = `공유에 실패했습니다.\n\n에러: ${errorInfo.errorName}\n${errorInfo.errorMessage}\n\n모바일에서는 시스템 공유만 사용합니다.\n\n디버그 정보:\n- 모바일 감지: ${isMobile}\n- Web Share 지원: ${webShareSupported}`;
+
+            // 개발 모드에서 추가 alert 표시 (모바일에서도 확인 가능)
+            if (isDev) {
+              alert(
+                `[디버그] Web Share API 실패\n\n에러: ${errorInfo.errorName}\n${errorInfo.errorMessage}\n\n모바일 감지: ${isMobile}\nWeb Share 지원: ${webShareSupported}`
+              );
+            }
+
             useApiErrorModalStore.getState().showError({
               isFatal: false,
-              message: '공유에 실패했습니다. 다시 시도해주세요.',
+              message: errorMessage,
             });
             return;
           }
         } else {
           // 모바일에서 Web Share API가 지원되지 않는 경우 에러 표시
-          console.warn('[WebShareButton] 모바일: Web Share API 미지원');
+          const debugInfo = {
+            hasNavigatorShare: 'share' in navigator,
+            hostname: location.hostname,
+            isSecureContext: window.isSecureContext,
+            protocol: location.protocol,
+            userAgent:
+              typeof navigator !== 'undefined'
+                ? navigator.userAgent
+                : 'unknown',
+          };
+          console.warn(
+            '[WebShareButton] 모바일: Web Share API 미지원',
+            debugInfo
+          );
+
+          // 모바일에서도 확인할 수 있도록 상세 정보 포함
+          const errorMessage = `공유 기능을 사용할 수 없습니다.\n\n시스템 공유 기능이 지원되지 않는 환경입니다.\n\n디버그 정보:\n- navigator.share 존재: ${debugInfo.hasNavigatorShare}\n- 보안 컨텍스트: ${debugInfo.isSecureContext}\n- 프로토콜: ${debugInfo.protocol}\n- 호스트: ${debugInfo.hostname}`;
+
+          // 개발 모드에서 추가 alert 표시 (모바일에서도 확인 가능)
+          if (isDev) {
+            alert(
+              `[디버그] Web Share API 미지원\n\n모바일 감지: ${isMobile}\nnavigator.share 존재: ${debugInfo.hasNavigatorShare}\n보안 컨텍스트: ${debugInfo.isSecureContext}\n프로토콜: ${debugInfo.protocol}\n호스트: ${debugInfo.hostname}`
+            );
+          }
+
           useApiErrorModalStore.getState().showError({
             isFatal: false,
-            message: '공유 기능을 사용할 수 없습니다.',
+            message: errorMessage,
           });
-          return;
+          return; // 모바일에서는 절대 카카오톡 공유로 넘어가지 않음
         }
       }
 
       // 데스크톱: 기존 로직 유지 (Web Share API → 카카오톡 공유 → 클립보드 복사)
+      // 만약 모바일인데 여기로 왔다면 에러 표시하고 종료 (이론적으로는 발생하지 않아야 함)
+      if (isMobile) {
+        const debugInfo = {
+          isMobile,
+          userAgent:
+            typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown',
+          webShareSupported,
+          windowWidth:
+            typeof window !== 'undefined' ? window.innerWidth : 'unknown',
+        };
+        console.error(
+          '[WebShareButton] 오류: 모바일로 감지되었지만 데스크톱 분기로 진입했습니다!',
+          debugInfo
+        );
+
+        // 모바일에서도 확인할 수 있도록 상세 정보 포함
+        const errorMessage = `공유 오류 발생\n\n모바일로 감지되었지만 데스크톱 분기로 진입했습니다.\n\n디버그 정보:\n- 모바일 감지: ${isMobile}\n- Web Share 지원: ${webShareSupported}\n- 화면 크기: ${debugInfo.windowWidth}px\n- User-Agent: ${debugInfo.userAgent.substring(0, 80)}...`;
+
+        // 개발 모드에서 추가 alert 표시 (모바일에서도 확인 가능)
+        const isDev =
+          process.env.NODE_ENV === 'development' ||
+          process.env.NEXT_PUBLIC_APP_ENV === 'local';
+        if (isDev) {
+          alert(
+            `[디버그] 분기 오류!\n\n모바일로 감지되었지만 데스크톱 분기로 진입했습니다.\n\n모바일 감지: ${isMobile}\nWeb Share 지원: ${webShareSupported}\n화면 크기: ${debugInfo.windowWidth}px\nUser-Agent: ${debugInfo.userAgent.substring(0, 100)}...`
+          );
+        }
+
+        useApiErrorModalStore.getState().showError({
+          isFatal: false,
+          message: errorMessage,
+        });
+        return;
+      }
+      console.info('[WebShareButton] 데스크톱으로 감지됨, 폴백 로직 사용');
       // 1. Web Share API 먼저 시도
       if (webShareSupported) {
         try {
