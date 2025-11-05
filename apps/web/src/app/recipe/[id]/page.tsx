@@ -21,13 +21,47 @@ async function getRecipeData(recipeId: string): Promise<Recipe | null> {
       ? '' // MSW가 현재 도메인에서 요청을 가로챔
       : (process.env.NEXT_PUBLIC_BACKEND_URL ?? 'https://api.hankkibuteo.com');
 
-    const response = await axios.get(`${baseURL}/v1/recipes/${recipeId}`, {
-      timeout: 5000,
+    const url = `${baseURL}/v1/recipes/${recipeId}`;
+    console.info('[RecipePage] 레시피 데이터 가져오기 시도:', {
+      baseURL,
+      recipeId,
+      url,
     });
 
-    return response.data?.data ?? null;
+    const response = await axios.get(url, {
+      timeout: 10000, // 타임아웃 증가
+    });
+
+    const recipeData = response.data?.data;
+
+    if (!recipeData) {
+      console.warn('[RecipePage] 레시피 데이터가 비어있음:', {
+        recipeId,
+        responseData: response.data,
+      });
+      return null;
+    }
+
+    console.info('[RecipePage] 레시피 데이터 가져오기 성공:', {
+      hasDescription: !!recipeData.description,
+      hasImages: !!(recipeData.images && recipeData.images.length > 0),
+      hasTitle: !!recipeData.title,
+      recipeId,
+    });
+
+    return recipeData;
   } catch (error) {
-    console.error('[RecipePage] 레시피 데이터 가져오기 실패:', error);
+    if (axios.isAxiosError(error)) {
+      console.error('[RecipePage] 레시피 데이터 가져오기 실패:', {
+        message: error.message,
+        recipeId,
+        response: error.response?.data,
+        status: error.response?.status,
+        url: error.config?.url,
+      });
+    } else {
+      console.error('[RecipePage] 레시피 데이터 가져오기 실패:', error);
+    }
     return null;
   }
 }
@@ -39,11 +73,6 @@ export async function generateMetadata({
   const { id } = await params;
   const recipe = await getRecipeData(id);
 
-  // 기본 메타 태그
-  const defaultTitle = '한끼부터 - 맛있는 레시피';
-  const defaultDescription = '냉장고 속 재료로 만드는 유연채식 집밥 레시피';
-  const defaultImage = '/recipeImage.png';
-
   // 현재 환경에 맞는 base URL (서버 사이드)
   const baseUrl =
     process.env.NEXT_PUBLIC_APP_URL ??
@@ -51,26 +80,47 @@ export async function generateMetadata({
 
   const recipeUrl = `${baseUrl}/recipe/${id}`;
 
+  // 레시피 데이터가 없으면 경고 로그
+  if (!recipe) {
+    console.warn(
+      '[RecipePage] generateMetadata: 레시피 데이터가 없어 기본값 사용',
+      {
+        recipeId: id,
+      }
+    );
+  }
+
   // 레시피 데이터가 있으면 사용, 없으면 기본값 사용
-  const title = recipe?.title ?? defaultTitle;
-  const description = recipe?.description ?? defaultDescription;
+  // 제목은 레시피 제목만 사용 (접두사 없이)
+  const title = recipe?.title ?? '맛있는 레시피';
+  // 설명은 레시피 설명 사용
+  const description =
+    recipe?.description ?? '냉장고 속 재료로 만드는 유연채식 집밥 레시피';
 
   // 레시피 이미지 URL 생성
-  let imageUrl = defaultImage;
+  let imageUrl = `${baseUrl}/recipeImage.png`; // 기본 이미지 (절대 URL)
   if (recipe?.images && recipe.images.length > 0) {
-    const recipeImage = recipe.images[0].imageUrl;
+    const recipeImage = recipe.images[0]?.imageUrl;
     if (recipeImage) {
       // 절대 URL인 경우 그대로 사용, 상대 경로인 경우 base URL 추가
-      imageUrl =
-        recipeImage?.startsWith('http://') ||
-        recipeImage?.startsWith('https://')
-          ? recipeImage
-          : `${baseUrl}${recipeImage.startsWith('/') ? recipeImage : `/${recipeImage}`}`;
+      if (
+        recipeImage.startsWith('http://') ||
+        recipeImage.startsWith('https://')
+      ) {
+        imageUrl = recipeImage;
+      } else {
+        imageUrl = `${baseUrl}${recipeImage.startsWith('/') ? recipeImage : `/${recipeImage}`}`;
+      }
     }
-  } else {
-    // 기본 이미지도 절대 URL로 변환
-    imageUrl = `${baseUrl}${defaultImage}`;
   }
+
+  console.info('[RecipePage] generateMetadata 완료:', {
+    description,
+    hasRecipe: !!recipe,
+    imageUrl,
+    recipeId: id,
+    title,
+  });
 
   return {
     description,
