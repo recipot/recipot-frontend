@@ -141,8 +141,12 @@ export const createApiInstance = (
         error.response?.data ?? error.message
       );
 
+      const suppressGlobalError = Boolean(
+        (error.config as { suppressGlobalError?: boolean })?.suppressGlobalError
+      );
+
       if (error.response?.status !== 401) {
-        if (globalApiErrorHandler) {
+        if (!suppressGlobalError && globalApiErrorHandler) {
           try {
             globalApiErrorHandler(error);
           } catch (handlerError) {
@@ -159,7 +163,7 @@ export const createApiInstance = (
         requestUrl.includes('/v1/auth/refresh') ||
         requestUrl.includes('/v1/login')
       ) {
-        if (globalApiErrorHandler) {
+        if (!suppressGlobalError && globalApiErrorHandler) {
           try {
             globalApiErrorHandler(error);
           } catch (handlerError) {
@@ -171,7 +175,7 @@ export const createApiInstance = (
 
       if (originalRequest._retry) {
         tokenUtils.clearTokens();
-        if (globalApiErrorHandler) {
+        if (!suppressGlobalError && globalApiErrorHandler) {
           try {
             globalApiErrorHandler(error);
           } catch (handlerError) {
@@ -218,7 +222,7 @@ export const createApiInstance = (
       } catch (refreshError) {
         tokenUtils.clearTokens();
 
-        if (globalApiErrorHandler) {
+        if (!suppressGlobalError && globalApiErrorHandler) {
           try {
             globalApiErrorHandler(refreshError);
           } catch (handlerError) {

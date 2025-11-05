@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 import { createApiInstance } from './createApiInstance';
 import { debugAuth } from './debug';
 
@@ -75,11 +77,36 @@ export const recentAPI = {
   getRecentRecipes: async (
     params: GetCompletedRecipesParams = { limit: 10, page: 1 }
   ): Promise<CompletedRecipesResponse['data']> => {
-    const response = await mypageApi.get<CompletedRecipesResponse>(
-      '/v1/users/recipes/recent',
-      { params }
-    );
-    return response.data.data;
+    try {
+      const response = await mypageApi.get<CompletedRecipesResponse>(
+        '/v1/users/recipes/recent',
+        { params, suppressGlobalError: true } as {
+          params?: GetCompletedRecipesParams;
+          suppressGlobalError: boolean;
+        }
+      );
+      return response.data.data;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const errorCode = error.response?.data?.errorCode;
+        const status = error.response?.status;
+
+        if (errorCode === 'E13002' || status === 400) {
+          const page = params.page ?? 1;
+          const limit = params.limit ?? 10;
+
+          return {
+            items: [],
+            limit,
+            page,
+            total: 0,
+            totalPages: 0,
+          };
+        }
+      }
+
+      throw error;
+    }
   },
 
   // 최근 본 레시피 추가

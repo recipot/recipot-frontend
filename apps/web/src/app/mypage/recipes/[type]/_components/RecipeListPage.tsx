@@ -1,5 +1,7 @@
 'use client';
 
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { recipe as recipeApi } from '@recipot/api';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { PageHeader } from '@/app/mypage/_components/PageHeader';
@@ -13,6 +15,8 @@ import {
   mockDefaultRecipes,
 } from '@/mocks/data/myPage.mock';
 import type { PageType } from '@/types/MyPage.types';
+
+import type { CompletedRecipe } from '@recipot/api';
 
 const PAGE_CONFIG = {
   cooked: {
@@ -36,6 +40,26 @@ const PAGE_CONFIG = {
     title: '내가 찜한 레시피',
     titleColor: '#228be6',
   },
+};
+
+const hasRecipeDetailData = (detail: unknown): boolean => {
+  if (detail === null || detail === undefined) {
+    return false;
+  }
+
+  if (Array.isArray(detail)) {
+    return detail.length > 0;
+  }
+
+  if (typeof detail === 'object') {
+    return Object.keys(detail as Record<string, unknown>).length > 0;
+  }
+
+  if (typeof detail === 'string') {
+    return detail.trim().length > 0;
+  }
+
+  return true;
 };
 
 export default function RecipeListPage({ type }: { type: PageType }) {
@@ -66,6 +90,107 @@ export default function RecipeListPage({ type }: { type: PageType }) {
   const defaultRecipe = type === 'saved' ? storedRecipes : recentRecipes;
 
   const queryClient = useQueryClient();
+  const recipeDetailValidityRef = useRef<Map<number, boolean>>(new Map());
+
+  const [filteredCookedRecipes, setFilteredCookedRecipes] =
+    useState<CompletedRecipe[]>(cookedRecipes);
+  const [filteredDefaultRecipes, setFilteredDefaultRecipes] =
+    useState<CompletedRecipe[]>(defaultRecipe);
+
+  const shouldValidateCooked = Boolean(completedRecipesData?.items);
+  const shouldValidateDefault =
+    type === 'cooked'
+      ? false
+      : Boolean(
+          type === 'saved' ? storedRecipesData?.items : recentRecipesData?.items
+        );
+
+  const filterRecipesWithDetail = useCallback(
+    async (recipes: CompletedRecipe[]) => {
+      if (!recipes.length) {
+        return [];
+      }
+
+      const results = await Promise.all(
+        recipes.map(async recipeItem => {
+          if (!recipeItem?.recipeId) {
+            return null;
+          }
+
+          const cachedValidity = recipeDetailValidityRef.current.get(
+            recipeItem.recipeId
+          );
+
+          if (cachedValidity !== undefined) {
+            return cachedValidity ? recipeItem : null;
+          }
+
+          try {
+            const detail = await recipeApi.getRecipeDetail(recipeItem.recipeId);
+            const isValid = hasRecipeDetailData(detail);
+            recipeDetailValidityRef.current.set(recipeItem.recipeId, isValid);
+            return isValid ? recipeItem : null;
+          } catch {
+            recipeDetailValidityRef.current.set(recipeItem.recipeId, false);
+            return null;
+          }
+        })
+      );
+
+      return results.filter(
+        (recipeItem): recipeItem is CompletedRecipe => recipeItem !== null
+      );
+    },
+    []
+  );
+
+  useEffect(() => {
+    let isActive = true;
+
+    const validateCookedRecipes = async () => {
+      if (!shouldValidateCooked) {
+        if (isActive) {
+          setFilteredCookedRecipes(cookedRecipes);
+        }
+        return;
+      }
+
+      const validated = await filterRecipesWithDetail(cookedRecipes);
+      if (isActive) {
+        setFilteredCookedRecipes(validated);
+      }
+    };
+
+    validateCookedRecipes();
+
+    return () => {
+      isActive = false;
+    };
+  }, [cookedRecipes, filterRecipesWithDetail, shouldValidateCooked]);
+
+  useEffect(() => {
+    let isActive = true;
+
+    const validateDefaultRecipes = async () => {
+      if (!shouldValidateDefault) {
+        if (isActive) {
+          setFilteredDefaultRecipes(defaultRecipe);
+        }
+        return;
+      }
+
+      const validated = await filterRecipesWithDetail(defaultRecipe);
+      if (isActive) {
+        setFilteredDefaultRecipes(validated);
+      }
+    };
+
+    validateDefaultRecipes();
+
+    return () => {
+      isActive = false;
+    };
+  }, [defaultRecipe, filterRecipesWithDetail, shouldValidateDefault]);
 
   const handleToggleSave = () => {
     const queryKeys = ['completed-recipes', 'stored-recipes', 'recent-recipes'];
@@ -97,13 +222,13 @@ export default function RecipeListPage({ type }: { type: PageType }) {
         {type === 'cooked' ? (
           <CookedRecipeList
             config={config}
-            recipes={cookedRecipes}
+            recipes={filteredCookedRecipes}
             onToggleSave={handleToggleSave}
           />
         ) : (
           <DefaultRecipeList
             config={config}
-            recipes={defaultRecipe}
+            recipes={filteredDefaultRecipes}
             onToggleSave={handleToggleSave}
             type={type}
           />

@@ -1,3 +1,4 @@
+import type { AxiosRequestConfig } from 'axios';
 import { createApiInstance } from '@recipot/api';
 
 import type { ReviewSubmitData } from './types';
@@ -31,7 +32,9 @@ export const recipe = {
   },
 
   getRecipeDetail: async (recipeId: string | number) => {
-    const response = await recipeAPI.get(`/v1/recipes/${recipeId}`);
+    const response = await recipeAPI.get(`/v1/recipes/${recipeId}`, {
+      suppressGlobalError: true,
+    } as AxiosRequestConfig & { suppressGlobalError: boolean });
     return response.data.data;
   },
 
