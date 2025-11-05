@@ -5,7 +5,7 @@ import type { Recipe } from '@/app/recipe/[id]/types/recipe.types';
 import type { MoodType } from '@/components/EmotionState';
 import { getEmotionGradientOverlay } from '@/utils/emotionGradient';
 
-import { CARD_STYLES } from './constants';
+import { CARD_STYLES, TOP_GRADIENT_OVERLAY_STYLE } from './constants';
 import { RecipeActions } from './RecipeActions';
 import { RecipeContent } from './RecipeContent';
 import { RecipeImage } from './RecipeImage';
@@ -59,6 +59,11 @@ export const RecipeCard = memo(
           <div
             className={`absolute inset-0 flex flex-col transition-opacity duration-300 ${isMainCard ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
           >
+            {/* 상단 검정색 그라데이션 오버레이 */}
+            <div
+              className="pointer-events-none absolute inset-x-0 top-0 h-[40%]"
+              style={TOP_GRADIENT_OVERLAY_STYLE}
+            />
             {/* 하단 그라데이션 오버레이 */}
             <div
               className="pointer-events-none absolute inset-x-0 bottom-0 h-[60%]"
@@ -67,7 +72,7 @@ export const RecipeCard = memo(
 
             <div className="flex size-full flex-col justify-between">
               {/* 상단 메타 정보 */}
-              <div className="recipe-card-meta w-full px-5 pt-5 pb-3">
+              <div className="recipe-card-meta z-10 w-full px-5 pt-5 pb-3">
                 <RecipeMetaInfo recipe={recipe} />
               </div>
 
