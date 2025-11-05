@@ -11,9 +11,9 @@ import { Modal } from '@/components/common/Modal/Modal';
 import { Toast } from '@/components/common/Toast';
 import { CookIcon } from '@/components/Icons';
 import { useToast, useViewportBasedPadding } from '@/hooks';
+import { useIsKakaoInApp } from '@/hooks/useIsKakaoInApp';
 import { usePostRecentRecipe } from '@/hooks/usePostRecentRecipe';
 import { isProduction } from '@/lib/env';
-import { isKakaoTalkInAppBrowser } from '@/lib/kakao';
 import { useApiErrorModalStore } from '@/stores';
 
 import CookwareSection from './CookwareSection';
@@ -40,14 +40,7 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
   const { mutate: postRecentRecipe } = usePostRecentRecipe();
   const { isVisible, message, showToast } = useToast();
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [isKakaoInApp, setIsKakaoInApp] = useState(false);
-
-  // 카카오톡 인앱 브라우저 감지
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setIsKakaoInApp(isKakaoTalkInAppBrowser());
-    }
-  }, []);
+  const isKakaoInApp = useIsKakaoInApp();
 
   useEffect(() => {
     const fetchRecipe = async () => {

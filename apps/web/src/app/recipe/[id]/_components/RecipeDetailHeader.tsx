@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { storedAPI } from '@recipot/api';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
@@ -11,8 +11,8 @@ import { Header } from '@/components/common/Header';
 import { Modal } from '@/components/common/Modal/Modal';
 import { HeartIcon, ShareIcon } from '@/components/Icons';
 import WebShareButton from '@/components/Share/WebShareButton';
+import { useIsKakaoInApp } from '@/hooks/useIsKakaoInApp';
 import { isProduction } from '@/lib/env';
-import { isKakaoTalkInAppBrowser } from '@/lib/kakao';
 import { useApiErrorModalStore } from '@/stores';
 
 import type { Recipe } from '../types/recipe.types';
@@ -30,14 +30,7 @@ export function RecipeDetailHeader({ recipe, showToast }: RecipeHeaderProps) {
   const [isLiked, setIsLiked] = useState(recipe.isBookmarked);
   const [isLoading, setIsLoading] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [isKakaoInApp, setIsKakaoInApp] = useState(false);
-
-  // 카카오톡 인앱 브라우저 감지
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setIsKakaoInApp(isKakaoTalkInAppBrowser());
-    }
-  }, []);
+  const isKakaoInApp = useIsKakaoInApp();
 
   const shareData = useMemo(() => {
     const baseUrl = isProduction
