@@ -43,44 +43,40 @@ export function IngredientsList({
   // 레시피 상세 페이지 스타일
   if (variant === 'detail') {
     return (
-      <div className="mb-4">
-        <div className="flex flex-wrap gap-2">
-          {uniqueIngredients.map((ingredient: RecipeIngredient) => (
-            <div
-              key={ingredient.id}
-              className="bg-secondary-light-green border-secondary-soft-green flex h-[29px] w-fit max-w-full items-center rounded-md border px-3 py-1.5"
-            >
-              <span className="text-15b text-ingredient-green mr-[5px] min-w-0 truncate">
-                {ingredient.name}
-              </span>{' '}
-              <span className="text-15 text-ingredient-green shrink-0">
-                {ingredient.amount}
-              </span>
-            </div>
-          ))}
-        </div>
+      <div className="flex flex-wrap gap-2">
+        {uniqueIngredients.map((ingredient: RecipeIngredient) => (
+          <div
+            key={ingredient.id}
+            className="bg-secondary-light-green border-secondary-soft-green flex h-[29px] w-fit max-w-full items-center rounded-md border px-3"
+          >
+            <span className="text-15b text-ingredient-green mr-[5px] min-w-0 truncate">
+              {ingredient.name}
+            </span>{' '}
+            <span className="text-15 text-ingredient-green shrink-0">
+              {ingredient.amount}
+            </span>
+          </div>
+        ))}
       </div>
     );
   }
 
   // 사이드바 스타일
   return (
-    <div className="mb-6">
-      <div className="flex flex-wrap gap-2">
-        {uniqueIngredients.map((ingredient: RecipeIngredient) => (
-          <div
-            key={ingredient.id}
-            className="border-secondary-soft-green bg-secondary-light-green flex h-[29px] w-fit max-w-full items-center rounded-md border px-3 py-2"
-          >
-            <span className="text-15b mr-[5px] min-w-0 truncate text-[#53880A]">
-              {ingredient.name}
-            </span>
-            <span className="text-15 shrink-0 text-[#53880A]">
-              {ingredient.amount}
-            </span>
-          </div>
-        ))}
-      </div>
+    <div className="flex flex-wrap gap-2">
+      {uniqueIngredients.map((ingredient: RecipeIngredient) => (
+        <div
+          key={ingredient.id}
+          className="border-secondary-soft-green bg-secondary-light-green flex h-[29px] w-fit max-w-full items-center rounded-md border px-3 py-2"
+        >
+          <span className="text-15b mr-[5px] min-w-0 truncate text-[#53880A]">
+            {ingredient.name}
+          </span>
+          <span className="text-15 shrink-0 text-[#53880A]">
+            {ingredient.amount}
+          </span>
+        </div>
+      ))}
     </div>
   );
 }

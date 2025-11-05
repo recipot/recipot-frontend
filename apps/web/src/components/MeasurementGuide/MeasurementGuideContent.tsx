@@ -23,7 +23,7 @@ export function MeasurementGuideContent({
   }
 
   return (
-    <div className="no-scrollbar flex flex-nowrap gap-[20px] overflow-x-auto rounded-xl px-4 pb-5">
+    <div className="no-scrollbar flex flex-nowrap gap-[20px] overflow-x-auto rounded-xl pb-5">
       {items.map(item => (
         <div
           key={item.standard}

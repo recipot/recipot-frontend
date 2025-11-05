@@ -13,7 +13,7 @@ export function MeasurementGuideToggle({
     <div className="space-y-1">
       {/* 토글 헤더 */}
       <div
-        className="flex cursor-pointer items-center justify-between px-3 py-1.5 transition-colors"
+        className="flex cursor-pointer items-center justify-between py-1.5 transition-colors"
         onClick={onToggle}
         role="button"
         tabIndex={0}

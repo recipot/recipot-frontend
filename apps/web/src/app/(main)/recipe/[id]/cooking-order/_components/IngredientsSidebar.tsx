@@ -3,8 +3,8 @@
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 
 import type { Recipe } from '@/app/recipe/[id]/types/recipe.types';
-import { IngredientsList } from '@/components/common/IngredientsList';
-import { SeasoningsSection } from '@/components/common/SeasoningsSection';
+import { IngredientsList } from '@/components/common/RecipeDetails/IngredientsList';
+import { SeasoningsSection } from '@/components/common/RecipeDetails/SeasoningsSection';
 import {
   Sidebar,
   SidebarContent,

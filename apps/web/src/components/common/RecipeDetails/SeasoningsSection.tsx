@@ -2,7 +2,8 @@ import React from 'react';
 
 import type { Seasoning } from '@/app/recipe/[id]/types/recipe.types';
 
-import { MeasurementGuide } from '../MeasurementGuide';
+import Title from './common/Title';
+import { MeasurementGuide } from '../../MeasurementGuide';
 import { SeasoningsList } from './SeasoningsList';
 
 interface SeasoningsSectionProps {
@@ -25,31 +26,24 @@ export function SeasoningsSection({
 
   if (variant === 'detail') {
     return (
-      <div className="mt-8">
-        <div className="rounded-2xl bg-white p-4">
-          <div className="mb-5 flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-gray-900">양념류</h3>
-          </div>
+      <div className="space-y-5">
+        <Title title="양념류" />
 
-          <SeasoningsList
-            seasonings={seasonings}
-            variant="detail"
-            showIcon={showIcon}
-          />
+        <SeasoningsList
+          seasonings={seasonings}
+          variant="detail"
+          showIcon={showIcon}
+        />
 
-          <div className="mt-5">
-            <MeasurementGuide />
-          </div>
-        </div>
+        <MeasurementGuide />
       </div>
     );
   }
 
   return (
     <div className="mb-6">
-      <div className="mb-3">
-        <span className="text-14sb text-gray-900">양념류</span>
-      </div>
+      <Title title="양념류" />
+
       <SeasoningsList
         seasonings={seasonings}
         variant="sidebar"

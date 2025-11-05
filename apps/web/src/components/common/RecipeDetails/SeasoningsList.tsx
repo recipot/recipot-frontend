@@ -30,18 +30,18 @@ export function SeasoningsList({
   // 레시피 상세 페이지 스타일
   if (variant === 'detail') {
     return (
-      <div className="w-full space-y-0 rounded-xl bg-gray-50 px-4 py-5">
+      <div className="w-full space-y-5 rounded-xl bg-gray-50 px-4 py-5">
         {seasonings.map(seasoning => {
           const IconComponent = getSeasoningIcon(seasoning.name);
           return (
-            <div className="flex items-center py-3" key={seasoning.id}>
-              <div className="flex min-w-0 flex-shrink-0 items-center gap-2">
+            <div className="flex items-center" key={seasoning.id}>
+              <div className="flex min-w-0 flex-shrink-0 items-center gap-3">
                 {showIcon && <IconComponent color="#68982D" size={20} />}
                 <span className="text-15sb max-w-[120px] truncate text-gray-700">
                   {seasoning.name}
                 </span>
               </div>
-              <div className="mx-[18px] h-1 flex-1 border-b border-dashed border-gray-200" />
+              <div className="mx-2 h-1 flex-1 border-b border-dashed border-gray-200" />
               <span className="text-15sb max-w-[100px] flex-shrink-0 truncate text-gray-700">
                 {seasoning.amount}
               </span>
