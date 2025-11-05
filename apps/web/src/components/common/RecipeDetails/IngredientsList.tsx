@@ -47,14 +47,16 @@ export function IngredientsList({
         {uniqueIngredients.map((ingredient: RecipeIngredient) => (
           <div
             key={ingredient.id}
-            className="bg-secondary-light-green border-secondary-soft-green flex h-[29px] w-fit max-w-full items-center rounded-md border px-3"
+            className="bg-secondary-light-green border-secondary-soft-green flex h-[29px] w-fit max-w-full items-center gap-[5px] rounded-md border px-3"
           >
-            <span className="text-15b text-ingredient-green mr-[5px] min-w-0 truncate">
+            <span className="text-15b text-ingredient-green min-w-0 truncate">
               {ingredient.name}
-            </span>{' '}
-            <span className="text-15 text-ingredient-green shrink-0">
-              {ingredient.amount}
             </span>
+            {ingredient.amount && (
+              <span className="text-15 text-ingredient-green shrink-0">
+                {ingredient.amount}
+              </span>
+            )}
           </div>
         ))}
       </div>

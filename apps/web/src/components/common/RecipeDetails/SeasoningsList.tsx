@@ -42,7 +42,7 @@ export function SeasoningsList({
                 </span>
               </div>
               <div className="mx-2 h-1 flex-1 border-b border-dashed border-gray-200" />
-              <span className="text-15sb max-w-[100px] flex-shrink-0 truncate text-gray-700">
+              <span className="text-15 max-w-[100px] flex-shrink-0 truncate text-gray-700">
                 {seasoning.amount}
               </span>
             </div>
