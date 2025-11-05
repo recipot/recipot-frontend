@@ -28,6 +28,7 @@ import { Header } from '@/components/common/Header';
 import { Toast } from '@/components/common/Toast';
 import { ExploreComplete } from '@/components/ExploreComplete';
 import { RecipeCard } from '@/components/RecipeCard';
+import { useMoodExpiry } from '@/hooks/useMoodExpiry';
 import { useToast } from '@/hooks/useToast';
 import { isProduction } from '@/lib/env';
 import { useMoodStore } from '@/stores/moodStore';
@@ -70,8 +71,18 @@ export default function RecipeRecommend() {
   }, [loading, user, router]);
 
   // 온보딩에서 저장된 사용자의 기분 상태 가져오기
-  const mood = useMoodStore(state => state.mood);
+  const isRecommendationReady = useMoodStore(
+    state => state.isRecommendationReady
+  );
   const selectedFoodIds = useSelectedFoodsStore(state => state.selectedFoodIds);
+
+  const handleMoodExpired = useCallback(() => {
+    router.replace('/');
+  }, [router]);
+
+  const { mood } = useMoodExpiry({
+    onExpire: handleMoodExpired,
+  });
 
   const userSelectedMood = mood ?? 'neutral';
 
@@ -94,6 +105,20 @@ export default function RecipeRecommend() {
     console.info('RecipeRecommend - condition 생성:', cond);
     return cond;
   }, [userSelectedMood]);
+
+  useEffect(() => {
+    if (loading) {
+      return;
+    }
+
+    if (!user) {
+      return;
+    }
+
+    if (!mood || !isRecommendationReady) {
+      router.replace('/');
+    }
+  }, [isRecommendationReady, loading, mood, router, user]);
 
   const [showTutorial, setShowTutorial] = useState(false);
 
@@ -233,6 +258,11 @@ export default function RecipeRecommend() {
       return;
     }
 
+    if (!mood || !isRecommendationReady) {
+      lastFetchKeyRef.current = null;
+      return;
+    }
+
     if (!Array.isArray(selectedFoodIds) || selectedFoodIds.length === 0) {
       lastFetchKeyRef.current = null;
       return;
@@ -247,7 +277,15 @@ export default function RecipeRecommend() {
     lastFetchKeyRef.current = fetchKey;
     setCurrentPage(1); // 새로운 조건으로 검색 시 페이지 초기화
     fetchRecommendRecipes(1);
-  }, [fetchRecommendRecipes, loading, selectedFoodIds, user, userSelectedMood]);
+  }, [
+    fetchRecommendRecipes,
+    isRecommendationReady,
+    loading,
+    mood,
+    selectedFoodIds,
+    user,
+    userSelectedMood,
+  ]);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -369,6 +407,10 @@ export default function RecipeRecommend() {
 
   // 로딩 중이거나 비로그인 사용자인 경우 빈 화면 표시
   if (loading || !user) {
+    return null;
+  }
+
+  if (!mood || !isRecommendationReady) {
     return null;
   }
 

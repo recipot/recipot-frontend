@@ -24,6 +24,7 @@ import { IngredientsSearch } from '@/components/IngredientsSearch';
 import { ReviewRemindBottomSheet } from '@/components/review/ReviewRemindBottomSheet';
 import { useSplash } from '@/contexts/SplashContext';
 import { useCompletedRecipes } from '@/hooks/useCompletedRecipes';
+import { useMoodExpiry } from '@/hooks/useMoodExpiry';
 import { useToast } from '@/hooks/useToast';
 import { useMoodStore } from '@/stores/moodStore';
 import { useSelectedFoodsStore } from '@/stores/selectedFoodsStore';
@@ -60,8 +61,32 @@ export default function Home() {
   } = useMoodSelectionFlow();
 
   // moodStore와 동기화
-  const setMoodStore = useMoodStore(state => state.setMood);
-  const mood = useMoodStore(state => state.mood) ?? localMood;
+  const setMoodWithExpiry = useMoodStore(state => state.setMoodWithExpiry);
+  const markRecommendationReady = useMoodStore(
+    state => state.markRecommendationReady
+  );
+  const isRecommendationReady = useMoodStore(
+    state => state.isRecommendationReady
+  );
+  const ensureMoodValidity = useMoodStore(state => state.ensureMoodValidity);
+
+  const handleMoodExpired = useCallback(() => {
+    handleBack();
+    navigateWithoutScroll('/');
+  }, [handleBack, navigateWithoutScroll]);
+
+  const { mood: storedMood } = useMoodExpiry({
+    onExpire: handleMoodExpired,
+  });
+
+  useEffect(() => {
+    if (!storedMood && localMood) {
+      originalHandleMoodSelect(localMood);
+      handleBack();
+    }
+  }, [storedMood, localMood, originalHandleMoodSelect, handleBack]);
+
+  const mood = storedMood ?? localMood;
 
   // mood 선택 시 store도 업데이트
   const handleMoodSelect = useCallback(
@@ -69,15 +94,38 @@ export default function Home() {
       const nextMood = mood === selectedMood ? null : selectedMood;
 
       originalHandleMoodSelect(selectedMood);
-      setMoodStore(nextMood);
+      setMoodWithExpiry(nextMood);
     },
-    [mood, originalHandleMoodSelect, setMoodStore]
+    [mood, originalHandleMoodSelect, setMoodWithExpiry]
   );
 
   const [hasMounted, setHasMounted] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
   const [selectedCount, setSelectedCount] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!hasMounted || loading) {
+      return;
+    }
+
+    const isValid = ensureMoodValidity();
+
+    if (!isValid) {
+      return;
+    }
+
+    if (storedMood && isRecommendationReady) {
+      navigateWithoutScroll('/recipeRecommend');
+    }
+  }, [
+    ensureMoodValidity,
+    hasMounted,
+    isRecommendationReady,
+    loading,
+    navigateWithoutScroll,
+    storedMood,
+  ]);
 
   // 완료한 레시피 수 조회 (로그인 상태일 때만)
   // 이 데이터는 EmotionCharacter에서 캐시를 통해 사용됨
@@ -138,6 +186,11 @@ export default function Home() {
     try {
       setIsSubmitting(true);
 
+      if (!ensureMoodValidity()) {
+        navigateWithoutScroll('/');
+        return;
+      }
+
       if (!mood) {
         showToast('기분을 먼저 선택해주세요');
         return;
@@ -156,6 +209,8 @@ export default function Home() {
         conditionId,
         isRecommendationStarted: true,
       });
+
+      markRecommendationReady(true);
 
       console.info('✅ 재료 선택 및 컨디션 저장 완료');
 

@@ -2,15 +2,18 @@
 
 import '../utils/setupConsole';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { setApiErrorHandler } from '@recipot/api';
 import { AuthProvider, MswProvider } from '@recipot/contexts';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { usePathname, useRouter } from 'next/navigation';
 
 import { ApiErrorModal } from '@/components/common/ApiErrorModal';
 import { SplashScreen } from '@/components/common/SplashScreen';
 import { SplashProvider } from '@/contexts/SplashContext';
+import { useMoodExpiry } from '@/hooks/useMoodExpiry';
 import { useApiErrorModalStore } from '@/stores/apiErrorModalStore';
+import { useMoodStore } from '@/stores/moodStore';
 
 import type { ReactNode } from 'react';
 
@@ -18,6 +21,35 @@ const FATAL_STATUS_CODES = new Set<number>([401]);
 
 export default function Providers({ children }: { children: ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
+  const router = useRouter();
+  const pathname = usePathname();
+  const mood = useMoodStore(state => state.mood);
+  const isRecommendationReady = useMoodStore(
+    state => state.isRecommendationReady
+  );
+
+  const handleGlobalMoodExpired = useCallback(() => {
+    if (pathname !== '/') {
+      router.replace('/');
+    }
+  }, [pathname, router]);
+
+  useMoodExpiry({
+    autoRefresh: true,
+    onExpire: handleGlobalMoodExpired,
+  });
+
+  useEffect(() => {
+    if (!mood || !isRecommendationReady) {
+      return;
+    }
+
+    if (pathname === '/recipeRecommend') {
+      return;
+    }
+
+    router.replace('/recipeRecommend');
+  }, [isRecommendationReady, mood, pathname, router]);
 
   // MSW 활성화 조건: NEXT_PUBLIC_APP_ENV가 'local'일 때만 사용
   const shouldUseMSW = process.env.NEXT_PUBLIC_APP_ENV === 'local';
