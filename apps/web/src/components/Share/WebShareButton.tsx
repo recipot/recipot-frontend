@@ -2,7 +2,13 @@
 
 import React, { useEffect, useState } from 'react';
 
-import { initKakao, isKakaoSDKLoaded, shareKakao } from '@/lib/kakao';
+import {
+  initKakao,
+  isKakaoSDKLoaded,
+  isKakaoTalkInAppBrowser,
+  shareKakao,
+} from '@/lib/kakao';
+import { useApiErrorModalStore } from '@/stores';
 
 interface ShareData {
   title?: string;
@@ -23,6 +29,7 @@ interface WebShareButtonProps {
   fallbackText?: string;
   enableKakao?: boolean;
   kakaoShareData?: KakaoShareData;
+  onKakaoInAppClick?: () => void;
 }
 
 const WebShareButton: React.FC<WebShareButtonProps> = ({
@@ -30,6 +37,7 @@ const WebShareButton: React.FC<WebShareButtonProps> = ({
   enableKakao = false,
   fallbackText = '공유하기',
   kakaoShareData,
+  onKakaoInAppClick,
   shareData,
 }) => {
   const [isSharing, setIsSharing] = useState(false);
@@ -90,35 +98,51 @@ const WebShareButton: React.FC<WebShareButtonProps> = ({
   };
 
   const handleWebShare = async () => {
+    // 카카오톡 인앱 브라우저에서 접속한 경우 로그인 모달 표시
+    if (onKakaoInAppClick && isKakaoTalkInAppBrowser()) {
+      onKakaoInAppClick();
+      return;
+    }
+
     setIsSharing(true);
 
     try {
-      // 1. 카카오 공유가 활성화되고 준비된 경우 우선 실행
+      // 1. Web Share API 먼저 시도 (시스템 공유 모달)
+      if (isWebShareSupported()) {
+        try {
+          await navigator.share(shareData);
+          return; // 성공 시 종료
+        } catch (shareError) {
+          // 사용자가 공유를 취소한 경우 (AbortError)는 그대로 종료
+          if (shareError instanceof Error && shareError.name === 'AbortError') {
+            return;
+          }
+          // 다른 에러인 경우 카카오톡 공유로 폴백
+          useApiErrorModalStore.getState().showError({
+            isFatal: false,
+            message: '공유에 실패했습니다. 다시 시도해주세요.',
+          });
+        }
+      }
+
+      // 2. Web Share API 미지원 또는 실패 시 카카오톡 공유 시도
       if (enableKakao && kakaoSDKReady) {
         try {
           await handleKakaoShare();
           return;
         } catch (kakaoError) {
           console.warn(
-            '[WebShareButton] 카카오 공유 실패, Web Share API로 폴백:',
+            '[WebShareButton] 카카오 공유 실패, 클립보드 복사로 폴백:',
             kakaoError
           );
-          // 카카오 공유 실패 시 Web Share API로 폴백
+          // 카카오 공유 실패 시 클립보드 복사로 폴백
         }
       }
 
-      // 2. Web Share API 지원 확인
-      if (isWebShareSupported()) {
-        await navigator.share(shareData);
-        return;
-      }
-
-      // 3. 폴백: 클립보드 복사
+      // 3. 최종 폴백: 클립보드 복사
       handleFallbackShare();
     } catch (error) {
-      if (error instanceof Error && error.name !== 'AbortError') {
-        console.error('공유 중 오류 발생:', error);
-      }
+      console.error('공유 중 오류 발생:', error);
     } finally {
       setIsSharing(false);
     }
