@@ -119,8 +119,8 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
         onTabChange={handleTabChange}
         hasTools={!!(recipeData?.tools && recipeData.tools.length > 0)}
       />
-      <div className="px-4" style={contentStyle}>
-        <div className="bg-secondary-light-green border-secondary-soft-green my-4 rounded-2xl border-[1px] px-5 py-4">
+      <div className="space-y-3 px-4 pt-3" style={contentStyle}>
+        <div className="bg-secondary-light-green border-secondary-soft-green rounded-2xl border-[1px] px-5 py-4">
           <p className="text-15sb text-primary-pressed">
             {recipeData?.healthPoint?.content}
           </p>

@@ -1,5 +1,7 @@
 import React from 'react';
 
+import Title from '@/components/common/RecipeDetails/common/Title';
+
 import type { CookingStep } from '../types/recipe.types';
 
 interface StepSectionProps {
@@ -8,8 +10,8 @@ interface StepSectionProps {
 
 export function StepSection({ steps }: StepSectionProps) {
   return (
-    <div id="steps" className="mt-6 rounded-2xl bg-white p-6">
-      <h3 className="text-17sb mb-4 text-gray-900">요리순서</h3>
+    <div id="steps" className="space-y-5 rounded-2xl bg-white px-6 py-7">
+      <Title title="요리순서" />
       <div className="space-y-6">
         {steps?.map((step, index) => (
           <React.Fragment key={step.orderNum}>
@@ -24,7 +26,7 @@ export function StepSection({ steps }: StepSectionProps) {
               </div>
             </div>
             {index < steps.length - 1 && (
-              <div className="mt-6 h-0 w-full border-t border-dashed border-gray-300" />
+              <div className="h-0 w-full border-t border-dashed border-gray-300" />
             )}
           </React.Fragment>
         ))}

@@ -2,8 +2,10 @@
 
 import React from 'react';
 
-import { IngredientsList } from '@/components/common/IngredientsList';
-import { SeasoningsSection } from '@/components/common/SeasoningsSection';
+import { IngredientsList } from '@/components/common/RecipeDetails/IngredientsList';
+import { SeasoningsSection } from '@/components/common/RecipeDetails/SeasoningsSection';
+
+import Title from '../../../../components/common/RecipeDetails/common/Title';
 
 import type { IngredientsGroup, Seasoning } from '../types/recipe.types';
 
@@ -17,17 +19,17 @@ export function IngredientsSection({
   seasonings,
 }: IngredientsSectionProps) {
   return (
-    <div id="ingredients" className="space-y-4">
+    <div id="ingredients" className="space-y-8 rounded-2xl bg-white p-6">
       {/* Ingredients */}
-      <div className="rounded-2xl bg-white p-4">
-        <div className="mb-4 flex items-center justify-between">
-          <p className="text-17sb text-gray-900">재료</p>
-          <p className="text-15 text-gray-500">1인분</p>
-        </div>
-        <IngredientsList ingredients={ingredients} variant="detail" />
+      <div className="space-y-5">
+        <Title title="재료">
+          <p className="text-15 text-gray-600">1인분</p>
+        </Title>
 
-        <SeasoningsSection seasonings={seasonings} variant="detail" showIcon />
+        <IngredientsList ingredients={ingredients} variant="detail" />
       </div>
+
+      <SeasoningsSection seasonings={seasonings} variant="detail" showIcon />
     </div>
   );
 }

@@ -17,9 +17,9 @@ export default function CookingOrderContent({
   const currentStepData = recipe.steps?.[currentStep - 1];
 
   return (
-    <div className="px-4 py-6">
+    <>
       {/* 이미지 */}
-      <div className="mb-4 aspect-video overflow-hidden bg-gray-100">
+      <div className="aspect-video overflow-hidden bg-gray-100">
         {currentStepData?.imageUrl ? (
           <Image
             src={currentStepData.imageUrl}
@@ -36,7 +36,7 @@ export default function CookingOrderContent({
       </div>
 
       {/* 설명 */}
-      <p className="text-16 max-h-[calc(100vh-450px)] overflow-y-auto px-6 pb-5 text-[#000]">
+      <p className="text-18 max-h-[calc(100vh-450px)] overflow-y-auto p-6 text-[#000]">
         {currentStepData?.summary}
       </p>
 
@@ -82,6 +82,6 @@ export default function CookingOrderContent({
           ))}
         </div>
       </div>
-    </div>
+    </>
   );
 }
