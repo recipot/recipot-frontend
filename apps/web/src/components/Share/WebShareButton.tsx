@@ -269,20 +269,37 @@ const WebShareButton: React.FC<WebShareButtonProps> = ({
   };
 
   const handleWebShare = async () => {
-    // 초기 상태 확인 (모바일에서는 항상 디버깅 정보 표시)
+    // 초기 상태 확인 (무조건 디버깅 정보 표시)
     const isMobile = isMobileDevice();
     const webShareSupported = checkWebShareSupport();
     const shareDataValid = validateShareData();
     const isKakaoInApp = isKakaoTalkInAppBrowser();
+    const hasNavigatorShare = 'share' in navigator;
+    const navigatorShareType = typeof navigator.share;
 
-    // 모바일에서는 함수 호출 시점에 즉시 디버깅 정보 표시
-    if (isMobile) {
-      const initialDebugInfo = `\n\n[초기 디버깅 정보]\n- 함수 호출: 성공\n- 모바일 감지: ${isMobile}\n- Web Share 지원: ${webShareSupported}\n- shareData 유효: ${shareDataValid}\n- 카카오톡 인앱: ${isKakaoInApp}\n- 보안 컨텍스트: ${window.isSecureContext}\n- 프로토콜: ${location.protocol}\n- 호스트: ${location.hostname}\n- navigator.share 존재: ${'share' in navigator}\n- shareData: ${JSON.stringify(shareData, null, 2)}`;
+    // 항상 디버깅 정보 표시 (테스트용)
+    const initialDebugInfo = `\n\n[초기 디버깅 정보]\n- 함수 호출: 성공 ✅\n- 모바일 감지: ${isMobile}\n- Web Share 지원: ${webShareSupported}\n- shareData 유효: ${shareDataValid}\n- 카카오톡 인앱: ${isKakaoInApp}\n- 보안 컨텍스트: ${window.isSecureContext}\n- 프로토콜: ${location.protocol}\n- 호스트: ${location.hostname}\n- navigator.share 존재: ${hasNavigatorShare}\n- navigator.share 타입: ${navigatorShareType}\n- shareData: ${JSON.stringify(shareData, null, 2)}`;
 
-      useApiErrorModalStore.getState().showError({
-        isFatal: false,
-        message: `공유 기능 실행 중...${initialDebugInfo}`,
-      });
+    const debugMessage = `공유 버튼 클릭됨!${initialDebugInfo}`;
+
+    // 여러 방법으로 모달 표시 시도 (확실하게 보장)
+    try {
+      // 방법 1: useApiErrorModalStore 시도
+      const store = useApiErrorModalStore.getState();
+      if (store && typeof store.showError === 'function') {
+        store.showError({
+          isFatal: false,
+          message: debugMessage,
+        });
+      } else {
+        // store가 없으면 alert 사용
+        alert(debugMessage);
+      }
+    } catch (error) {
+      // useApiErrorModalStore 실패 시 alert로 대체
+      alert(
+        `공유 버튼 클릭됨!\n\nuseApiErrorModalStore 실패: ${error}\n\n${initialDebugInfo}`
+      );
     }
 
     // 카카오톡 인앱 브라우저에서 접속한 경우 로그인 모달 표시
