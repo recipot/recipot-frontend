@@ -32,31 +32,42 @@ export function RecipeDetailHeader({ recipe, showToast }: RecipeHeaderProps) {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const isKakaoInApp = useIsKakaoInApp();
 
-  // Web Share API용 공유 데이터
-  // 시스템 공유 모달에서 사용되며, 메타태그와 일치하도록 기본값 통일
-  // 레시피 상세 API에서 받아온 데이터를 우선 사용
   const shareData = useMemo(() => {
-    const baseUrl =
-      typeof window !== 'undefined' && window.location.origin
-        ? window.location.origin
-        : isProduction
-          ? 'https://hankkibuteo.com'
-          : 'https://dev.hankkibuteo.com';
-
-    // 레시피 제목이 있으면 사용, 없으면 기본값 (공백 제거)
-    const shareTitle = (recipe.title?.trim() || '맛있는 레시피').trim();
-
-    // 레시피 설명이 있으면 사용, 없으면 기본값 (공백 제거)
-    const shareText = (
-      recipe.description?.trim() ||
-      '냉장고 속 재료로 만드는 유연채식 집밥 레시피'
-    ).trim();
-
-    // 시스템 공유 모달에 항상 올바른 데이터 전달 보장
+    const baseUrl = isProduction
+      ? 'https://hankkibuteo.com'
+      : 'https://dev.hankkibuteo.com';
     return {
-      text: shareText ?? '냉장고 속 재료로 만드는 유연채식 집밥 레시피',
-      title: shareTitle ?? '맛있는 레시피',
+      text: recipe.description,
+      title: recipe.title,
       url: `${baseUrl}/recipe/${recipe.id}`,
+    };
+  }, [recipe]);
+
+  const kakaoShareData = useMemo(() => {
+    const recipeImageUrl = recipe.images?.[0]?.imageUrl;
+
+    const getImageUrl = (url: string | undefined) => {
+      const baseUrl = isProduction
+        ? 'https://hankkibuteo.com'
+        : 'https://dev.hankkibuteo.com';
+
+      if (!url) return `${baseUrl}/recipeImage.png`;
+
+      // 이미 절대 URL인 경우 그대로 사용
+      if (url.startsWith('http://') || url.startsWith('https://')) {
+        return url;
+      }
+
+      // 상대 경로인 경우 절대 URL로 변환
+      return `${baseUrl}${url.startsWith('/') ? url : `/${url}`}`;
+    };
+
+    const imageUrl = getImageUrl(recipeImageUrl);
+
+    return {
+      description: recipe.description,
+      imageUrl,
+      title: recipe.title,
     };
   }, [recipe]);
 
@@ -124,7 +135,15 @@ export function RecipeDetailHeader({ recipe, showToast }: RecipeHeaderProps) {
       <Header className="px-4 py-3">
         <Header.Back onClick={handleBack} />
         <div className="flex items-center space-x-2">
-          <WebShareButton shareData={shareData} className="p-2">
+          <WebShareButton
+            shareData={shareData}
+            kakaoShareData={kakaoShareData}
+            enableKakao
+            className="p-2"
+            onKakaoInAppClick={
+              isKakaoInApp ? () => setShowLoginModal(true) : undefined
+            }
+          >
             <ShareIcon className="h-6 w-6" color="#212529" />
           </WebShareButton>
           <button
