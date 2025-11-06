@@ -30,6 +30,13 @@ async function getRecipeData(
 
     const url = `${baseURL}/v1/recipes/${recipeId}`;
 
+    console.info('[getRecipeData] API 호출 시작:', {
+      baseURL,
+      recipeId,
+      retryCount,
+      url,
+    });
+
     const response = await axios.get(url, {
       headers: {
         'Cache-Control': 'no-cache',
@@ -37,12 +44,21 @@ async function getRecipeData(
       timeout,
     });
 
+    console.info('[getRecipeData] API 응답 받음:', {
+      hasData: !!response.data,
+      hasNestedData: !!response.data?.data,
+      recipeId,
+      responseStructure: Object.keys(response.data ?? {}),
+      status: response.status,
+    });
+
     const recipeData = response.data?.data;
 
     if (!recipeData) {
-      console.warn('[RecipePage] 레시피 데이터가 비어있음:', {
+      console.warn('[getRecipeData] 레시피 데이터가 비어있음:', {
         recipeId,
         responseData: response.data,
+        responseStructure: response.data ? Object.keys(response.data) : 'null',
         retryCount,
       });
       // 재시도
@@ -53,18 +69,38 @@ async function getRecipeData(
       return null;
     }
 
+    console.info('[getRecipeData] 레시피 데이터 추출 성공:', {
+      hasDescription: !!recipeData.description,
+      hasImages: !!recipeData.images?.length,
+      hasTitle: !!recipeData.title,
+      imageCount: recipeData.images?.length ?? 0,
+      recipeId,
+      title: recipeData.title?.substring(0, 30),
+    });
+
     // 필수 필드 검증
     if (!recipeData.title || !recipeData.description) {
-      console.warn('[RecipePage] 레시피 데이터에 필수 필드가 없음:', {
+      console.warn('[getRecipeData] 레시피 데이터에 필수 필드가 없음:', {
         hasDescription: !!recipeData.description,
         hasTitle: !!recipeData.title,
+        recipeDataKeys: Object.keys(recipeData),
         recipeId,
       });
       if (retryCount < maxRetries) {
         await new Promise(resolve => setTimeout(resolve, 1000));
         return getRecipeData(recipeId, retryCount + 1);
       }
+      // 필수 필드가 없어도 데이터는 반환 (기본값 사용)
+      console.warn(
+        '[getRecipeData] 필수 필드가 없지만 데이터 반환 (기본값 사용)'
+      );
     }
+
+    console.info('[getRecipeData] 최종 성공:', {
+      description: recipeData.description?.substring(0, 50),
+      recipeId,
+      title: recipeData.title,
+    });
 
     return recipeData;
   } catch (error) {
@@ -74,9 +110,22 @@ async function getRecipeData(
       const isRetryable =
         isTimeout || (error.response?.status && error.response.status >= 500);
 
+      console.error('[getRecipeData] API 호출 실패:', {
+        code: error.code,
+        error: error.message,
+        isRetryable,
+        isTimeout,
+        maxRetries,
+        recipeId,
+        responseData: error.response?.data,
+        retryCount,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        url: error.config?.url,
+      });
+
       if (isRetryable && retryCount < maxRetries) {
-        console.warn('[RecipePage] 레시피 데이터 가져오기 실패, 재시도:', {
-          error: error.message,
+        console.warn('[getRecipeData] 재시도 예정:', {
           maxRetries,
           recipeId,
           retryCount: retryCount + 1,
@@ -87,16 +136,18 @@ async function getRecipeData(
         return getRecipeData(recipeId, retryCount + 1);
       }
 
-      console.error('[RecipePage] 레시피 데이터 가져오기 최종 실패:', {
+      console.error('[getRecipeData] 최종 실패 (재시도 불가):', {
         message: error.message,
         recipeId,
-        response: error.response?.data,
-        retryCount,
         status: error.response?.status,
         url: error.config?.url,
       });
     } else {
-      console.error('[RecipePage] 레시피 데이터 가져오기 실패:', error);
+      console.error('[getRecipeData] 예상치 못한 에러:', {
+        error,
+        errorType: typeof error,
+        recipeId,
+      });
     }
     return null;
   }
@@ -109,8 +160,21 @@ export async function generateMetadata({
 }: RecipePageProps): Promise<Metadata> {
   const { id } = await params;
 
+  console.info('[generateMetadata] 시작:', { recipeId: id });
+
   // 레시피 데이터 가져오기 (재시도 포함)
   const recipe = await getRecipeData(id);
+
+  console.info('[generateMetadata] 레시피 데이터 가져오기 완료:', {
+    description: recipe?.description?.substring(0, 50),
+    hasDescription: !!recipe?.description,
+    hasImages: !!recipe?.images?.length,
+    hasRecipe: !!recipe,
+    hasTitle: !!recipe?.title,
+    imageUrl: recipe?.images?.[0]?.imageUrl,
+    recipeId: id,
+    title: recipe?.title,
+  });
 
   // 현재 환경에 맞는 base URL (서버 사이드)
   const baseUrl =
@@ -121,12 +185,11 @@ export async function generateMetadata({
 
   // 레시피 데이터가 없으면 경고 로그
   if (!recipe) {
-    console.warn(
-      '[RecipePage] generateMetadata: 레시피 데이터가 없어 기본값 사용',
-      {
-        recipeId: id,
-      }
-    );
+    console.warn('[generateMetadata] 레시피 데이터가 없어 기본값 사용', {
+      baseUrl,
+      recipeId: id,
+      recipeUrl,
+    });
   }
 
   // 레시피 데이터가 있으면 사용, 없으면 기본값 사용
@@ -164,6 +227,14 @@ export async function generateMetadata({
   if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
     imageUrl = `${baseUrl}${imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`}`;
   }
+
+  console.info('[generateMetadata] 메타태그 생성 완료:', {
+    description: description.substring(0, 50),
+    imageUrl,
+    recipeId: id,
+    recipeUrl,
+    title,
+  });
 
   return {
     description,

@@ -9,6 +9,7 @@ import { tokenUtils } from 'packages/api/src/auth';
 import { Button } from '@/components/common/Button';
 import { Modal } from '@/components/common/Modal/Modal';
 import { Toast } from '@/components/common/Toast';
+import MetadataDebugPanel from '@/components/debug/MetadataDebugPanel';
 import { CookIcon } from '@/components/Icons';
 import { useToast, useViewportBasedPadding } from '@/hooks';
 import { useIsKakaoInApp } from '@/hooks/useIsKakaoInApp';
@@ -186,6 +187,7 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
           로그인
         </Button>
       </Modal>
+      <MetadataDebugPanel recipeId={recipeId} />
     </div>
   );
 }
