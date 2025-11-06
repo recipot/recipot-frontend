@@ -2,12 +2,13 @@
 
 import '../utils/setupConsole';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { setApiErrorHandler } from '@recipot/api';
 import { AuthProvider, MswProvider } from '@recipot/contexts';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import { ApiErrorModal } from '@/components/common/ApiErrorModal';
+import { PageViewTracker } from '@/components/common/PageViewTracker';
 import { SplashScreen } from '@/components/common/SplashScreen';
 import { SplashProvider } from '@/contexts/SplashContext';
 import { useApiErrorModalStore } from '@/stores/apiErrorModalStore';
@@ -133,7 +134,12 @@ export default function Providers({ children }: { children: ReactNode }) {
       <SplashScreen />
       <QueryClientProvider client={queryClient}>
         <MswProvider mswReady={mswReady}>
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            <Suspense fallback={null}>
+              <PageViewTracker />
+            </Suspense>
+            {children}
+          </AuthProvider>
         </MswProvider>
         <ApiErrorModal />
         {/* {isDevelopment ? <ReactQueryDevtools initialIsOpen={false} /> : null} */}
