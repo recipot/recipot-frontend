@@ -13,7 +13,14 @@ interface RecipePageProps {
 }
 
 // 서버 사이드에서 레시피 데이터 가져오기
-async function getRecipeData(recipeId: string): Promise<Recipe | null> {
+// 메타태그 생성을 위해 재시도 로직 포함
+async function getRecipeData(
+  recipeId: string,
+  retryCount = 0
+): Promise<Recipe | null> {
+  const maxRetries = 2;
+  const timeout = 15000; // 타임아웃 증가 (15초)
+
   try {
     const APP_ENV = process.env.NEXT_PUBLIC_APP_ENV ?? 'production';
     const shouldUseMock = APP_ENV === 'local';
@@ -22,14 +29,12 @@ async function getRecipeData(recipeId: string): Promise<Recipe | null> {
       : (process.env.NEXT_PUBLIC_BACKEND_URL ?? 'https://api.hankkibuteo.com');
 
     const url = `${baseURL}/v1/recipes/${recipeId}`;
-    console.info('[RecipePage] 레시피 데이터 가져오기 시도:', {
-      baseURL,
-      recipeId,
-      url,
-    });
 
     const response = await axios.get(url, {
-      timeout: 10000, // 타임아웃 증가
+      headers: {
+        'Cache-Control': 'no-cache',
+      },
+      timeout,
     });
 
     const recipeData = response.data?.data;
@@ -38,24 +43,55 @@ async function getRecipeData(recipeId: string): Promise<Recipe | null> {
       console.warn('[RecipePage] 레시피 데이터가 비어있음:', {
         recipeId,
         responseData: response.data,
+        retryCount,
       });
+      // 재시도
+      if (retryCount < maxRetries) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        return getRecipeData(recipeId, retryCount + 1);
+      }
       return null;
     }
 
-    console.info('[RecipePage] 레시피 데이터 가져오기 성공:', {
-      hasDescription: !!recipeData.description,
-      hasImages: !!(recipeData.images && recipeData.images.length > 0),
-      hasTitle: !!recipeData.title,
-      recipeId,
-    });
+    // 필수 필드 검증
+    if (!recipeData.title || !recipeData.description) {
+      console.warn('[RecipePage] 레시피 데이터에 필수 필드가 없음:', {
+        hasDescription: !!recipeData.description,
+        hasTitle: !!recipeData.title,
+        recipeId,
+      });
+      if (retryCount < maxRetries) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        return getRecipeData(recipeId, retryCount + 1);
+      }
+    }
 
     return recipeData;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      console.error('[RecipePage] 레시피 데이터 가져오기 실패:', {
+      const isTimeout =
+        error.code === 'ECONNABORTED' || error.message.includes('timeout');
+      const isRetryable =
+        isTimeout || (error.response?.status && error.response.status >= 500);
+
+      if (isRetryable && retryCount < maxRetries) {
+        console.warn('[RecipePage] 레시피 데이터 가져오기 실패, 재시도:', {
+          error: error.message,
+          maxRetries,
+          recipeId,
+          retryCount: retryCount + 1,
+        });
+        await new Promise(resolve =>
+          setTimeout(resolve, 1000 * (retryCount + 1))
+        );
+        return getRecipeData(recipeId, retryCount + 1);
+      }
+
+      console.error('[RecipePage] 레시피 데이터 가져오기 최종 실패:', {
         message: error.message,
         recipeId,
         response: error.response?.data,
+        retryCount,
         status: error.response?.status,
         url: error.config?.url,
       });
@@ -67,10 +103,13 @@ async function getRecipeData(recipeId: string): Promise<Recipe | null> {
 }
 
 // 메타 태그 생성
+// 카카오톡 링크 미리보기와 시스템 공유 모달에서 사용
 export async function generateMetadata({
   params,
 }: RecipePageProps): Promise<Metadata> {
   const { id } = await params;
+
+  // 레시피 데이터 가져오기 (재시도 포함)
   const recipe = await getRecipeData(id);
 
   // 현재 환경에 맞는 base URL (서버 사이드)
@@ -91,37 +130,40 @@ export async function generateMetadata({
   }
 
   // 레시피 데이터가 있으면 사용, 없으면 기본값 사용
-  // 제목은 레시피 제목만 사용 (접두사 없이)
-  const title = recipe?.title ?? '맛있는 레시피';
-  // 설명은 레시피 설명 사용
+  // 제목: 레시피 제목 (없으면 기본값)
+  const title = recipe?.title?.trim() ?? '맛있는 레시피';
+
+  // 설명: 레시피 설명 (없으면 기본값)
   const description =
-    recipe?.description ?? '냉장고 속 재료로 만드는 유연채식 집밥 레시피';
+    recipe?.description?.trim() ??
+    '냉장고 속 재료로 만드는 유연채식 집밥 레시피';
 
   // 레시피 이미지 URL 생성 (절대 URL로 변환)
-  // 카카오 공유 시에도 동일한 이미지 URL이 사용되도록 일관성 유지
+  // 카카오톡 링크 미리보기와 카카오 공유 시에도 동일한 이미지 URL이 사용되도록 일관성 유지
   let imageUrl = `${baseUrl}/recipeImage.png`; // 기본 이미지 (절대 URL)
-  if (recipe?.images && recipe.images.length > 0) {
+
+  if (recipe?.images?.length) {
     const recipeImage = recipe.images[0]?.imageUrl;
-    if (recipeImage) {
+    if (recipeImage?.trim()) {
       // 절대 URL인 경우 그대로 사용, 상대 경로인 경우 base URL 추가
       if (
         recipeImage.startsWith('http://') ||
         recipeImage.startsWith('https://')
       ) {
-        imageUrl = recipeImage;
+        imageUrl = recipeImage.trim();
       } else {
-        imageUrl = `${baseUrl}${recipeImage.startsWith('/') ? recipeImage : `/${recipeImage}`}`;
+        const normalizedPath = recipeImage.startsWith('/')
+          ? recipeImage.trim()
+          : `/${recipeImage.trim()}`;
+        imageUrl = `${baseUrl}${normalizedPath}`;
       }
     }
   }
 
-  console.info('[RecipePage] generateMetadata 완료:', {
-    description,
-    hasRecipe: !!recipe,
-    imageUrl,
-    recipeId: id,
-    title,
-  });
+  // 메타태그가 항상 올바른 절대 URL을 가지도록 보장
+  if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
+    imageUrl = `${baseUrl}${imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`}`;
+  }
 
   return {
     description,
@@ -153,6 +195,7 @@ export async function generateMetadata({
       'og:image:height': '630',
       'og:image:type': 'image/jpeg',
       'og:image:width': '1200',
+      'og:url': recipeUrl,
     },
   };
 }

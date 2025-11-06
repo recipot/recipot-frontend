@@ -51,7 +51,8 @@ export function RecipeDetailHeader({ recipe, showToast }: RecipeHeaderProps) {
   };
 
   // Web Share API용 공유 데이터
-  // 메타태그와 일치하도록 기본값 통일
+  // 시스템 공유 모달에서 사용되며, 메타태그와 일치하도록 기본값 통일
+  // 레시피 상세 API에서 받아온 데이터를 우선 사용
   const shareData = useMemo(() => {
     const baseUrl =
       typeof window !== 'undefined' && window.location.origin
@@ -60,14 +61,19 @@ export function RecipeDetailHeader({ recipe, showToast }: RecipeHeaderProps) {
           ? 'https://hankkibuteo.com'
           : 'https://dev.hankkibuteo.com';
 
-    // 메타태그와 동일한 기본값 사용
-    const shareTitle = recipe.title ?? '맛있는 레시피';
-    const shareText =
-      recipe.description ?? '냉장고 속 재료로 만드는 유연채식 집밥 레시피';
+    // 레시피 제목이 있으면 사용, 없으면 기본값 (공백 제거)
+    const shareTitle = (recipe.title?.trim() || '맛있는 레시피').trim();
 
+    // 레시피 설명이 있으면 사용, 없으면 기본값 (공백 제거)
+    const shareText = (
+      recipe.description?.trim() ||
+      '냉장고 속 재료로 만드는 유연채식 집밥 레시피'
+    ).trim();
+
+    // 시스템 공유 모달에 항상 올바른 데이터 전달 보장
     return {
-      text: shareText,
-      title: shareTitle,
+      text: shareText ?? '냉장고 속 재료로 만드는 유연채식 집밥 레시피',
+      title: shareTitle ?? '맛있는 레시피',
       url: `${baseUrl}/recipe/${recipe.id}`,
     };
   }, [recipe]);
@@ -79,12 +85,14 @@ export function RecipeDetailHeader({ recipe, showToast }: RecipeHeaderProps) {
     const recipeImageUrl = recipe.images?.[0]?.imageUrl;
     const imageUrl = getAbsoluteImageUrl(recipeImageUrl);
 
-    // 메타태그와 동일한 데이터 사용
+    // 메타태그와 동일한 데이터 사용 (공백 제거 및 기본값 처리)
     return {
-      description:
-        recipe.description ?? '냉장고 속 재료로 만드는 유연채식 집밥 레시피',
+      description: (
+        recipe.description?.trim() ??
+        '냉장고 속 재료로 만드는 유연채식 집밥 레시피'
+      ).trim(),
       imageUrl, // 절대 URL로 변환된 이미지 (메타태그 og:image와 일치)
-      title: recipe.title ?? '맛있는 레시피', // 메타태그 og:title과 일치
+      title: (recipe.title?.trim() ?? '맛있는 레시피').trim(), // 메타태그 og:title과 일치
     };
   }, [recipe]);
 
