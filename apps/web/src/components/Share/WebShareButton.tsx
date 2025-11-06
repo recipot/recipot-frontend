@@ -269,8 +269,24 @@ const WebShareButton: React.FC<WebShareButtonProps> = ({
   };
 
   const handleWebShare = async () => {
+    // 초기 상태 확인 (모바일에서는 항상 디버깅 정보 표시)
+    const isMobile = isMobileDevice();
+    const webShareSupported = checkWebShareSupport();
+    const shareDataValid = validateShareData();
+    const isKakaoInApp = isKakaoTalkInAppBrowser();
+
+    // 모바일에서는 함수 호출 시점에 즉시 디버깅 정보 표시
+    if (isMobile) {
+      const initialDebugInfo = `\n\n[초기 디버깅 정보]\n- 함수 호출: 성공\n- 모바일 감지: ${isMobile}\n- Web Share 지원: ${webShareSupported}\n- shareData 유효: ${shareDataValid}\n- 카카오톡 인앱: ${isKakaoInApp}\n- 보안 컨텍스트: ${window.isSecureContext}\n- 프로토콜: ${location.protocol}\n- 호스트: ${location.hostname}\n- navigator.share 존재: ${'share' in navigator}\n- shareData: ${JSON.stringify(shareData, null, 2)}`;
+
+      useApiErrorModalStore.getState().showError({
+        isFatal: false,
+        message: `공유 기능 실행 중...${initialDebugInfo}`,
+      });
+    }
+
     // 카카오톡 인앱 브라우저에서 접속한 경우 로그인 모달 표시
-    if (onKakaoInAppClick && isKakaoTalkInAppBrowser()) {
+    if (onKakaoInAppClick && isKakaoInApp) {
       onKakaoInAppClick();
       return;
     }
@@ -278,8 +294,6 @@ const WebShareButton: React.FC<WebShareButtonProps> = ({
     setIsSharing(true);
 
     try {
-      const isMobile = isMobileDevice();
-
       if (isMobile) {
         await handleMobileShare();
       } else {
@@ -291,9 +305,8 @@ const WebShareButton: React.FC<WebShareButtonProps> = ({
         error instanceof Error ? error.message : String(error);
       const stack = error instanceof Error ? error.stack : undefined;
 
-      const isMobile = isMobileDevice();
       const debugInfo = isMobile
-        ? `\n\n[디버그 정보]\n- 에러 이름: ${errorName}\n- 에러 메시지: ${errorMessage}\n- 스택: ${stack ?? '없음'}\n- 모바일 감지: ${isMobile}\n- Web Share 지원: ${checkWebShareSupport()}\n- shareData 유효: ${validateShareData()}`
+        ? `\n\n[예외 발생 디버그 정보]\n- 에러 이름: ${errorName}\n- 에러 메시지: ${errorMessage}\n- 스택: ${stack ?? '없음'}\n- 모바일 감지: ${isMobile}\n- Web Share 지원: ${checkWebShareSupport()}\n- shareData 유효: ${validateShareData()}`
         : `\n\n에러: ${errorName}\n${errorMessage}`;
 
       useApiErrorModalStore.getState().showError({
