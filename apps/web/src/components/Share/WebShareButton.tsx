@@ -1,13 +1,8 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
-import {
-  initKakao,
-  isKakaoSDKLoaded,
-  isKakaoTalkInAppBrowser,
-  shareKakao,
-} from '@/lib/kakao';
+import copyToClipboard from '@/lib/copyToClipboard';
 import { useApiErrorModalStore } from '@/stores';
 
 interface ShareData {
@@ -16,380 +11,149 @@ interface ShareData {
   url?: string;
 }
 
-interface KakaoShareData {
-  title?: string;
-  description?: string;
-  imageUrl?: string;
-}
-
 interface WebShareButtonProps {
   shareData: ShareData;
   children?: React.ReactNode;
   className?: string;
   fallbackText?: string;
-  enableKakao?: boolean;
-  kakaoShareData?: KakaoShareData;
-  onKakaoInAppClick?: () => void;
 }
+
+/**
+ * Web Share API 지원 여부 확인
+ */
+const isShareSupported = (): boolean => {
+  if (typeof navigator === 'undefined' || typeof window === 'undefined') {
+    return false;
+  }
+
+  // navigator.share 존재 여부 확인
+  if (!('share' in navigator) || typeof navigator.share !== 'function') {
+    return false;
+  }
+
+  // HTTPS 또는 localhost 환경인지 확인 (Web Share API는 안전한 컨텍스트에서만 동작)
+  return (
+    window.isSecureContext ||
+    location.protocol === 'https:' ||
+    location.hostname === 'localhost' ||
+    location.hostname === '127.0.0.1'
+  );
+};
+
+/**
+ * shareData 검증 - navigator.share()는 최소한 하나의 필드가 필요
+ */
+const validateShareData = (data: ShareData): boolean => {
+  const hasTitle = Boolean(data.title?.trim());
+  const hasText = Boolean(data.text?.trim());
+  const hasUrl = Boolean(data.url?.trim());
+
+  return hasTitle || hasText || hasUrl;
+};
 
 const WebShareButton: React.FC<WebShareButtonProps> = ({
   children,
-  enableKakao = false,
+  className,
   fallbackText = '공유하기',
-  kakaoShareData,
-  onKakaoInAppClick,
   shareData,
 }) => {
   const [isSharing, setIsSharing] = useState(false);
-  const [isAndroid, setIsAndroid] = useState(false);
-  const [kakaoSDKReady, setKakaoSDKReady] = useState(false);
 
-  // 모바일 환경인지 확인하는 함수
-  const isMobileDevice = (): boolean => {
-    if (typeof navigator === 'undefined' || typeof window === 'undefined') {
+  // shareData 정리 (빈 문자열 제거)
+  const cleanShareData = (data: ShareData): ShareData => {
+    const cleaned: ShareData = {};
+    if (data.title?.trim()) {
+      cleaned.title = data.title.trim();
+    }
+    if (data.text?.trim()) {
+      cleaned.text = data.text.trim();
+    }
+    if (data.url?.trim()) {
+      cleaned.url = data.url.trim();
+    }
+    return cleaned;
+  };
+
+  // Web Share API를 통한 공유 시도
+  const tryWebShare = async (data: ShareData): Promise<boolean> => {
+    if (!isShareSupported() || !validateShareData(data)) {
       return false;
     }
 
-    const { userAgent } = navigator;
-    const isMobileUA =
-      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(
-        userAgent
-      );
-
-    const isSmallScreen = window.innerWidth <= 768;
-    const hasTouchSupport =
-      'ontouchstart' in window ||
-      navigator.maxTouchPoints > 0 ||
-      // @ts-expect-error - 일부 브라우저에서 지원
-      navigator.msMaxTouchPoints > 0;
-
-    return isMobileUA || (isSmallScreen && hasTouchSupport);
-  };
-
-  // Web Share API 지원 여부 확인
-  // 모바일 기기에서 시스템 공유 모달 지원 여부를 확인
-  const checkWebShareSupport = (): boolean => {
-    if (typeof navigator === 'undefined' || typeof window === 'undefined') {
-      return false;
-    }
-
-    // navigator.share 존재 여부 확인
-    if (!('share' in navigator) || typeof navigator.share !== 'function') {
-      return false;
-    }
-
-    // HTTPS 또는 localhost 환경인지 확인 (Web Share API는 안전한 컨텍스트에서만 동작)
-    return (
-      window.isSecureContext ||
-      location.protocol === 'https:' ||
-      location.hostname === 'localhost' ||
-      location.hostname === '127.0.0.1'
-    );
-  };
-
-  // 클라이언트에서만 브라우저 정보 확인
-  useEffect(() => {
-    if (typeof navigator !== 'undefined') {
-      setIsAndroid(/Android/i.test(navigator.userAgent));
-    }
-  }, []);
-
-  // 카카오 SDK 초기화
-  useEffect(() => {
-    if (enableKakao && typeof window !== 'undefined') {
-      let retryCount = 0;
-      const maxRetries = 30; // 최대 3초 대기
-
-      const checkKakaoSDK = () => {
-        if (isKakaoSDKLoaded()) {
-          const initialized = initKakao();
-          if (initialized) {
-            setKakaoSDKReady(true);
-          }
-        } else if (retryCount < maxRetries) {
-          retryCount++;
-          setTimeout(checkKakaoSDK, 100);
-        }
-      };
-
-      checkKakaoSDK();
-    }
-  }, [enableKakao]);
-
-  // 카카오톡 공유 실행
-  // 레시피 상세 API에서 받아온 이미지, 제목, 설명을 사용
-  const handleKakaoShare = async () => {
-    if (!kakaoShareData || !shareData.title || !shareData.url) {
-      throw new Error('카카오 공유에 필요한 데이터가 부족합니다.');
-    }
-
-    // 레시피 상세 API 데이터 우선 사용
-    const kakaoData = {
-      description: kakaoShareData.description ?? shareData.text ?? '',
-      imageUrl: kakaoShareData.imageUrl ?? '/recipeImage.png',
-      title: kakaoShareData.title ?? shareData.title ?? '',
-      url: shareData.url,
-    };
-
-    await shareKakao(kakaoData);
-  };
-
-  // shareData 검증 - navigator.share()는 최소한 하나의 필드가 필요
-  const validateShareData = (): boolean => {
-    const hasTitle = Boolean(shareData.title?.trim());
-    const hasText = Boolean(shareData.text?.trim());
-    const hasUrl = Boolean(shareData.url?.trim());
-
-    return hasTitle || hasText || hasUrl;
-  };
-
-  // Web Share API 시도 (사용자 취소는 무시)
-  const tryWebShare = async (showDebugInfo = false): Promise<boolean> => {
-    if (!checkWebShareSupport()) {
-      const debugMsg = showDebugInfo
-        ? `\n\n[디버그 정보]\n- navigator.share 존재: ${'share' in navigator}\n- 함수 타입: ${typeof navigator.share}\n- 보안 컨텍스트: ${window.isSecureContext}\n- 프로토콜: ${location.protocol}\n- 호스트: ${location.hostname}`
-        : '';
+    const cleaned = cleanShareData(data);
+    if (!validateShareData(cleaned)) {
       useApiErrorModalStore.getState().showError({
         isFatal: false,
-        message: `공유 기능을 사용할 수 없습니다.\n시스템 공유 기능이 지원되지 않는 환경입니다.${debugMsg}`,
-      });
-      return false;
-    }
-
-    // shareData 검증
-    if (!validateShareData()) {
-      const debugMsg = showDebugInfo
-        ? `\n\n[디버그 정보]\n- shareData: ${JSON.stringify(shareData, null, 2)}`
-        : '';
-      useApiErrorModalStore.getState().showError({
-        isFatal: false,
-        message: `공유할 데이터가 없습니다.${debugMsg}`,
-      });
-      return false;
-    }
-
-    // navigator.share()에 전달할 데이터 정리 (빈 문자열 제거)
-    const cleanShareData: ShareData = {};
-    if (shareData.title?.trim()) {
-      cleanShareData.title = shareData.title.trim();
-    }
-    if (shareData.text?.trim()) {
-      cleanShareData.text = shareData.text.trim();
-    }
-    if (shareData.url?.trim()) {
-      cleanShareData.url = shareData.url.trim();
-    }
-
-    // 최소한 하나의 필드가 있는지 재확인
-    if (!validateShareData()) {
-      const debugMsg = showDebugInfo
-        ? `\n\n[디버그 정보]\n- 정리된 shareData: ${JSON.stringify(cleanShareData, null, 2)}`
-        : '';
-      useApiErrorModalStore.getState().showError({
-        isFatal: false,
-        message: `공유할 데이터가 없습니다.${debugMsg}`,
+        message: '공유할 데이터가 없습니다.',
       });
       return false;
     }
 
     try {
-      await navigator.share(cleanShareData);
+      await navigator.share(cleaned);
       return true;
     } catch (error) {
-      // 사용자가 공유를 취소한 경우 (AbortError)는 정상 종료로 처리
+      // 사용자가 공유를 취소한 경우는 정상 종료
       if (error instanceof Error && error.name === 'AbortError') {
         return true;
       }
-      // 다른 에러는 모달로 표시
-      const errorName = error instanceof Error ? error.name : 'Unknown';
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      const debugMsg = showDebugInfo
-        ? `\n\n[디버그 정보]\n- 에러 이름: ${errorName}\n- 에러 메시지: ${errorMessage}\n- shareData: ${JSON.stringify(cleanShareData, null, 2)}`
-        : `\n\n에러: ${errorName}\n${errorMessage}`;
-      useApiErrorModalStore.getState().showError({
-        isFatal: false,
-        message: `공유에 실패했습니다.${debugMsg}`,
-      });
       return false;
     }
   };
 
-  // 모바일 공유 처리
-  const handleMobileShare = async (): Promise<void> => {
-    const webShareSupported = checkWebShareSupport();
-    const shareDataValid = validateShareData();
-
-    // 모바일에서는 디버깅 정보를 모달로 표시
-    const debugInfo = `\n\n[디버그 정보]\n- 모바일 감지: true\n- Web Share 지원: ${webShareSupported}\n- shareData 유효: ${shareDataValid}\n- 보안 컨텍스트: ${window.isSecureContext}\n- 프로토콜: ${location.protocol}\n- 호스트: ${location.hostname}\n- navigator.share 존재: ${'share' in navigator}\n- shareData: ${JSON.stringify(shareData, null, 2)}`;
-
-    if (!webShareSupported) {
+  // 클립보드 복사 폴백
+  const tryClipboardFallback = async (url: string): Promise<boolean> => {
+    const success = await copyToClipboard(url);
+    if (success) {
       useApiErrorModalStore.getState().showError({
         isFatal: false,
-        message: `공유 기능을 사용할 수 없습니다.\n시스템 공유 기능이 지원되지 않는 환경입니다.${debugInfo}`,
+        message: '링크가 클립보드에 복사되었습니다.',
       });
-      return;
+      return true;
     }
-
-    if (!shareDataValid) {
-      useApiErrorModalStore.getState().showError({
-        isFatal: false,
-        message: `공유할 데이터가 없습니다.${debugInfo}`,
-      });
-      return;
-    }
-
-    // 모바일에서는 디버깅 정보 표시
-    const success = await tryWebShare(true);
-    if (!success) {
-      // tryWebShare에서 이미 에러 모달을 표시했으므로 여기서는 추가 처리 불필요
-    }
+    return false;
   };
 
-  // 데스크톱 공유 처리 (Web Share API → 카카오톡 공유 → 클립보드 복사)
-  const handleDesktopShare = async (): Promise<void> => {
-    // 1. Web Share API 시도
-    const webShareSuccess = await tryWebShare();
-    if (webShareSuccess) {
-      return;
-    }
-
-    // 2. 카카오톡 공유 시도
-    if (enableKakao && kakaoSDKReady) {
-      try {
-        await handleKakaoShare();
-        return;
-      } catch {
-        // 카카오 공유 실패 시 클립보드 복사로 폴백
-      }
-    }
-
-    // 3. 최종 폴백: 클립보드 복사
-    handleFallbackShare();
-  };
-
-  const handleWebShare = async () => {
-    // 초기 상태 확인 (무조건 디버깅 정보 표시)
-    const isMobile = isMobileDevice();
-    const webShareSupported = checkWebShareSupport();
-    const shareDataValid = validateShareData();
-    const isKakaoInApp = isKakaoTalkInAppBrowser();
-    const hasNavigatorShare = 'share' in navigator;
-    const navigatorShareType = typeof navigator.share;
-
-    // 항상 디버깅 정보 표시 (테스트용)
-    const initialDebugInfo = `\n\n[초기 디버깅 정보]\n- 함수 호출: 성공 ✅\n- 모바일 감지: ${isMobile}\n- Web Share 지원: ${webShareSupported}\n- shareData 유효: ${shareDataValid}\n- 카카오톡 인앱: ${isKakaoInApp}\n- 보안 컨텍스트: ${window.isSecureContext}\n- 프로토콜: ${location.protocol}\n- 호스트: ${location.hostname}\n- navigator.share 존재: ${hasNavigatorShare}\n- navigator.share 타입: ${navigatorShareType}\n- shareData: ${JSON.stringify(shareData, null, 2)}`;
-
-    const debugMessage = `공유 버튼 클릭됨!${initialDebugInfo}`;
-
-    // 함수 호출 즉시 alert 표시 (가장 먼저)
-    alert('handleWebShare 함수 호출됨! (1단계)');
-
-    // 여러 방법으로 모달 표시 시도 (확실하게 보장)
-    try {
-      // 방법 1: useApiErrorModalStore 시도
-      alert('useApiErrorModalStore 호출 시도... (2단계)');
-      const store = useApiErrorModalStore.getState();
-      if (store && typeof store.showError === 'function') {
-        store.showError({
-          isFatal: false,
-          message: debugMessage,
-        });
-        alert('useApiErrorModalStore.showError 호출 완료 (3단계)');
-      } else {
-        // store가 없으면 alert 사용
-        alert(
-          `useApiErrorModalStore 없음. alert로 대체 (3단계):\n\n${debugMessage}`
-        );
-      }
-    } catch (error) {
-      // useApiErrorModalStore 실패 시 alert로 대체
-      alert(`useApiErrorModalStore 실패 (3단계): ${error}\n\n${debugMessage}`);
-    }
-
-    // 카카오톡 인앱 브라우저 체크는 디버깅 후에 수행
-    if (onKakaoInAppClick && isKakaoInApp) {
-      alert('카카오톡 인앱 브라우저 감지됨. 로그인 모달 표시 예정 (4단계)');
-      onKakaoInAppClick();
-      return;
-    }
-
-    alert('카카오톡 인앱 브라우저 아님. 공유 로직 진행 (4단계)');
-
+  const handleShare = async () => {
     setIsSharing(true);
 
     try {
-      if (isMobile) {
-        await handleMobileShare();
-      } else {
-        await handleDesktopShare();
+      // 1. Web Share API 시도
+      const webShareSuccess = await tryWebShare(shareData);
+      if (webShareSuccess) {
+        return;
       }
-    } catch (error) {
-      const errorName = error instanceof Error ? error.name : 'Unknown';
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      const stack = error instanceof Error ? error.stack : undefined;
 
-      const debugInfo = isMobile
-        ? `\n\n[예외 발생 디버그 정보]\n- 에러 이름: ${errorName}\n- 에러 메시지: ${errorMessage}\n- 스택: ${stack ?? '없음'}\n- 모바일 감지: ${isMobile}\n- Web Share 지원: ${checkWebShareSupport()}\n- shareData 유효: ${validateShareData()}`
-        : `\n\n에러: ${errorName}\n${errorMessage}`;
+      // 2. 클립보드 복사 폴백
+      if (shareData.url) {
+        const clipboardSuccess = await tryClipboardFallback(shareData.url);
+        if (clipboardSuccess) {
+          return;
+        }
+      }
 
+      // 3. 모든 방법 실패
       useApiErrorModalStore.getState().showError({
         isFatal: false,
-        message: `공유 중 오류가 발생했습니다.${debugInfo}`,
+        message: '공유 기능을 사용할 수 없습니다.',
+      });
+    } catch (error) {
+      console.error('공유 중 오류 발생:', error);
+      useApiErrorModalStore.getState().showError({
+        isFatal: false,
+        message: '공유 중 오류가 발생했습니다.',
       });
     } finally {
       setIsSharing(false);
     }
   };
 
-  const handleFallbackShare = () => {
-    const shareText =
-      `${shareData.title ?? ''}\n${shareData.text ?? ''}\n${shareData.url ?? ''}`.trim();
-
-    if (navigator.clipboard) {
-      navigator.clipboard
-        .writeText(shareText)
-        .then(() => {
-          alert(
-            isAndroid
-              ? '링크가 클립보드에 복사되었습니다.\n다른 앱에서 붙여넣기하여 공유하세요.'
-              : '링크가 클립보드에 복사되었습니다.'
-          );
-        })
-        .catch(error => {
-          console.error('클립보드 복사 실패:', error);
-          alert(
-            isAndroid
-              ? `링크: ${shareText}\n\n이 내용을 복사하여 다른 앱에서 공유하세요.`
-              : `공유할 내용: ${shareText}`
-          );
-        });
-    } else {
-      alert(
-        isAndroid
-          ? `링크: ${shareText}\n\n이 내용을 복사하여 다른 앱에서 공유하세요.`
-          : `공유할 내용: ${shareText}`
-      );
-    }
-  };
-
-  const handleButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    // 버튼 클릭 즉시 alert 표시 (확실하게 보장)
-    alert('공유 버튼 클릭됨! (handleButtonClick 호출 확인)');
-
-    // handleWebShare 호출
-    handleWebShare();
-  };
-
   return (
     <button
-      onClick={handleButtonClick}
+      onClick={handleShare}
       disabled={isSharing}
-      className="hover:cursor-pointer disabled:cursor-not-allowed"
+      className={className}
+      aria-label="공유하기"
     >
       {children ?? fallbackText}
     </button>

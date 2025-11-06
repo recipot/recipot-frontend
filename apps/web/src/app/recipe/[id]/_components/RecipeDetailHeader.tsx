@@ -32,24 +32,6 @@ export function RecipeDetailHeader({ recipe, showToast }: RecipeHeaderProps) {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const isKakaoInApp = useIsKakaoInApp();
 
-  // 이미지 URL을 절대 경로로 변환하는 헬퍼 함수
-  // 메타태그와 동일한 로직을 사용하여 일관성 유지
-  const getAbsoluteImageUrl = (url: string | undefined): string => {
-    const baseUrl = isProduction
-      ? 'https://hankkibuteo.com'
-      : 'https://dev.hankkibuteo.com';
-
-    if (!url) return `${baseUrl}/recipeImage.png`;
-
-    // 이미 절대 URL인 경우 그대로 사용
-    if (url.startsWith('http://') || url.startsWith('https://')) {
-      return url;
-    }
-
-    // 상대 경로인 경우 절대 URL로 변환
-    return `${baseUrl}${url.startsWith('/') ? url : `/${url}`}`;
-  };
-
   // Web Share API용 공유 데이터
   // 시스템 공유 모달에서 사용되며, 메타태그와 일치하도록 기본값 통일
   // 레시피 상세 API에서 받아온 데이터를 우선 사용
@@ -75,24 +57,6 @@ export function RecipeDetailHeader({ recipe, showToast }: RecipeHeaderProps) {
       text: shareText ?? '냉장고 속 재료로 만드는 유연채식 집밥 레시피',
       title: shareTitle ?? '맛있는 레시피',
       url: `${baseUrl}/recipe/${recipe.id}`,
-    };
-  }, [recipe]);
-
-  // 카카오톡 공유용 데이터
-  // 메타태그(og:title, og:description, og:image)와 일치하도록 설정
-  // 레시피 상세 API에서 받아온 이미지, 제목, 설명을 사용
-  const kakaoShareData = useMemo(() => {
-    const recipeImageUrl = recipe.images?.[0]?.imageUrl;
-    const imageUrl = getAbsoluteImageUrl(recipeImageUrl);
-
-    // 메타태그와 동일한 데이터 사용 (공백 제거 및 기본값 처리)
-    return {
-      description: (
-        recipe.description?.trim() ??
-        '냉장고 속 재료로 만드는 유연채식 집밥 레시피'
-      ).trim(),
-      imageUrl, // 절대 URL로 변환된 이미지 (메타태그 og:image와 일치)
-      title: (recipe.title?.trim() ?? '맛있는 레시피').trim(), // 메타태그 og:title과 일치
     };
   }, [recipe]);
 
@@ -160,15 +124,7 @@ export function RecipeDetailHeader({ recipe, showToast }: RecipeHeaderProps) {
       <Header className="px-4 py-3">
         <Header.Back onClick={handleBack} />
         <div className="flex items-center space-x-2">
-          <WebShareButton
-            shareData={shareData}
-            kakaoShareData={kakaoShareData}
-            enableKakao
-            className="p-2"
-            onKakaoInAppClick={
-              isKakaoInApp ? () => setShowLoginModal(true) : undefined
-            }
-          >
+          <WebShareButton shareData={shareData} className="p-2">
             <ShareIcon className="h-6 w-6" color="#212529" />
           </WebShareButton>
           <button
