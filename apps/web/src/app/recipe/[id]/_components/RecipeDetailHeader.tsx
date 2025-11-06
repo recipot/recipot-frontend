@@ -13,7 +13,9 @@ import { HeartIcon, ShareIcon } from '@/components/Icons';
 import WebShareButton from '@/components/Share/WebShareButton';
 import { useIsKakaoInApp } from '@/hooks/useIsKakaoInApp';
 import { isProduction } from '@/lib/env';
+import { getAbsoluteUrl, getRecipeShareUrl } from '@/lib/url';
 import { useApiErrorModalStore } from '@/stores';
+import type { KakaoShareData, ShareData } from '@/types/share.types';
 
 import type { Recipe } from '../types/recipe.types';
 
@@ -32,44 +34,27 @@ export function RecipeDetailHeader({ recipe, showToast }: RecipeHeaderProps) {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const isKakaoInApp = useIsKakaoInApp();
 
-  const shareData = useMemo(() => {
-    const baseUrl = isProduction
-      ? 'https://hankkibuteo.com'
-      : 'https://dev.hankkibuteo.com';
+  // Web Share API용 공유 데이터 (시스템 공유 모달에서 사용)
+  const webShareData = useMemo<ShareData>(() => {
     return {
       text: recipe.description,
       title: recipe.title,
-      url: `${baseUrl}/recipe/${recipe.id}`,
+      url: getRecipeShareUrl(recipe.id),
     };
-  }, [recipe]);
+  }, [recipe.id, recipe.title, recipe.description]);
 
-  const kakaoShareData = useMemo(() => {
+  // 카카오톡 공유용 데이터
+  const kakaoShareData = useMemo<KakaoShareData>(() => {
     const recipeImageUrl = recipe.images?.[0]?.imageUrl;
-
-    const getImageUrl = (url: string | undefined) => {
-      const baseUrl = isProduction
-        ? 'https://hankkibuteo.com'
-        : 'https://dev.hankkibuteo.com';
-
-      if (!url) return `${baseUrl}/recipeImage.png`;
-
-      // 이미 절대 URL인 경우 그대로 사용
-      if (url.startsWith('http://') || url.startsWith('https://')) {
-        return url;
-      }
-
-      // 상대 경로인 경우 절대 URL로 변환
-      return `${baseUrl}${url.startsWith('/') ? url : `/${url}`}`;
-    };
-
-    const imageUrl = getImageUrl(recipeImageUrl);
+    const imageUrl = getAbsoluteUrl(recipeImageUrl);
 
     return {
       description: recipe.description,
       imageUrl,
       title: recipe.title,
+      url: getRecipeShareUrl(recipe.id),
     };
-  }, [recipe]);
+  }, [recipe.id, recipe.title, recipe.description, recipe.images]);
 
   const handleToggleBookmark = async (recipeId: number) => {
     // 카카오톡 인앱 브라우저에서 접속한 경우 로그인 모달 표시
@@ -89,10 +74,10 @@ export function RecipeDetailHeader({ recipe, showToast }: RecipeHeaderProps) {
     try {
       if (isCurrentlyLiked) {
         await storedAPI.deleteStoredRecipe(recipeId);
-        setIsLiked(false);
+        setIsLiked(prev => !prev);
       } else {
         await storedAPI.postStoredRecipe(recipeId);
-        setIsLiked(true);
+        setIsLiked(prev => !prev);
         showToast('레시피가 저장되었어요!');
       }
     } catch (error: unknown) {
@@ -136,13 +121,14 @@ export function RecipeDetailHeader({ recipe, showToast }: RecipeHeaderProps) {
         <Header.Back onClick={handleBack} />
         <div className="flex items-center space-x-2">
           <WebShareButton
-            shareData={shareData}
+            webShareData={webShareData}
             kakaoShareData={kakaoShareData}
             enableKakao
             className="p-2"
             onKakaoInAppClick={
               isKakaoInApp ? () => setShowLoginModal(true) : undefined
             }
+            onShareSuccess={showToast}
           >
             <ShareIcon className="h-6 w-6" color="#212529" />
           </WebShareButton>
