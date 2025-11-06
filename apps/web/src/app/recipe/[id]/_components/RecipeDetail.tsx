@@ -27,6 +27,27 @@ import type { Recipe, TabId } from '../types/recipe.types';
 
 const SCROLL_OFFSET = 120;
 
+// 메타 태그 업데이트 헬퍼 함수
+const updateMetaTag = (
+  selector: string,
+  attribute: 'name' | 'property',
+  value: string,
+  content: string
+) => {
+  let meta = document.querySelector(selector);
+  if (!meta) {
+    meta = document.createElement('meta');
+    meta.setAttribute(attribute, value);
+    document.head.appendChild(meta);
+  }
+  meta.setAttribute('content', content);
+};
+
+// Open Graph 메타 태그 업데이트 헬퍼 함수
+const updateOGTag = (property: string, content: string) => {
+  updateMetaTag(`meta[property="${property}"]`, 'property', property, content);
+};
+
 export function RecipeDetail({ recipeId }: { recipeId: string }) {
   const token = tokenUtils.getToken();
   const useCookieAuth = isProduction;
@@ -42,6 +63,7 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const isKakaoInApp = useIsKakaoInApp();
 
+  // 레시피 데이터 fetch
   useEffect(() => {
     const fetchRecipe = async () => {
       try {
@@ -59,33 +81,58 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
     fetchRecipe();
   }, [recipeId, postRecentRecipe]);
 
+  // 메타데이터 동적 업데이트
   useEffect(() => {
     if (!recipeData) return;
 
-    // DOM 렌더링 완료 후 scrollSpy 초기화
-    const timer = setTimeout(() => {
-      scrollSpy.update();
-    }, 300);
+    const title = `${recipeData.title}`;
+    const description =
+      recipeData.description ?? `${recipeData.title} 레시피입니다.`;
+    const imageUrl =
+      recipeData.images && recipeData.images.length > 0
+        ? recipeData.images[0].imageUrl
+        : undefined;
 
-    // tools가 없고 activeTab이 cookware인 경우 ingredients로 변경
+    document.title = title;
+
+    updateMetaTag(
+      'meta[name="description"]',
+      'name',
+      'description',
+      description
+    );
+
+    updateOGTag('og:title', title);
+    updateOGTag('og:description', description);
+    updateOGTag('og:type', 'website');
+    if (imageUrl) {
+      updateOGTag('og:image', imageUrl);
+      updateOGTag('og:image:width', '1200');
+      updateOGTag('og:image:height', '630');
+      updateOGTag('og:image:alt', recipeData.title);
+    }
+  }, [recipeData]);
+
+  // tools가 없을 때 cookware 탭을 ingredients로 자동 조정
+  useEffect(() => {
     if (
+      recipeData &&
       (!recipeData.tools || recipeData.tools.length === 0) &&
       activeTab === 'cookware'
     ) {
       setActiveTab('ingredients');
     }
-
-    return () => clearTimeout(timer);
   }, [recipeData, activeTab]);
 
-  // 컴포넌트 마운트 및 데이터 로드 후 scrollSpy 초기화
+  // scrollSpy 초기화
   useEffect(() => {
-    if (typeof window !== 'undefined' && recipeData) {
-      const timer = setTimeout(() => {
-        scrollSpy.update();
-      }, 100);
-      return () => clearTimeout(timer);
-    }
+    if (typeof window === 'undefined' || !recipeData) return;
+
+    const timer = setTimeout(() => {
+      scrollSpy.update();
+    }, 300);
+
+    return () => clearTimeout(timer);
   }, [recipeData]);
 
   const contentStyle = useMemo(
