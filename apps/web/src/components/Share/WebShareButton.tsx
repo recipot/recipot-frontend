@@ -282,31 +282,39 @@ const WebShareButton: React.FC<WebShareButtonProps> = ({
 
     const debugMessage = `공유 버튼 클릭됨!${initialDebugInfo}`;
 
+    // 함수 호출 즉시 alert 표시 (가장 먼저)
+    alert('handleWebShare 함수 호출됨! (1단계)');
+
     // 여러 방법으로 모달 표시 시도 (확실하게 보장)
     try {
       // 방법 1: useApiErrorModalStore 시도
+      alert('useApiErrorModalStore 호출 시도... (2단계)');
       const store = useApiErrorModalStore.getState();
       if (store && typeof store.showError === 'function') {
         store.showError({
           isFatal: false,
           message: debugMessage,
         });
+        alert('useApiErrorModalStore.showError 호출 완료 (3단계)');
       } else {
         // store가 없으면 alert 사용
-        alert(debugMessage);
+        alert(
+          `useApiErrorModalStore 없음. alert로 대체 (3단계):\n\n${debugMessage}`
+        );
       }
     } catch (error) {
       // useApiErrorModalStore 실패 시 alert로 대체
-      alert(
-        `공유 버튼 클릭됨!\n\nuseApiErrorModalStore 실패: ${error}\n\n${initialDebugInfo}`
-      );
+      alert(`useApiErrorModalStore 실패 (3단계): ${error}\n\n${debugMessage}`);
     }
 
-    // 카카오톡 인앱 브라우저에서 접속한 경우 로그인 모달 표시
+    // 카카오톡 인앱 브라우저 체크는 디버깅 후에 수행
     if (onKakaoInAppClick && isKakaoInApp) {
+      alert('카카오톡 인앱 브라우저 감지됨. 로그인 모달 표시 예정 (4단계)');
       onKakaoInAppClick();
       return;
     }
+
+    alert('카카오톡 인앱 브라우저 아님. 공유 로직 진행 (4단계)');
 
     setIsSharing(true);
 
@@ -366,9 +374,20 @@ const WebShareButton: React.FC<WebShareButtonProps> = ({
     }
   };
 
+  const handleButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // 버튼 클릭 즉시 alert 표시 (확실하게 보장)
+    alert('공유 버튼 클릭됨! (handleButtonClick 호출 확인)');
+
+    // handleWebShare 호출
+    handleWebShare();
+  };
+
   return (
     <button
-      onClick={handleWebShare}
+      onClick={handleButtonClick}
       disabled={isSharing}
       className="hover:cursor-pointer disabled:cursor-not-allowed"
     >
