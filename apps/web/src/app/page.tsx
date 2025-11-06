@@ -104,29 +104,6 @@ export default function Home() {
   const [selectedCount, setSelectedCount] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    if (!hasMounted || loading) {
-      return;
-    }
-
-    const isValid = ensureMoodValidity();
-
-    if (!isValid) {
-      return;
-    }
-
-    if (storedMood && isRecommendationReady) {
-      navigateWithoutScroll('/recipeRecommend');
-    }
-  }, [
-    ensureMoodValidity,
-    hasMounted,
-    isRecommendationReady,
-    loading,
-    navigateWithoutScroll,
-    storedMood,
-  ]);
-
   // 완료한 레시피 수 조회 (로그인 상태일 때만)
   // 이 데이터는 EmotionCharacter에서 캐시를 통해 사용됨
   useCompletedRecipes({ limit: 10, page: 1 });

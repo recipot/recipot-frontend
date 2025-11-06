@@ -81,7 +81,11 @@ export default function RefrigeratorStep() {
     try {
       // 1. 모든 온보딩 데이터 수집 (각 도메인 스토어에서)
       const { allergies } = useAllergiesStore.getState();
-      const { mood } = useMoodStore.getState();
+      const {
+        markRecommendationReady: setRecommendationReady,
+        mood,
+        setMoodWithExpiry,
+      } = useMoodStore.getState();
       const { selectedFoodIds } = useSelectedFoodsStore.getState();
 
       if (!mood) {
@@ -139,6 +143,9 @@ export default function RefrigeratorStep() {
         mood: completeData.mood,
         selectedFoods: completeData.selectedFoods,
       });
+
+      setMoodWithExpiry(mood);
+      setRecommendationReady(true);
 
       navigateWithoutScroll('/recipeRecommend');
     } catch (error) {

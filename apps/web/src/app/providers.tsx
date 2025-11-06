@@ -18,6 +18,7 @@ import { useMoodStore } from '@/stores/moodStore';
 import type { ReactNode } from 'react';
 
 const FATAL_STATUS_CODES = new Set<number>([401]);
+const RECIPE_AUTO_REDIRECT_SESSION_KEY = 'recipe-recommend-auto-redirected';
 
 export default function Providers({ children }: { children: ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
@@ -40,14 +41,28 @@ export default function Providers({ children }: { children: ReactNode }) {
   });
 
   useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
     if (!mood || !isRecommendationReady) {
+      sessionStorage.removeItem(RECIPE_AUTO_REDIRECT_SESSION_KEY);
       return;
     }
 
     if (pathname === '/recipeRecommend') {
+      sessionStorage.setItem(RECIPE_AUTO_REDIRECT_SESSION_KEY, 'true');
       return;
     }
 
+    const hasRedirected =
+      sessionStorage.getItem(RECIPE_AUTO_REDIRECT_SESSION_KEY) === 'true';
+
+    if (hasRedirected) {
+      return;
+    }
+
+    sessionStorage.setItem(RECIPE_AUTO_REDIRECT_SESSION_KEY, 'true');
     router.replace('/recipeRecommend');
   }, [isRecommendationReady, mood, pathname, router]);
 
