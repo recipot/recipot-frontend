@@ -48,6 +48,21 @@ const UI_TEXT_MAPPING: Record<string, string> = {
   R05003: '간단해요',
 };
 
+// 감정 섹션 설정 타입
+type EmotionSectionType = 'taste' | 'difficulty' | 'experience';
+
+interface EmotionSectionConfig {
+  type: EmotionSectionType;
+  title: string;
+}
+
+// 감정 섹션 설정 상수
+const EMOTION_SECTIONS: EmotionSectionConfig[] = [
+  { title: '요리의 맛은 어땠나요?', type: 'taste' },
+  { title: '요리를 시작하기가 어땠나요?', type: 'difficulty' },
+  { title: '직접 요리해보니 어땠나요?', type: 'experience' },
+];
+
 export function ReviewBottomSheet({
   isOpen,
   onClose,
@@ -105,7 +120,31 @@ export function ReviewBottomSheet({
   const watchedTasteOption = watch('tasteOption');
   const watchedDifficultyOption = watch('difficultyOption');
   const watchedExperienceOption = watch('experienceOption');
-  const watchedContent = watch('content');
+
+  // 감정 섹션 데이터 생성
+  const createEmotionSections = () => {
+    if (!reviewData) return [];
+
+    const optionsByType = {
+      difficulty: reviewData.difficultyOptions,
+      experience: reviewData.experienceOptions,
+      taste: reviewData.tasteOptions,
+    };
+
+    const valuesByType = {
+      difficulty: watchedDifficultyOption,
+      experience: watchedExperienceOption,
+      taste: watchedTasteOption,
+    };
+
+    return EMOTION_SECTIONS.map(section => ({
+      ...section,
+      options: optionsByType[section.type],
+      value: valuesByType[section.type],
+    }));
+  };
+
+  const emotionSections = createEmotionSections();
 
   // recipeId가 변경될 때 폼의 completedRecipeId도 업데이트
   useEffect(() => {
@@ -118,8 +157,7 @@ export function ReviewBottomSheet({
   const isFormValid =
     watchedTasteOption !== null &&
     watchedDifficultyOption !== null &&
-    watchedExperienceOption !== null &&
-    watchedContent?.trim();
+    watchedExperienceOption !== null;
 
   const handleEmotionSelect = (
     type: 'taste' | 'difficulty' | 'experience',
@@ -127,17 +165,20 @@ export function ReviewBottomSheet({
   ) => {
     if (!reviewData) return;
 
-    const fieldMap = {
+    const fieldMap: Record<
+      'taste' | 'difficulty' | 'experience',
+      'tasteOption' | 'difficultyOption' | 'experienceOption'
+    > = {
       difficulty: 'difficultyOption',
       experience: 'experienceOption',
       taste: 'tasteOption',
-    } as const;
+    };
 
     const optionsMap = {
       difficulty: reviewData.difficultyOptions,
       experience: reviewData.experienceOptions,
       taste: reviewData.tasteOptions,
-    } as const;
+    };
 
     const field = fieldMap[type];
     const options = optionsMap[type];
@@ -246,26 +287,7 @@ export function ReviewBottomSheet({
                 {/* 스크롤 가능한 영역 - 선택 항목 및 의견 작성 */}
                 <div className="overflow-y-auto px-4">
                   {/* 감정 선택 섹션 */}
-                  {[
-                    {
-                      options: reviewData.tasteOptions,
-                      title: '요리의 맛은 어땠나요?',
-                      type: 'taste' as const,
-                      value: watchedTasteOption,
-                    },
-                    {
-                      options: reviewData.difficultyOptions,
-                      title: '요리를 시작하기가 어땠나요?',
-                      type: 'difficulty' as const,
-                      value: watchedDifficultyOption,
-                    },
-                    {
-                      options: reviewData.experienceOptions,
-                      title: '직접 요리해보니 어땠나요?',
-                      type: 'experience' as const,
-                      value: watchedExperienceOption,
-                    },
-                  ].map(section => (
+                  {emotionSections.map(section => (
                     <EmotionSection
                       key={section.type}
                       title={section.title}

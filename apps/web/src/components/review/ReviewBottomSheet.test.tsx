@@ -224,38 +224,6 @@ describe('ReviewBottomSheet', () => {
     expect(tasteButton).toHaveClass('bg-secondary-light-green');
   });
 
-  it('모든 감정을 선택하고 댓글을 입력해야 제출 버튼이 활성화되어야 함', async () => {
-    const user = userEvent.setup();
-    render(<ReviewBottomSheet {...defaultProps} />, { wrapper });
-
-    await waitFor(() => {
-      expect(screen.getByText('맛있어요')).toBeInTheDocument();
-    });
-
-    const submitButton = screen.getByRole('button', { name: /후기 등록하기/i });
-    const commentInput = screen.getByPlaceholderText('내용을 입력해 주세요');
-
-    expect(submitButton).toBeDisabled();
-
-    // 맛 선택
-    await user.click(screen.getByText('맛있어요'));
-    expect(submitButton).toBeDisabled();
-
-    // 시작하기 선택
-    await user.click(screen.getByText('쉬워요'));
-    expect(submitButton).toBeDisabled();
-
-    // 직접 요리 선택
-    await user.click(screen.getByText('간단해요'));
-    expect(submitButton).toBeDisabled(); // 아직 댓글을 입력하지 않았으므로 비활성화
-
-    // 댓글 입력
-    await user.type(commentInput, '정말 맛있었어요!');
-    await waitFor(() => {
-      expect(submitButton).not.toBeDisabled();
-    });
-  });
-
   it('댓글 입력이 작동해야 함', async () => {
     const user = userEvent.setup();
     render(<ReviewBottomSheet {...defaultProps} />, { wrapper });

@@ -7,9 +7,11 @@ import { useRouter } from 'next/navigation';
 import { tokenUtils } from 'packages/api/src/auth';
 
 import { Button } from '@/components/common/Button';
+import { Modal } from '@/components/common/Modal/Modal';
 import { Toast } from '@/components/common/Toast';
 import { CookIcon } from '@/components/Icons';
 import { useToast, useViewportBasedPadding } from '@/hooks';
+import { useIsKakaoInApp } from '@/hooks/useIsKakaoInApp';
 import { usePostRecentRecipe } from '@/hooks/usePostRecentRecipe';
 import { isProduction } from '@/lib/env';
 import { useApiErrorModalStore } from '@/stores';
@@ -37,23 +39,25 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
   const router = useRouter();
   const { mutate: postRecentRecipe } = usePostRecentRecipe();
   const { isVisible, message, showToast } = useToast();
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const isKakaoInApp = useIsKakaoInApp();
 
   useEffect(() => {
     const fetchRecipe = async () => {
-      if (!useCookieAuth && !token) return;
       try {
         const data = await recipe.getRecipeDetail(recipeId);
         setRecipeData(data);
         postRecentRecipe(Number(recipeId));
       } catch {
         useApiErrorModalStore.getState().showError({
+          isFatal: false,
           message:
             '레시피를 불러오는 중 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.',
         });
       }
     };
     fetchRecipe();
-  }, [token, recipeId, useCookieAuth, postRecentRecipe]);
+  }, [recipeId, postRecentRecipe]);
 
   useEffect(() => {
     if (!recipeData) return;
@@ -101,6 +105,16 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
   }
 
   const handleCookingOrder = () => {
+    // 카카오톡 인앱 브라우저에서 접속한 경우 로그인 모달 표시
+    if (isKakaoInApp) {
+      setShowLoginModal(true);
+      return;
+    }
+
+    if (!useCookieAuth && !token) {
+      setShowLoginModal(true);
+      return;
+    }
     router.push(`/recipe/${recipeId}/cooking-order`);
   };
 
@@ -158,6 +172,20 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
         </div>
       </div>
       <Toast message={message} isVisible={isVisible} position="card-bottom" />
+      <Modal
+        open={showLoginModal}
+        onOpenChange={setShowLoginModal}
+        title="로그인이 필요합니다."
+        description={
+          isKakaoInApp
+            ? '로그인하면 더 많은 기능을 사용할 수 있어요.'
+            : '로그인하면 요리 시작하기 기능을 사용할 수 있어요.'
+        }
+      >
+        <Button variant="default" onClick={() => router.push('/signin')}>
+          로그인
+        </Button>
+      </Modal>
     </div>
   );
 }
