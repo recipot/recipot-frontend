@@ -2,7 +2,7 @@
  * 카카오 SDK 관련 유틸리티 함수들
  */
 
-import { isProduction } from './env';
+import { getAbsoluteUrl } from './url';
 
 // 카카오 SDK 타입 정의
 declare global {
@@ -100,18 +100,6 @@ export const shareKakao = async (shareData: KakaoShareData): Promise<void> => {
       throw new Error('카카오 SDK 초기화에 실패했습니다.');
     }
   }
-
-  // 이미지 URL을 절대 경로로 변환
-  const getAbsoluteUrl = (url: string): string => {
-    if (url.startsWith('http://') || url.startsWith('https://')) {
-      return url;
-    }
-    // 상대 경로인 경우 환경에 따라 도메인 추가
-    const baseUrl = isProduction
-      ? 'https://hankkibuteo.com'
-      : 'https://dev.hankkibuteo.com';
-    return `${baseUrl}${url.startsWith('/') ? url : `/${url}`}`;
-  };
 
   const shareOptions: KakaoShareOptions = {
     buttons: [
