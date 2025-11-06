@@ -97,7 +97,8 @@ export async function generateMetadata({
   const description =
     recipe?.description ?? '냉장고 속 재료로 만드는 유연채식 집밥 레시피';
 
-  // 레시피 이미지 URL 생성
+  // 레시피 이미지 URL 생성 (절대 URL로 변환)
+  // 카카오 공유 시에도 동일한 이미지 URL이 사용되도록 일관성 유지
   let imageUrl = `${baseUrl}/recipeImage.png`; // 기본 이미지 (절대 URL)
   if (recipe?.images && recipe.images.length > 0) {
     const recipeImage = recipe.images[0]?.imageUrl;

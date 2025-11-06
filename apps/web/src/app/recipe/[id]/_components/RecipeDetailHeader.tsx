@@ -32,8 +32,27 @@ export function RecipeDetailHeader({ recipe, showToast }: RecipeHeaderProps) {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const isKakaoInApp = useIsKakaoInApp();
 
+  // 이미지 URL을 절대 경로로 변환하는 헬퍼 함수
+  // 메타태그와 동일한 로직을 사용하여 일관성 유지
+  const getAbsoluteImageUrl = (url: string | undefined): string => {
+    const baseUrl = isProduction
+      ? 'https://hankkibuteo.com'
+      : 'https://dev.hankkibuteo.com';
+
+    if (!url) return `${baseUrl}/recipeImage.png`;
+
+    // 이미 절대 URL인 경우 그대로 사용
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+
+    // 상대 경로인 경우 절대 URL로 변환
+    return `${baseUrl}${url.startsWith('/') ? url : `/${url}`}`;
+  };
+
+  // Web Share API용 공유 데이터
+  // 메타태그와 일치하도록 기본값 통일
   const shareData = useMemo(() => {
-    // 현재 페이지의 origin을 사용하여 환경에 맞는 URL 자동 감지
     const baseUrl =
       typeof window !== 'undefined' && window.location.origin
         ? window.location.origin
@@ -41,55 +60,31 @@ export function RecipeDetailHeader({ recipe, showToast }: RecipeHeaderProps) {
           ? 'https://hankkibuteo.com'
           : 'https://dev.hankkibuteo.com';
 
-    const shareUrl = `${baseUrl}/recipe/${recipe.id}`;
-    const shareTitle = recipe.title || '한끼부터 레시피';
-    const shareText = recipe.description || '맛있는 레시피를 확인해보세요!';
-
-    const data = {
-      text: shareText,
-      title: shareTitle,
-      url: shareUrl,
-    };
-
-    // 디버깅 로그
-    console.info('[RecipeDetailHeader] shareData 생성:', {
-      baseUrl,
-      hasDescription: !!recipe.description,
-      hasTitle: !!recipe.title,
-      recipeId: recipe.id,
-      shareText,
-      shareTitle,
-      shareUrl,
-    });
-
-    return data;
-  }, [recipe]);
-
-  const kakaoShareData = useMemo(() => {
-    const recipeImageUrl = recipe.images?.[0]?.imageUrl;
-
-    const getImageUrl = (url: string | undefined) => {
-      const baseUrl = isProduction
-        ? 'https://hankkibuteo.com'
-        : 'https://dev.hankkibuteo.com';
-
-      if (!url) return `${baseUrl}/recipeImage.png`;
-
-      // 이미 절대 URL인 경우 그대로 사용
-      if (url.startsWith('http://') || url.startsWith('https://')) {
-        return url;
-      }
-
-      // 상대 경로인 경우 절대 URL로 변환
-      return `${baseUrl}${url.startsWith('/') ? url : `/${url}`}`;
-    };
-
-    const imageUrl = getImageUrl(recipeImageUrl);
+    // 메타태그와 동일한 기본값 사용
+    const shareTitle = recipe.title ?? '맛있는 레시피';
+    const shareText =
+      recipe.description ?? '냉장고 속 재료로 만드는 유연채식 집밥 레시피';
 
     return {
-      description: recipe.description,
-      imageUrl,
-      title: recipe.title,
+      text: shareText,
+      title: shareTitle,
+      url: `${baseUrl}/recipe/${recipe.id}`,
+    };
+  }, [recipe]);
+
+  // 카카오톡 공유용 데이터
+  // 메타태그(og:title, og:description, og:image)와 일치하도록 설정
+  // 레시피 상세 API에서 받아온 이미지, 제목, 설명을 사용
+  const kakaoShareData = useMemo(() => {
+    const recipeImageUrl = recipe.images?.[0]?.imageUrl;
+    const imageUrl = getAbsoluteImageUrl(recipeImageUrl);
+
+    // 메타태그와 동일한 데이터 사용
+    return {
+      description:
+        recipe.description ?? '냉장고 속 재료로 만드는 유연채식 집밥 레시피',
+      imageUrl, // 절대 URL로 변환된 이미지 (메타태그 og:image와 일치)
+      title: recipe.title ?? '맛있는 레시피', // 메타태그 og:title과 일치
     };
   }, [recipe]);
 
