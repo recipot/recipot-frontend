@@ -134,20 +134,83 @@ const WebShareButton: React.FC<WebShareButtonProps> = ({
     await shareKakao(kakaoData);
   };
 
+  // shareData 검증 - navigator.share()는 최소한 하나의 필드가 필요
+  const validateShareData = (): boolean => {
+    const hasTitle = Boolean(shareData.title?.trim());
+    const hasText = Boolean(shareData.text?.trim());
+    const hasUrl = Boolean(shareData.url?.trim());
+
+    return hasTitle || hasText || hasUrl;
+  };
+
   // Web Share API 시도 (사용자 취소는 무시)
-  const tryWebShare = async (): Promise<boolean> => {
+  const tryWebShare = async (showDebugInfo = false): Promise<boolean> => {
     if (!checkWebShareSupport()) {
+      const debugMsg = showDebugInfo
+        ? `\n\n[디버그 정보]\n- navigator.share 존재: ${'share' in navigator}\n- 함수 타입: ${typeof navigator.share}\n- 보안 컨텍스트: ${window.isSecureContext}\n- 프로토콜: ${location.protocol}\n- 호스트: ${location.hostname}`
+        : '';
+      useApiErrorModalStore.getState().showError({
+        isFatal: false,
+        message: `공유 기능을 사용할 수 없습니다.\n시스템 공유 기능이 지원되지 않는 환경입니다.${debugMsg}`,
+      });
+      return false;
+    }
+
+    // shareData 검증
+    if (!validateShareData()) {
+      const debugMsg = showDebugInfo
+        ? `\n\n[디버그 정보]\n- shareData: ${JSON.stringify(shareData, null, 2)}`
+        : '';
+      useApiErrorModalStore.getState().showError({
+        isFatal: false,
+        message: `공유할 데이터가 없습니다.${debugMsg}`,
+      });
+      return false;
+    }
+
+    // navigator.share()에 전달할 데이터 정리 (빈 문자열 제거)
+    const cleanShareData: ShareData = {};
+    if (shareData.title?.trim()) {
+      cleanShareData.title = shareData.title.trim();
+    }
+    if (shareData.text?.trim()) {
+      cleanShareData.text = shareData.text.trim();
+    }
+    if (shareData.url?.trim()) {
+      cleanShareData.url = shareData.url.trim();
+    }
+
+    // 최소한 하나의 필드가 있는지 재확인
+    if (!validateShareData()) {
+      const debugMsg = showDebugInfo
+        ? `\n\n[디버그 정보]\n- 정리된 shareData: ${JSON.stringify(cleanShareData, null, 2)}`
+        : '';
+      useApiErrorModalStore.getState().showError({
+        isFatal: false,
+        message: `공유할 데이터가 없습니다.${debugMsg}`,
+      });
       return false;
     }
 
     try {
-      await navigator.share(shareData);
+      await navigator.share(cleanShareData);
       return true;
     } catch (error) {
       // 사용자가 공유를 취소한 경우 (AbortError)는 정상 종료로 처리
       if (error instanceof Error && error.name === 'AbortError') {
         return true;
       }
+      // 다른 에러는 모달로 표시
+      const errorName = error instanceof Error ? error.name : 'Unknown';
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      const debugMsg = showDebugInfo
+        ? `\n\n[디버그 정보]\n- 에러 이름: ${errorName}\n- 에러 메시지: ${errorMessage}\n- shareData: ${JSON.stringify(cleanShareData, null, 2)}`
+        : `\n\n에러: ${errorName}\n${errorMessage}`;
+      useApiErrorModalStore.getState().showError({
+        isFatal: false,
+        message: `공유에 실패했습니다.${debugMsg}`,
+      });
       return false;
     }
   };
@@ -155,22 +218,31 @@ const WebShareButton: React.FC<WebShareButtonProps> = ({
   // 모바일 공유 처리
   const handleMobileShare = async (): Promise<void> => {
     const webShareSupported = checkWebShareSupport();
+    const shareDataValid = validateShareData();
+
+    // 모바일에서는 디버깅 정보를 모달로 표시
+    const debugInfo = `\n\n[디버그 정보]\n- 모바일 감지: true\n- Web Share 지원: ${webShareSupported}\n- shareData 유효: ${shareDataValid}\n- 보안 컨텍스트: ${window.isSecureContext}\n- 프로토콜: ${location.protocol}\n- 호스트: ${location.hostname}\n- navigator.share 존재: ${'share' in navigator}\n- shareData: ${JSON.stringify(shareData, null, 2)}`;
 
     if (!webShareSupported) {
       useApiErrorModalStore.getState().showError({
         isFatal: false,
-        message:
-          '공유 기능을 사용할 수 없습니다.\n시스템 공유 기능이 지원되지 않는 환경입니다.',
+        message: `공유 기능을 사용할 수 없습니다.\n시스템 공유 기능이 지원되지 않는 환경입니다.${debugInfo}`,
       });
       return;
     }
 
-    const success = await tryWebShare();
-    if (!success) {
+    if (!shareDataValid) {
       useApiErrorModalStore.getState().showError({
         isFatal: false,
-        message: '공유에 실패했습니다. 잠시 후 다시 시도해주세요.',
+        message: `공유할 데이터가 없습니다.${debugInfo}`,
       });
+      return;
+    }
+
+    // 모바일에서는 디버깅 정보 표시
+    const success = await tryWebShare(true);
+    if (!success) {
+      // tryWebShare에서 이미 에러 모달을 표시했으므로 여기서는 추가 처리 불필요
     }
   };
 
@@ -214,10 +286,19 @@ const WebShareButton: React.FC<WebShareButtonProps> = ({
         await handleDesktopShare();
       }
     } catch (error) {
-      console.error('[WebShareButton] 공유 중 오류 발생:', error);
+      const errorName = error instanceof Error ? error.name : 'Unknown';
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      const stack = error instanceof Error ? error.stack : undefined;
+
+      const isMobile = isMobileDevice();
+      const debugInfo = isMobile
+        ? `\n\n[디버그 정보]\n- 에러 이름: ${errorName}\n- 에러 메시지: ${errorMessage}\n- 스택: ${stack ?? '없음'}\n- 모바일 감지: ${isMobile}\n- Web Share 지원: ${checkWebShareSupport()}\n- shareData 유효: ${validateShareData()}`
+        : `\n\n에러: ${errorName}\n${errorMessage}`;
+
       useApiErrorModalStore.getState().showError({
         isFatal: false,
-        message: '공유 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+        message: `공유 중 오류가 발생했습니다.${debugInfo}`,
       });
     } finally {
       setIsSharing(false);
