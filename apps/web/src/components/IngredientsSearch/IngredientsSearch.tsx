@@ -5,7 +5,7 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { Loader2, XIcon } from 'lucide-react';
+import { Loader2, Plus, XIcon } from 'lucide-react';
 
 import { HighlightText } from '@/components/common/HighlightText';
 import { SearchInput } from '@/components/common/SearchInput';
@@ -156,6 +156,28 @@ const IngredientsSearch = forwardRef<
               />
             </Button>
           ))}
+        </div>
+      )}
+
+      {/* 검색 결과 없음 - 재료 추가 요청 */}
+      {value && filteredFoodList.length === 0 && (
+        <div className="absolute top-[84px] left-0 flex w-full flex-col items-center justify-center gap-3 bg-white px-8 py-8">
+          <p className="text-18 text-center text-gray-900">
+            &apos;{value}&apos;는(은) <br /> 아직 등록되지 않은 재료예요 😥
+          </p>
+          <Button
+            onClick={() => {
+              window.open(
+                'https://slashpage.com/hankki/ndvwx7287vk1xm3z6jpg',
+                '_blank'
+              );
+            }}
+            variant="outline"
+            className="text-15sb h-10 border-gray-200 bg-white text-gray-900"
+          >
+            <Plus size={16} />
+            재료 추가 요청하기
+          </Button>
         </div>
       )}
 
