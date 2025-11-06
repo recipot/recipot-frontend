@@ -24,7 +24,9 @@ import type {
   Recipe,
   RecommendationItem,
 } from '@/app/recipe/[id]/types/recipe.types';
+import { Button } from '@/components/common/Button';
 import { Header } from '@/components/common/Header';
+import { Modal } from '@/components/common/Modal/Modal';
 import { Toast } from '@/components/common/Toast';
 import { ExploreComplete } from '@/components/ExploreComplete';
 import { RecipeCard } from '@/components/RecipeCard';
@@ -44,6 +46,7 @@ import type { Swiper as SwiperType } from 'swiper';
 
 // localStorage 키 상수
 const TUTORIAL_CLOSED_KEY = 'recipe-recommend-tutorial-closed';
+const BETA_NOTICE_CLOSED_KEY = 'recipe-recommend-beta-notice-closed';
 
 export default function RecipeRecommend() {
   const { loading, user } = useAuth();
@@ -96,6 +99,9 @@ export default function RecipeRecommend() {
   }, [userSelectedMood]);
 
   const [showTutorial, setShowTutorial] = useState(false);
+  const [showBetaNotice, setShowBetaNotice] = useState(false);
+  const [shouldOpenTutorialAfterModal, setShouldOpenTutorialAfterModal] =
+    useState(false);
 
   // API 응답을 Recipe 타입으로 변환하는 함수
   const mapRecommendationToRecipe = (item: RecommendationItem): Recipe => {
@@ -256,15 +262,20 @@ export default function RecipeRecommend() {
 
         // localStorage 확인 - 이미 튜토리얼을 닫은 적이 있는지 체크
         const tutorialClosed = localStorage.getItem(TUTORIAL_CLOSED_KEY);
+        const betaNoticeClosed = localStorage.getItem(BETA_NOTICE_CLOSED_KEY);
+        const hasRecipesAvailable = hasFetched && recipes.length > 0;
 
         // 첫 진입이고, 아직 튜토리얼을 닫은 적이 없고, 레시피가 있을 때만 표시
         // (탐험완료 상태에서는 표시하지 않음)
-        if (
-          userInfo.isFirstEntry &&
-          !tutorialClosed &&
-          hasFetched &&
-          recipes.length > 0
-        ) {
+        if (userInfo.isFirstEntry && !betaNoticeClosed) {
+          setShowBetaNotice(true);
+          setShouldOpenTutorialAfterModal(
+            !tutorialClosed && hasRecipesAvailable
+          );
+          return;
+        }
+
+        if (userInfo.isFirstEntry && !tutorialClosed && hasRecipesAvailable) {
           setShowTutorial(true);
         }
       } catch (error) {
@@ -355,6 +366,24 @@ export default function RecipeRecommend() {
     setShowTutorial(false);
   };
 
+  const handleCloseBetaNotice = () => {
+    localStorage.setItem(BETA_NOTICE_CLOSED_KEY, 'true');
+    setShowBetaNotice(false);
+
+    if (shouldOpenTutorialAfterModal) {
+      setShowTutorial(true);
+      setShouldOpenTutorialAfterModal(false);
+    }
+  };
+
+  const handleBetaNoticeOpenChange = (open: boolean) => {
+    if (!open) {
+      handleCloseBetaNotice();
+    } else {
+      setShowBetaNotice(true);
+    }
+  };
+
   // 이미지 사전 로딩
   useEffect(() => {
     if (recipes.length > 0) {
@@ -385,6 +414,26 @@ export default function RecipeRecommend() {
     <div className="overflow-hidden">
       <RecipeHeader onRefresh={handleRefresh} />
       <Header.Spacer />
+
+      {/* TODO: 베타 서비스 이후 제거 예정 */}
+      <Modal
+        open={showBetaNotice}
+        onOpenChange={handleBetaNoticeOpenChange}
+        title="베타 서비스 안내"
+        description={
+          "'한끼부터'에 와주셔서 고마워요 🐤\n지금 한끼부터는 유저분들의 식탁에 맞는 레시피를 열심히 채우는 중이에요.\n그래서 아직은, 찾으시는 레시피가 없을 수도 있어요.\n\n그 대신 원하는 메뉴나 갖고 있는 재료를 알려주시면, 최대한 24시간 이내에 딱 맞는 레시피를 골라 드릴게요.\n\n밥새에게 부탁해볼까요?"
+        }
+        contentGap={24}
+        className="mx-auto w-[calc(100%-2rem)] sm:w-[calc(100%-3rem)] md:w-[calc(100%-4rem)]"
+        textAlign="left"
+        titleBlock
+      >
+        <div className="flex flex-col gap-3">
+          <Button size="full" onClick={handleCloseBetaNotice}>
+            확인했어요!
+          </Button>
+        </div>
+      </Modal>
       <div
         className={`recipe-recommend-main flex flex-col items-center justify-center ${getEmotionGradient(
           userSelectedMood
