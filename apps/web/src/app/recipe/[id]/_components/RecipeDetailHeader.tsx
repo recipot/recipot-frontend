@@ -2,6 +2,7 @@
 
 import React, { useMemo, useState } from 'react';
 import { storedAPI } from '@recipot/api';
+import { useAuthStore } from '@recipot/contexts';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { tokenUtils } from 'packages/api/src/auth';
@@ -26,6 +27,7 @@ export function RecipeDetailHeader({ recipe, showToast }: RecipeHeaderProps) {
   const router = useRouter();
   const token = tokenUtils.getToken();
   const useCookieAuth = isProduction;
+  const user = useAuthStore(state => state.user);
 
   const [isLiked, setIsLiked] = useState(recipe.isBookmarked);
   const [isLoading, setIsLoading] = useState(false);
@@ -72,16 +74,15 @@ export function RecipeDetailHeader({ recipe, showToast }: RecipeHeaderProps) {
   }, [recipe]);
 
   const handleToggleBookmark = async (recipeId: number) => {
-    // 카카오톡 인앱 브라우저에서 접속한 경우 로그인 모달 표시
-    if (isKakaoInApp) {
+    // 로그인 상태 확인: 프로덕션에서는 쿠키 기반 인증 사용, 개발 환경에서는 토큰 확인
+    const isLoggedIn = useCookieAuth ? user !== null : token !== null;
+
+    // 로그인하지 않은 경우에만 모달 표시
+    if (!isLoggedIn) {
       setShowLoginModal(true);
       return;
     }
 
-    if (!useCookieAuth && token === null) {
-      setShowLoginModal(true);
-      return;
-    }
     if (isLoading) return;
 
     setIsLoading(true);
@@ -126,7 +127,11 @@ export function RecipeDetailHeader({ recipe, showToast }: RecipeHeaderProps) {
             : '로그인하면 북마크 기능을 사용할 수 있어요.'
         }
       >
-        <Button variant="default" onClick={() => router.push('/signin')}>
+        <Button
+          variant="default"
+          onClick={() => router.push('/signin')}
+          size="full"
+        >
           로그인
         </Button>
       </Modal>

@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Element, scrollSpy } from 'react-scroll';
 import { recipe } from '@recipot/api';
+import { useAuthStore } from '@recipot/contexts';
 import { useRouter } from 'next/navigation';
 import { tokenUtils } from 'packages/api/src/auth';
 
@@ -30,6 +31,7 @@ const SCROLL_OFFSET = 120;
 export function RecipeDetail({ recipeId }: { recipeId: string }) {
   const token = tokenUtils.getToken();
   const useCookieAuth = isProduction;
+  const user = useAuthStore(state => state.user);
   const [recipeData, setRecipeData] = useState<Recipe | null>(null);
   const [activeTab, setActiveTab] = useState<TabId>('ingredients');
   const bottomPadding = useViewportBasedPadding({
@@ -105,16 +107,15 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
   }
 
   const handleCookingOrder = () => {
-    // 카카오톡 인앱 브라우저에서 접속한 경우 로그인 모달 표시
-    if (isKakaoInApp) {
+    // 로그인 상태 확인: 프로덕션에서는 쿠키 기반 인증 사용, 개발 환경에서는 토큰 확인
+    const isLoggedIn = useCookieAuth ? user !== null : token !== null;
+
+    // 로그인하지 않은 경우에만 모달 표시
+    if (!isLoggedIn) {
       setShowLoginModal(true);
       return;
     }
 
-    if (!useCookieAuth && !token) {
-      setShowLoginModal(true);
-      return;
-    }
     router.push(`/recipe/${recipeId}/cooking-order`);
   };
 
@@ -182,7 +183,11 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
             : '로그인하면 요리 시작하기 기능을 사용할 수 있어요.'
         }
       >
-        <Button variant="default" onClick={() => router.push('/signin')}>
+        <Button
+          variant="default"
+          onClick={() => router.push('/signin')}
+          size="full"
+        >
           로그인
         </Button>
       </Modal>
