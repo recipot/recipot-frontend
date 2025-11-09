@@ -3,18 +3,15 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Element, scrollSpy } from 'react-scroll';
 import { recipe } from '@recipot/api';
-import { useAuthStore } from '@recipot/contexts';
 import { useRouter } from 'next/navigation';
-import { tokenUtils } from 'packages/api/src/auth';
 
 import { Button } from '@/components/common/Button';
 import { Modal } from '@/components/common/Modal/Modal';
 import { Toast } from '@/components/common/Toast';
 import { CookIcon } from '@/components/Icons';
-import { useToast, useViewportBasedPadding } from '@/hooks';
+import { useIsLoggedIn, useToast, useViewportBasedPadding } from '@/hooks';
 import { useIsKakaoInApp } from '@/hooks/useIsKakaoInApp';
 import { usePostRecentRecipe } from '@/hooks/usePostRecentRecipe';
-import { isProduction } from '@/lib/env';
 import { useApiErrorModalStore } from '@/stores';
 
 import CookwareSection from './CookwareSection';
@@ -50,9 +47,7 @@ const updateOGTag = (property: string, content: string) => {
 };
 
 export function RecipeDetail({ recipeId }: { recipeId: number }) {
-  const token = tokenUtils.getToken();
-  const useCookieAuth = isProduction;
-  const user = useAuthStore(state => state.user);
+  const isLoggedIn = useIsLoggedIn();
   const [recipeData, setRecipeData] = useState<Recipe | null>(null);
   const [activeTab, setActiveTab] = useState<TabId>('ingredients');
   const bottomPadding = useViewportBasedPadding({
@@ -154,9 +149,6 @@ export function RecipeDetail({ recipeId }: { recipeId: number }) {
   }
 
   const handleCookingOrder = () => {
-    // 로그인 상태 확인: 프로덕션에서는 쿠키 기반 인증 사용, 개발 환경에서는 토큰 확인
-    const isLoggedIn = useCookieAuth ? user !== null : token !== null;
-
     // 로그인하지 않은 경우에만 모달 표시
     if (!isLoggedIn) {
       setShowLoginModal(true);

@@ -2,10 +2,8 @@
 
 import React, { useMemo, useState } from 'react';
 import { storedAPI } from '@recipot/api';
-import { useAuthStore } from '@recipot/contexts';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
-import { tokenUtils } from 'packages/api/src/auth';
 
 import { Button } from '@/components/common/Button';
 import { Header } from '@/components/common/Header';
@@ -13,7 +11,7 @@ import { Modal } from '@/components/common/Modal/Modal';
 import { HeartIcon, ShareIcon } from '@/components/Icons';
 import WebShareButton from '@/components/Share/WebShareButton';
 import { useIsKakaoInApp } from '@/hooks/useIsKakaoInApp';
-import { isProduction } from '@/lib/env';
+import { useIsLoggedIn } from '@/hooks/useIsLoggedIn';
 import { getAbsoluteUrl, getRecipeShareUrl } from '@/lib/url';
 import { useApiErrorModalStore } from '@/stores';
 import type { KakaoShareData, ShareData } from '@/types/share.types';
@@ -27,9 +25,7 @@ export interface RecipeHeaderProps {
 
 export function RecipeDetailHeader({ recipe, showToast }: RecipeHeaderProps) {
   const router = useRouter();
-  const token = tokenUtils.getToken();
-  const useCookieAuth = isProduction;
-  const user = useAuthStore(state => state.user);
+  const isLoggedIn = useIsLoggedIn();
 
   const [isLiked, setIsLiked] = useState(recipe.isBookmarked);
   const [isLoading, setIsLoading] = useState(false);
@@ -59,9 +55,6 @@ export function RecipeDetailHeader({ recipe, showToast }: RecipeHeaderProps) {
   }, [recipe.id, recipe.title, recipe.description, recipe.images]);
 
   const handleToggleBookmark = async (recipeId: number) => {
-    // 로그인 상태 확인: 프로덕션에서는 쿠키 기반 인증 사용, 개발 환경에서는 토큰 확인
-    const isLoggedIn = useCookieAuth ? user !== null : token !== null;
-
     // 로그인하지 않은 경우에만 모달 표시
     if (!isLoggedIn) {
       setShowLoginModal(true);
