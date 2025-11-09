@@ -1,15 +1,19 @@
 import { Button } from '../common/Button';
 
+import type { HealthSurveyPreparationOption } from '@recipot/api';
+
+interface HealthChangeOptionsProps {
+  options: HealthSurveyPreparationOption[];
+  onSelect: (value: string) => void;
+  selectedValue: string;
+}
+
 // 옵션 렌더링 컴포넌트
 const HealthChangeOptions = ({
   onSelect,
   options,
   selectedValue,
-}: {
-  options: Array<{ code: string; codeName: string }>;
-  onSelect: (value: string) => void;
-  selectedValue: string;
-}) => (
+}: HealthChangeOptionsProps) => (
   <div className="mt-2 flex w-full flex-wrap items-center justify-center gap-2">
     {options.map(option => {
       const optionText = option.codeName;
