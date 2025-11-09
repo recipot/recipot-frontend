@@ -25,7 +25,6 @@ interface EmotionSectionConfig {
   title: string;
 }
 
-// UI용 매핑 객체 - 이미지 디자인에 맞는 텍스트로 변환
 export const UI_TEXT_MAPPING: Record<string, string> = {
   // 맛 관련
   R03001: '별로예요',
@@ -50,8 +49,6 @@ export const EMOTION_SECTIONS: EmotionSectionConfig[] = [
   { title: '직접 요리해보니 어땠나요?', type: 'experience' },
 ];
 
-// API에서 가져온 데이터로 대체될 예정이므로 임시로 유지
-// API 응답과 동일한 객체 형태로 변경하여 일관성 유지
 export const HEALTH_IMPROVEMENT_OPTIONS = [
   { code: 'H02001', codeName: '피로가 줄었다' },
   { code: 'H02002', codeName: '몸이 가벼워 졌다' },

@@ -97,10 +97,6 @@ export function ReviewBottomSheet({
   const { handleSubmit, register, setValue, watch } = formMethods;
   const contentRegister = register('content');
 
-  // const watchedTasteOption = watch('tasteOption');
-  // const watchedDifficultyOption = watch('difficultyOption');
-  // const watchedExperienceOption = watch('experienceOption');
-
   const watchOptions = watch([
     'tasteOption',
     'difficultyOption',
