@@ -26,7 +26,13 @@ import {
   DrawerDescription,
   DrawerTitle,
 } from '../ui/drawer';
-import { EMOTION_SECTIONS, UI_TEXT_MAPPING } from './constants';
+import {
+  EMOTION_SECTIONS,
+  EMOTION_TO_FORM_FIELD_MAP,
+  EMOTION_TO_REVIEW_DATA_OPTIONS_MAP,
+  type EmotionSectionType,
+  UI_TEXT_MAPPING,
+} from './constants';
 import { EmotionSection } from './EmotionSection';
 import ReviewCompleteModal from './ReviewCompleteModal';
 import { ReviewRecipeInfo } from './ReviewRecipeInfo';
@@ -155,30 +161,16 @@ export function ReviewBottomSheet({
     }
   }, [isFormValid]);
 
-  const handleEmotionSelect = (
-    type: 'taste' | 'difficulty' | 'experience',
-    value: string
-  ) => {
+  const handleEmotionSelect = (type: EmotionSectionType, value: string) => {
     if (!reviewData) return;
 
-    const fieldMap: Record<
-      'taste' | 'difficulty' | 'experience',
-      'tasteOption' | 'difficultyOption' | 'experienceOption'
-    > = {
-      difficulty: 'difficultyOption',
-      experience: 'experienceOption',
-      taste: 'tasteOption',
-    };
-
-    const optionsMap = {
-      difficulty: reviewData.difficultyOptions,
-      experience: reviewData.experienceOptions,
-      taste: reviewData.tasteOptions,
-    };
-
-    const field = fieldMap[type];
-    const options = optionsMap[type];
-    const selectedOption = options.find(option => option.code === value);
+    // 타입 안전한 매핑 사용
+    const field = EMOTION_TO_FORM_FIELD_MAP[type];
+    const optionsKey = EMOTION_TO_REVIEW_DATA_OPTIONS_MAP[type];
+    const options = reviewData[optionsKey];
+    const selectedOption = options.find(
+      (option: { code: string }) => option.code === value
+    );
 
     if (selectedOption) {
       const currentValue = watch(field);

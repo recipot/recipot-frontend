@@ -1,4 +1,24 @@
-type EmotionSectionType = 'taste' | 'difficulty' | 'experience';
+export type EmotionSectionType = 'taste' | 'difficulty' | 'experience';
+
+// 타입 안전한 매핑: EmotionType -> FormFieldKey
+export const EMOTION_TO_FORM_FIELD_MAP = {
+  difficulty: 'difficultyOption',
+  experience: 'experienceOption',
+  taste: 'tasteOption',
+} as const satisfies Record<
+  EmotionSectionType,
+  'tasteOption' | 'difficultyOption' | 'experienceOption'
+>;
+
+// 타입 안전한 매핑: EmotionType -> ReviewData의 옵션 필드 키
+export const EMOTION_TO_REVIEW_DATA_OPTIONS_MAP = {
+  difficulty: 'difficultyOptions',
+  experience: 'experienceOptions',
+  taste: 'tasteOptions',
+} as const satisfies Record<
+  EmotionSectionType,
+  'tasteOptions' | 'difficultyOptions' | 'experienceOptions'
+>;
 
 interface EmotionSectionConfig {
   type: EmotionSectionType;
