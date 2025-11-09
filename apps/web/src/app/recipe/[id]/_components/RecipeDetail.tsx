@@ -49,7 +49,7 @@ const updateOGTag = (property: string, content: string) => {
   updateMetaTag(`meta[property="${property}"]`, 'property', property, content);
 };
 
-export function RecipeDetail({ recipeId }: { recipeId: string }) {
+export function RecipeDetail({ recipeId }: { recipeId: number }) {
   const token = tokenUtils.getToken();
   const useCookieAuth = isProduction;
   const user = useAuthStore(state => state.user);

@@ -5,7 +5,7 @@ import RecipeDetail from './_components/RecipeDetail';
 import type { Metadata } from 'next';
 
 interface RecipePageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: number }>;
 }
 
 export async function generateMetadata(): Promise<Metadata> {
