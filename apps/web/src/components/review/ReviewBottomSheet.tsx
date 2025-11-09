@@ -31,6 +31,8 @@ import { EmotionSection } from './EmotionSection';
 import ReviewCompleteModal from './ReviewCompleteModal';
 import { ReviewRecipeInfo } from './ReviewRecipeInfo';
 
+const TEXT_AREA_MAX_LENGTH = 200;
+
 export function ReviewBottomSheet({
   isOpen,
   onClose,
@@ -89,9 +91,15 @@ export function ReviewBottomSheet({
   const { handleSubmit, register, setValue, watch } = formMethods;
   const contentRegister = register('content');
 
-  const watchedTasteOption = watch('tasteOption');
-  const watchedDifficultyOption = watch('difficultyOption');
-  const watchedExperienceOption = watch('experienceOption');
+  // const watchedTasteOption = watch('tasteOption');
+  // const watchedDifficultyOption = watch('difficultyOption');
+  // const watchedExperienceOption = watch('experienceOption');
+
+  const watchOptions = watch([
+    'tasteOption',
+    'difficultyOption',
+    'experienceOption',
+  ]);
 
   // 감정 섹션 데이터 생성
   const createEmotionSections = () => {
@@ -104,9 +112,9 @@ export function ReviewBottomSheet({
     };
 
     const valuesByType = {
-      difficulty: watchedDifficultyOption,
-      experience: watchedExperienceOption,
-      taste: watchedTasteOption,
+      difficulty: watchOptions[1],
+      experience: watchOptions[2],
+      taste: watchOptions[0],
     };
 
     return EMOTION_SECTIONS.map(section => ({
@@ -127,9 +135,9 @@ export function ReviewBottomSheet({
 
   // 폼 유효성 검사
   const isFormValid =
-    watchedTasteOption !== null &&
-    watchedDifficultyOption !== null &&
-    watchedExperienceOption !== null;
+    watchOptions[0] !== null &&
+    watchOptions[1] !== null &&
+    watchOptions[2] !== null;
 
   // textarea ref 콜백 함수
   const handleTextareaRef = (element: HTMLTextAreaElement | null) => {
@@ -207,12 +215,13 @@ export function ReviewBottomSheet({
             error.message ?? '레시피 완료 후에만 후기를 작성할 수 있습니다.',
         });
       }
+      if (error instanceof AxiosError && error.response?.status === 409) {
+        useApiErrorModalStore.getState().showError({
+          message:
+            error.message ?? '이미 해당 레시피에 대한 후기를 작성했습니다.',
+        });
+      }
     }
-  };
-
-  // 닫기 기능을 컴포넌트 내부에서만 제어
-  const handleClose = () => {
-    onClose();
   };
 
   return (
@@ -236,7 +245,7 @@ export function ReviewBottomSheet({
               <div className="flex justify-end">
                 <button
                   type="button"
-                  onClick={handleClose}
+                  onClick={onClose}
                   className="rounded-full p-1.5"
                 >
                   <CloseIcon size={24} />
@@ -273,7 +282,7 @@ export function ReviewBottomSheet({
                       ref={handleTextareaRef}
                       placeholder="내용을 입력해 주세요"
                       className="text-17 w-full rounded-xl border border-gray-300 bg-white p-4 text-gray-900 placeholder:text-gray-400 focus:border-[#68982d] focus:outline-none"
-                      maxLength={200}
+                      maxLength={TEXT_AREA_MAX_LENGTH}
                     />
                   </div>
                 </div>
