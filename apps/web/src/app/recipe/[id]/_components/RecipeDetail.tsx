@@ -7,7 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/common/Button';
-import { Modal } from '@/components/common/Modal/Modal';
+import { LoginRequiredModal } from '@/components/common/LoginRequiredModal';
 import { Toast } from '@/components/common/Toast';
 import { CookIcon } from '@/components/Icons';
 import { useIsLoggedIn, useToast, useViewportBasedPadding } from '@/hooks';
@@ -244,24 +244,15 @@ export function RecipeDetail({ recipeId }: { recipeId: number }) {
         </div>
       </div>
       <Toast message={message} isVisible={isVisible} position="card-bottom" />
-      <Modal
-        open={showLoginModal}
-        onOpenChange={setShowLoginModal}
-        title="로그인이 필요합니다."
+      <LoginRequiredModal
         description={
           isKakaoInApp
             ? '로그인하면 더 많은 기능을 사용할 수 있어요.'
             : '로그인하면 요리 시작하기 기능을 사용할 수 있어요.'
         }
-      >
-        <Button
-          variant="default"
-          onClick={() => router.push('/signin')}
-          size="full"
-        >
-          로그인
-        </Button>
-      </Modal>
+        onOpenChange={setShowLoginModal}
+        open={showLoginModal}
+      />
     </div>
   );
 }

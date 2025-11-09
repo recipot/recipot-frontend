@@ -5,9 +5,8 @@ import { storedAPI } from '@recipot/api';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 
-import { Button } from '@/components/common/Button';
 import { Header } from '@/components/common/Header';
-import { Modal } from '@/components/common/Modal/Modal';
+import { LoginRequiredModal } from '@/components/common/LoginRequiredModal';
 import { HeartIcon, ShareIcon } from '@/components/Icons';
 import WebShareButton from '@/components/Share/WebShareButton';
 import { useIsKakaoInApp } from '@/hooks/useIsKakaoInApp';
@@ -95,24 +94,15 @@ export function RecipeDetailHeader({ recipe, showToast }: RecipeHeaderProps) {
   return (
     <>
       {/* Login Modal */}
-      <Modal
-        open={showLoginModal}
-        onOpenChange={setShowLoginModal}
-        title="로그인이 필요합니다."
+      <LoginRequiredModal
         description={
           isKakaoInApp
             ? '로그인하면 더 많은 기능을 사용할 수 있어요.'
             : '로그인하면 북마크 기능을 사용할 수 있어요.'
         }
-      >
-        <Button
-          variant="default"
-          onClick={() => router.push('/signin')}
-          size="full"
-        >
-          로그인
-        </Button>
-      </Modal>
+        onOpenChange={setShowLoginModal}
+        open={showLoginModal}
+      />
 
       {/* Header */}
       <Header className="px-4 py-3">
