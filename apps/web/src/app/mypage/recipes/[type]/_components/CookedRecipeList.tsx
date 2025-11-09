@@ -46,17 +46,19 @@ export default function CookedRecipeList({
   if (recipes.length === 0) {
     return (
       <div className="relative">
-        <div
-          className="h-[calc(100vh-100px)] max-h-full rounded-[1.25rem] px-3"
-          style={{
-            backgroundImage: `url(${config.noneBackImage})`,
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-            backgroundSize: '100% 100%',
-          }}
-        >
-          <div className="flex h-full flex-col items-center justify-center">
-            <div className="mb-9 text-center">
+        <div className="relative h-[calc(100vh-100px)] max-h-full rounded-[1.25rem] px-3">
+          <div
+            className="absolute inset-0 rounded-[1.25rem] opacity-70"
+            style={{
+              backgroundImage: `url(${config.noneBackImage})`,
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+              backgroundSize: '100% 100%',
+            }}
+          />
+
+          <div className="relative flex h-full flex-col items-center justify-center gap-6">
+            <div className="text-center">
               <p className="text-22sb text-gray-900">
                 아직 내가 만든 요리가 없어요
               </p>
@@ -69,8 +71,8 @@ export default function CookedRecipeList({
               <Image
                 src="/mypage/none-refrigerator.png"
                 alt="빈 냉장고"
-                width={142}
-                height={142}
+                width={160}
+                height={160}
                 priority
               />
             </div>

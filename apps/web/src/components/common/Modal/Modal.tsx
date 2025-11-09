@@ -19,22 +19,31 @@ export interface ModalProps
   disableOverlayClick?: boolean;
   contentGap?: number;
   children: React.ReactNode;
+  className?: string;
+  textAlign?: 'center' | 'left';
+  titleBlock?: boolean;
 }
 
 export function Modal({
   children,
+  className,
   contentGap,
   description,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   disableOverlayClick: _disableOverlayClick,
   onOpenChange,
+  textAlign = 'center',
   title,
+  titleBlock = false,
   ...props
 }: ModalProps) {
   return (
     <Dialog onOpenChange={onOpenChange} {...props}>
       <DialogContent
-        className="bg-background flex w-[17.5rem] flex-col items-center justify-center gap-[var(--modal-gap)] rounded-3xl border"
+        className={cn(
+          'bg-background flex w-[17.5rem] flex-col items-center justify-center gap-[var(--modal-gap)] rounded-3xl border',
+          className
+        )}
         showOverlay
         style={
           {
@@ -44,14 +53,29 @@ export function Modal({
         }
       >
         <DialogHeader
-          className={cn('text-center', title ? 'space-y-1.2' : 'space-y-0')}
+          className={cn('text-center', title ? 'space-y-2' : 'space-y-0')}
         >
-          <VisuallyHidden asChild>
-            <DialogTitle className="text-base">{title}</DialogTitle>
-          </VisuallyHidden>
-
+          {titleBlock === true ? (
+            <DialogTitle
+              className={cn(
+                'text-20 text-[#212529]',
+                textAlign === 'left' && 'text-left'
+              )}
+            >
+              {title}
+            </DialogTitle>
+          ) : (
+            <VisuallyHidden asChild>
+              <DialogTitle className="text-base">{title}</DialogTitle>
+            </VisuallyHidden>
+          )}
           {description ? (
-            <DialogDescription className="text-center text-base whitespace-pre-line">
+            <DialogDescription
+              className={cn(
+                'text-center text-base whitespace-pre-line',
+                textAlign === 'left' && 'text-left'
+              )}
+            >
               {description}
             </DialogDescription>
           ) : null}

@@ -21,16 +21,18 @@ export default function DefaultRecipeList({
   if (recipes.length === 0) {
     return (
       <div className="relative">
-        <div
-          className="h-[calc(100vh-100px)] max-h-full rounded-[1.25rem] px-3"
-          style={{
-            backgroundImage: `url(${config.noneBackImage})`,
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-            backgroundSize: '100% 100%',
-          }}
-        >
-          <div className="flex h-full flex-col items-center justify-center gap-6">
+        <div className="relative h-[calc(100vh-100px)] max-h-full rounded-[1.25rem] px-3">
+          <div
+            className="absolute inset-0 rounded-[1.25rem] opacity-70"
+            style={{
+              backgroundImage: `url(${config.noneBackImage})`,
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+              backgroundSize: '100% 100%',
+            }}
+          />
+
+          <div className="relative flex h-full flex-col items-center justify-center gap-6">
             <div className="text-center">
               <p className="text-22sb text-gray-900">
                 아직 {noneRecipeText} 레시피가 없어요
