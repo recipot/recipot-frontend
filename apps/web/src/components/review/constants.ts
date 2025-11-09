@@ -49,3 +49,22 @@ export const EMOTION_SECTIONS: EmotionSectionConfig[] = [
   { title: '요리를 시작하기가 어땠나요?', type: 'difficulty' },
   { title: '직접 요리해보니 어땠나요?', type: 'experience' },
 ];
+
+// API에서 가져온 데이터로 대체될 예정이므로 임시로 유지
+// API 응답과 동일한 객체 형태로 변경하여 일관성 유지
+export const HEALTH_IMPROVEMENT_OPTIONS = [
+  { code: 'H02001', codeName: '피로가 줄었다' },
+  { code: 'H02002', codeName: '몸이 가벼워 졌다' },
+  { code: 'H02003', codeName: '속이 편했다' },
+  { code: 'H02004', codeName: '체중 관리에 도움이 된다' },
+  { code: 'H02005', codeName: '기타' },
+] as const;
+
+export const HEALTH_CHANGE_OPTIONS = [
+  { code: 'H01001', codeName: '더 나빠졌어요' },
+  { code: 'H01002', codeName: '비슷해요' },
+  { code: 'H01003', codeName: '개선됐어요' },
+] as const;
+
+export const HEALTH_CHANGE_OPTIONS_ARRAY = [...HEALTH_CHANGE_OPTIONS];
+export const HEALTH_IMPROVEMENT_OPTIONS_ARRAY = [...HEALTH_IMPROVEMENT_OPTIONS];

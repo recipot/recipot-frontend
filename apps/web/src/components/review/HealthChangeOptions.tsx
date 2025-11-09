@@ -10,7 +10,7 @@ const HealthChangeOptions = ({
   onSelect: (value: string) => void;
   selectedValue: string;
 }) => (
-  <div className="mt-2 flex gap-2">
+  <div className="mt-2 flex w-full flex-wrap items-center justify-center gap-2">
     {options.map(option => {
       const optionText = option.codeName;
       const optionValue = option.code;
@@ -22,7 +22,7 @@ const HealthChangeOptions = ({
           size="full"
           type="button"
           onClick={() => onSelect(optionValue)}
-          className={`text-15sb rounded-[10px] border p-3 ${
+          className={`text-15sb xs:text-13sb min-w-0 flex-1 rounded-[10px] border p-3 ${
             selectedValue === optionValue
               ? 'border-secondary-soft-green bg-secondary-light-green text-primary'
               : 'border-gray-300 text-gray-600'
