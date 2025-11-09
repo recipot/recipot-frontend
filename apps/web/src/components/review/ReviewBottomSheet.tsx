@@ -252,15 +252,13 @@ export function ReviewBottomSheet({
                 {/* 스크롤 가능한 영역 - 선택 항목 및 의견 작성 */}
                 <div className="overflow-y-auto px-4">
                   {/* 감정 선택 섹션 */}
-                  {emotionSections.map(section => (
+                  {emotionSections.map(({ options, title, type, value }) => (
                     <EmotionSection
-                      key={section.type}
-                      title={section.title}
-                      options={section.options}
-                      selectedValue={section.value?.code ?? null}
-                      onSelect={value =>
-                        handleEmotionSelect(section.type, value)
-                      }
+                      key={type}
+                      title={title}
+                      options={options}
+                      selectedValue={value?.code ?? null}
+                      onSelect={value => handleEmotionSelect(type, value)}
                       uiTextMapping={UI_TEXT_MAPPING}
                     />
                   ))}
