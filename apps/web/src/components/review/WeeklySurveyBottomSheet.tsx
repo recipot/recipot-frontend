@@ -21,6 +21,7 @@ import {
   DrawerDescription,
   DrawerTitle,
 } from '../ui/drawer';
+import HealthChangeOptions from './HealthChangeOptions';
 import { ImprovementOptions } from './ImprovementOptions';
 
 // API에서 가져온 데이터로 대체될 예정이므로 임시로 유지
@@ -74,41 +75,6 @@ const isSubmitDisabled = (
     isSubmitting
   );
 };
-
-// 옵션 렌더링 컴포넌트
-const HealthChangeOptions = ({
-  onSelect,
-  options,
-  selectedValue,
-}: {
-  options: Array<{ code: string; codeName: string }>;
-  onSelect: (value: string) => void;
-  selectedValue: string;
-}) => (
-  <div className="mt-2 flex gap-2">
-    {options.map(option => {
-      const optionText = option.codeName;
-      const optionValue = option.code;
-
-      return (
-        <Button
-          key={optionValue}
-          variant="outline"
-          size="full"
-          type="button"
-          onClick={() => onSelect(optionValue)}
-          className={`text-15sb rounded-[10px] border p-3 ${
-            selectedValue === optionValue
-              ? 'border-secondary-soft-green bg-secondary-light-green text-primary'
-              : 'border-gray-300 text-gray-600'
-          }`}
-        >
-          {optionText}
-        </Button>
-      );
-    })}
-  </div>
-);
 
 export function WeeklySurveyBottomSheet() {
   const token = tokenUtils.getToken();
