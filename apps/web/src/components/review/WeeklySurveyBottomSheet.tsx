@@ -322,7 +322,7 @@ export function WeeklySurveyBottomSheet() {
                 <div className="mb-2">
                   <h1
                     id="review-request-title"
-                    className="text-24 mb-2 text-gray-900"
+                    className="text-24 xs:text-22 mb-2 text-gray-900"
                   >
                     집밥을 챙겨 먹은 후에
                     <br />
