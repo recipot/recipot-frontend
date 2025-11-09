@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Element, scrollSpy } from 'react-scroll';
 import { recipe } from '@recipot/api';
+import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/common/Button';
@@ -48,7 +49,28 @@ const updateOGTag = (property: string, content: string) => {
 
 export function RecipeDetail({ recipeId }: { recipeId: number }) {
   const isLoggedIn = useIsLoggedIn();
-  const [recipeData, setRecipeData] = useState<Recipe | null>(null);
+  const {
+    data: recipeData,
+    isError,
+    isLoading,
+  } = useQuery<Recipe, Error>({
+    enabled: !!recipeId, // recipeId가 있을 때만 조회
+    queryFn: async () => {
+      try {
+        return await recipe.getRecipeDetail(recipeId);
+      } catch (error) {
+        useApiErrorModalStore.getState().showError({
+          isFatal: false,
+          message:
+            '레시피를 불러오는 중 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.',
+        });
+        throw error;
+      }
+    },
+    queryKey: ['recipe-detail', recipeId],
+    staleTime: 1000 * 60 * 5, // 5분간 fresh 상태 유지
+  });
+
   const [activeTab, setActiveTab] = useState<TabId>('ingredients');
   const bottomPadding = useViewportBasedPadding({
     minPadding: 400,
@@ -60,23 +82,12 @@ export function RecipeDetail({ recipeId }: { recipeId: number }) {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const isKakaoInApp = useIsKakaoInApp();
 
-  // 레시피 데이터 fetch
+  // 레시피 데이터 로드 성공 시 최근 본 레시피 등록
   useEffect(() => {
-    const fetchRecipe = async () => {
-      try {
-        const data = await recipe.getRecipeDetail(recipeId);
-        setRecipeData(data);
-        postRecentRecipe(Number(recipeId));
-      } catch {
-        useApiErrorModalStore.getState().showError({
-          isFatal: false,
-          message:
-            '레시피를 불러오는 중 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.',
-        });
-      }
-    };
-    fetchRecipe();
-  }, [recipeId, postRecentRecipe]);
+    if (recipeData) {
+      postRecentRecipe(Number(recipeId));
+    }
+  }, [recipeData, recipeId, postRecentRecipe]);
 
   // 메타데이터 동적 업데이트
   useEffect(() => {
@@ -137,12 +148,33 @@ export function RecipeDetail({ recipeId }: { recipeId: number }) {
     [bottomPadding]
   );
 
-  if (!recipeData) {
+  // 로딩 상태
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen w-full items-center justify-center bg-gray-50">
+        <div className="flex flex-col items-center justify-center">
+          <div className="border-primary mb-4 h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" />
+          <p className="text-gray-600">레시피를 불러오는 중...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 에러 상태
+  if (isError || !recipeData) {
     return (
       <div className="flex min-h-screen w-full items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="border-primary mb-4 h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" />
-          <p className="text-gray-600">레시피를 불러오는 중...</p>
+          <p className="mb-4 text-gray-600">
+            레시피를 불러오는 중 오류가 발생했습니다.
+          </p>
+          <Button
+            variant="default"
+            onClick={() => window.location.reload()}
+            className="bg-primary px-6 py-2 text-white"
+          >
+            다시 시도
+          </Button>
         </div>
       </div>
     );
