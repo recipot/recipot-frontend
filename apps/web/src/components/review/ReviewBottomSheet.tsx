@@ -9,7 +9,6 @@ import { recipe } from '@recipot/api';
 import { useAuth } from '@recipot/contexts';
 import { useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import Image from 'next/image';
 
 import { isProduction } from '@/lib/env';
 import { useApiErrorModalStore } from '@/stores';
@@ -27,41 +26,10 @@ import {
   DrawerDescription,
   DrawerTitle,
 } from '../ui/drawer';
+import { EMOTION_SECTIONS, UI_TEXT_MAPPING } from './constants';
 import { EmotionSection } from './EmotionSection';
 import ReviewCompleteModal from './ReviewCompleteModal';
-
-// UI용 매핑 객체 - 이미지 디자인에 맞는 텍스트로 변환
-const UI_TEXT_MAPPING: Record<string, string> = {
-  // 맛 관련
-  R03001: '별로예요',
-  R03002: '그저그래요',
-  R03003: '맛있어요',
-
-  // 시작하기 관련
-  R04001: '힘들어요',
-  R04002: '적당해요',
-  R04003: '쉬워요',
-
-  // 직접 요리해보니 관련
-  R05001: '어려워요',
-  R05002: '적당해요',
-  R05003: '간단해요',
-};
-
-// 감정 섹션 설정 타입
-type EmotionSectionType = 'taste' | 'difficulty' | 'experience';
-
-interface EmotionSectionConfig {
-  type: EmotionSectionType;
-  title: string;
-}
-
-// 감정 섹션 설정 상수
-const EMOTION_SECTIONS: EmotionSectionConfig[] = [
-  { title: '요리의 맛은 어땠나요?', type: 'taste' },
-  { title: '요리를 시작하기가 어땠나요?', type: 'difficulty' },
-  { title: '직접 요리해보니 어땠나요?', type: 'experience' },
-];
+import { ReviewRecipeInfo } from './ReviewRecipeInfo';
 
 export function ReviewBottomSheet({
   isOpen,
@@ -163,6 +131,12 @@ export function ReviewBottomSheet({
     watchedDifficultyOption !== null &&
     watchedExperienceOption !== null;
 
+  // textarea ref 콜백 함수
+  const handleTextareaRef = (element: HTMLTextAreaElement | null) => {
+    contentRegister.ref(element);
+    textareaRef.current = element;
+  };
+
   // 모든 항목이 선택되었을 때 textarea로 부드럽게 스크롤
   useEffect(() => {
     if (isFormValid && textareaRef.current) {
@@ -208,12 +182,14 @@ export function ReviewBottomSheet({
   const onFormSubmit = async (data: ReviewFormData) => {
     if (!reviewData) return;
 
+    const { completionCount, completionMessage } = reviewData;
+
     const { content, difficultyOption, experienceOption, tasteOption } = data;
 
     const submitData = {
       completedRecipeId: recipeId,
-      completionCount: reviewData.completionCount,
-      completionMessage: reviewData.completionMessage,
+      completionCount,
+      completionMessage,
       content,
       difficultyCode: difficultyOption?.code,
       experienceCode: experienceOption?.code,
@@ -268,32 +244,7 @@ export function ReviewBottomSheet({
               </div>
 
               {/* 레시피 정보 - 데이터가 로드된 후에만 표시 */}
-              {reviewData && (
-                <div className="flex items-center gap-4">
-                  <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gray-100">
-                    {reviewData.recipeImageUrl ? (
-                      <Image
-                        src={reviewData.recipeImageUrl}
-                        alt={reviewData.recipeName}
-                        width={72}
-                        height={72}
-                        className="h-full w-full object-cover"
-                        priority
-                      />
-                    ) : (
-                      <div className="h-7 w-7 rounded bg-gray-300" />
-                    )}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-15 text-gray-600">
-                      {reviewData.completionCount}번째 레시피 해먹기 완료!
-                    </p>
-                    <h2 className="text-20 truncate text-gray-900">
-                      {reviewData.recipeName}
-                    </h2>
-                  </div>
-                </div>
-              )}
+              {reviewData && <ReviewRecipeInfo reviewData={reviewData} />}
             </div>
             {reviewData && (
               <>
@@ -321,10 +272,7 @@ export function ReviewBottomSheet({
                     </p>
                     <textarea
                       {...contentRegister}
-                      ref={e => {
-                        contentRegister.ref(e);
-                        textareaRef.current = e;
-                      }}
+                      ref={handleTextareaRef}
                       placeholder="내용을 입력해 주세요"
                       className="text-17 w-full rounded-xl border border-gray-300 bg-white p-4 text-gray-900 placeholder:text-gray-400 focus:border-[#68982d] focus:outline-none"
                       maxLength={200}
