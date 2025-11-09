@@ -239,36 +239,67 @@ describe('ReviewBottomSheet', () => {
 
     expect(commentInput).toHaveValue('정말 맛있었어요!');
   });
+  it('모든 항목이 선택되면 기타 의견을 입력하는 textarea로 자동 스크롤이 되어야 함', async () => {
+    const user = userEvent.setup();
+    const scrollIntoViewMock = vi.fn();
 
-  // TODO: 백엔드 확인 필요
-  // it('완전한 폼 제출이 작동해야 함', async () => {
-  //   const user = userEvent.setup();
-  //   render(<ReviewBottomSheet {...defaultProps} />, { wrapper });
+    render(<ReviewBottomSheet {...defaultProps} />, { wrapper });
 
-  //   // 모든 감정 선택
-  //   await user.click(screen.getByText('맛있어요'));
-  //   await user.click(screen.getByText('쉬워요'));
-  //   await user.click(screen.getByText('간단해요'));
+    await waitFor(() => {
+      expect(screen.getByText('김치찌개')).toBeInTheDocument();
+    });
 
-  //   // 댓글 입력 - fireEvent 사용 (react-hook-form과 호환)
-  //   const commentInput = screen.getByPlaceholderText('내용을 입력해 주세요');
-  //   fireEvent.change(commentInput, {
-  //     target: { value: '정말 맛있었어요!' },
-  //   });
+    // textarea 요소 찾기
+    const textarea = screen.getByPlaceholderText('내용을 입력해 주세요');
 
-  //   // 제출
-  //   const submitButton = screen.getByRole('button', { name: /후기 등록하기/i });
-  //   await user.click(submitButton);
+    // scrollIntoView 메서드 모킹
+    textarea.scrollIntoView = scrollIntoViewMock;
 
-  //   expect(defaultProps.onSubmit).toHaveBeenCalledWith({
-  //     comment: '정말 맛있었어요!',
-  //     emotions: {
-  //       difficulty: 'easy',
-  //       experience: 'easy',
-  //       taste: 'good',
-  //     },
-  //   });
-  // });
+    // 첫 번째 항목 선택 (맛)
+    const tasteButton = screen.getByRole('button', { name: '맛있어요' });
+    await user.click(tasteButton);
+
+    // scrollIntoView가 아직 호출되지 않았는지 확인
+    expect(scrollIntoViewMock).not.toHaveBeenCalled();
+
+    // 두 번째 항목 선택 (난이도) - 섹션 제목을 기준으로 찾기
+    const difficultySection =
+      screen.getByText('요리를 시작하기가 어땠나요?').parentElement;
+    const difficultyButtons =
+      difficultySection?.querySelectorAll('button') ?? [];
+    const difficultyButton = Array.from(difficultyButtons).find(button =>
+      button.textContent?.includes('적당해요')
+    );
+    expect(difficultyButton).toBeDefined();
+    if (difficultyButton) {
+      await user.click(difficultyButton);
+    }
+
+    // scrollIntoView가 아직 호출되지 않았는지 확인
+    expect(scrollIntoViewMock).not.toHaveBeenCalled();
+
+    // 세 번째 항목 선택 (경험) - 이제 모든 항목이 선택됨
+    const experienceSection =
+      screen.getByText('직접 요리해보니 어땠나요?').parentElement;
+    const experienceButtons =
+      experienceSection?.querySelectorAll('button') ?? [];
+    const experienceButton = Array.from(experienceButtons).find(button =>
+      button.textContent?.includes('간단해요')
+    );
+    expect(experienceButton).toBeDefined();
+    if (experienceButton) {
+      await user.click(experienceButton);
+    }
+
+    // 모든 항목이 선택되었을 때 scrollIntoView가 호출되어야 함
+    await waitFor(() => {
+      expect(scrollIntoViewMock).toHaveBeenCalledTimes(1);
+      expect(scrollIntoViewMock).toHaveBeenCalledWith({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    });
+  });
 
   it('다양한 reviewData에 따라 올바르게 렌더링되어야 함', async () => {
     // 이미지가 없을 때

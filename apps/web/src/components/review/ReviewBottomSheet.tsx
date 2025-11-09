@@ -2,7 +2,7 @@
 
 import './styles.css';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { recipe } from '@recipot/api';
@@ -72,6 +72,7 @@ export function ReviewBottomSheet({
   const [reviewData, setReviewData] = useState<ReviewData | null>(null);
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
   const { token } = useAuth();
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   // v1/reviews/preparation API 호출 - 바텀시트가 열릴 때만 데이터 로드
   useEffect(() => {
@@ -106,7 +107,7 @@ export function ReviewBottomSheet({
     getReviewData();
   }, [isOpen, token, recipeId]);
 
-  const { handleSubmit, register, setValue, watch } = useForm<ReviewFormData>({
+  const formMethods = useForm<ReviewFormData>({
     defaultValues: {
       completedRecipeId: recipeId,
       content: '',
@@ -116,6 +117,9 @@ export function ReviewBottomSheet({
     },
     mode: 'onChange',
   });
+
+  const { handleSubmit, register, setValue, watch } = formMethods;
+  const contentRegister = register('content');
 
   const watchedTasteOption = watch('tasteOption');
   const watchedDifficultyOption = watch('difficultyOption');
@@ -158,6 +162,16 @@ export function ReviewBottomSheet({
     watchedTasteOption !== null &&
     watchedDifficultyOption !== null &&
     watchedExperienceOption !== null;
+
+  // 모든 항목이 선택되었을 때 textarea로 부드럽게 스크롤
+  useEffect(() => {
+    if (isFormValid && textareaRef.current) {
+      textareaRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }
+  }, [isFormValid]);
 
   const handleEmotionSelect = (
     type: 'taste' | 'difficulty' | 'experience',
@@ -306,7 +320,11 @@ export function ReviewBottomSheet({
                       기타 의견이 있어요!
                     </p>
                     <textarea
-                      {...register('content')}
+                      {...contentRegister}
+                      ref={e => {
+                        contentRegister.ref(e);
+                        textareaRef.current = e;
+                      }}
                       placeholder="내용을 입력해 주세요"
                       className="text-17 w-full rounded-xl border border-gray-300 bg-white p-4 text-gray-900 placeholder:text-gray-400 focus:border-[#68982d] focus:outline-none"
                       maxLength={200}
