@@ -96,7 +96,7 @@ export function ReviewBottomSheet({
   const { handleSubmit, register, setValue, watch } = formMethods;
   const contentRegister = register('content');
 
-  const watchOptions = watch([
+  const [tasteOption, difficultyOption, experienceOption] = watch([
     'tasteOption',
     'difficultyOption',
     'experienceOption',
@@ -113,9 +113,9 @@ export function ReviewBottomSheet({
     };
 
     const valuesByType = {
-      difficulty: watchOptions[1],
-      experience: watchOptions[2],
-      taste: watchOptions[0],
+      difficulty: difficultyOption,
+      experience: experienceOption,
+      taste: tasteOption,
     };
 
     return EMOTION_SECTIONS.map(section => ({
@@ -136,9 +136,9 @@ export function ReviewBottomSheet({
 
   // 폼 유효성 검사
   const isFormValid =
-    watchOptions[0] !== null &&
-    watchOptions[1] !== null &&
-    watchOptions[2] !== null;
+    tasteOption !== null &&
+    difficultyOption !== null &&
+    experienceOption !== null;
 
   // textarea ref 콜백 함수
   const handleTextareaRef = (element: HTMLTextAreaElement | null) => {
