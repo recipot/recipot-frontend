@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
 
@@ -216,10 +216,13 @@ describe('ReviewBottomSheet', () => {
     render(<ReviewBottomSheet {...defaultProps} />, { wrapper });
 
     await waitFor(() => {
-      expect(screen.getByText('맛있어요')).toBeInTheDocument();
+      expect(screen.getByTestId('emotion-section-taste')).toBeInTheDocument();
     });
 
-    const tasteButton = screen.getByRole('button', { name: '맛있어요' });
+    const tasteSection = screen.getByTestId('emotion-section-taste');
+    const tasteButton = within(tasteSection).getByRole('button', {
+      name: '맛있어요',
+    });
     await user.click(tasteButton);
     expect(tasteButton).toHaveClass('bg-secondary-light-green');
   });
@@ -229,12 +232,10 @@ describe('ReviewBottomSheet', () => {
     render(<ReviewBottomSheet {...defaultProps} />, { wrapper });
 
     await waitFor(() => {
-      expect(
-        screen.getByPlaceholderText('내용을 입력해 주세요')
-      ).toBeInTheDocument();
+      expect(screen.getByTestId('review-comment-textarea')).toBeInTheDocument();
     });
 
-    const commentInput = screen.getByPlaceholderText('내용을 입력해 주세요');
+    const commentInput = screen.getByTestId('review-comment-textarea');
     await user.type(commentInput, '정말 맛있었어요!');
 
     expect(commentInput).toHaveValue('정말 맛있었어요!');
@@ -250,46 +251,37 @@ describe('ReviewBottomSheet', () => {
     });
 
     // textarea 요소 찾기
-    const textarea = screen.getByPlaceholderText('내용을 입력해 주세요');
+    const textarea = screen.getByTestId('review-comment-textarea');
 
     // scrollIntoView 메서드 모킹
     textarea.scrollIntoView = scrollIntoViewMock;
 
     // 첫 번째 항목 선택 (맛)
-    const tasteButton = screen.getByRole('button', { name: '맛있어요' });
+    const tasteSection = screen.getByTestId('emotion-section-taste');
+    const tasteButton = within(tasteSection).getByRole('button', {
+      name: '맛있어요',
+    });
     await user.click(tasteButton);
 
     // scrollIntoView가 아직 호출되지 않았는지 확인
     expect(scrollIntoViewMock).not.toHaveBeenCalled();
 
-    // 두 번째 항목 선택 (난이도) - 섹션 제목을 기준으로 찾기
-    const difficultySection =
-      screen.getByText('요리를 시작하기가 어땠나요?').parentElement;
-    const difficultyButtons =
-      difficultySection?.querySelectorAll('button') ?? [];
-    const difficultyButton = Array.from(difficultyButtons).find(button =>
-      button.textContent?.includes('적당해요')
-    );
-    expect(difficultyButton).toBeDefined();
-    if (difficultyButton) {
-      await user.click(difficultyButton);
-    }
+    // 두 번째 항목 선택 (난이도)
+    const difficultySection = screen.getByTestId('emotion-section-difficulty');
+    const difficultyButton = within(difficultySection).getByRole('button', {
+      name: '적당해요',
+    });
+    await user.click(difficultyButton);
 
     // scrollIntoView가 아직 호출되지 않았는지 확인
     expect(scrollIntoViewMock).not.toHaveBeenCalled();
 
     // 세 번째 항목 선택 (경험) - 이제 모든 항목이 선택됨
-    const experienceSection =
-      screen.getByText('직접 요리해보니 어땠나요?').parentElement;
-    const experienceButtons =
-      experienceSection?.querySelectorAll('button') ?? [];
-    const experienceButton = Array.from(experienceButtons).find(button =>
-      button.textContent?.includes('간단해요')
-    );
-    expect(experienceButton).toBeDefined();
-    if (experienceButton) {
-      await user.click(experienceButton);
-    }
+    const experienceSection = screen.getByTestId('emotion-section-experience');
+    const experienceButton = within(experienceSection).getByRole('button', {
+      name: '간단해요',
+    });
+    await user.click(experienceButton);
 
     // 모든 항목이 선택되었을 때 scrollIntoView가 호출되어야 함
     await waitFor(() => {

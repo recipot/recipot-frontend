@@ -31,7 +31,6 @@ import {
   EMOTION_TO_FORM_FIELD_MAP,
   EMOTION_TO_REVIEW_DATA_OPTIONS_MAP,
   type EmotionSectionType,
-  UI_TEXT_MAPPING,
 } from './constants';
 import { EmotionSection } from './EmotionSection';
 import ReviewCompleteModal from './ReviewCompleteModal';
@@ -252,11 +251,11 @@ export function ReviewBottomSheet({
                   {emotionSections.map(({ options, title, type, value }) => (
                     <EmotionSection
                       key={type}
+                      type={type}
                       title={title}
                       options={options}
                       selectedValue={value?.code ?? null}
                       onSelect={value => handleEmotionSelect(type, value)}
-                      uiTextMapping={UI_TEXT_MAPPING}
                     />
                   ))}
 
@@ -269,6 +268,7 @@ export function ReviewBottomSheet({
                       {...contentRegister}
                       ref={handleTextareaRef}
                       placeholder="내용을 입력해 주세요"
+                      data-testid="review-comment-textarea"
                       className="text-17 w-full rounded-xl border border-gray-300 bg-white p-4 text-gray-900 placeholder:text-gray-400 focus:border-[#68982d] focus:outline-none"
                       maxLength={TEXT_AREA_MAX_LENGTH}
                     />
