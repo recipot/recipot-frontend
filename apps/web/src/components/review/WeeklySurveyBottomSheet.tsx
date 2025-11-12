@@ -227,8 +227,8 @@ export function WeeklySurveyBottomSheet() {
     }
   }, [watchedImprovements]);
 
-  const handleClose = () => {
-    setIsOpen(prev => !prev);
+  const handleClose = (open: boolean) => {
+    setIsOpen(open);
   };
 
   const onSubmit = async (data: SurveyFormData) => {
@@ -253,7 +253,7 @@ export function WeeklySurveyBottomSheet() {
         await healthSurvey.submitHealthSurvey(healthSurveyRequest);
 
       if (healthSurveySubmitResponse.status === 200) {
-        handleClose();
+        handleClose(false);
       } else {
         useApiErrorModalStore.getState().showError({
           message: '설문 제출 실패',
