@@ -3,6 +3,7 @@ import {
   useEffect,
   useImperativeHandle,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import { Loader2, Plus, XIcon } from 'lucide-react';
@@ -33,6 +34,9 @@ const IngredientsSearch = forwardRef<
 >(({ onSelectionChange, variant = 'onboarding' }, ref) => {
   const [value, setValue] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [maxHeight, setMaxHeight] = useState<number>(400);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLDivElement>(null);
 
   // 서버에서 재료 목록 조회
   const { data: foodList = [], isLoading: isFoodListLoading } = useFoodList();
@@ -66,6 +70,52 @@ const IngredientsSearch = forwardRef<
       (food: Food | undefined): food is Food => food !== undefined
     );
   }, [selectedFoodIds, foodList]);
+
+  // 검색 결과 리스트 스타일 메모이제이션
+  const searchListStyle = useMemo(
+    () => ({ maxHeight: `${maxHeight}px` }),
+    [maxHeight]
+  );
+
+  // 브라우저 높이 측정 및 maxHeight 계산
+  useEffect(() => {
+    const calculateMaxHeight = () => {
+      const viewportHeight = window.innerHeight;
+
+      if (searchInputRef.current) {
+        // SearchInput의 실제 위치 측정
+        const searchInputRect = searchInputRef.current.getBoundingClientRect();
+        const searchInputBottom = searchInputRect.bottom;
+
+        // 검색 입력창 아래부터 화면 하단까지의 거리 계산
+        const availableHeight = viewportHeight - searchInputBottom - 72;
+        setMaxHeight(Math.max(200, availableHeight));
+      } else {
+        const searchInputTop = 84;
+        const searchInputHeight = 40;
+        const padding = 16;
+        const availableHeight =
+          viewportHeight - searchInputTop - searchInputHeight - padding;
+        setMaxHeight(Math.max(200, availableHeight));
+      }
+    };
+
+    // 초기 계산 (약간의 지연을 두어 DOM이 완전히 렌더링된 후 측정)
+    const timeoutId = setTimeout(calculateMaxHeight, 0);
+
+    // 리사이즈 이벤트 리스너 추가 (모바일 주소창 숨김/표시 대응)
+    window.addEventListener('resize', calculateMaxHeight);
+    window.addEventListener('orientationchange', calculateMaxHeight);
+    // 모바일에서 스크롤 시 주소창이 숨겨지는 경우 대응
+    window.addEventListener('scroll', calculateMaxHeight, { passive: true });
+
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener('resize', calculateMaxHeight);
+      window.removeEventListener('orientationchange', calculateMaxHeight);
+      window.removeEventListener('scroll', calculateMaxHeight);
+    };
+  }, []);
 
   // 선택된 재료 개수 변경 시 부모에게 알림
   useEffect(() => {
@@ -128,16 +178,21 @@ const IngredientsSearch = forwardRef<
   }
 
   return (
-    <div className="relative p-8">
-      <SearchInput
-        value={value}
-        onChange={e => setValue(e.target.value)}
-        onClear={handleClearSearch}
-      />
+    <div ref={containerRef} className="relative p-8">
+      <div ref={searchInputRef}>
+        <SearchInput
+          value={value}
+          onChange={e => setValue(e.target.value)}
+          onClear={handleClearSearch}
+        />
+      </div>
 
       {/* 검색된 재료 리스트 */}
       {value && filteredFoodList.length > 0 && (
-        <div className="absolute top-[84px] left-0 flex w-full flex-wrap gap-3 bg-white px-8 py-5">
+        <div
+          className="absolute top-[84px] left-0 z-10 flex w-full flex-wrap gap-3 overflow-y-auto bg-white px-8 py-5"
+          style={searchListStyle}
+        >
           {filteredFoodList.map(food => (
             <Button
               key={food.id}
