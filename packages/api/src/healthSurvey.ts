@@ -45,7 +45,7 @@ export const healthSurvey = {
     return response.data?.data ?? response.data;
   },
 
-  submit: async (
+  submitHealthSurvey: async (
     payload: HealthSurveyRequest
   ): Promise<HealthSurveySubmitResponse> => {
     const response = await healthSurveyApi.post(`/v1/health-survey`, payload);

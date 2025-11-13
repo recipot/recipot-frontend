@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
 
@@ -216,10 +216,13 @@ describe('ReviewBottomSheet', () => {
     render(<ReviewBottomSheet {...defaultProps} />, { wrapper });
 
     await waitFor(() => {
-      expect(screen.getByText('맛있어요')).toBeInTheDocument();
+      expect(screen.getByTestId('emotion-section-taste')).toBeInTheDocument();
     });
 
-    const tasteButton = screen.getByRole('button', { name: '맛있어요' });
+    const tasteSection = screen.getByTestId('emotion-section-taste');
+    const tasteButton = within(tasteSection).getByRole('button', {
+      name: '맛있어요',
+    });
     await user.click(tasteButton);
     expect(tasteButton).toHaveClass('bg-secondary-light-green');
   });
@@ -229,46 +232,66 @@ describe('ReviewBottomSheet', () => {
     render(<ReviewBottomSheet {...defaultProps} />, { wrapper });
 
     await waitFor(() => {
-      expect(
-        screen.getByPlaceholderText('내용을 입력해 주세요')
-      ).toBeInTheDocument();
+      expect(screen.getByTestId('review-comment-textarea')).toBeInTheDocument();
     });
 
-    const commentInput = screen.getByPlaceholderText('내용을 입력해 주세요');
+    const commentInput = screen.getByTestId('review-comment-textarea');
     await user.type(commentInput, '정말 맛있었어요!');
 
     expect(commentInput).toHaveValue('정말 맛있었어요!');
   });
+  it('모든 항목이 선택되면 기타 의견을 입력하는 textarea로 자동 스크롤이 되어야 함', async () => {
+    const user = userEvent.setup();
+    const scrollIntoViewMock = vi.fn();
 
-  // TODO: 백엔드 확인 필요
-  // it('완전한 폼 제출이 작동해야 함', async () => {
-  //   const user = userEvent.setup();
-  //   render(<ReviewBottomSheet {...defaultProps} />, { wrapper });
+    render(<ReviewBottomSheet {...defaultProps} />, { wrapper });
 
-  //   // 모든 감정 선택
-  //   await user.click(screen.getByText('맛있어요'));
-  //   await user.click(screen.getByText('쉬워요'));
-  //   await user.click(screen.getByText('간단해요'));
+    await waitFor(() => {
+      expect(screen.getByText('김치찌개')).toBeInTheDocument();
+    });
 
-  //   // 댓글 입력 - fireEvent 사용 (react-hook-form과 호환)
-  //   const commentInput = screen.getByPlaceholderText('내용을 입력해 주세요');
-  //   fireEvent.change(commentInput, {
-  //     target: { value: '정말 맛있었어요!' },
-  //   });
+    // textarea 요소 찾기
+    const textarea = screen.getByTestId('review-comment-textarea');
 
-  //   // 제출
-  //   const submitButton = screen.getByRole('button', { name: /후기 등록하기/i });
-  //   await user.click(submitButton);
+    // scrollIntoView 메서드 모킹
+    textarea.scrollIntoView = scrollIntoViewMock;
 
-  //   expect(defaultProps.onSubmit).toHaveBeenCalledWith({
-  //     comment: '정말 맛있었어요!',
-  //     emotions: {
-  //       difficulty: 'easy',
-  //       experience: 'easy',
-  //       taste: 'good',
-  //     },
-  //   });
-  // });
+    // 첫 번째 항목 선택 (맛)
+    const tasteSection = screen.getByTestId('emotion-section-taste');
+    const tasteButton = within(tasteSection).getByRole('button', {
+      name: '맛있어요',
+    });
+    await user.click(tasteButton);
+
+    // scrollIntoView가 아직 호출되지 않았는지 확인
+    expect(scrollIntoViewMock).not.toHaveBeenCalled();
+
+    // 두 번째 항목 선택 (난이도)
+    const difficultySection = screen.getByTestId('emotion-section-difficulty');
+    const difficultyButton = within(difficultySection).getByRole('button', {
+      name: '적당해요',
+    });
+    await user.click(difficultyButton);
+
+    // scrollIntoView가 아직 호출되지 않았는지 확인
+    expect(scrollIntoViewMock).not.toHaveBeenCalled();
+
+    // 세 번째 항목 선택 (경험) - 이제 모든 항목이 선택됨
+    const experienceSection = screen.getByTestId('emotion-section-experience');
+    const experienceButton = within(experienceSection).getByRole('button', {
+      name: '간단해요',
+    });
+    await user.click(experienceButton);
+
+    // 모든 항목이 선택되었을 때 scrollIntoView가 호출되어야 함
+    await waitFor(() => {
+      expect(scrollIntoViewMock).toHaveBeenCalledTimes(1);
+      expect(scrollIntoViewMock).toHaveBeenCalledWith({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    });
+  });
 
   it('다양한 reviewData에 따라 올바르게 렌더링되어야 함', async () => {
     // 이미지가 없을 때

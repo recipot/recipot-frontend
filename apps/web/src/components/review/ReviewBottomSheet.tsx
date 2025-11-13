@@ -2,14 +2,13 @@
 
 import './styles.css';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { recipe } from '@recipot/api';
 import { useAuth } from '@recipot/contexts';
 import { useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import Image from 'next/image';
 
 import { isProduction } from '@/lib/env';
 import { useApiErrorModalStore } from '@/stores';
@@ -27,41 +26,17 @@ import {
   DrawerDescription,
   DrawerTitle,
 } from '../ui/drawer';
+import {
+  EMOTION_SECTIONS,
+  EMOTION_TO_FORM_FIELD_MAP,
+  EMOTION_TO_REVIEW_DATA_OPTIONS_MAP,
+  type EmotionSectionType,
+} from './constants';
 import { EmotionSection } from './EmotionSection';
 import ReviewCompleteModal from './ReviewCompleteModal';
+import { ReviewRecipeInfo } from './ReviewRecipeInfo';
 
-// UI용 매핑 객체 - 이미지 디자인에 맞는 텍스트로 변환
-const UI_TEXT_MAPPING: Record<string, string> = {
-  // 맛 관련
-  R03001: '별로예요',
-  R03002: '그저그래요',
-  R03003: '맛있어요',
-
-  // 시작하기 관련
-  R04001: '힘들어요',
-  R04002: '적당해요',
-  R04003: '쉬워요',
-
-  // 직접 요리해보니 관련
-  R05001: '어려워요',
-  R05002: '적당해요',
-  R05003: '간단해요',
-};
-
-// 감정 섹션 설정 타입
-type EmotionSectionType = 'taste' | 'difficulty' | 'experience';
-
-interface EmotionSectionConfig {
-  type: EmotionSectionType;
-  title: string;
-}
-
-// 감정 섹션 설정 상수
-const EMOTION_SECTIONS: EmotionSectionConfig[] = [
-  { title: '요리의 맛은 어땠나요?', type: 'taste' },
-  { title: '요리를 시작하기가 어땠나요?', type: 'difficulty' },
-  { title: '직접 요리해보니 어땠나요?', type: 'experience' },
-];
+const TEXT_AREA_MAX_LENGTH = 200;
 
 export function ReviewBottomSheet({
   isOpen,
@@ -72,6 +47,7 @@ export function ReviewBottomSheet({
   const [reviewData, setReviewData] = useState<ReviewData | null>(null);
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
   const { token } = useAuth();
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   // v1/reviews/preparation API 호출 - 바텀시트가 열릴 때만 데이터 로드
   useEffect(() => {
@@ -106,7 +82,7 @@ export function ReviewBottomSheet({
     getReviewData();
   }, [isOpen, token, recipeId]);
 
-  const { handleSubmit, register, setValue, watch } = useForm<ReviewFormData>({
+  const formMethods = useForm<ReviewFormData>({
     defaultValues: {
       completedRecipeId: recipeId,
       content: '',
@@ -117,9 +93,14 @@ export function ReviewBottomSheet({
     mode: 'onChange',
   });
 
-  const watchedTasteOption = watch('tasteOption');
-  const watchedDifficultyOption = watch('difficultyOption');
-  const watchedExperienceOption = watch('experienceOption');
+  const { handleSubmit, register, setValue, watch } = formMethods;
+  const contentRegister = register('content');
+
+  const [tasteOption, difficultyOption, experienceOption] = watch([
+    'tasteOption',
+    'difficultyOption',
+    'experienceOption',
+  ]);
 
   // 감정 섹션 데이터 생성
   const createEmotionSections = () => {
@@ -132,9 +113,9 @@ export function ReviewBottomSheet({
     };
 
     const valuesByType = {
-      difficulty: watchedDifficultyOption,
-      experience: watchedExperienceOption,
-      taste: watchedTasteOption,
+      difficulty: difficultyOption,
+      experience: experienceOption,
+      taste: tasteOption,
     };
 
     return EMOTION_SECTIONS.map(section => ({
@@ -155,34 +136,36 @@ export function ReviewBottomSheet({
 
   // 폼 유효성 검사
   const isFormValid =
-    watchedTasteOption !== null &&
-    watchedDifficultyOption !== null &&
-    watchedExperienceOption !== null;
+    tasteOption !== null &&
+    difficultyOption !== null &&
+    experienceOption !== null;
 
-  const handleEmotionSelect = (
-    type: 'taste' | 'difficulty' | 'experience',
-    value: string
-  ) => {
+  // textarea ref 콜백 함수
+  const handleTextareaRef = (element: HTMLTextAreaElement | null) => {
+    contentRegister.ref(element);
+    textareaRef.current = element;
+  };
+
+  // 모든 항목이 선택되었을 때 textarea로 부드럽게 스크롤
+  useEffect(() => {
+    if (isFormValid && textareaRef.current) {
+      textareaRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }
+  }, [isFormValid]);
+
+  const handleEmotionSelect = (type: EmotionSectionType, value: string) => {
     if (!reviewData) return;
 
-    const fieldMap: Record<
-      'taste' | 'difficulty' | 'experience',
-      'tasteOption' | 'difficultyOption' | 'experienceOption'
-    > = {
-      difficulty: 'difficultyOption',
-      experience: 'experienceOption',
-      taste: 'tasteOption',
-    };
-
-    const optionsMap = {
-      difficulty: reviewData.difficultyOptions,
-      experience: reviewData.experienceOptions,
-      taste: reviewData.tasteOptions,
-    };
-
-    const field = fieldMap[type];
-    const options = optionsMap[type];
-    const selectedOption = options.find(option => option.code === value);
+    // 타입 안전한 매핑 사용
+    const field = EMOTION_TO_FORM_FIELD_MAP[type];
+    const optionsKey = EMOTION_TO_REVIEW_DATA_OPTIONS_MAP[type];
+    const options = reviewData[optionsKey];
+    const selectedOption = options.find(
+      (option: { code: string }) => option.code === value
+    );
 
     if (selectedOption) {
       const currentValue = watch(field);
@@ -194,12 +177,14 @@ export function ReviewBottomSheet({
   const onFormSubmit = async (data: ReviewFormData) => {
     if (!reviewData) return;
 
+    const { completionCount, completionMessage } = reviewData;
+
     const { content, difficultyOption, experienceOption, tasteOption } = data;
 
     const submitData = {
       completedRecipeId: recipeId,
-      completionCount: reviewData.completionCount,
-      completionMessage: reviewData.completionMessage,
+      completionCount,
+      completionMessage,
       content,
       difficultyCode: difficultyOption?.code,
       experienceCode: experienceOption?.code,
@@ -217,12 +202,13 @@ export function ReviewBottomSheet({
             error.message ?? '레시피 완료 후에만 후기를 작성할 수 있습니다.',
         });
       }
+      if (error instanceof AxiosError && error.response?.status === 409) {
+        useApiErrorModalStore.getState().showError({
+          message:
+            error.message ?? '이미 해당 레시피에 대한 후기를 작성했습니다.',
+        });
+      }
     }
-  };
-
-  // 닫기 기능을 컴포넌트 내부에서만 제어
-  const handleClose = () => {
-    onClose();
   };
 
   return (
@@ -246,7 +232,7 @@ export function ReviewBottomSheet({
               <div className="flex justify-end">
                 <button
                   type="button"
-                  onClick={handleClose}
+                  onClick={onClose}
                   className="rounded-full p-1.5"
                 >
                   <CloseIcon size={24} />
@@ -254,32 +240,7 @@ export function ReviewBottomSheet({
               </div>
 
               {/* 레시피 정보 - 데이터가 로드된 후에만 표시 */}
-              {reviewData && (
-                <div className="flex items-center gap-4">
-                  <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gray-100">
-                    {reviewData.recipeImageUrl ? (
-                      <Image
-                        src={reviewData.recipeImageUrl}
-                        alt={reviewData.recipeName}
-                        width={72}
-                        height={72}
-                        className="h-full w-full object-cover"
-                        priority
-                      />
-                    ) : (
-                      <div className="h-7 w-7 rounded bg-gray-300" />
-                    )}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-15 text-gray-600">
-                      {reviewData.completionCount}번째 레시피 해먹기 완료!
-                    </p>
-                    <h2 className="text-20 truncate text-gray-900">
-                      {reviewData.recipeName}
-                    </h2>
-                  </div>
-                </div>
-              )}
+              {reviewData && <ReviewRecipeInfo reviewData={reviewData} />}
             </div>
             {reviewData && (
               <>
@@ -287,16 +248,14 @@ export function ReviewBottomSheet({
                 {/* 스크롤 가능한 영역 - 선택 항목 및 의견 작성 */}
                 <div className="overflow-y-auto px-4">
                   {/* 감정 선택 섹션 */}
-                  {emotionSections.map(section => (
+                  {emotionSections.map(({ options, title, type, value }) => (
                     <EmotionSection
-                      key={section.type}
-                      title={section.title}
-                      options={section.options}
-                      selectedValue={section.value?.code ?? null}
-                      onSelect={value =>
-                        handleEmotionSelect(section.type, value)
-                      }
-                      uiTextMapping={UI_TEXT_MAPPING}
+                      key={type}
+                      type={type}
+                      title={title}
+                      options={options}
+                      selectedValue={value?.code ?? null}
+                      onSelect={value => handleEmotionSelect(type, value)}
                     />
                   ))}
 
@@ -306,10 +265,12 @@ export function ReviewBottomSheet({
                       기타 의견이 있어요!
                     </p>
                     <textarea
-                      {...register('content')}
+                      {...contentRegister}
+                      ref={handleTextareaRef}
                       placeholder="내용을 입력해 주세요"
+                      data-testid="review-comment-textarea"
                       className="text-17 w-full rounded-xl border border-gray-300 bg-white p-4 text-gray-900 placeholder:text-gray-400 focus:border-[#68982d] focus:outline-none"
-                      maxLength={200}
+                      maxLength={TEXT_AREA_MAX_LENGTH}
                     />
                   </div>
                 </div>
