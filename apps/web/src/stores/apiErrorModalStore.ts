@@ -18,24 +18,24 @@ interface ApiErrorModalState {
 }
 
 const DEFAULT_ERROR_MESSAGE =
-  '요청을 처리하는 중 문제가 발생했어요.\n잠시 후 다시 시도해주세요.';
+  '서버 내부 오류입니다.\n잠시 후 다시 시도해주세요.';
 
 export const useApiErrorModalStore = create<ApiErrorModalState>(set => ({
   code: undefined,
-  isFatal: false,
-  isOpen: false,
-  message: DEFAULT_ERROR_MESSAGE,
   hide: () =>
     set(state => ({
       ...state,
       isFatal: false,
       isOpen: false,
     })),
+  isFatal: false,
+  isOpen: false,
+  message: DEFAULT_ERROR_MESSAGE,
   showError: payload =>
     set(() => ({
       code: payload?.code != null ? String(payload.code) : undefined,
       isFatal: Boolean(payload?.isFatal),
       isOpen: true,
-      message: payload?.message ?? DEFAULT_ERROR_MESSAGE,
+      message: DEFAULT_ERROR_MESSAGE,
     })),
 }));
