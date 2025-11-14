@@ -5,33 +5,22 @@ import 'swiper/css/effect-cards';
 import './styles.css';
 import '@/components/EmotionState/styles.css';
 
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
-import { recipe, storedAPI } from '@recipot/api';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useAuth } from '@recipot/contexts';
-import axios from 'axios';
 import { useRouter } from 'next/navigation';
-import { tokenUtils } from 'packages/api/src/auth';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
 import { moodToConditionId } from '@/app/onboarding/_utils/conditionMapper';
-import type {
-  Recipe,
-  RecommendationItem,
-} from '@/app/recipe/[id]/types/recipe.types';
 import { Button } from '@/components/common/Button';
 import { Header } from '@/components/common/Header';
 import { Modal } from '@/components/common/Modal/Modal';
 import { Toast } from '@/components/common/Toast';
+import type { MoodType } from '@/components/EmotionState';
 import { ExploreComplete } from '@/components/ExploreComplete';
 import { RecipeCard } from '@/components/RecipeCard';
-import { useToast } from '@/hooks/useToast';
-import { isProduction } from '@/lib/env';
+import { useToastContext } from '@/contexts/ToastContext';
+import { useRecipeRecommend } from '@/hooks/useRecipeRecommend';
+import { useTutorial } from '@/hooks/useTutorial';
 import { useMoodStore } from '@/stores/moodStore';
 import { useSelectedFoodsStore } from '@/stores/selectedFoodsStore';
 import { getEmotionGradient } from '@/utils/emotionGradient';
@@ -44,22 +33,12 @@ import { SWIPER_CONFIG, SWIPER_MODULES, swiperStyles } from '../constants';
 
 import type { Swiper as SwiperType } from 'swiper';
 
-// localStorage 키 상수
-const TUTORIAL_CLOSED_KEY = 'recipe-recommend-tutorial-closed';
-const BETA_NOTICE_CLOSED_KEY = 'recipe-recommend-beta-notice-closed';
-
 export default function RecipeRecommend() {
   const { loading, user } = useAuth();
   const router = useRouter();
-  const [likedRecipes, setLikedRecipes] = useState<Set<number>>(new Set());
-  const [isLoading, setIsLoading] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [recipes, setRecipes] = useState<Recipe[]>([]);
-  const [hasFetched, setHasFetched] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const { isVisible, message, showToast } = useToast();
-  const lastFetchKeyRef = useRef<string | null>(null);
+  const { isVisible, message, showToast } = useToastContext();
   const swiperRef = useRef<SwiperType | null>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   // 인증 상태 확인 및 리다이렉트
   useEffect(() => {
@@ -75,313 +54,51 @@ export default function RecipeRecommend() {
   // 온보딩에서 저장된 사용자의 기분 상태 가져오기
   const mood = useMoodStore(state => state.mood);
   const selectedFoodIds = useSelectedFoodsStore(state => state.selectedFoodIds);
+  const userSelectedMood: MoodType = mood ?? 'neutral';
 
-  const userSelectedMood = mood ?? 'neutral';
-
-  console.info(
-    'RecipeRecommend - mood:',
-    mood,
-    'userSelectedMood:',
-    userSelectedMood
-  );
-
-  const token = tokenUtils.getToken();
-  const useCookieAuth = isProduction;
-
-  // condition 객체를 useMemo로 메모이제이션
-  const condition = useMemo(() => {
-    const cond = {
-      id: moodToConditionId(userSelectedMood),
-      name: userSelectedMood,
-    };
-    console.info('RecipeRecommend - condition 생성:', cond);
-    return cond;
-  }, [userSelectedMood]);
-
-  const [showTutorial, setShowTutorial] = useState(false);
-  const [showBetaNotice, setShowBetaNotice] = useState(false);
-  const [shouldOpenTutorialAfterModal, setShouldOpenTutorialAfterModal] =
-    useState(false);
-
-  // API 응답을 Recipe 타입으로 변환하는 함수
-  const mapRecommendationToRecipe = (item: RecommendationItem): Recipe => {
-    const images = (item.imageUrls ?? []).map((url, index) => ({
-      id: index + 1,
-      imageUrl: url,
-    }));
-
-    const tools = (item.tools ?? []).map((tool, index) => {
-      if (typeof tool === 'string') {
-        return {
-          id: index + 1,
-          name: tool,
-        };
-      }
-      return {
-        id: tool.id ?? index + 1,
-        name: tool.name ?? '',
-        ...(tool.imageUrl && { imageUrl: tool.imageUrl }),
-      };
+  // 레시피 추천 훅
+  const { hasFetched, recipes, refreshRecipes, updateRecipeBookmark } =
+    useRecipeRecommend({
+      enabled: !loading && !!user,
+      selectedFoodIds,
+      showToast,
+      userSelectedMood,
     });
 
-    return {
-      description: item.description ?? '',
-      duration: item.duration ?? '',
-      id: item.recipeId,
-      images,
-      ingredients: {
-        alternativeUnavailable: [],
-        notOwned: [],
-        owned: [],
-      },
-      isBookmarked: item.isBookmarked ?? false,
-      seasonings: [],
-      steps: [],
-      title: item.title ?? '',
-      tools,
-    };
+  // 북마크 변경 핸들러
+  const handleBookmarkChange = (recipeId: number, isBookmarked: boolean) => {
+    updateRecipeBookmark(recipeId, isBookmarked);
   };
 
-  // 레시피 추천 API 호출 공통 함수
-  const fetchRecommendRecipes = useCallback(
-    async (page: number = 1) => {
-      try {
-        // selectedFoodIds가 비어있으면 API 호출하지 않음
-        if (selectedFoodIds?.length === 0) {
-          console.warn('선택된 재료가 없어서 레시피 추천을 건너뜁니다.');
-          setHasFetched(false);
-          return;
-        }
+  // 튜토리얼 훅
+  const {
+    closeBetaNotice,
+    closeTutorial,
+    handleBetaNoticeOpenChange,
+    showBetaNotice,
+    showTutorial,
+  } = useTutorial({
+    enabled: !loading && !!user,
+    hasRecipesAvailable: hasFetched && recipes.length > 0,
+    router,
+  });
 
-        const conditionId = moodToConditionId(userSelectedMood);
-
-        const response = await recipe.recipeRecommend(
-          conditionId,
-          selectedFoodIds,
-          page
-        );
-
-        // API 응답 구조: recipe.recipeRecommend()는 response.data를 반환
-        // axios response.data = { status: 200, data: { items: [...] } }
-        // 따라서 response.data.items로 접근
-        const items = response?.data?.items ?? [];
-        const responseCurrentPage = response?.data?.currentPage ?? page;
-
-        // items가 배열이 아니거나 빈 배열인 경우에만 탐험완료 표시
-        if (!Array.isArray(items) || items.length === 0) {
-          console.error(
-            '⚠️ 레시피 추천 결과가 빈 배열입니다. API 응답:',
-            response
-          );
-          setRecipes([]);
-          setHasFetched(true);
-          setCurrentPage(responseCurrentPage);
-          return;
-        }
-
-        // API 응답을 Recipe 타입으로 변환
-        const mappedRecipes = items.map(mapRecommendationToRecipe);
-
-        console.info('변환된 레시피 개수:', mappedRecipes.length);
-
-        // 변환된 레시피가 빈 배열인 경우도 탐험완료로 처리
-        if (mappedRecipes.length === 0) {
-          console.info('변환된 레시피가 빈 배열입니다.');
-          setRecipes([]);
-          setHasFetched(true);
-          setCurrentPage(responseCurrentPage);
-          return;
-        }
-
-        setRecipes(mappedRecipes);
-        setHasFetched(true);
-        setCurrentPage(responseCurrentPage);
-
-        // 초기 북마크 상태 설정
-        const bookmarkedRecipe = mappedRecipes.filter(
-          (recipe: Recipe) => recipe.isBookmarked
-        );
-
-        const bookmarkedIds = new Set<number>(
-          bookmarkedRecipe.map((recipe: Recipe) => recipe.id)
-        );
-
-        setLikedRecipes(bookmarkedIds);
-      } catch (error) {
-        console.error('레시피 추천 조회 실패:', error);
-
-        // 에러 발생 시 상세 정보 로깅
-        if (axios.isAxiosError(error)) {
-          console.error('에러 응답:', error.response?.data);
-          console.error('에러 상태:', error.response?.status);
-        }
-
-        // 인증 오류인 경우 로그인 페이지로 리다이렉트
-        if (axios.isAxiosError(error) && error.response?.status === 401) {
-          console.info('🔒 인증 오류, 로그인 페이지로 이동');
-          router.push('/signin');
-          return;
-        }
-
-        // 에러 발생 시에도 상태를 올바르게 관리 (탐험완료 페이지가 표시되지 않도록)
-        // 에러는 실제 빈 배열과 구분하기 위해 hasFetched는 true로 설정하되
-        // recipes는 빈 배열로 설정하지 않음 (기존 레시피 유지 또는 로딩 상태 유지)
-        // 단, 실제 빈 배열 반환과 구분하기 위해 이전 recipes 상태 유지
-        setHasFetched(false);
-        showToast('레시피를 불러오는데 실패했어요');
-      }
-    },
-    [userSelectedMood, selectedFoodIds, router]
+  // condition 객체
+  const condition = useMemo(
+    () => ({
+      id: moodToConditionId(userSelectedMood),
+      name: userSelectedMood,
+    }),
+    [userSelectedMood]
   );
 
-  useEffect(() => {
-    if (loading || !user) {
-      return;
-    }
-
-    if (!Array.isArray(selectedFoodIds) || selectedFoodIds.length === 0) {
-      lastFetchKeyRef.current = null;
-      return;
-    }
-
-    const fetchKey = `${userSelectedMood}:${selectedFoodIds.join(',')}`;
-
-    if (lastFetchKeyRef.current === fetchKey) {
-      return;
-    }
-
-    lastFetchKeyRef.current = fetchKey;
-    setCurrentPage(1); // 새로운 조건으로 검색 시 페이지 초기화
-    fetchRecommendRecipes(1);
-  }, [fetchRecommendRecipes, loading, selectedFoodIds, user, userSelectedMood]);
-
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const userInfo = await recipe.getMyProfile();
-
-        // localStorage 확인 - 이미 튜토리얼을 닫은 적이 있는지 체크
-        const tutorialClosed = localStorage.getItem(TUTORIAL_CLOSED_KEY);
-        const betaNoticeClosed = localStorage.getItem(BETA_NOTICE_CLOSED_KEY);
-        const hasRecipesAvailable = hasFetched && recipes.length > 0;
-
-        // 첫 진입이고, 아직 튜토리얼을 닫은 적이 없고, 레시피가 있을 때만 표시
-        // (탐험완료 상태에서는 표시하지 않음)
-        if (userInfo.isFirstEntry && !betaNoticeClosed) {
-          setShowBetaNotice(true);
-          setShouldOpenTutorialAfterModal(
-            !tutorialClosed && hasRecipesAvailable
-          );
-          return;
-        }
-
-        if (userInfo.isFirstEntry && !tutorialClosed && hasRecipesAvailable) {
-          setShowTutorial(true);
-        }
-      } catch (error) {
-        console.error('프로필 조회 실패:', error);
-        // 인증 오류인 경우 로그인 페이지로 리다이렉트
-        if (axios.isAxiosError(error) && error.response?.status === 401) {
-          console.info('🔒 인증 오류, 로그인 페이지로 이동');
-          router.push('/signin');
-          return;
-        }
-      }
-    };
-    fetchProfile();
-  }, [router, hasFetched, recipes.length]);
-
-  // 하트 아이콘 클릭 시 북마크 토글 함수
-  const handleToggleBookmark = async (_index: number, recipeId: number) => {
-    if (isLoading) return;
-
-    setIsLoading(true);
-    if (!useCookieAuth && !token) {
-      console.error('인증 토큰이 없어 북마크를 변경할 수 없습니다.');
-      router.push('/signin');
-      setIsLoading(false);
-      return;
-    }
-
-    const isCurrentlyLiked = likedRecipes.has(recipeId);
-
-    try {
-      if (isCurrentlyLiked) {
-        // DELETE 요청
-        await storedAPI.deleteStoredRecipe(recipeId);
-        setLikedRecipes(prev => {
-          const newSet = new Set(prev);
-          newSet.delete(recipeId);
-          return newSet;
-        });
-        // recipes 배열의 isBookmarked 상태도 업데이트
-        setRecipes(prev =>
-          prev.map(recipe =>
-            recipe.id === recipeId ? { ...recipe, isBookmarked: false } : recipe
-          )
-        );
-      } else {
-        // POST 요청
-        await storedAPI.postStoredRecipe(recipeId);
-        setLikedRecipes(prev => new Set(prev).add(recipeId));
-        // recipes 배열의 isBookmarked 상태도 업데이트
-        setRecipes(prev =>
-          prev.map(recipe =>
-            recipe.id === recipeId ? { ...recipe, isBookmarked: true } : recipe
-          )
-        );
-
-        showToast('레시피가 저장되었어요!');
-      }
-    } catch (error: unknown) {
-      console.error('북마크 토글 실패:', error);
-      // 인증 오류인 경우 로그인 페이지로 리다이렉트
-      if (axios.isAxiosError(error) && error.response?.status === 401) {
-        console.info('🔒 인증 오류, 로그인 페이지로 이동');
-        router.push('/signin');
-        return;
-      }
-      showToast(
-        isCurrentlyLiked
-          ? '북마크 제거에 실패했어요'
-          : '북마크 추가에 실패했어요'
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
+  // 새로고침 핸들러
   const handleRefresh = async () => {
-    const nextPage = currentPage + 1;
     // 새로고침 시 첫 번째 슬라이드로 이동
     swiperRef.current?.slideTo(0);
     setActiveIndex(0);
-    await fetchRecommendRecipes(nextPage);
+    await refreshRecipes();
     showToast('새로운 레시피가 추천되었어요');
-  };
-
-  const handleCloseTutorial = () => {
-    // localStorage에 튜토리얼 닫음 플래그 저장
-    localStorage.setItem(TUTORIAL_CLOSED_KEY, 'true');
-    setShowTutorial(false);
-  };
-
-  const handleCloseBetaNotice = () => {
-    localStorage.setItem(BETA_NOTICE_CLOSED_KEY, 'true');
-    setShowBetaNotice(false);
-
-    if (shouldOpenTutorialAfterModal) {
-      setShowTutorial(true);
-      setShouldOpenTutorialAfterModal(false);
-    }
-  };
-
-  const handleBetaNoticeOpenChange = (open: boolean) => {
-    if (!open) {
-      handleCloseBetaNotice();
-    } else {
-      setShowBetaNotice(true);
-    }
   };
 
   // 이미지 사전 로딩
@@ -429,7 +146,7 @@ export default function RecipeRecommend() {
         titleBlock
       >
         <div className="flex flex-col gap-3">
-          <Button size="full" onClick={handleCloseBetaNotice}>
+          <Button size="full" onClick={closeBetaNotice}>
             확인했어요!
           </Button>
         </div>
@@ -466,8 +183,8 @@ export default function RecipeRecommend() {
                     <RecipeCard
                       recipe={recipe}
                       index={index}
-                      onToggleLike={handleToggleBookmark}
-                      isLiked={likedRecipes.has(recipe.id)}
+                      onBookmarkChange={handleBookmarkChange}
+                      isBookmarked={recipe.isBookmarked}
                       isMainCard={index === activeIndex}
                       mood={userSelectedMood}
                     />
@@ -485,7 +202,7 @@ export default function RecipeRecommend() {
       <Toast message={message} isVisible={isVisible} position="card-bottom" />
 
       {/* 튜토리얼 팝업 */}
-      {showTutorial && <TutorialPopup onClose={handleCloseTutorial} />}
+      {showTutorial && <TutorialPopup onClose={closeTutorial} />}
     </div>
   );
 }
