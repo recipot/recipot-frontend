@@ -4,14 +4,11 @@ import { useRouter } from 'next/navigation';
 
 import { handleAuthError } from '@/utils/errorHandler';
 
-import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
-
 // localStorage 키 상수
 const TUTORIAL_CLOSED_KEY = 'recipe-recommend-tutorial-closed';
 const BETA_NOTICE_CLOSED_KEY = 'recipe-recommend-beta-notice-closed';
 
 interface UseTutorialParams {
-  router: AppRouterInstance;
   hasRecipesAvailable: boolean;
   enabled?: boolean;
 }

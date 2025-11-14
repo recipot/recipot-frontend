@@ -80,7 +80,6 @@ export default function RecipeRecommend() {
   } = useTutorial({
     enabled: !loading && !!user,
     hasRecipesAvailable: hasFetched && recipes.length > 0,
-    router,
   });
 
   // condition 객체
