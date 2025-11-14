@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { storedAPI } from '@recipot/api';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
@@ -11,9 +11,8 @@ import { HeartIcon, ShareIcon } from '@/components/Icons';
 import WebShareButton from '@/components/Share/WebShareButton';
 import { useIsKakaoInApp } from '@/hooks/useIsKakaoInApp';
 import { useIsLoggedIn } from '@/hooks/useIsLoggedIn';
-import { getAbsoluteUrl, getRecipeShareUrl } from '@/lib/url';
 import { useApiErrorModalStore } from '@/stores';
-import type { KakaoShareData, ShareData } from '@/types/share.types';
+import { createKakaoShareData, createWebShareData } from '@/utils/shareData';
 
 import type { Recipe } from '../types/recipe.types';
 
@@ -32,26 +31,11 @@ export function RecipeDetailHeader({ recipe, showToast }: RecipeHeaderProps) {
   const isKakaoInApp = useIsKakaoInApp();
 
   // Web Share API용 공유 데이터 (시스템 공유 모달에서 사용)
-  const webShareData = useMemo<ShareData>(() => {
-    return {
-      text: recipe.description,
-      title: recipe.title,
-      url: getRecipeShareUrl(recipe.id),
-    };
-  }, [recipe.id, recipe.title, recipe.description]);
+  const webShareData = createWebShareData(recipe);
 
-  // 카카오톡 공유용 데이터
-  const kakaoShareData = useMemo<KakaoShareData>(() => {
-    const recipeImageUrl = recipe.images?.[0]?.imageUrl;
-    const imageUrl = getAbsoluteUrl(recipeImageUrl);
-
-    return {
-      description: recipe.description,
-      imageUrl,
-      title: recipe.title,
-      url: getRecipeShareUrl(recipe.id),
-    };
-  }, [recipe.id, recipe.title, recipe.description, recipe.images]);
+  // 카카오톡 스크랩 메시지용 공유 데이터
+  // 포함 정보: 레시피 이미지, 레시피 제목, 레시피 설명, 레시피 링크
+  const kakaoShareData = createKakaoShareData(recipe);
 
   const handleToggleBookmark = async (recipeId: number) => {
     // 로그인하지 않은 경우에만 모달 표시
