@@ -57,7 +57,7 @@ export function RecipeDetail({ recipeId }: { recipeId: number }) {
     enabled: !!recipeId, // recipeId가 있을 때만 조회
     queryFn: async () => {
       try {
-        return await recipe.getRecipeDetail(recipeId);
+        return await recipe.getPublicRecipeDetail(recipeId);
       } catch (error) {
         useApiErrorModalStore.getState().showError({
           isFatal: false,
