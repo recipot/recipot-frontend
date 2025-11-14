@@ -1,4 +1,3 @@
-import { use } from 'react';
 import { recipe } from '@recipot/api';
 
 import { getAbsoluteUrl, getRecipeShareUrl } from '@/lib/url';
@@ -6,11 +5,12 @@ import { getAbsoluteUrl, getRecipeShareUrl } from '@/lib/url';
 import RecipeDetail from './_components/RecipeDetail';
 
 interface RecipePageProps {
-  params: Promise<{ id: number }>;
+  params: { id: string };
 }
 
 export async function generateMetadata({ params }: RecipePageProps) {
   const { id } = await params;
+
   const recipeData = await recipe.getPublicRecipeDetail(id);
 
   if (!recipeData) {
@@ -65,6 +65,7 @@ export async function generateMetadata({ params }: RecipePageProps) {
 }
 
 export default function RecipePage({ params }: RecipePageProps) {
-  const { id } = use(params);
+  const { id } = params;
+
   return <RecipeDetail recipeId={id} />;
 }

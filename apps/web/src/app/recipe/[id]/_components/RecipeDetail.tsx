@@ -47,7 +47,7 @@ const updateOGTag = (property: string, content: string) => {
   updateMetaTag(`meta[property="${property}"]`, 'property', property, content);
 };
 
-export function RecipeDetail({ recipeId }: { recipeId: number }) {
+export function RecipeDetail({ recipeId }: { recipeId: string }) {
   const isLoggedIn = useIsLoggedIn();
   const {
     data: recipeData,
