@@ -33,13 +33,13 @@ export function ReviewRemindBottomSheet() {
   const token = tokenUtils.getToken();
 
   // 사용자가 일부러 닫았는지 확인
-  const isDismissed = () => {
+  const isDismissed = useCallback(() => {
     if (typeof window === 'undefined') return false;
     return localStorage.getItem(DISMISSED_KEY) === 'true';
-  };
+  }, []);
 
   // 24시간 경과 여부 체크
-  const shouldShowBottomSheet = () => {
+  const shouldShowBottomSheet = useCallback(() => {
     if (typeof window === 'undefined') return false;
 
     // 사용자가 일부러 닫았다면 표시하지 않음
@@ -53,7 +53,7 @@ export function ReviewRemindBottomSheet() {
     const twentyFourHours = 24 * 60 * 60 * 1000;
 
     return now - lastShownTime >= twentyFourHours;
-  };
+  }, [isDismissed]);
 
   // API에서 데이터 로드
   const loadPendingReviews = useCallback(async () => {
@@ -113,7 +113,7 @@ export function ReviewRemindBottomSheet() {
       setLoading(false);
       isFetchingRef.current = false;
     }
-  }, [token, useCookieAuth]);
+  }, [token, useCookieAuth, shouldShowBottomSheet]);
 
   useEffect(() => {
     void loadPendingReviews();
@@ -214,7 +214,7 @@ export function ReviewRemindBottomSheet() {
             {/* 레시피 정보 카드 */}
             {recipes.map(recipe => (
               <ReviewRecipeCard
-                key={recipe.id}
+                key={recipe.completedRecipeId}
                 onClick={handleRecipeClick}
                 recipe={recipe}
               />
