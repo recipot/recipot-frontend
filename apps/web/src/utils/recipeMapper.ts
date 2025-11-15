@@ -28,16 +28,6 @@ export const mapRecommendationToRecipe = (item: RecommendationItem): Recipe => {
 
   const isBookmarked = item.isBookmarked ?? false;
 
-  // API 응답의 isBookmarked 값 로깅 (디버깅용)
-  if (item.recipeId) {
-    console.info('[recipeMapper] 레시피 북마크 상태 매핑', {
-      apiIsBookmarked: item.isBookmarked,
-      mappedIsBookmarked: isBookmarked,
-      recipeId: item.recipeId,
-      recipeTitle: item.title,
-    });
-  }
-
   return {
     description: item.description ?? '',
     duration: item.duration ?? '',
