@@ -182,7 +182,7 @@ export const useRecipeRecommend = ({
             recipe.id === recipeId
               ? {
                   ...recipe,
-                  isBookmarked: !isCurrentlyBookmarked,
+                  isBookmarked: isCurrentlyBookmarked,
                 }
               : recipe
           )
