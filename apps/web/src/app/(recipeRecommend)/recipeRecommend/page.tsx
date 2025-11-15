@@ -38,6 +38,7 @@ export default function RecipeRecommend() {
   const router = useRouter();
   const { isVisible, message, showToast } = useToastContext();
   const swiperRef = useRef<SwiperType | null>(null);
+  const lastFetchKeyRef = useRef<string | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
   // 인증 상태 확인 및 리다이렉트
@@ -55,15 +56,42 @@ export default function RecipeRecommend() {
   const mood = useMoodStore(state => state.mood);
   const selectedFoodIds = useSelectedFoodsStore(state => state.selectedFoodIds);
   const userSelectedMood: MoodType = mood ?? 'neutral';
+  const enabled = !loading && !!user;
 
   // 레시피 추천 훅
-  const { hasFetched, recipes, refreshRecipes, updateRecipeBookmark } =
-    useRecipeRecommend({
-      enabled: !loading && !!user,
-      selectedFoodIds,
-      showToast,
-      userSelectedMood,
-    });
+  const {
+    fetchRecipes,
+    hasFetched,
+    recipes,
+    refreshRecipes,
+    updateRecipeBookmark,
+  } = useRecipeRecommend({
+    enabled,
+    selectedFoodIds,
+    showToast,
+    userSelectedMood,
+  });
+
+  // 조건 변경 시 레시피 조회
+  useEffect(() => {
+    if (!enabled) {
+      return;
+    }
+
+    if (!Array.isArray(selectedFoodIds) || selectedFoodIds.length === 0) {
+      lastFetchKeyRef.current = null;
+      return;
+    }
+
+    const fetchKey = `${userSelectedMood}:${selectedFoodIds.join(',')}`;
+
+    if (lastFetchKeyRef.current === fetchKey) {
+      return;
+    }
+
+    lastFetchKeyRef.current = fetchKey;
+    fetchRecipes(1);
+  }, [selectedFoodIds, userSelectedMood, enabled, fetchRecipes]);
 
   // 북마크 변경 핸들러
   const handleBookmarkChange = (recipeId: number, isBookmarked: boolean) => {

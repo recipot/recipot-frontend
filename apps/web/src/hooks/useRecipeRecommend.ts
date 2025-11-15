@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { recipe } from '@recipot/api';
 import axios from 'axios';
 
@@ -18,7 +18,6 @@ interface UseRecipeRecommendParams {
  * 레시피 추천 API 호출 및 상태 관리 훅
  */
 export const useRecipeRecommend = ({
-  enabled = true,
   selectedFoodIds,
   showToast,
   userSelectedMood,
@@ -27,8 +26,6 @@ export const useRecipeRecommend = ({
   const [hasFetched, setHasFetched] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-
-  const lastFetchKeyRef = useRef<string | null>(null);
 
   // API 호출 함수
   const callRecipeRecommendAPI = async (page: number) => {
@@ -93,59 +90,39 @@ export const useRecipeRecommend = ({
   };
 
   // 레시피 조회 메인 로직
-  const fetchRecipes = async (page: number = 1) => {
-    if (selectedFoodIds?.length === 0) {
-      console.warn('선택된 재료가 없어서 레시피 추천을 건너뜁니다.');
-      setHasFetched(false);
-      return;
-    }
-
-    setIsLoading(true);
-
-    try {
-      const response = await callRecipeRecommendAPI(page);
-      const { currentPage: responsePage, recipes: processedRecipes } =
-        processRecipeResponse(response, page);
-
-      updateRecipeState(processedRecipes, responsePage, true);
-    } catch (error) {
-      const isAuthError = handleFetchError(error);
-      if (isAuthError) {
+  const fetchRecipes = useCallback(
+    async (page: number = 1) => {
+      if (selectedFoodIds?.length === 0) {
+        console.warn('선택된 재료가 없어서 레시피 추천을 건너뜁니다.');
+        setHasFetched(false);
         return;
       }
-    } finally {
-      setIsLoading(false);
-    }
-  };
+
+      setIsLoading(true);
+
+      try {
+        const response = await callRecipeRecommendAPI(page);
+        const { currentPage: responsePage, recipes: processedRecipes } =
+          processRecipeResponse(response, page);
+
+        updateRecipeState(processedRecipes, responsePage, true);
+      } catch (error) {
+        const isAuthError = handleFetchError(error);
+        if (isAuthError) {
+          return;
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [selectedFoodIds, userSelectedMood, showToast]
+  );
 
   // 다음 페이지 레시피 조회
   const refreshRecipes = async () => {
     const nextPage = currentPage + 1;
     await fetchRecipes(nextPage);
   };
-
-  // 조건 변경 시 자동으로 레시피 조회
-  useEffect(() => {
-    if (!enabled) {
-      return;
-    }
-
-    if (!Array.isArray(selectedFoodIds) || selectedFoodIds.length === 0) {
-      lastFetchKeyRef.current = null;
-      return;
-    }
-
-    const fetchKey = `${userSelectedMood}:${selectedFoodIds.join(',')}`;
-
-    if (lastFetchKeyRef.current === fetchKey) {
-      return;
-    }
-
-    lastFetchKeyRef.current = fetchKey;
-    setCurrentPage(1); // 새로운 조건으로 검색 시 페이지 초기화
-    fetchRecipes(1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedFoodIds, userSelectedMood, enabled]);
 
   // 북마크 상태 업데이트 함수
   const updateRecipeBookmark = useCallback(
