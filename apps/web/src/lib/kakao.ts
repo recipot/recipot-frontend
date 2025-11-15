@@ -2,7 +2,7 @@
  * 카카오 SDK 관련 유틸리티 함수들
  */
 
-import { isProduction } from './env';
+import { getAbsoluteUrl } from './url';
 
 // 카카오 SDK 타입 정의
 declare global {
@@ -17,27 +17,41 @@ declare global {
   }
 }
 
-interface KakaoShareOptions {
-  objectType: 'feed';
-  content: {
-    title: string;
-    description: string;
-    imageUrl: string;
-    imageWidth?: number;
-    imageHeight?: number;
-    link: {
-      mobileWebUrl: string;
-      webUrl: string;
+type KakaoShareOptions =
+  | {
+      objectType: 'feed';
+      content: {
+        title: string;
+        description: string;
+        imageUrl: string;
+        imageWidth?: number;
+        imageHeight?: number;
+        link: {
+          mobileWebUrl: string;
+          webUrl: string;
+        };
+      };
+      buttons?: Array<{
+        title: string;
+        link: {
+          mobileWebUrl: string;
+          webUrl: string;
+        };
+      }>;
+    }
+  | {
+      objectType: 'scrap';
+      content: {
+        title: string;
+        description: string;
+        imageUrl: string;
+        link: {
+          mobileWebUrl: string;
+          webUrl: string;
+        };
+      };
+      requestUrl: string;
     };
-  };
-  buttons?: Array<{
-    title: string;
-    link: {
-      mobileWebUrl: string;
-      webUrl: string;
-    };
-  }>;
-}
 
 interface KakaoShareData {
   title: string;
@@ -83,7 +97,9 @@ export const initKakao = (): boolean => {
 };
 
 /**
- * 카카오톡 공유 실행
+ * 카카오톡 스크랩 메시지 공유 실행
+ * @param shareData - 공유할 데이터 (타이틀, 설명, 이미지, URL)
+ * @throws 브라우저 환경이 아니거나 카카오 SDK 초기화 실패 시 에러 발생
  */
 export const shareKakao = async (shareData: KakaoShareData): Promise<void> => {
   if (typeof window === 'undefined') {
@@ -101,40 +117,19 @@ export const shareKakao = async (shareData: KakaoShareData): Promise<void> => {
     }
   }
 
-  // 이미지 URL을 절대 경로로 변환
-  const getAbsoluteUrl = (url: string): string => {
-    if (url.startsWith('http://') || url.startsWith('https://')) {
-      return url;
-    }
-    // 상대 경로인 경우 환경에 따라 도메인 추가
-    const baseUrl = isProduction
-      ? 'https://hankkibuteo.com'
-      : 'https://dev.hankkibuteo.com';
-    return `${baseUrl}${url.startsWith('/') ? url : `/${url}`}`;
-  };
-
+  // 스크랩 메시지 옵션 구성
   const shareOptions: KakaoShareOptions = {
-    buttons: [
-      {
-        link: {
-          mobileWebUrl: shareData.url,
-          webUrl: shareData.url,
-        },
-        title: '시작해보기',
-      },
-    ],
     content: {
-      description: shareData.description,
-      imageHeight: 400,
-      imageUrl: getAbsoluteUrl(shareData.imageUrl),
-      imageWidth: 800,
+      description: shareData.description ?? '',
+      imageUrl: getAbsoluteUrl(shareData.imageUrl ?? '/recipeImage.png'),
       link: {
         mobileWebUrl: shareData.url,
         webUrl: shareData.url,
       },
-      title: shareData.title,
+      title: shareData.title ?? '',
     },
-    objectType: 'feed',
+    objectType: 'scrap',
+    requestUrl: shareData.url,
   };
 
   try {

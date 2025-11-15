@@ -33,13 +33,13 @@ export function ReviewRemindBottomSheet() {
   const token = tokenUtils.getToken();
 
   // 사용자가 일부러 닫았는지 확인
-  const isDismissed = () => {
+  const isDismissed = useCallback(() => {
     if (typeof window === 'undefined') return false;
     return localStorage.getItem(DISMISSED_KEY) === 'true';
-  };
+  }, []);
 
   // 24시간 경과 여부 체크
-  const shouldShowBottomSheet = () => {
+  const shouldShowBottomSheet = useCallback(() => {
     if (typeof window === 'undefined') return false;
 
     // 사용자가 일부러 닫았다면 표시하지 않음
@@ -53,7 +53,7 @@ export function ReviewRemindBottomSheet() {
     const twentyFourHours = 24 * 60 * 60 * 1000;
 
     return now - lastShownTime >= twentyFourHours;
-  };
+  }, [isDismissed]);
 
   // API에서 데이터 로드
   const loadPendingReviews = useCallback(async () => {
@@ -113,7 +113,7 @@ export function ReviewRemindBottomSheet() {
       setLoading(false);
       isFetchingRef.current = false;
     }
-  }, [token, useCookieAuth]);
+  }, [token, useCookieAuth, shouldShowBottomSheet]);
 
   useEffect(() => {
     void loadPendingReviews();
@@ -176,7 +176,7 @@ export function ReviewRemindBottomSheet() {
         }
       }}
     >
-      <DrawerContent className="mx-auto w-full max-w-[430px]">
+      <DrawerContent className="mx-auto flex w-full max-w-[430px] flex-col">
         <VisuallyHidden asChild>
           <DrawerTitle>어제 드신 메뉴 어떠셨나요?</DrawerTitle>
         </VisuallyHidden>
@@ -185,49 +185,41 @@ export function ReviewRemindBottomSheet() {
             완료한 레시피에 대한 리뷰를 작성해 보세요.
           </DrawerDescription>
         </VisuallyHidden>
-        <div>
-          <div className="overflow-y-auto px-6 pb-6">
-            {/* 헤더 - 상단에 고정 */}
-            <header className="sticky top-0 z-10 -mx-4 flex justify-end bg-white px-4">
-              <DrawerClose
-                type="button"
-                className="rounded-full p-1.5"
-                aria-label="리뷰 리마인드 바텀시트 닫기"
-              >
-                <CloseIcon size={24} color="#626A7A" />
-                <span className="sr-only">닫기</span>
-              </DrawerClose>
-            </header>
-
-            {/* 메인 컨텐츠 영역 */}
-            <main className="mt-2">
-              {/* 리뷰 요청 섹션 */}
-              <section
-                aria-labelledby="review-request-title"
-                className="space-y-8"
-              >
-                <div className="mb-[13px]">
-                  <h1
-                    id="review-request-title"
-                    className="text-24 mb-2 text-gray-900"
-                  >
-                    어제 드신 메뉴 어떠셨나요?
-                    <br />
-                    리뷰를 작성해 보세요
-                  </h1>
-                </div>
-
-                {/* 레시피 정보 카드 */}
-                {recipes.map(recipe => (
-                  <ReviewRecipeCard
-                    key={recipe.id}
-                    onClick={handleRecipeClick}
-                    recipe={recipe}
-                  />
-                ))}
-              </section>
-            </main>
+        <header className="flex-shrink-0 px-6 pt-2">
+          <div className="flex justify-end">
+            <DrawerClose
+              type="button"
+              className="rounded-full p-1.5"
+              aria-label="리뷰 리마인드 바텀시트 닫기"
+            >
+              <CloseIcon size={24} color="#626A7A" />
+              <span className="sr-only">닫기</span>
+            </DrawerClose>
           </div>
+          <div className="mb-[13px]">
+            <h1
+              id="review-request-title"
+              className="text-24 mb-2 text-gray-900"
+            >
+              어제 드신 메뉴 어떠셨나요?
+              <br />
+              리뷰를 작성해 보세요
+            </h1>
+          </div>
+        </header>
+
+        {/* 메인 컨텐츠 영역 - 스크롤 가능 */}
+        <div className="flex-1 overflow-y-auto px-6 pb-6">
+          <section aria-labelledby="review-request-title" className="space-y-8">
+            {/* 레시피 정보 카드 */}
+            {recipes.map(recipe => (
+              <ReviewRecipeCard
+                key={recipe.completedRecipeId}
+                onClick={handleRecipeClick}
+                recipe={recipe}
+              />
+            ))}
+          </section>
         </div>
       </DrawerContent>
     </Drawer>

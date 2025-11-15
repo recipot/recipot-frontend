@@ -35,6 +35,11 @@ export const recipe = {
     return response.data.data;
   },
 
+  getPublicRecipeDetail: async (recipeId: string | number) => {
+    const response = await recipeAPI.get(`/v1/recipes/public/${recipeId}`);
+    return response.data.data;
+  },
+
   postRecipeReview: async (data: ReviewSubmitData) => {
     return await recipeAPI.post(`/v1/reviews`, data);
   },

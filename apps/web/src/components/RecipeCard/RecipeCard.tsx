@@ -14,8 +14,8 @@ import { RecipeMetaInfo } from './RecipeMetaInfo';
 interface RecipeCardProps {
   recipe: Recipe;
   index: number;
-  isLiked?: boolean;
-  onToggleLike: (index: number, recipeId: number) => void;
+  isBookmarked?: boolean;
+  onBookmarkChange?: (recipeId: number, isBookmarked: boolean) => void;
   isMainCard?: boolean;
   mood?: MoodType;
 }
@@ -23,16 +23,13 @@ interface RecipeCardProps {
 export const RecipeCard = memo(
   ({
     index,
-    isLiked,
+    isBookmarked,
     isMainCard = false,
     mood = 'neutral',
-    onToggleLike,
+    onBookmarkChange,
     recipe,
   }: RecipeCardProps) => {
     const router = useRouter();
-    const handleToggleLike = useCallback(() => {
-      onToggleLike(index, recipe.id);
-    }, [onToggleLike, index, recipe.id]);
 
     const handleCardClick = useCallback(() => {
       // 레시피 상세 URL로 이동 (외부 링크 또는 API 엔드포인트)
@@ -80,8 +77,8 @@ export const RecipeCard = memo(
               <div className="z-10">
                 <RecipeContent recipe={recipe} />
                 <RecipeActions
-                  isLiked={isLiked}
-                  onToggleLike={handleToggleLike}
+                  isBookmarked={isBookmarked}
+                  onBookmarkChange={onBookmarkChange}
                   recipeId={recipe.id}
                 />
               </div>
@@ -98,10 +95,11 @@ export const RecipeCard = memo(
       prevProps.recipe.title === nextProps.recipe.title &&
       prevProps.recipe.images[0]?.imageUrl ===
         nextProps.recipe.images[0]?.imageUrl &&
-      prevProps.isLiked === nextProps.isLiked &&
+      prevProps.isBookmarked === nextProps.isBookmarked &&
       prevProps.isMainCard === nextProps.isMainCard &&
       prevProps.index === nextProps.index &&
-      prevProps.mood === nextProps.mood
+      prevProps.mood === nextProps.mood &&
+      prevProps.onBookmarkChange === nextProps.onBookmarkChange
     );
   }
 );

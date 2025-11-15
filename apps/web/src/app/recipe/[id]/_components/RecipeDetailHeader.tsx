@@ -1,20 +1,18 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { storedAPI } from '@recipot/api';
-import { useAuthStore } from '@recipot/contexts';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
-import { tokenUtils } from 'packages/api/src/auth';
 
-import { Button } from '@/components/common/Button';
 import { Header } from '@/components/common/Header';
-import { Modal } from '@/components/common/Modal/Modal';
+import { LoginRequiredModal } from '@/components/common/LoginRequiredModal';
 import { HeartIcon, ShareIcon } from '@/components/Icons';
 import WebShareButton from '@/components/Share/WebShareButton';
 import { useIsKakaoInApp } from '@/hooks/useIsKakaoInApp';
-import { isProduction } from '@/lib/env';
+import { useIsLoggedIn } from '@/hooks/useIsLoggedIn';
 import { useApiErrorModalStore } from '@/stores';
+import { createKakaoShareData, createWebShareData } from '@/utils/shareData';
 
 import type { Recipe } from '../types/recipe.types';
 
@@ -25,58 +23,21 @@ export interface RecipeHeaderProps {
 
 export function RecipeDetailHeader({ recipe, showToast }: RecipeHeaderProps) {
   const router = useRouter();
-  const token = tokenUtils.getToken();
-  const useCookieAuth = isProduction;
-  const user = useAuthStore(state => state.user);
+  const isLoggedIn = useIsLoggedIn();
 
   const [isLiked, setIsLiked] = useState(recipe.isBookmarked);
   const [isLoading, setIsLoading] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const isKakaoInApp = useIsKakaoInApp();
 
-  const shareData = useMemo(() => {
-    const baseUrl = isProduction
-      ? 'https://hankkibuteo.com'
-      : 'https://dev.hankkibuteo.com';
-    return {
-      text: recipe.description,
-      title: recipe.title,
-      url: `${baseUrl}/recipe/${recipe.id}`,
-    };
-  }, [recipe]);
+  // Web Share API용 공유 데이터 (시스템 공유 모달에서 사용)
+  const webShareData = createWebShareData(recipe);
 
-  const kakaoShareData = useMemo(() => {
-    const recipeImageUrl = recipe.images?.[0]?.imageUrl;
-
-    const getImageUrl = (url: string | undefined) => {
-      const baseUrl = isProduction
-        ? 'https://hankkibuteo.com'
-        : 'https://dev.hankkibuteo.com';
-
-      if (!url) return `${baseUrl}/recipeImage.png`;
-
-      // 이미 절대 URL인 경우 그대로 사용
-      if (url.startsWith('http://') || url.startsWith('https://')) {
-        return url;
-      }
-
-      // 상대 경로인 경우 절대 URL로 변환
-      return `${baseUrl}${url.startsWith('/') ? url : `/${url}`}`;
-    };
-
-    const imageUrl = getImageUrl(recipeImageUrl);
-
-    return {
-      description: recipe.description,
-      imageUrl,
-      title: recipe.title,
-    };
-  }, [recipe]);
+  // 카카오톡 스크랩 메시지용 공유 데이터
+  // 포함 정보: 레시피 이미지, 레시피 제목, 레시피 설명, 레시피 링크
+  const kakaoShareData = createKakaoShareData(recipe);
 
   const handleToggleBookmark = async (recipeId: number) => {
-    // 로그인 상태 확인: 프로덕션에서는 쿠키 기반 인증 사용, 개발 환경에서는 토큰 확인
-    const isLoggedIn = useCookieAuth ? user !== null : token !== null;
-
     // 로그인하지 않은 경우에만 모달 표시
     if (!isLoggedIn) {
       setShowLoginModal(true);
@@ -90,10 +51,10 @@ export function RecipeDetailHeader({ recipe, showToast }: RecipeHeaderProps) {
     try {
       if (isCurrentlyLiked) {
         await storedAPI.deleteStoredRecipe(recipeId);
-        setIsLiked(false);
+        setIsLiked(prev => !prev);
       } else {
         await storedAPI.postStoredRecipe(recipeId);
-        setIsLiked(true);
+        setIsLiked(prev => !prev);
         showToast('레시피가 저장되었어요!');
       }
     } catch (error: unknown) {
@@ -117,37 +78,29 @@ export function RecipeDetailHeader({ recipe, showToast }: RecipeHeaderProps) {
   return (
     <>
       {/* Login Modal */}
-      <Modal
-        open={showLoginModal}
-        onOpenChange={setShowLoginModal}
-        title="로그인이 필요합니다."
+      <LoginRequiredModal
         description={
           isKakaoInApp
             ? '로그인하면 더 많은 기능을 사용할 수 있어요.'
             : '로그인하면 북마크 기능을 사용할 수 있어요.'
         }
-      >
-        <Button
-          variant="default"
-          onClick={() => router.push('/signin')}
-          size="full"
-        >
-          로그인
-        </Button>
-      </Modal>
+        onOpenChange={setShowLoginModal}
+        open={showLoginModal}
+      />
 
       {/* Header */}
       <Header className="px-4 py-3">
         <Header.Back onClick={handleBack} />
         <div className="flex items-center space-x-2">
           <WebShareButton
-            shareData={shareData}
+            webShareData={webShareData}
             kakaoShareData={kakaoShareData}
             enableKakao
             className="p-2"
             onKakaoInAppClick={
               isKakaoInApp ? () => setShowLoginModal(true) : undefined
             }
+            onShareSuccess={showToast}
           >
             <ShareIcon className="h-6 w-6" color="#212529" />
           </WebShareButton>

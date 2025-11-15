@@ -32,13 +32,11 @@ const TABS: Tab[] = [
 
 export function TabNavigation({
   activeTab,
+  hasTools = true,
   offset,
   onTabChange,
-  hasTools = true,
 }: TabNavigationProps) {
-  const filteredTabs = TABS.filter(
-    tab => tab.id !== 'cookware' || hasTools
-  );
+  const filteredTabs = TABS.filter(tab => tab.id !== 'cookware' || hasTools);
 
   return (
     <div className="sticky top-14 z-10 bg-gray-100 px-4 py-3">

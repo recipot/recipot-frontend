@@ -11,6 +11,7 @@ import { ApiErrorModal } from '@/components/common/ApiErrorModal';
 import { PageViewTracker } from '@/components/common/PageViewTracker';
 import { SplashScreen } from '@/components/common/SplashScreen';
 import { SplashProvider } from '@/contexts/SplashContext';
+import { ToastProvider } from '@/contexts/ToastContext';
 import { useApiErrorModalStore } from '@/stores/apiErrorModalStore';
 
 import type { ReactNode } from 'react';
@@ -135,10 +136,12 @@ export default function Providers({ children }: { children: ReactNode }) {
       <QueryClientProvider client={queryClient}>
         <MswProvider mswReady={mswReady}>
           <AuthProvider>
-            <Suspense fallback={null}>
-              <PageViewTracker />
-            </Suspense>
-            {children}
+            <ToastProvider>
+              <Suspense fallback={null}>
+                <PageViewTracker />
+              </Suspense>
+              {children}
+            </ToastProvider>
           </AuthProvider>
         </MswProvider>
         <ApiErrorModal />

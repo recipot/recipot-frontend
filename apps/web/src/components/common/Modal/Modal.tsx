@@ -70,13 +70,26 @@ export function Modal({
             </VisuallyHidden>
           )}
           {description ? (
-            <DialogDescription
-              className={cn(
-                'text-center text-base whitespace-pre-line',
-                textAlign === 'left' && 'text-left'
+            <DialogDescription asChild>
+              {typeof description === 'string' ? (
+                <p
+                  className={cn(
+                    'text-center text-base whitespace-pre-line',
+                    textAlign === 'left' && 'text-left'
+                  )}
+                >
+                  {description}
+                </p>
+              ) : (
+                <div
+                  className={cn(
+                    'text-center text-base whitespace-pre-line',
+                    textAlign === 'left' && 'text-left'
+                  )}
+                >
+                  {description}
+                </div>
               )}
-            >
-              {description}
             </DialogDescription>
           ) : null}
         </DialogHeader>
