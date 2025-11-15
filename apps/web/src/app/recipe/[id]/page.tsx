@@ -9,7 +9,7 @@ interface RecipePageProps {
 }
 
 export async function generateMetadata({ params }: RecipePageProps) {
-  const { id } = await params;
+  const { id } = params;
 
   const recipeData = await recipe.getPublicRecipeDetail(id);
 
