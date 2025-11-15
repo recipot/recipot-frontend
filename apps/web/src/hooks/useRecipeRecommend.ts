@@ -1,15 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { recipe, storedAPI } from '@recipot/api';
+import { recipe } from '@recipot/api';
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
-import { tokenUtils } from 'packages/api/src/auth';
 
 import { moodToConditionId } from '@/app/onboarding/_utils/conditionMapper';
 import type { Recipe } from '@/app/recipe/[id]/types/recipe.types';
 import type { MoodType } from '@/components/EmotionState';
-import { isProduction } from '@/lib/env';
-import { useApiErrorModalStore } from '@/stores';
-import { handleAuthError } from '@/utils/errorHandler';
 import { mapRecommendationToRecipe } from '@/utils/recipeMapper';
 
 interface UseRecipeRecommendParams {
@@ -32,9 +27,8 @@ export const useRecipeRecommend = ({
   const [hasFetched, setHasFetched] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-  const [isBookmarkLoading, setIsBookmarkLoading] = useState(false);
+
   const lastFetchKeyRef = useRef<string | null>(null);
-  const router = useRouter();
 
   // API 호출 함수
   const callRecipeRecommendAPI = async (page: number) => {
@@ -130,77 +124,6 @@ export const useRecipeRecommend = ({
     await fetchRecipes(nextPage);
   };
 
-  // 북마크 토글
-  const toggleBookmark = useCallback(
-    async (recipeId: number): Promise<void> => {
-      if (isBookmarkLoading) {
-        return;
-      }
-
-      const token = tokenUtils.getToken();
-      const useCookieAuth = isProduction;
-      if (!useCookieAuth && !token) {
-        console.warn(
-          '[useRecipeRecommend] 인증 토큰 없음, 로그인 페이지로 이동'
-        );
-        router.push('/signin');
-        return;
-      }
-
-      const currentRecipe = recipes.find(recipe => recipe.id === recipeId);
-      if (!currentRecipe) {
-        console.warn('[useRecipeRecommend] 레시피를 찾을 수 없음', {
-          recipeId,
-        });
-        return;
-      }
-
-      const isCurrentlyBookmarked = currentRecipe.isBookmarked;
-
-      setIsBookmarkLoading(true);
-
-      // 낙관적 업데이트
-      setRecipes(prevRecipes =>
-        prevRecipes.map(recipe =>
-          recipe.id === recipeId
-            ? { ...recipe, isBookmarked: !isCurrentlyBookmarked }
-            : recipe
-        )
-      );
-
-      try {
-        if (isCurrentlyBookmarked) {
-          await storedAPI.deleteStoredRecipe(recipeId);
-        } else {
-          await storedAPI.postStoredRecipe(recipeId);
-          showToast('레시피가 저장되었어요!');
-        }
-      } catch (error) {
-        // 상태 동기화 또는 롤백
-        setRecipes(prevRecipes =>
-          prevRecipes.map(recipe =>
-            recipe.id === recipeId
-              ? {
-                  ...recipe,
-                  isBookmarked: isCurrentlyBookmarked,
-                }
-              : recipe
-          )
-        );
-
-        if (handleAuthError(error, router)) {
-          return;
-        }
-        useApiErrorModalStore.getState().showError({
-          message: '북마크 처리 중 오류가 발생했어요.',
-        });
-      } finally {
-        setIsBookmarkLoading(false);
-      }
-    },
-    [isBookmarkLoading, recipes, router, showToast]
-  );
-
   // 조건 변경 시 자동으로 레시피 조회
   useEffect(() => {
     if (!enabled) {
@@ -243,7 +166,7 @@ export const useRecipeRecommend = ({
     isLoading,
     recipes,
     refreshRecipes,
-    toggleBookmark,
+
     updateRecipeBookmark,
   };
 };
