@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Element, scrollSpy } from 'react-scroll';
 import { recipe } from '@recipot/api';
 import { useQuery } from '@tanstack/react-query';
@@ -31,63 +31,6 @@ import type { Recipe, TabId } from '../types/recipe.types';
 const SCROLL_OFFSET = 120;
 const SCROLL_SPY_UPDATE_DELAY = 300;
 const RECIPE_QUERY_STALE_TIME = 1000 * 60 * 5; // 5분
-
-// ============================================================================
-// 헬퍼 함수
-// ============================================================================
-
-/**
- * 메타 태그를 업데이트하거나 생성하는 헬퍼 함수
- */
-const updateMetaTag = (
-  selector: string,
-  attribute: 'name' | 'property',
-  value: string,
-  content: string
-) => {
-  let meta = document.querySelector(selector);
-  if (!meta) {
-    meta = document.createElement('meta');
-    meta.setAttribute(attribute, value);
-    document.head.appendChild(meta);
-  }
-  meta.setAttribute('content', content);
-};
-
-/**
- * Open Graph 메타 태그를 업데이트하는 헬퍼 함수
- */
-const updateOGTag = (property: string, content: string) => {
-  updateMetaTag(`meta[property="${property}"]`, 'property', property, content);
-};
-
-/**
- * 레시피 데이터를 기반으로 메타데이터를 업데이트하는 함수
- */
-const updateRecipeMetadata = (recipeData: Recipe) => {
-  const { description: recipeDescription, images, title } = recipeData;
-  const description = recipeDescription ?? `${title} 레시피입니다.`;
-  const imageUrl = images?.[0]?.imageUrl;
-
-  // 페이지 제목 업데이트
-  document.title = title;
-
-  // 기본 메타 태그 업데이트
-  updateMetaTag('meta[name="description"]', 'name', 'description', description);
-
-  // Open Graph 메타 태그 업데이트
-  updateOGTag('og:title', title);
-  updateOGTag('og:description', description);
-  updateOGTag('og:type', 'website');
-
-  // 이미지가 있는 경우 이미지 관련 메타 태그 업데이트
-  if (imageUrl) {
-    updateOGTag('og:image', imageUrl);
-    updateOGTag('og:image:width', '1200');
-    updateOGTag('og:image:height', '630');
-    updateOGTag('og:image:alt', title);
-  }
-};
 
 // ============================================================================
 // 로딩/에러 상태 컴포넌트
@@ -128,6 +71,9 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
   // 데이터 페칭 훅
   // ============================================================================
 
+  const { mutate: postRecentRecipe } = usePostRecentRecipe();
+  const hasPostedRecentRecipeRef = useRef<string | null>(null);
+
   const {
     data: recipeData,
     isError,
@@ -164,7 +110,6 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
   const router = useRouter();
   const isLoggedIn = useIsLoggedIn();
   const isKakaoInApp = useIsKakaoInApp();
-  const { mutate: postRecentRecipe } = usePostRecentRecipe();
   const { isVisible, message, showToast } = useToast();
   const bottomPadding = useViewportBasedPadding({
     minPadding: 400,
@@ -172,24 +117,40 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
   });
 
   // ============================================================================
+  // 계산된 값
+  // ============================================================================
+
+  const hasTools = recipeData?.tools && recipeData.tools.length > 0;
+
+  // tools가 없을 때 cookware 탭을 ingredients로 자동 조정
+  const adjustedActiveTab =
+    !hasTools && activeTab === 'cookware' ? 'ingredients' : activeTab;
+
+  const getContentStyle = () => ({ paddingBottom: `${bottomPadding}px` });
+
+  // ============================================================================
   // 사이드 이펙트 (useEffect)
   // ============================================================================
 
-  // 레시피 데이터 로드 성공 시 최근 본 레시피 등록
+  // 레시피 데이터 로드 성공 시 최근 본 레시피 등록 (recipeId당 한 번만 실행)
   useEffect(() => {
-    if (recipeData) {
+    // recipeId가 변경되면 ref 초기화
+    if (hasPostedRecentRecipeRef.current !== recipeId) {
+      hasPostedRecentRecipeRef.current = null;
+    }
+
+    if (recipeData && hasPostedRecentRecipeRef.current !== recipeId) {
+      hasPostedRecentRecipeRef.current = recipeId;
       postRecentRecipe(Number(recipeId));
     }
   }, [recipeData, recipeId, postRecentRecipe]);
 
-  // 메타데이터 동적 업데이트
+  // recipeId 변경 시 activeTab 초기화
   useEffect(() => {
-    if (!recipeData) return;
-    updateRecipeMetadata(recipeData);
-  }, [recipeData]);
+    setActiveTab('ingredients');
+  }, [recipeId]);
 
-  // tools가 없을 때 cookware 탭을 ingredients로 자동 조정
-  const hasTools = recipeData?.tools && recipeData.tools.length > 0;
+  // recipeData 로드 후 tools가 없고 cookware 탭이 활성화되어 있으면 조정
   useEffect(() => {
     if (recipeData && !hasTools && activeTab === 'cookware') {
       setActiveTab('ingredients');
@@ -206,15 +167,6 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
 
     return () => clearTimeout(timer);
   }, [recipeData]);
-
-  // ============================================================================
-  // 계산된 값 (useMemo)
-  // ============================================================================
-
-  const contentStyle = useMemo(
-    () => ({ paddingBottom: `${bottomPadding}px` }),
-    [bottomPadding]
-  );
 
   // ============================================================================
   // 이벤트 핸들러
@@ -262,13 +214,13 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
       <RecipeHero recipe={recipeData} />
 
       <TabNavigation
-        activeTab={activeTab}
+        activeTab={adjustedActiveTab}
         offset={SCROLL_OFFSET}
         onTabChange={handleTabChange}
-        hasTools={!!hasTools}
+        hasTools={hasTools}
       />
 
-      <div className="space-y-3 px-4 pt-3" style={contentStyle}>
+      <div className="space-y-3 px-4 pt-3" style={getContentStyle()}>
         {recipeData.healthPoint?.content && (
           <div className="bg-secondary-light-green border-secondary-soft-green rounded-2xl border-[1px] px-5 py-4">
             <p className="text-15sb text-primary-pressed">
