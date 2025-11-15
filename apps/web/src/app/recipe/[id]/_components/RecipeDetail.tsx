@@ -132,18 +132,24 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
   // 사이드 이펙트 (useEffect)
   // ============================================================================
 
-  // 레시피 데이터 로드 성공 시 최근 본 레시피 등록 (recipeId당 한 번만 실행)
+  // 레시피 데이터 로드 성공 시 최근 본 레시피 등록 (recipeId당 한 번만 실행, 로그인 사용자만)
   useEffect(() => {
-    // recipeId가 변경되면 ref 초기화
-    if (hasPostedRecentRecipeRef.current !== recipeId) {
-      hasPostedRecentRecipeRef.current = null;
-    }
-
-    if (recipeData && hasPostedRecentRecipeRef.current !== recipeId) {
+    if (
+      isLoggedIn &&
+      recipeData &&
+      hasPostedRecentRecipeRef.current !== recipeId
+    ) {
       hasPostedRecentRecipeRef.current = recipeId;
       postRecentRecipe(Number(recipeId));
     }
-  }, [recipeData, recipeId, postRecentRecipe]);
+  }, [isLoggedIn, recipeData, recipeId, postRecentRecipe]);
+
+  // 로그아웃 시 ref 초기화 (재로그인 시 최근 본 레시피 등록을 위해)
+  useEffect(() => {
+    if (!isLoggedIn) {
+      hasPostedRecentRecipeRef.current = null;
+    }
+  }, [isLoggedIn]);
 
   // recipeId 변경 시 activeTab 초기화
   useEffect(() => {
