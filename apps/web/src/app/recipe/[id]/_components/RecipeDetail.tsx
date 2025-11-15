@@ -78,6 +78,7 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
     data: recipeData,
     isError,
     isLoading,
+    refetch,
   } = useQuery<Recipe, Error>({
     enabled: !!recipeId,
     queryFn: async () => {
@@ -191,7 +192,7 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
   };
 
   const handleRetry = () => {
-    window.location.reload();
+    refetch();
   };
 
   // ============================================================================
