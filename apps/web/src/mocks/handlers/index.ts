@@ -1,6 +1,7 @@
 import { authHandlers } from './auth.handlers';
 import { allergyCheckHandlers } from './allergyCheck.handlers';
 import { foodHandlers } from './food.handlers';
+
 import { moodHandlers } from './mood.handlers';
 import { recipeRecommendHandlers } from './recipeRecommend.handlers';
 import { mypageHandlers } from './mypage.handlers';
