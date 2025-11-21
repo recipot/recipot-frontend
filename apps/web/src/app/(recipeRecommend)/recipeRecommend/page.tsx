@@ -78,13 +78,6 @@ export default function RecipeRecommend() {
 
   const userSelectedMood = mood ?? 'neutral';
 
-  console.info(
-    'RecipeRecommend - mood:',
-    mood,
-    'userSelectedMood:',
-    userSelectedMood
-  );
-
   const token = tokenUtils.getToken();
   const useCookieAuth = isProduction;
 
@@ -94,7 +87,6 @@ export default function RecipeRecommend() {
       id: moodToConditionId(userSelectedMood),
       name: userSelectedMood,
     };
-    console.info('RecipeRecommend - condition 생성:', cond);
     return cond;
   }, [userSelectedMood]);
 

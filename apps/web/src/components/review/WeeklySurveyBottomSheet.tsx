@@ -35,6 +35,10 @@ interface SurveyFormData {
   additionalNote: string;
 }
 
+interface WeeklySurveyBottomSheetProps {
+  onClose?: () => void;
+}
+
 // 유틸리티 함수들
 const IMPROVEMENT_CODE = 'H01003'; // 개선됐어요 코드
 
@@ -88,7 +92,9 @@ const isSubmitDisabled = (
   return false;
 };
 
-export function WeeklySurveyBottomSheet() {
+export function WeeklySurveyBottomSheet({
+  onClose,
+}: WeeklySurveyBottomSheetProps = {}) {
   const token = tokenUtils.getToken();
   const useCookieAuth = isProduction;
   const [isOpen, setIsOpen] = useState(true);
@@ -229,6 +235,9 @@ export function WeeklySurveyBottomSheet() {
 
   const handleClose = (open: boolean) => {
     setIsOpen(open);
+    if (!open) {
+      onClose?.();
+    }
   };
 
   const onSubmit = async (data: SurveyFormData) => {
@@ -254,6 +263,7 @@ export function WeeklySurveyBottomSheet() {
 
       if (healthSurveySubmitResponse.status === 200) {
         handleClose(false);
+        onClose?.();
       } else {
         useApiErrorModalStore.getState().showError({
           message: '설문 제출 실패',

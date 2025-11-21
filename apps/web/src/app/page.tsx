@@ -22,6 +22,7 @@ import {
 import UserIcon from '@/components/Icons/UserIcon';
 import { IngredientsSearch } from '@/components/IngredientsSearch';
 import { ReviewRemindBottomSheet } from '@/components/review/ReviewRemindBottomSheet';
+import { WeeklySurveyBottomSheet } from '@/components/review/WeeklySurveyBottomSheet';
 import { useSplash } from '@/contexts/SplashContext';
 import { useCompletedRecipes } from '@/hooks/useCompletedRecipes';
 import { useToast } from '@/hooks/useToast';
@@ -78,6 +79,7 @@ export default function Home() {
   const [isDesktop, setIsDesktop] = useState(false);
   const [selectedCount, setSelectedCount] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isWeeklySurveyClosed, setIsWeeklySurveyClosed] = useState(false);
 
   // 완료한 레시피 수 조회 (로그인 상태일 때만)
   // 이 데이터는 EmotionCharacter에서 캐시를 통해 사용됨
@@ -178,6 +180,10 @@ export default function Home() {
     setSelectedCount(count);
   };
 
+  const handleWeeklySurveyClose = useCallback(() => {
+    setIsWeeklySurveyClosed(true);
+  }, []);
+
   if (!hasMounted) {
     return null;
   }
@@ -260,7 +266,8 @@ export default function Home() {
           </div>
         </div>
 
-        {isCompleted && <ReviewRemindBottomSheet />}
+        {isCompleted && isWeeklySurveyClosed && <ReviewRemindBottomSheet />}
+        <WeeklySurveyBottomSheet onClose={handleWeeklySurveyClose} />
       </div>
 
       {/* 재료 검색 화면 - 슬라이드 애니메이션 */}
