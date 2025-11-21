@@ -263,7 +263,6 @@ export function WeeklySurveyBottomSheet({
 
       if (healthSurveySubmitResponse.status === 200) {
         handleClose(false);
-        onClose?.();
       } else {
         useApiErrorModalStore.getState().showError({
           message: '설문 제출 실패',
