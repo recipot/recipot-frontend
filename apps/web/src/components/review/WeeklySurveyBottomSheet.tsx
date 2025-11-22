@@ -156,13 +156,6 @@ export function WeeklySurveyBottomSheet({
   }, [initializeData]);
 
   useEffect(() => {
-    if (!loading && !isEligible) {
-      setIsOpen(false);
-      onClose?.();
-    }
-  }, [loading, isEligible, onClose]);
-
-  useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
         void initializeData();
