@@ -3,19 +3,28 @@ import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/common/Button';
 import { HeartIcon } from '@/components/Icons';
+import { useToastContext } from '@/contexts/ToastContext';
+import { useBookmark } from '@/hooks/useBookmark';
 
 interface RecipeActionsProps {
-  isLiked?: boolean;
-  onToggleLike: () => void;
+  isBookmarked?: boolean;
+  onBookmarkChange?: (recipeId: number, isBookmarked: boolean) => void;
   recipeId: number;
 }
 
 export const RecipeActions = ({
-  isLiked,
-  onToggleLike,
+  isBookmarked = false,
+  onBookmarkChange,
   recipeId,
 }: RecipeActionsProps) => {
   const router = useRouter();
+  const { showToast } = useToastContext();
+
+  const { toggleBookmark } = useBookmark({
+    initialBookmarkedIds: isBookmarked ? [recipeId] : [],
+    onBookmarkChange,
+    showToast,
+  });
 
   const handleRecipeDetail = (recipeId: number) => {
     router.push(`/recipe/${recipeId}`);
@@ -30,10 +39,14 @@ export const RecipeActions = ({
           className="rounded-full border border-white bg-transparent hover:bg-transparent hover:text-white focus:bg-transparent focus:outline-none active:bg-transparent"
           onClick={e => {
             e.stopPropagation(); // 이벤트 전파 방지
-            onToggleLike();
+            toggleBookmark(recipeId);
           }}
         >
-          <HeartIcon className="h-5 w-5" color="#ffffff" active={isLiked} />
+          <HeartIcon
+            className="h-5 w-5"
+            color="#ffffff"
+            active={isBookmarked}
+          />
         </Button>
         <Button
           onClick={e => {
