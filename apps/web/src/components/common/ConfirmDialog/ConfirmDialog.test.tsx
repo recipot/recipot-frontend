@@ -103,11 +103,21 @@ describe('ConfirmDialog', () => {
       />
     );
 
+    // React.ReactNode는 div 태그로 렌더링되므로 DIV를 찾아야 함
     // br 태그로 나눠진 텍스트를 찾기 위해 더 유연한 매처 사용
+    // description div는 특정 클래스를 가지고 있으므로 이를 확인하여 정확한 요소만 선택
     const description = screen.getByText((content, element) => {
+      if (element?.tagName !== 'DIV') {
+        return false;
+      }
+      const hasDescriptionClass =
+        element.classList?.contains('text-center') &&
+        element.classList?.contains('text-base') &&
+        element.classList?.contains('whitespace-pre-line');
       return (
-        element?.tagName === 'P' &&
-        element?.textContent === '첫 번째 줄두 번째 줄'
+        hasDescriptionClass === true &&
+        element.textContent?.includes('첫 번째 줄') === true &&
+        element.textContent?.includes('두 번째 줄') === true
       );
     });
     expect(description).toBeInTheDocument();
