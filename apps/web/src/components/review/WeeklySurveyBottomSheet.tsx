@@ -63,8 +63,7 @@ const isSubmitDisabled = (
     return true;
   }
 
-  // 자격 및 완료 여부는 서버에서 검증하므로 클라이언트에서는 저장만 함
-  if (isEligible === false || recentCompletionCount >= 1) {
+  if (isEligible === false) {
     return true;
   }
 
@@ -97,7 +96,7 @@ export function WeeklySurveyBottomSheet({
 }: WeeklySurveyBottomSheetProps = {}) {
   const token = tokenUtils.getToken();
   const useCookieAuth = isProduction;
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [preparationData, setPreparationData] =
     useState<HealthSurveyPreparationResponse | null>(null);
@@ -119,6 +118,7 @@ export function WeeklySurveyBottomSheet({
 
     if (!useCookieAuth && !token) {
       setLoading(false);
+      onClose?.();
       return;
     }
 
@@ -136,8 +136,15 @@ export function WeeklySurveyBottomSheet({
       setIsEligible(eligibilityData.isEligible);
       setRecentCompletionCount(eligibilityData.recentCompletionCount);
       setPreparationData(preparation);
+
+      if (eligibilityData.isEligible) {
+        setIsOpen(true);
+      } else {
+        onClose?.();
+      }
     } catch (error) {
       console.error('데이터 초기화 실패:', error);
+      onClose?.();
     } finally {
       setLoading(false);
       isFetchingRef.current = false;
@@ -147,6 +154,13 @@ export function WeeklySurveyBottomSheet({
   useEffect(() => {
     void initializeData();
   }, [initializeData]);
+
+  useEffect(() => {
+    if (!loading && !isEligible) {
+      setIsOpen(false);
+      onClose?.();
+    }
+  }, [loading, isEligible, onClose]);
 
   useEffect(() => {
     const handleVisibilityChange = () => {
@@ -263,6 +277,7 @@ export function WeeklySurveyBottomSheet({
 
       if (healthSurveySubmitResponse.status === 200) {
         handleClose(false);
+        onClose?.();
       } else {
         useApiErrorModalStore.getState().showError({
           message: '설문 제출 실패',
@@ -277,21 +292,9 @@ export function WeeklySurveyBottomSheet({
     }
   };
 
-  // 로딩 중일 때 표시
-  if (loading) {
-    return (
-      <Drawer open={isOpen} onOpenChange={handleClose}>
-        <DrawerContent className="mx-auto w-full max-w-[430px]">
-          <div className="flex h-[400px] items-center justify-center">
-            <div className="text-center">
-              <div className="mb-4 text-lg text-gray-600">
-                데이터를 불러오는 중...
-              </div>
-            </div>
-          </div>
-        </DrawerContent>
-      </Drawer>
-    );
+  // 로딩 중이거나 자격이 없으면 렌더링하지 않음
+  if (loading || !isEligible) {
+    return null;
   }
 
   return (
