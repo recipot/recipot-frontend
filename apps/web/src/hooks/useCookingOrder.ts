@@ -47,7 +47,8 @@ export function useCookingOrder(recipeId: string): UseCookingOrderReturn {
           completedRecipeIdRef.current = completedRecipeId;
         }
 
-        const data = await recipeService.getRecipeDetail(recipeId);
+        // const data = await recipeService.getRecipeDetail(recipeId);
+        const data = await recipeService.getPublicRecipeDetail(recipeId);
         setRecipe(data);
       } catch (err) {
         console.error('Recipe fetch error:', err);
