@@ -1,10 +1,3 @@
-/**
- * MyPage 도메인 타입 정의
- *
- * 이 파일은 마이페이지 관련 모든 타입의 단일 진실의 원천(Single Source of Truth)입니다.
- * apps/web/src/types/MyPage.types.ts의 타입을 통합한 것입니다.
- */
-
 import { CompletedRecipe } from '../../api/src/mypage.api';
 
 // ============================================================================
