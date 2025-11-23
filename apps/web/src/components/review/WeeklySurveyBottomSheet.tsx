@@ -8,7 +8,7 @@ import {
   type HealthSurveyRequest,
   type HealthSurveySubmitResponse,
 } from '@recipot/api';
-import { tokenUtils } from 'packages/api/src/auth';
+import { tokenUtils } from '@recipot/api';
 
 import { isProduction } from '@/lib/env';
 import { useApiErrorModalStore } from '@/stores';

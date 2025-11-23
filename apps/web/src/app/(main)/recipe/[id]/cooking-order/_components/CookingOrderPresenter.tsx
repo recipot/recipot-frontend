@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { tokenUtils } from 'packages/api/src/auth';
+import { tokenUtils } from '@recipot/api';
 
 import { useCompleteCooking } from '@/hooks/useCompleteCooking';
 import { useCookingOrder } from '@/hooks/useCookingOrder';

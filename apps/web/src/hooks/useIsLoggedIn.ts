@@ -1,5 +1,5 @@
 import { useAuthStore } from '@recipot/contexts';
-import { tokenUtils } from 'packages/api/src/auth';
+import { tokenUtils } from '@recipot/api';
 
 import { isProduction } from '@/lib/env';
 

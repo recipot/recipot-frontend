@@ -5,7 +5,7 @@
  * apps/web/src/types/MyPage.types.ts의 타입을 통합한 것입니다.
  */
 
-import type { CompletedRecipe } from '../../../packages/api/src/mypageAPI';
+import { CompletedRecipe } from '../../api/src/mypage.api';
 
 // ============================================================================
 // 사용자 관련 타입

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { recipe as recipeService } from '@recipot/api';
-import { tokenUtils } from 'packages/api/src/auth';
+import { tokenUtils } from '@recipot/api';
 
 import type { Recipe } from '@recipot/types';
 import { isProduction } from '@/lib/env';

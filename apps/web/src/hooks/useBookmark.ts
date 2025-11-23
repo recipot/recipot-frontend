@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { storedAPI } from '@recipot/api';
 import { useRouter } from 'next/navigation';
-import { tokenUtils } from 'packages/api/src/auth';
+import { tokenUtils } from '@recipot/api';
 
 import { isProduction } from '@/lib/env';
 import { handleAuthError } from '@/utils/errorHandler';

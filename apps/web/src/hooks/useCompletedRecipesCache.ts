@@ -2,7 +2,7 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import { COMPLETED_RECIPES_QUERY_KEY } from './useCompletedRecipes';
 
-import type { CompletedRecipesResponse } from 'packages/api/src/mypageAPI';
+import type { CompletedRecipesResponse } from '@recipot/api';
 
 /**
  * 완료한 레시피 데이터를 캐시에서만 가져오는 훅
