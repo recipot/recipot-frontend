@@ -2,9 +2,8 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
-import { recipe, reviewReminder } from '@recipot/api';
+import { recipe, reviewReminder, tokenUtils } from '@recipot/api';
 import { useRouter } from 'next/navigation';
-import { tokenUtils } from '@recipot/api';
 
 import { isProduction } from '@/lib/env';
 
