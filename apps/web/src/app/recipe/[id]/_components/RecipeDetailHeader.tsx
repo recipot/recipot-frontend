@@ -14,7 +14,7 @@ import { useIsLoggedIn } from '@/hooks/useIsLoggedIn';
 import { useApiErrorModalStore } from '@/stores';
 import { createKakaoShareData, createWebShareData } from '@/utils/shareData';
 
-import type { Recipe } from '../types/recipe.types';
+import type { Recipe } from '@recipot/types';
 
 export interface RecipeHeaderProps {
   recipe: Recipe;

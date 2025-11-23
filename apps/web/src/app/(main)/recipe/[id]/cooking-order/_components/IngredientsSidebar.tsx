@@ -1,6 +1,6 @@
 'use client';
 
-import type { Recipe } from '@/app/recipe/[id]/types/recipe.types';
+import type { Recipe } from '@recipot/types';
 import Title from '@/components/common/RecipeDetails/common/Title';
 import { IngredientsList } from '@/components/common/RecipeDetails/IngredientsList';
 import { SeasoningsSection } from '@/components/common/RecipeDetails/SeasoningsSection';

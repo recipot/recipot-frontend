@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 import { PageHeader } from '@/app/mypage/_components/PageHeader';
 import { useAllergiesStore } from '@/stores/allergiesStore';
-import type { DietaryRestriction, User } from '@/types/MyPage.types';
+import type { DietaryRestriction, User } from '@recipot/types';
 
 import DietaryRestrictions from './DietaryRestrictions';
 import DietaryRestrictionsSheet from './DietaryRestrictionsSheet';

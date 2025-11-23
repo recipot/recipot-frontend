@@ -22,7 +22,7 @@ import RecipeHero from './RecipeHero';
 import StepSection from './StepSection';
 import TabNavigation from './TabNavigation';
 
-import type { Recipe, TabId } from '../types/recipe.types';
+import type { Recipe, TabId } from '@recipot/types';
 
 // ============================================================================
 // 상수

@@ -1,6 +1,6 @@
 import Image from 'next/image';
 
-import type { ProfileSectionProps } from '@/types/MyPage.types';
+import type { ProfileSectionProps } from '@recipot/types';
 
 export default function ProfileSection({ user }: ProfileSectionProps) {
   return (

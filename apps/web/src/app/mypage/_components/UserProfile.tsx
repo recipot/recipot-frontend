@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/common/Button';
 import { SettingsIcon } from '@/components/Icons';
-import type { User } from '@/types/MyPage.types';
+import type { User } from '@recipot/types';
 
 interface UserProfileProps {
   user: User | null;

@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { moodToConditionId } from '@/app/onboarding/_utils';
-import type { Condition } from '@/app/recipe/[id]/types/recipe.types';
+import type { Condition } from '@recipot/types';
 import type { MoodType } from '@/components/EmotionState';
 
 interface RecipeTitleProps {

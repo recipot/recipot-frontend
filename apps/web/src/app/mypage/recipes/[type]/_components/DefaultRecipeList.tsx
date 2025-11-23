@@ -3,7 +3,7 @@ import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/common/Button';
 import { useScrollGradient } from '@/hooks/useScrollGradient';
-import type { DefaultRecipeListProps } from '@/types/MyPage.types';
+import type { DefaultRecipeListProps } from '@recipot/types';
 
 import RecipeCard from './RecipeCard';
 

@@ -1,6 +1,6 @@
 import { use } from 'react';
 
-import type { RecipePageProps } from '@/types/MyPage.types';
+import type { RecipePageProps } from '@recipot/types';
 
 import RecipeListPage from './_components/RecipeListPage';
 

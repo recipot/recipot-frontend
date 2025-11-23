@@ -1,11 +1,7 @@
 'use client';
 
 import React from 'react';
-
-import type {
-  IngredientsGroup,
-  Seasoning,
-} from '@/app/recipe/[id]/types/recipe.types';
+import type { IngredientsGroup, Seasoning } from '@recipot/types';
 import Title from '@/components/common/RecipeDetails/common/Title';
 import { IngredientsList } from '@/components/common/RecipeDetails/IngredientsList';
 import { SeasoningsSection } from '@/components/common/RecipeDetails/SeasoningsSection';

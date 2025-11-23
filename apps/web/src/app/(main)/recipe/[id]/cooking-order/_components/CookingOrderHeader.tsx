@@ -2,7 +2,7 @@
 
 import { ArrowLeft } from 'lucide-react';
 
-import type { Recipe } from '@/app/recipe/[id]/types/recipe.types';
+import type { Recipe } from '@recipot/types';
 import { IngredientIcon } from '@/components/Icons';
 
 interface CookingOrderHeaderProps {

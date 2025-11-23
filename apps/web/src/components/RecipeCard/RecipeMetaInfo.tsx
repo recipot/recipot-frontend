@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 
-import type { Recipe } from '@/app/recipe/[id]/types/recipe.types';
+import type { Recipe } from '@recipot/types';
 
 import { CardTimeIcon, CookwareIcon } from '../Icons';
 

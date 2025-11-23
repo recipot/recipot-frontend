@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 
-import type { Recipe } from '@/app/recipe/[id]/types/recipe.types';
+import type { Recipe } from '@recipot/types';
 import { CookOrderIcon } from '@/components/Icons';
 
 interface CookingOrderContentProps {

@@ -1,7 +1,4 @@
-import type {
-  Recipe,
-  RecommendationItem,
-} from '@/app/recipe/[id]/types/recipe.types';
+import type { Recipe, RecommendationItem } from '@recipot/types';
 
 /**
  * API 응답의 RecommendationItem을 Recipe 타입으로 변환

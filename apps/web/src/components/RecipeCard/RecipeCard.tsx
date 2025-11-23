@@ -1,7 +1,7 @@
 import { memo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 
-import type { Recipe } from '@/app/recipe/[id]/types/recipe.types';
+import type { Recipe } from '@recipot/types';
 import type { MoodType } from '@/components/EmotionState';
 import { getEmotionGradientOverlay } from '@/utils/emotionGradient';
 

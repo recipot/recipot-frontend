@@ -2,7 +2,7 @@ import Image from 'next/image';
 
 import { CardTimeIcon, CookwareIcon } from '@/components/Icons';
 
-import type { Recipe } from '../types/recipe.types';
+import type { Recipe } from '@recipot/types';
 
 interface RecipeHeroProps {
   recipe: Recipe;

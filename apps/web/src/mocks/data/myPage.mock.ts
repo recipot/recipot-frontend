@@ -1,4 +1,3 @@
-import { CookedRecipe, Recipe } from '@/types/MyPage.types';
 import { CompletedRecipe } from '@recipot/api';
 
 // 보관한 레시피, 최근 본 레시피 목록 mock

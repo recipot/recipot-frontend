@@ -12,7 +12,7 @@ import {
   mockCookedRecipes,
   mockDefaultRecipes,
 } from '@/mocks/data/myPage.mock';
-import type { PageType } from '@/types/MyPage.types';
+import type { PageType } from '@recipot/types';
 
 const PAGE_CONFIG = {
   cooked: {

@@ -2,7 +2,7 @@ import React from 'react';
 
 import Title from '@/components/common/RecipeDetails/common/Title';
 
-import type { CookingStep } from '../types/recipe.types';
+import type { CookingStep } from '@recipot/types';
 
 interface StepSectionProps {
   steps: CookingStep[];

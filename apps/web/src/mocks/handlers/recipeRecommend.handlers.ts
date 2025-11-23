@@ -1,7 +1,4 @@
-import {
-  Recipe,
-  RecipeRecommendResponse,
-} from '@/app/recipe/[id]/types/recipe.types';
+import type { Recipe, RecipeRecommendResponse } from '@recipot/types';
 import { http, HttpResponse } from 'msw';
 
 // 목 데이터

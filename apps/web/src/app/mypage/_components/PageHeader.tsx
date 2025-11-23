@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 
 import { Header } from '@/components/common/Header';
-import type { PageHeaderProps } from '@/types/MyPage.types';
+import type { PageHeaderProps } from '@recipot/types';
 
 export function PageHeader({ title }: PageHeaderProps) {
   const router = useRouter();

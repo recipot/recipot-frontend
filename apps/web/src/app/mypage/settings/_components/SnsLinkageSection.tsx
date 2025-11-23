@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { Button } from '@/components/common/Button';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import { GoogleIcon, KakaoIcon } from '@/components/Icons';
-import type { ProfileSectionProps } from '@/types/MyPage.types';
+import type { ProfileSectionProps } from '@recipot/types';
 import { useAuth } from '@recipot/contexts';
 
 type ProviderType = 'kakao' | 'google';
@@ -55,7 +55,9 @@ export default function SnsLinkageSection({ user }: ProfileSectionProps) {
         <div className="flex items-center justify-between gap-10">
           <div>
             <h2 className="text-18sb text-gray-900">SNS 연동</h2>
-            <span className="text-16 text-[#7A8394]">간편 로그인 수단 추가</span>
+            <span className="text-16 text-[#7A8394]">
+              간편 로그인 수단 추가
+            </span>
           </div>
           <div className="flex items-center gap-3">
             <Button

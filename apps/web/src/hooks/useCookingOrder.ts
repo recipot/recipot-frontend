@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { recipe as recipeService } from '@recipot/api';
 import { tokenUtils } from 'packages/api/src/auth';
 
-import type { Recipe } from '@/app/recipe/[id]/types/recipe.types';
+import type { Recipe } from '@recipot/types';
 import { isProduction } from '@/lib/env';
 
 import { useStartCooking } from './useStartCooking';

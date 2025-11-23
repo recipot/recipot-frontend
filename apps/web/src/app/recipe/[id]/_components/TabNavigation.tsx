@@ -9,7 +9,7 @@ import {
 import { cn } from '@/lib/utils';
 import type { IconProps } from '@/types/Icon.types';
 
-import type { TabId } from '../types/recipe.types';
+import type { TabId } from '@recipot/types';
 
 interface Tab {
   icon: React.FC<IconProps>;

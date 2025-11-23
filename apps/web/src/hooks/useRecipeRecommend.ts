@@ -3,7 +3,7 @@ import { recipe } from '@recipot/api';
 import axios from 'axios';
 
 import { moodToConditionId } from '@/app/onboarding/_utils/conditionMapper';
-import type { Recipe } from '@/app/recipe/[id]/types/recipe.types';
+import type { Recipe } from '@recipot/types';
 import type { MoodType } from '@/components/EmotionState';
 import { mapRecommendationToRecipe } from '@/utils/recipeMapper';
 

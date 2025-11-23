@@ -3,7 +3,7 @@ import React from 'react';
 import Title from '@/components/common/RecipeDetails/common/Title';
 import { getToolIcon } from '@/utils/iconMatcher';
 
-import type { Cookware } from '../types/recipe.types';
+import type { Cookware } from '@recipot/types';
 
 interface CookwareSectionProps {
   cookware: Cookware[];

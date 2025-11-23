@@ -1,6 +1,6 @@
 import { Button } from '@/components/common/Button';
 import { AddIcon } from '@/components/Icons';
-import type { DietaryRestriction } from '@/types/MyPage.types';
+import type { DietaryRestriction } from '@recipot/types';
 
 export default function DietaryRestrictions({
   onOpenSheet,

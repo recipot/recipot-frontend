@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/common/Button';
 import { ReviewBottomSheet } from '@/components/review/ReviewBottomSheet';
 import { useScrollGradient } from '@/hooks/useScrollGradient';
-import type { CookedRecipeListProps } from '@/types/MyPage.types';
+import type { CookedRecipeListProps } from '@recipot/types';
 
 import RecipeCard from './RecipeCard';
 

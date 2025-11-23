@@ -1,6 +1,6 @@
 import React from 'react';
 
-import type { Seasoning } from '@/app/recipe/[id]/types/recipe.types';
+import type { Seasoning } from '@recipot/types';
 
 import Title from './common/Title';
 import { MeasurementGuide } from '../../MeasurementGuide';

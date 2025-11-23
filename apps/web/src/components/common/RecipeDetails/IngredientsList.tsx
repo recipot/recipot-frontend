@@ -1,20 +1,17 @@
 import React from 'react';
 
-import type {
-  RecipeIngredient,
-  RecipeIngredients,
-} from '@/app/recipe/[id]/types/recipe.types';
+import type { Ingredient, IngredientsGroup } from '@recipot/types';
 
 // 레시피 상세 페이지의 IngredientsGroup 타입과 호환성을 위한 타입
 type IngredientsGroupType = {
-  owned?: RecipeIngredient[];
-  notOwned?: RecipeIngredient[];
-  alternativeUnavailable?: RecipeIngredient[];
+  owned?: Ingredient[];
+  notOwned?: Ingredient[];
+  alternativeUnavailable?: Ingredient[];
 };
 
 interface IngredientsListProps {
   /** 재료 그룹 */
-  ingredients: RecipeIngredients | IngredientsGroupType;
+  ingredients: IngredientsGroup | IngredientsGroupType;
   /** 스타일 variant: 'detail' (레시피 상세 페이지) 또는 'sidebar' (사이드바) */
   variant?: 'detail' | 'sidebar';
 }
@@ -39,7 +36,7 @@ export function IngredientsList({ ingredients }: IngredientsListProps) {
 
   return (
     <div className="flex flex-wrap gap-2">
-      {uniqueIngredients.map((ingredient: RecipeIngredient) => (
+      {uniqueIngredients.map((ingredient: Ingredient) => (
         <div
           key={ingredient.id}
           className="bg-secondary-light-green border-secondary-soft-green flex h-[29px] w-fit max-w-full items-center gap-[5px] rounded-md border px-3"
