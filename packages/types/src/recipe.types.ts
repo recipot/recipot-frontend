@@ -116,12 +116,6 @@ export interface RecommendationItem {
   isBookmarked: boolean;
 }
 
-export interface MeasurementGuideItem {
-  standard: string;
-  imageUrl: string;
-  description: string;
-}
-
 // ============================================================================
 // API 응답 타입
 // ============================================================================
@@ -165,14 +159,5 @@ export interface PendingReviewsResponse {
   data: {
     completedRecipeIds: number[];
     totalCount: number;
-  };
-}
-
-export interface MeasurementGuideResponse {
-  status: number;
-  data: {
-    data: {
-      [category: string]: MeasurementGuideItem[];
-    };
   };
 }
