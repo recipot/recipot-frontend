@@ -1,5 +1,4 @@
 import { createApiInstance } from './createApiInstance';
-import { debugAuth } from './debug';
 
 export interface CompletedRecipe {
   id: number;

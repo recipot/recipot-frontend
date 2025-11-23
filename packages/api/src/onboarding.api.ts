@@ -1,4 +1,4 @@
-import { allergy } from './allergy';
+import { allergy } from './allergy.api';
 import { createApiInstance } from './createApiInstance';
 import type { CompleteOnboardingData } from './types';
 

@@ -1,25 +1,25 @@
 // Auth API
-export { authService } from './auth';
+export { authService, tokenUtils } from './auth.api';
 
 // Allergy API
-export { allergy } from './allergy';
+export { allergy } from './allergy.api';
 
 // Food API
-export { food } from './food';
+export { food } from './food.api';
 export type {
   SubmitSelectedFoodsRequest,
   SubmitSelectedFoodsResponse,
-} from './food';
+} from './food.api';
 
 // Onboarding API
-export { onboarding } from './onboarding';
+export { onboarding } from './onboarding.api';
 
 // Condition API
-export { condition } from './condition';
+export { condition } from './condition.api';
 export type {
   SaveDailyConditionRequest,
   SaveDailyConditionResponse,
-} from './condition';
+} from './condition.api';
 
 // API Instance Creator
 export { createApiInstance, setApiErrorHandler } from './createApiInstance';
@@ -28,7 +28,7 @@ export type { CreateApiInstanceOptions } from './createApiInstance';
 // Debug API
 export { debugAuth } from './debug';
 
-export { recipe } from './recipeAPI';
+export { recipe } from './recipe.api';
 
 // Types
 export type {
@@ -48,19 +48,19 @@ export {
   type HealthSurveyPreparationOption,
   type HealthSurveyRequest,
   type HealthSurveySubmitResponse,
-} from './healthSurvey';
+} from './healthSurvey.api';
 
 // Mypage API
 export type {
   CompletedRecipe,
   CompletedRecipesResponse,
   GetCompletedRecipesParams,
-} from './mypageAPI';
-export { recipesAPI, storedAPI, recentAPI } from './mypageAPI';
+} from './mypage.api';
+export { recipesAPI, storedAPI, recentAPI } from './mypage.api';
 
 // Review Reminder API
 export {
   reviewReminder,
   type PendingReviewsResponse,
   type PendingReviewItem,
-} from './review';
+} from './review.api';

@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 
-import { tokenUtils } from './auth';
+import { tokenUtils } from './auth.api';
 
 type ApiErrorHandler = ((error: unknown) => void) | null;
 
@@ -222,10 +222,7 @@ export const createApiInstance = (
           try {
             globalApiErrorHandler(refreshError);
           } catch (handlerError) {
-            console.error(
-              'API error handler execution failed:',
-              handlerError
-            );
+            console.error('API error handler execution failed:', handlerError);
           }
         }
 
