@@ -139,7 +139,6 @@ export const recipeHandlers = [
     const recipeId = Number(id);
 
     const recipe = mockRecipes.find(r => r.id === recipeId);
-    console.log(recipe, 'recipe');
 
     if (!recipe) {
       return HttpResponse.json(
