@@ -83,7 +83,7 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
     enabled: !!recipeId,
     queryFn: async () => {
       try {
-        return await recipe.getRecipeDetail(recipeId);
+        return await recipe.getPublicRecipeDetail(recipeId);
       } catch (error) {
         useApiErrorModalStore.getState().showError({
           isFatal: false,

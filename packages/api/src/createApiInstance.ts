@@ -155,10 +155,14 @@ export const createApiInstance = (
       const originalRequest: any = error.config ?? {};
       const requestUrl = originalRequest.url ?? '';
 
-      if (
-        requestUrl.includes('/v1/auth/refresh') ||
-        requestUrl.includes('/v1/login')
-      ) {
+      // 공개 엔드포인트는 401 에러가 발생해도 리다이렉트하지 않음
+      const publicEndpoints = [
+        '/v1/auth/refresh',
+        '/v1/login',
+        '/v1/recipes/public/',
+      ];
+
+      if (publicEndpoints.some(endpoint => requestUrl.includes(endpoint))) {
         if (globalApiErrorHandler) {
           try {
             globalApiErrorHandler(error);
@@ -222,10 +226,7 @@ export const createApiInstance = (
           try {
             globalApiErrorHandler(refreshError);
           } catch (handlerError) {
-            console.error(
-              'API error handler execution failed:',
-              handlerError
-            );
+            console.error('API error handler execution failed:', handlerError);
           }
         }
 
