@@ -29,7 +29,6 @@ export function Modal({
   className,
   contentGap,
   description,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   disableOverlayClick: _disableOverlayClick,
   onOpenChange,
   textAlign = 'center',
