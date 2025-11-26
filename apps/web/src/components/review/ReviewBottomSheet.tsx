@@ -8,6 +8,7 @@ import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { recipe } from '@recipot/api';
 import { useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
+import { useRouter } from 'next/navigation';
 
 import { useIsLoggedIn } from '@/hooks';
 import { useApiErrorModalStore } from '@/stores';
@@ -43,6 +44,7 @@ export function ReviewBottomSheet({
   onClose,
   recipeId,
 }: ReviewBottomSheetProps) {
+  const router = useRouter();
   const queryClient = useQueryClient();
 
   const isLoggedIn = useIsLoggedIn();
@@ -213,6 +215,18 @@ export function ReviewBottomSheet({
     }
   };
 
+  const handleCompleteModalOpenChange = (nextOpen: boolean) => {
+    setIsCompleteModalOpen(nextOpen);
+
+    if (!nextOpen) {
+      router.push('/');
+    }
+  };
+
+  const handleCompleteModalConfirm = () => {
+    handleCompleteModalOpenChange(false);
+  };
+
   return (
     <Drawer open={isOpen}>
       <DrawerContent className="mx-auto flex w-full flex-col">
@@ -299,8 +313,8 @@ export function ReviewBottomSheet({
         </form>
         <ReviewCompleteModal
           open={isCompleteModalOpen}
-          onOpenChange={setIsCompleteModalOpen}
-          onConfirm={() => onClose(reviewData?.recipeId)}
+          onOpenChange={handleCompleteModalOpenChange}
+          onConfirm={handleCompleteModalConfirm}
         />
       </DrawerContent>
     </Drawer>

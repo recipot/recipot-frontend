@@ -7,6 +7,19 @@ import type { ReviewData } from '@/types/review.types';
 
 import { ReviewBottomSheet } from '.';
 
+const mockRouterPush = vi.fn();
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    back: vi.fn(),
+    forward: vi.fn(),
+    prefetch: vi.fn(),
+    push: mockRouterPush,
+    refresh: vi.fn(),
+    replace: vi.fn(),
+  }),
+}));
+
 // QueryClient 생성 함수
 const createTestQueryClient = () =>
   new QueryClient({
