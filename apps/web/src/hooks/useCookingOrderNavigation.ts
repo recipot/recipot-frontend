@@ -4,7 +4,7 @@ import type { Recipe } from '@/app/recipe/[id]/types/recipe.types';
 
 export function useCookingOrderNavigation(
   recipe: Recipe | null,
-  initialStep: number = 1
+  initialStep = 1
 ) {
   const [currentStep, setCurrentStep] = useState(initialStep);
 

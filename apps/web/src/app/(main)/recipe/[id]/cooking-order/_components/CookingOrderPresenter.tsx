@@ -7,6 +7,7 @@ import { useIsLoggedIn } from '@/hooks';
 import { useCompleteCooking } from '@/hooks/useCompleteCooking';
 import { useCookingOrder } from '@/hooks/useCookingOrder';
 import { useCookingOrderNavigation } from '@/hooks/useCookingOrderNavigation';
+import { checkIsNaN } from '@/lib/checkIsNaN';
 import { useApiErrorModalStore } from '@/stores';
 import { useLoginModalStore } from '@/stores/useLoginModalStore';
 
@@ -56,15 +57,16 @@ export default function CookingOrderPresenter({
 
   const stepParam = searchParams.get('step');
   const lastStepFlag = searchParams.get('lastStep') === 'true';
-  const parsedStep = stepParam ? parseInt(stepParam, 10) : NaN;
-  const hasValidStepParam = !Number.isNaN(parsedStep) && parsedStep > 0;
+  const parsedStep = stepParam ? Number(stepParam) : null;
+  const hasValidStepParam = parsedStep ? checkIsNaN(parsedStep) : false;
 
-  const initialStep =
-    hasValidStepParam && parsedStep
-      ? parsedStep
-      : lastStepFlag && recipe?.steps?.length
-        ? recipe.steps.length
-        : 1;
+  let initialStep = 1;
+
+  if (hasValidStepParam && parsedStep) {
+    initialStep = parsedStep;
+  } else if (lastStepFlag && recipe?.steps?.length) {
+    initialStep = recipe.steps.length;
+  }
 
   const {
     currentStep,

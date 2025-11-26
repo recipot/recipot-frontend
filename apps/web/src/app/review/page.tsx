@@ -4,45 +4,48 @@ import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { ReviewBottomSheet } from '@/components/review/ReviewBottomSheet';
-
-const parsePositiveNumber = (value: string | null) => {
-  if (!value) {
-    return null;
-  }
-
-  const parsed = Number(value);
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
-};
+import { checkIsNaN } from '@/lib/checkIsNaN';
 
 function ReviewContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isOpen, setIsOpen] = useState(false);
-  const completedRecipeId = parsePositiveNumber(
-    searchParams.get('completedRecipeId')
+  const [completedRecipeId, setCompletedRecipeId] = useState<number | null>(
+    null
   );
-  const recipeIdFromQuery = parsePositiveNumber(searchParams.get('recipeId'));
+
+  const [recipeIdFromUrl, setRecipeIdFromUrl] = useState<number | null>(null);
 
   useEffect(() => {
-    if (!completedRecipeId) {
+    const completedIdParam = searchParams.get('completedRecipeId');
+    const recipeIdParam = searchParams.get('recipeId');
+
+    if (completedIdParam) {
+      if (checkIsNaN(Number(completedIdParam))) {
+        setCompletedRecipeId(completedRecipeId);
+        setIsOpen(true);
+      } else {
+        router.push('/');
+      }
+    } else {
       router.push('/');
-      return;
     }
 
-    setIsOpen(true);
-  }, [completedRecipeId, router]);
+    if (recipeIdParam) {
+      const recipeId = Number(recipeIdParam);
 
-  const handleClose = async (recipeId?: number) => {
+      if (checkIsNaN(recipeId)) {
+        setRecipeIdFromUrl(recipeId);
+      }
+    }
+  }, [searchParams, router, completedRecipeId]);
+
+  const handleClose = async () => {
     setIsOpen(false);
 
-    const targetRecipeId = recipeId ?? recipeIdFromQuery;
-
-    if (targetRecipeId) {
-      router.push(`/recipe/${targetRecipeId}/cooking-order?lastStep=true`);
-      return;
+    if (recipeIdFromUrl) {
+      router.push(`/recipe/${recipeIdFromUrl}/cooking-order?lastStep=true`);
     }
-
-    router.push('/');
   };
 
   if (!completedRecipeId) {
