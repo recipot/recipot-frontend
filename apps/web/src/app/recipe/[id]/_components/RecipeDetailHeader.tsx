@@ -6,7 +6,6 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation';
 
 import { Header } from '@/components/common/Header';
-import { LoginRequiredModal } from '@/components/common/LoginRequiredModal';
 import { HeartIcon, ShareIcon } from '@/components/Icons';
 import WebShareButton from '@/components/Share/WebShareButton';
 import { useIsKakaoInApp } from '@/hooks/useIsKakaoInApp';
@@ -78,15 +77,6 @@ export function RecipeDetailHeader({ recipe, showToast }: RecipeHeaderProps) {
   return (
     <>
       {/* Login Modal */}
-      <LoginRequiredModal
-        description={
-          isKakaoInApp
-            ? '로그인하면 더 많은 기능을 사용할 수 있어요.'
-            : '로그인하면 북마크 기능을 사용할 수 있어요.'
-        }
-        onOpenChange={setShowLoginModal}
-        open={showLoginModal}
-      />
 
       {/* Header */}
       <Header className="px-4 py-3">
