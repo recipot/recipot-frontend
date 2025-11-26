@@ -35,6 +35,8 @@ import {
 import { EmotionSection } from './EmotionSection';
 import ReviewCompleteModal from './ReviewCompleteModal';
 import { ReviewRecipeInfo } from './ReviewRecipeInfo';
+import { useLoginModalStore } from '@/stores/useLoginModalStore';
+import { useIsLoggedIn } from '@/hooks';
 
 const TEXT_AREA_MAX_LENGTH = 200;
 
@@ -44,6 +46,10 @@ export function ReviewBottomSheet({
   recipeId,
 }: ReviewBottomSheetProps) {
   const queryClient = useQueryClient();
+
+  const isLoggedIn = useIsLoggedIn();
+  const openLoginModal = useLoginModalStore(state => state.openModal);
+
   const [reviewData, setReviewData] = useState<ReviewData | null>(null);
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
   const { token } = useAuth();
@@ -62,9 +68,8 @@ export function ReviewBottomSheet({
       return;
     }
 
-    // 프로덕션 환경에서는 쿠키 인증을 사용하므로 token 체크를 건너뛰고,
-    // 개발 환경에서는 token이 필요함
-    if (!isProduction && !token) {
+    if (!isLoggedIn) {
+      openLoginModal();
       return;
     }
 
@@ -80,7 +85,7 @@ export function ReviewBottomSheet({
     };
 
     getReviewData();
-  }, [isOpen, token, recipeId]);
+  }, [isOpen, token, recipeId, isLoggedIn, openLoginModal]);
 
   const formMethods = useForm<ReviewFormData>({
     defaultValues: {

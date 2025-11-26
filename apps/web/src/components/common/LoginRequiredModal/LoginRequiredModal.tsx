@@ -4,37 +4,28 @@ import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/common/Button';
 import { Modal } from '@/components/common/Modal/Modal';
-
-interface LoginRequiredModalProps {
-  description: string;
-  onOpenChange: (open: boolean) => void;
-  open: boolean;
-}
+import { useLoginModalStore } from '@/stores/useLoginModalStore';
 
 /**
- * 로그인이 필요한 경우 표시하는 공통 모달 컴포넌트
- *
- * @param description - 모달에 표시할 설명 텍스트
- * @param open - 모달 열림/닫힘 상태
- * @param onOpenChange - 모달 상태 변경 핸들러
+ * 전역 로그인 필요 모달 컴포넌트.
+ * 이 컴포넌트는 앱의 최상위 레벨 (e.g., layout.tsx)에 한 번만 렌더링되어야 합니다.
+ * useLoginModalStore를 통해 어디서든 모달을 열 수 있습니다.
  */
-export function LoginRequiredModal({
-  description,
-  onOpenChange,
-  open,
-}: LoginRequiredModalProps) {
+export function LoginRequiredModal() {
   const router = useRouter();
+  const { isOpen, closeModal } = useLoginModalStore();
 
   const handleLogin = () => {
-    router.push('/signin');
+    closeModal(); // 로그인 버튼 클릭 시 모달을 닫고
+    router.push('/signin'); // 로그인 페이지로 이동
   };
 
   return (
     <Modal
-      description={description}
-      onOpenChange={onOpenChange}
-      open={open}
-      title="로그인이 필요합니다."
+      open={isOpen}
+      onOpenChange={closeModal}
+      title="로그인이 필요한 서비스입니다."
+      description="로그인이 필요한 서비스입니다."
     >
       <Button onClick={handleLogin} size="full" variant="default">
         로그인
@@ -42,4 +33,3 @@ export function LoginRequiredModal({
     </Modal>
   );
 }
-

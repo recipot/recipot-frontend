@@ -7,11 +7,9 @@ import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/common/Button';
-import { LoginRequiredModal } from '@/components/common/LoginRequiredModal';
 import { Toast } from '@/components/common/Toast';
 import { CookIcon } from '@/components/Icons';
 import { useIsLoggedIn, useToast, useViewportBasedPadding } from '@/hooks';
-import { useIsKakaoInApp } from '@/hooks/useIsKakaoInApp';
 import { usePostRecentRecipe } from '@/hooks/usePostRecentRecipe';
 import { useApiErrorModalStore } from '@/stores';
 
@@ -23,6 +21,7 @@ import StepSection from './StepSection';
 import TabNavigation from './TabNavigation';
 
 import type { Recipe, TabId } from '../types/recipe.types';
+import { useLoginModalStore } from '@/stores/useLoginModalStore';
 
 // ============================================================================
 // 상수
@@ -102,7 +101,6 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
   // ============================================================================
 
   const [activeTab, setActiveTab] = useState<TabId>('ingredients');
-  const [showLoginModal, setShowLoginModal] = useState(false);
 
   // ============================================================================
   // 유틸리티 훅
@@ -110,8 +108,8 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
 
   const router = useRouter();
   const isLoggedIn = useIsLoggedIn();
-  const isKakaoInApp = useIsKakaoInApp();
   const { isVisible, message, showToast } = useToast();
+  const openLoginModal = useLoginModalStore(state => state.openModal);
   const bottomPadding = useViewportBasedPadding({
     minPadding: 400,
     ratio: 0.8,
@@ -181,7 +179,7 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
 
   const handleCookingOrder = () => {
     if (!isLoggedIn) {
-      setShowLoginModal(true);
+      openLoginModal();
       return;
     }
     router.push(`/recipe/${recipeId}/cooking-order`);
@@ -210,10 +208,6 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
   // ============================================================================
   // 렌더링
   // ============================================================================
-
-  const loginModalDescription = isKakaoInApp
-    ? '로그인하면 더 많은 기능을 사용할 수 있어요.'
-    : '로그인하면 요리 시작하기 기능을 사용할 수 있어요.';
 
   return (
     <div className="w-full bg-gray-100">
@@ -269,11 +263,6 @@ export function RecipeDetail({ recipeId }: { recipeId: string }) {
       </div>
 
       <Toast message={message} isVisible={isVisible} position="card-bottom" />
-      <LoginRequiredModal
-        description={loginModalDescription}
-        onOpenChange={setShowLoginModal}
-        open={showLoginModal}
-      />
     </div>
   );
 }

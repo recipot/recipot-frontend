@@ -2,12 +2,9 @@
 
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { tokenUtils } from 'packages/api/src/auth';
-
 import { useCompleteCooking } from '@/hooks/useCompleteCooking';
 import { useCookingOrder } from '@/hooks/useCookingOrder';
 import { useCookingOrderNavigation } from '@/hooks/useCookingOrderNavigation';
-import { isProduction } from '@/lib/env';
 import { useApiErrorModalStore } from '@/stores';
 
 import CookingOrderContent from './CookingOrderContent';
@@ -15,6 +12,8 @@ import CookingOrderFooter from './CookingOrderFooter';
 import CookingOrderHeader from './CookingOrderHeader';
 import { IngredientsSidebar } from './IngredientsSidebar';
 import WarningModal from './WarningModal';
+import { useLoginModalStore } from '@/stores/useLoginModalStore';
+import { useIsLoggedIn } from '@/hooks';
 
 // 모달 타입 정의
 type ModalType = 'ingredients' | 'warning' | null;
@@ -32,8 +31,8 @@ export default function CookingOrderPresenter({
   const searchParams = useSearchParams();
   const completeCookingMutation = useCompleteCooking();
 
-  const token = tokenUtils.getToken();
-  const useCookieAuth = isProduction;
+  const isLoggedIn = useIsLoggedIn();
+  const openLoginModal = useLoginModalStore(state => state.openModal);
 
   // 모달 상태 통합 관리
   const [activeModal, setActiveModal] = useState<ModalType>(null);
@@ -60,8 +59,8 @@ export default function CookingOrderPresenter({
   const closeModal = () => setActiveModal(null);
 
   const handleCookingComplete = async () => {
-    if (!useCookieAuth && !token) {
-      router.push('/signin');
+    if (!isLoggedIn) {
+      openLoginModal();
       return;
     }
 
@@ -94,17 +93,9 @@ export default function CookingOrderPresenter({
     );
   }
 
-  if (error) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-center">
-          <h2 className="mb-2 text-xl font-semibold text-gray-900">
-            레시피를 불러올 수 없습니다
-          </h2>
-          <p className="text-gray-600">{error}</p>
-        </div>
-      </div>
-    );
+  if (!isLoggedIn) {
+    openLoginModal();
+    return null;
   }
 
   if (!recipe) {
