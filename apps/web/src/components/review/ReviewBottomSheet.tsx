@@ -232,7 +232,7 @@ export function ReviewBottomSheet({
               <div className="flex justify-end">
                 <button
                   type="button"
-                  onClick={onClose}
+                  onClick={() => onClose(reviewData?.recipeId)}
                   className="rounded-full p-1.5"
                 >
                   <CloseIcon size={24} />
@@ -298,7 +298,7 @@ export function ReviewBottomSheet({
         <ReviewCompleteModal
           open={isCompleteModalOpen}
           onOpenChange={setIsCompleteModalOpen}
-          onConfirm={onClose}
+          onConfirm={() => onClose(reviewData?.recipeId)}
         />
       </DrawerContent>
     </Drawer>

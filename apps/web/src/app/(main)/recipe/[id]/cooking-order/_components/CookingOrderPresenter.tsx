@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { tokenUtils } from 'packages/api/src/auth';
 
 import { useCompleteCooking } from '@/hooks/useCompleteCooking';
@@ -29,6 +29,7 @@ export default function CookingOrderPresenter({
   const { completeStep, error, getCompletedRecipeId, isLoading, recipe } =
     useCookingOrder(recipeId);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const completeCookingMutation = useCompleteCooking();
 
   const token = tokenUtils.getToken();
@@ -37,13 +38,22 @@ export default function CookingOrderPresenter({
   // 모달 상태 통합 관리
   const [activeModal, setActiveModal] = useState<ModalType>(null);
 
+  const stepParam = searchParams.get('step');
+  const lastStepFlag = searchParams.get('lastStep') === 'true';
+
+  const initialStep = stepParam
+    ? parseInt(stepParam, 10)
+    : lastStepFlag && recipe?.steps?.length
+      ? recipe.steps.length
+      : 1;
+
   const {
     currentStep,
     handleNextStep,
     handlePrevStep,
     isFirstStep,
     isLastStep,
-  } = useCookingOrderNavigation(recipe);
+  } = useCookingOrderNavigation(recipe, initialStep);
 
   // 모달 핸들러 통합
   const openModal = (modalType: ModalType) => setActiveModal(modalType);
@@ -64,7 +74,9 @@ export default function CookingOrderPresenter({
     }
     await completeCookingMutation.mutateAsync(completedRecipeId);
     completeStep(currentStep);
-    router.push(`/review?completedRecipeId=${completedRecipeId}`);
+    router.push(
+      `/review?completedRecipeId=${completedRecipeId}&recipeId=${recipeId}`
+    );
   };
   const handleBack = () => {
     openModal('warning');

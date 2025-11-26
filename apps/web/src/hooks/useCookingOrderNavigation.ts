@@ -1,9 +1,16 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import type { Recipe } from '@/app/recipe/[id]/types/recipe.types';
 
-export function useCookingOrderNavigation(recipe: Recipe | null) {
-  const [currentStep, setCurrentStep] = useState(1);
+export function useCookingOrderNavigation(
+  recipe: Recipe | null,
+  initialStep: number = 1
+) {
+  const [currentStep, setCurrentStep] = useState(initialStep);
+
+  useEffect(() => {
+    setCurrentStep(initialStep);
+  }, [initialStep]);
 
   // recipe와 steps가 존재하는지 안전하게 확인
   const stepsLength = recipe?.steps?.length ?? 0;

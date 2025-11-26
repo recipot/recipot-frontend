@@ -37,6 +37,12 @@ export function useCookingOrder(recipeId: string): UseCookingOrderReturn {
         return;
       }
 
+      if (!recipeId || recipeId === 'undefined') {
+        setError('유효하지 않은 레시피 ID입니다.');
+        setIsRecipeLoading(false);
+        return;
+      }
+
       try {
         setIsRecipeLoading(true);
         setError(null);
