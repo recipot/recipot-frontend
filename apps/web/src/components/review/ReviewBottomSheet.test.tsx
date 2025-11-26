@@ -25,6 +25,25 @@ const wrapper = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
+type MockAuthStoreState = {
+  token: string | null;
+  user: unknown;
+};
+
+const mockUseAuthStore = vi.hoisted(() => {
+  const state: MockAuthStoreState = {
+    token: 'mock-token',
+    user: { id: 1, name: '테스터' },
+  };
+
+  const mockedUseAuthStore = vi.fn(
+    (selector?: (state: MockAuthStoreState) => unknown) =>
+      selector ? selector(state) : state
+  );
+
+  return mockedUseAuthStore;
+});
+
 // axios 모킹
 // vi.hoisted를 사용하여 모킹 함수 내부에서 사용할 수 있는 변수 생성
 const { mockAxiosGet, mockAxiosPost, mockInstanceGet, mockInstancePost } =
@@ -86,6 +105,7 @@ vi.mock('@recipot/contexts', () => ({
     token: 'mock-token',
     user: null,
   })),
+  useAuthStore: mockUseAuthStore,
 }));
 
 // Drawer 컴포넌트를 간단한 div로 모킹

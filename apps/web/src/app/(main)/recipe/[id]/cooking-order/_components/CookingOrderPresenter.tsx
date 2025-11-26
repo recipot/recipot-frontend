@@ -2,18 +2,19 @@
 
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+
+import { useIsLoggedIn } from '@/hooks';
 import { useCompleteCooking } from '@/hooks/useCompleteCooking';
 import { useCookingOrder } from '@/hooks/useCookingOrder';
 import { useCookingOrderNavigation } from '@/hooks/useCookingOrderNavigation';
 import { useApiErrorModalStore } from '@/stores';
+import { useLoginModalStore } from '@/stores/useLoginModalStore';
 
 import CookingOrderContent from './CookingOrderContent';
 import CookingOrderFooter from './CookingOrderFooter';
 import CookingOrderHeader from './CookingOrderHeader';
 import { IngredientsSidebar } from './IngredientsSidebar';
 import WarningModal from './WarningModal';
-import { useLoginModalStore } from '@/stores/useLoginModalStore';
-import { useIsLoggedIn } from '@/hooks';
 
 // 모달 타입 정의
 type ModalType = 'ingredients' | 'warning' | null;
@@ -25,7 +26,7 @@ interface CookingOrderPresenterProps {
 export default function CookingOrderPresenter({
   recipeId,
 }: CookingOrderPresenterProps) {
-  const { completeStep, error, getCompletedRecipeId, isLoading, recipe } =
+  const { completeStep, getCompletedRecipeId, isLoading, recipe } =
     useCookingOrder(recipeId);
   const router = useRouter();
   const searchParams = useSearchParams();

@@ -10,8 +10,9 @@ import { useAuth } from '@recipot/contexts';
 import { useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 
-import { isProduction } from '@/lib/env';
+import { useIsLoggedIn } from '@/hooks';
 import { useApiErrorModalStore } from '@/stores';
+import { useLoginModalStore } from '@/stores/useLoginModalStore';
 import type {
   ReviewBottomSheetProps,
   ReviewData,
@@ -35,8 +36,6 @@ import {
 import { EmotionSection } from './EmotionSection';
 import ReviewCompleteModal from './ReviewCompleteModal';
 import { ReviewRecipeInfo } from './ReviewRecipeInfo';
-import { useLoginModalStore } from '@/stores/useLoginModalStore';
-import { useIsLoggedIn } from '@/hooks';
 
 const TEXT_AREA_MAX_LENGTH = 200;
 

@@ -16,12 +16,12 @@ export interface ModalProps
   extends Pick<ComponentModalProps, 'open' | 'onOpenChange'> {
   title?: string;
   description?: string | React.ReactNode;
-  disableOverlayClick?: boolean;
   contentGap?: number;
   children: React.ReactNode;
   className?: string;
   textAlign?: 'center' | 'left';
   titleBlock?: boolean;
+  disableOverlayClick?: boolean;
 }
 
 export function Modal({
@@ -29,7 +29,8 @@ export function Modal({
   className,
   contentGap,
   description,
-  disableOverlayClick: _disableOverlayClick,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  disableOverlayClick,
   onOpenChange,
   textAlign = 'center',
   title,
