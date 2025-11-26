@@ -36,12 +36,9 @@ const mockUseAuthStore = vi.hoisted(() => {
     user: { id: 1, name: '테스터' },
   };
 
-  const mockedUseAuthStore = vi.fn(
-    (selector?: (state: MockAuthStoreState) => unknown) =>
-      selector ? selector(state) : state
+  return vi.fn((selector?: (state: MockAuthStoreState) => unknown) =>
+    selector ? selector(state) : state
   );
-
-  return mockedUseAuthStore;
 });
 
 // axios 모킹
