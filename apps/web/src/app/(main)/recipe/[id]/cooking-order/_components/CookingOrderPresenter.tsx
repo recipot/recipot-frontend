@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { useIsLoggedIn } from '@/hooks';
@@ -37,15 +37,34 @@ export default function CookingOrderPresenter({
 
   // 모달 상태 통합 관리
   const [activeModal, setActiveModal] = useState<ModalType>(null);
+  const [hasRequestedLogin, setHasRequestedLogin] = useState(false);
+
+  const shouldShowLoginModal = !isLoading && !isLoggedIn && !hasRequestedLogin;
+
+  useEffect(() => {
+    if (shouldShowLoginModal) {
+      openLoginModal();
+      setHasRequestedLogin(true);
+    }
+  }, [shouldShowLoginModal, openLoginModal]);
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      setHasRequestedLogin(false);
+    }
+  }, [isLoggedIn]);
 
   const stepParam = searchParams.get('step');
   const lastStepFlag = searchParams.get('lastStep') === 'true';
+  const parsedStep = stepParam ? parseInt(stepParam, 10) : NaN;
+  const hasValidStepParam = !Number.isNaN(parsedStep) && parsedStep > 0;
 
-  const initialStep = stepParam
-    ? parseInt(stepParam, 10)
-    : lastStepFlag && recipe?.steps?.length
-      ? recipe.steps.length
-      : 1;
+  const initialStep =
+    hasValidStepParam && parsedStep
+      ? parsedStep
+      : lastStepFlag && recipe?.steps?.length
+        ? recipe.steps.length
+        : 1;
 
   const {
     currentStep,
@@ -94,8 +113,7 @@ export default function CookingOrderPresenter({
     );
   }
 
-  if (!isLoggedIn) {
-    openLoginModal();
+  if (shouldShowLoginModal) {
     return null;
   }
 

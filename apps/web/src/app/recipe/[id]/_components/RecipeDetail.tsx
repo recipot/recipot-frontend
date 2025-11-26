@@ -12,6 +12,7 @@ import { CookIcon } from '@/components/Icons';
 import { useIsLoggedIn, useToast, useViewportBasedPadding } from '@/hooks';
 import { usePostRecentRecipe } from '@/hooks/usePostRecentRecipe';
 import { useApiErrorModalStore } from '@/stores';
+import { useLoginModalStore } from '@/stores/useLoginModalStore';
 
 import CookwareSection from './CookwareSection';
 import IngredientsSection from './IngredientsSection';
@@ -21,7 +22,6 @@ import StepSection from './StepSection';
 import TabNavigation from './TabNavigation';
 
 import type { Recipe, TabId } from '../types/recipe.types';
-import { useLoginModalStore } from '@/stores/useLoginModalStore';
 
 // ============================================================================
 // 상수
