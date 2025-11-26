@@ -21,8 +21,10 @@ function ReviewContent() {
     const recipeIdParam = searchParams.get('recipeId');
 
     if (completedIdParam) {
-      if (checkIsNaN(Number(completedIdParam))) {
-        setCompletedRecipeId(completedRecipeId);
+      const parsedCompletedId = Number(completedIdParam);
+
+      if (checkIsNaN(parsedCompletedId)) {
+        setCompletedRecipeId(parsedCompletedId);
         setIsOpen(true);
       } else {
         router.push('/');
@@ -38,7 +40,7 @@ function ReviewContent() {
         setRecipeIdFromUrl(recipeId);
       }
     }
-  }, [searchParams, router, completedRecipeId]);
+  }, [searchParams, router]);
 
   const handleClose = async () => {
     setIsOpen(false);
