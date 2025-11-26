@@ -6,7 +6,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { recipe } from '@recipot/api';
-import { useAuth } from '@recipot/contexts';
 import { useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 
@@ -51,7 +50,6 @@ export function ReviewBottomSheet({
 
   const [reviewData, setReviewData] = useState<ReviewData | null>(null);
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
-  const { token } = useAuth();
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   // v1/reviews/preparation API 호출 - 바텀시트가 열릴 때만 데이터 로드
@@ -84,7 +82,7 @@ export function ReviewBottomSheet({
     };
 
     getReviewData();
-  }, [isOpen, token, recipeId, isLoggedIn, openLoginModal]);
+  }, [isOpen, recipeId, isLoggedIn, openLoginModal]);
 
   const formMethods = useForm<ReviewFormData>({
     defaultValues: {
