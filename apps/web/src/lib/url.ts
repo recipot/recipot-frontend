@@ -29,3 +29,12 @@ export const getRecipeShareUrl = (recipeId: string | number): string => {
   const baseUrl = getBaseUrl();
   return `${baseUrl}/recipe/${recipeId}`;
 };
+
+/**
+ * 이미지 URL 정규화 (상대 경로를 절대 URL로 변환)
+ * @param url - 변환할 이미지 URL
+ * @returns 정규화된 이미지 URL
+ */
+export const normalizeImageUrl = (url: string | undefined): string => {
+  return getAbsoluteUrl(url);
+};
