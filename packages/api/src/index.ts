@@ -17,6 +17,8 @@ export { onboarding } from './onboarding';
 // Condition API
 export { condition } from './condition';
 export type {
+  Condition,
+  GetConditionsResponse,
   SaveDailyConditionRequest,
   SaveDailyConditionResponse,
 } from './condition';
@@ -39,6 +41,7 @@ export type {
   CompleteOnboardingData,
   ReviewData,
   ReviewOption,
+  RecipeUpdateRequest,
   ReviewSubmitData,
 } from './types';
 

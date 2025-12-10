@@ -26,9 +26,41 @@ export interface SaveDailyConditionResponse {
 }
 
 /**
+ * 컨디션 정보 타입
+ */
+export interface Condition {
+  id: number;
+  name: string;
+}
+
+/**
+ * 컨디션 조회 응답 타입
+ */
+export interface GetConditionsResponse {
+  data: {
+    conditions: Condition[];
+  };
+}
+
+/**
  * 컨디션 관련 API
  */
 export const condition = {
+  /**
+   * 컨디션 목록 조회
+   * @returns 컨디션 목록
+   */
+  getConditions: async (): Promise<Condition[]> => {
+    try {
+      const response =
+        await conditionApi.get<GetConditionsResponse>('/v1/conditions');
+      return response.data.data.conditions;
+    } catch (error) {
+      console.error('❌ 컨디션 조회 실패:', error);
+      throw error;
+    }
+  },
+
   /**
    * 일일 컨디션 저장
    * @param data - 컨디션 데이터

@@ -77,6 +77,12 @@ export interface AdminRecipe {
     name: string;
     amount: string;
   }[];
+  steps?: {
+    orderNum: number;
+    summary: string;
+    content: string;
+    imageUrl?: string;
+  }[];
 }
 
 export interface AdminRecipesResponse {
@@ -88,4 +94,32 @@ export interface AdminRecipesResponse {
     totalPages: number;
     hasNextPage: boolean;
   };
+}
+
+// 레시피 수정 요청 타입
+export interface RecipeUpdateRequest {
+  id: number;
+  title: string;
+  imageUrl?: string;
+  duration: number; // 분 단위
+  conditionId: number;
+  description: string;
+  tools: {
+    id: number;
+  }[];
+  ingredients: {
+    id: number;
+    amount: string;
+    isAlternative: boolean;
+  }[];
+  seasonings: {
+    id: number;
+    amount: string;
+  }[];
+  steps: {
+    orderNum: number;
+    summary: string;
+    content: string;
+    imageUrl?: string;
+  }[];
 }

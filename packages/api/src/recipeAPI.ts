@@ -80,4 +80,14 @@ export const recipe = {
     });
     return response.data;
   },
+
+  /**
+   * 레시피 수정 (어드민)
+   * @param recipes - 수정할 레시피 배열
+   * @returns
+   */
+  updateRecipes: async (recipes: import('./types').RecipeUpdateRequest[]) => {
+    const response = await recipeAPI.post(`/v1/recipes`, recipes);
+    return response.data;
+  },
 };
