@@ -33,10 +33,10 @@ export function useInfiniteRecipes(): UseInfiniteRecipesReturn {
     setError(null);
 
     try {
-      const response = (await recipe.getAllAdminRecipes(
+      const response: AdminRecipesResponse = await recipe.getAllAdminRecipes(
         page,
         PAGE_SIZE
-      )) as AdminRecipesResponse;
+      );
 
       const newRecipes = response?.data?.items ?? [];
       const hasNext = response?.data?.hasNextPage ?? false;
