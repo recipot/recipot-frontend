@@ -5,6 +5,9 @@ import { condition, recipe, type RecipeUpdateRequest } from '@recipot/api';
 import { Trash } from 'lucide-react';
 import Image from 'next/image';
 
+import { Button } from '@/components/common/Button';
+import { Modal } from '@/components/common/Modal/Modal';
+import { Toast } from '@/components/common/Toast';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
   Table,
@@ -16,6 +19,14 @@ import {
 } from '@/components/ui/table';
 import { useFoodList } from '@/hooks/useFoodList';
 import { useInfiniteRecipes } from '@/hooks/useInfiniteRecipes';
+import { useToast } from '@/hooks/useToast';
+import { useApiErrorModalStore } from '@/stores/apiErrorModalStore';
+import {
+  formatValidationErrors,
+  isAdminRecipeCompletelyEmpty,
+  isRecipeCompletelyEmpty,
+  validateRecipeUpdateRequests,
+} from '@/utils/recipeValidation';
 
 import { ConditionSelect } from './_components/ConditionSelect';
 import { EditableCell } from './_components/EditableCell';
@@ -26,8 +37,23 @@ import { StepsEditModal } from './_components/StepsEditModal';
 import { ToolsSelect } from './_components/ToolsSelect';
 
 export default function AdminRecipePage() {
-  const { hasNextPage, isLoading, loadMore, recipes } = useInfiniteRecipes();
+  const {
+    hasNextPage,
+    isLoading,
+    loadMore,
+    recipes: allRecipes,
+  } = useInfiniteRecipes();
   const { data: foodList = [] } = useFoodList();
+  const {
+    isVisible: isToastVisible,
+    message: toastMessage,
+    showToast,
+  } = useToast();
+
+  // 전 컬럼 공란 행 필터링 (화면 새로고침 시)
+  const recipes = useMemo(() => {
+    return allRecipes.filter(recipe => !isAdminRecipeCompletelyEmpty(recipe));
+  }, [allRecipes]);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [editedRecipes, setEditedRecipes] = useState<
     Map<number, Partial<RecipeUpdateRequest>>
@@ -36,6 +62,13 @@ export default function AdminRecipePage() {
   const [conditions, setConditions] = useState<
     Array<{ id: number; name: string }>
   >([]);
+  const [validationError, setValidationError] = useState<{
+    isOpen: boolean;
+    message: string;
+  }>({
+    isOpen: false,
+    message: '',
+  });
   const observerTarget = useRef<HTMLDivElement>(null);
 
   // 편집 상태 관리
@@ -59,6 +92,7 @@ export default function AdminRecipePage() {
     isOpen: boolean;
     recipeId: number;
   } | null>(null);
+  const { showError } = useApiErrorModalStore();
 
   // 컨디션 목록 조회
   useEffect(() => {
@@ -175,7 +209,10 @@ export default function AdminRecipePage() {
   // 저장 버튼 핸들러
   const handleSave = async () => {
     if (editedRecipes.size === 0) {
-      alert('수정된 레시피가 없습니다.');
+      setValidationError({
+        isOpen: true,
+        message: '수정된 레시피가 없습니다.',
+      });
       return;
     }
 
@@ -236,14 +273,39 @@ export default function AdminRecipePage() {
         };
       });
 
-      await recipe.updateRecipes(updateRequests);
-      alert('레시피가 성공적으로 저장되었습니다.');
+      // 전 컬럼 공란 행 제외
+      const validRequests = updateRequests.filter(
+        request => !isRecipeCompletelyEmpty(request)
+      );
+
+      if (validRequests.length === 0) {
+        showError({
+          message: '등록할 레시피가 없습니다.',
+        });
+        setIsSaving(false);
+        return;
+      }
+
+      // 데이터 검증 (전 컬럼 공란 행 제외한 것만)
+      const validationResult = validateRecipeUpdateRequests(validRequests);
+      if (!validationResult.isValid) {
+        const errorMessages = formatValidationErrors(validationResult.errors);
+        setValidationError({
+          isOpen: true,
+          message: errorMessages.join('\n'),
+        });
+        setIsSaving(false);
+        return;
+      }
+
+      await recipe.updateRecipes(validRequests);
+      showToast('레시피가 성공적으로 저장되었습니다.');
       setEditedRecipes(new Map()); // 저장 후 수정 내역 초기화
-      // 데이터 새로고침
-      window.location.reload();
     } catch (error) {
       console.error('레시피 저장 실패:', error);
-      alert('레시피 저장 중 오류가 발생했습니다.');
+      showError({
+        message: '레시피 저장 중 오류가 발생했습니다.',
+      });
     } finally {
       setIsSaving(false);
     }
@@ -251,6 +313,9 @@ export default function AdminRecipePage() {
 
   return (
     <div className="container mx-auto p-6">
+      {/* Toast 알림 */}
+      <Toast isVisible={isToastVisible} message={toastMessage} />
+
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-2xl font-bold">레시피 DB</h1>
         <div className="flex gap-2">
@@ -350,7 +415,9 @@ export default function AdminRecipePage() {
                           }
                           className="cursor-pointer hover:bg-gray-50"
                         >
-                          {currentTitle}
+                          {currentTitle && currentTitle.trim().length > 0
+                            ? currentTitle
+                            : '-'}
                         </div>
                       )}
                     </TableCell>
@@ -410,7 +477,9 @@ export default function AdminRecipePage() {
                           }
                           className="cursor-pointer hover:bg-gray-50"
                         >
-                          {currentDuration}
+                          {currentDuration && Number(currentDuration) > 0
+                            ? currentDuration
+                            : '-'}
                         </div>
                       )}
                     </TableCell>
@@ -466,7 +535,10 @@ export default function AdminRecipePage() {
                           }
                           className="cursor-pointer hover:bg-gray-50"
                         >
-                          {currentDescription ?? '-'}
+                          {currentDescription &&
+                          currentDescription.trim().length > 0
+                            ? currentDescription
+                            : '-'}
                         </div>
                       )}
                     </TableCell>
@@ -672,6 +744,27 @@ export default function AdminRecipePage() {
           }}
         />
       )}
+
+      {/* 검증 에러 모달 */}
+      <Modal
+        contentGap={24}
+        description={validationError.message}
+        onOpenChange={open => {
+          if (!open) {
+            setValidationError({ isOpen: false, message: '' });
+          }
+        }}
+        open={validationError.isOpen}
+        title="데이터 검증 오류"
+        titleBlock
+      >
+        <Button
+          onClick={() => setValidationError({ isOpen: false, message: '' })}
+          size="full"
+        >
+          확인
+        </Button>
+      </Modal>
     </div>
   );
 }
