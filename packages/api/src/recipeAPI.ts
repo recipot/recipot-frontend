@@ -64,4 +64,20 @@ export const recipe = {
       recipeId,
     });
   },
+
+  /**
+   * 모든 레시피 조회 (어드민)
+   * @param page - 페이지 번호 (기본값: 1)
+   * @param limit - 페이지당 항목 수 (기본값: 20)
+   * @returns
+   */
+  getAllAdminRecipes: async (page: number = 1, limit: number = 20) => {
+    const response = await recipeAPI.get(`/v1/recipes`, {
+      params: {
+        page,
+        limit,
+      },
+    });
+    return response.data;
+  },
 };

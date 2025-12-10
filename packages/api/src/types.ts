@@ -52,3 +52,40 @@ export interface ReviewSubmitData {
   experienceCode?: string;
   tasteCode?: string;
 }
+
+// Admin Recipe API Types
+export interface AdminRecipe {
+  id: number;
+  title: string;
+  imageUrl?: string;
+  duration: string;
+  condition?: string;
+  description?: string;
+  tools?: {
+    id: number;
+    name: string;
+  }[];
+  ingredients?: {
+    id: number;
+    name: string;
+    amount: string;
+    isAlternative: boolean;
+  }[];
+  irreplaceableIngredients?: string;
+  seasonings?: {
+    id: number;
+    name: string;
+    amount: string;
+  }[];
+}
+
+export interface AdminRecipesResponse {
+  data: {
+    items: AdminRecipe[];
+    currentPage: number;
+    pageSize: number;
+    totalItems: number;
+    totalPages: number;
+    hasNextPage: boolean;
+  };
+}

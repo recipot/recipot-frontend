@@ -32,6 +32,8 @@ export { recipe } from './recipeAPI';
 
 // Types
 export type {
+  AdminRecipe,
+  AdminRecipesResponse,
   Food,
   FoodListApiResponse,
   CompleteOnboardingData,
