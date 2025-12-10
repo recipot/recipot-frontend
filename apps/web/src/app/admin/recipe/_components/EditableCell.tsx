@@ -63,7 +63,7 @@ export function EditableCell({
         onChange={e => setEditValue(e.target.value)}
         onBlur={handleBlur}
         onKeyDown={handleKeyDown}
-        className={`w-full border-b-2 border-primary focus:outline-none ${className ?? ''}`}
+        className={`border-primary w-full border-b-2 focus:outline-none ${className ?? ''}`}
       />
     );
   }
@@ -77,4 +77,3 @@ export function EditableCell({
     </div>
   );
 }
-

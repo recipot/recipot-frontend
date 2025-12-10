@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { normalizeImageUrl } from '@/lib/url';
 
 interface ImageEditModalProps {
   isOpen: boolean;
@@ -26,8 +27,14 @@ export function ImageEditModal({
 }: ImageEditModalProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [imageUrl, setImageUrl] = useState(currentImageUrl ?? '');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      setSelectedFile(null);
+      setPreviewUrl(null);
+    }
+  }, [isOpen]);
 
   const handleFileSelect = () => {
     fileInputRef.current?.click();
@@ -37,36 +44,25 @@ export function ImageEditModal({
     const file = e.target.files?.[0];
     if (file) {
       setSelectedFile(file);
-      // 미리보기 URL 생성
-      const url = URL.createObjectURL(file);
-      setPreviewUrl(url);
-      // 파일명을 기반으로 임시 URL 생성 (실제로는 서버에 업로드 후 받아야 함)
-      // 여기서는 파일명을 URL로 사용
-      setImageUrl(file.name);
+      setPreviewUrl(URL.createObjectURL(file));
     }
   };
 
   const handleSave = () => {
-    if (imageUrl) {
-      onSave(imageUrl);
-      // 정리
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl);
-      }
+    const urlToSave = previewUrl ?? currentImageUrl;
+    if (urlToSave) {
+      onSave(urlToSave);
       setSelectedFile(null);
-      setPreviewUrl(null);
       onClose();
     }
   };
 
   const handleClose = () => {
-    // 정리
     if (previewUrl) {
       URL.revokeObjectURL(previewUrl);
     }
     setSelectedFile(null);
     setPreviewUrl(null);
-    setImageUrl(currentImageUrl ?? '');
     onClose();
   };
 
@@ -84,7 +80,6 @@ export function ImageEditModal({
         </DialogHeader>
 
         <div className="space-y-4">
-          {/* 파일명과 수정 버튼 */}
           <div className="flex items-center justify-between">
             <div className="flex-1">
               <div className="text-18sb mt-1">
@@ -109,7 +104,6 @@ export function ImageEditModal({
             </div>
           </div>
 
-          {/* 이미지 미리보기 영역 */}
           <div className="flex min-h-[300px] items-center justify-center">
             {previewUrl ? (
               <div className="relative h-full min-h-[300px] w-full">
@@ -123,7 +117,7 @@ export function ImageEditModal({
             ) : currentImageUrl ? (
               <div className="relative h-full min-h-[300px] w-full">
                 <Image
-                  src={currentImageUrl}
+                  src={normalizeImageUrl(currentImageUrl)}
                   alt="현재 이미지"
                   fill
                   className="object-contain"
@@ -142,8 +136,11 @@ export function ImageEditModal({
           <Button variant="outline" onClick={handleClose}>
             취소
           </Button>
-          <Button onClick={handleSave} disabled={!imageUrl}>
-            수정
+          <Button
+            onClick={handleSave}
+            disabled={!previewUrl && !currentImageUrl}
+          >
+            저장
           </Button>
         </div>
       </DialogContent>

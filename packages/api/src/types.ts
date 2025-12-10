@@ -58,7 +58,7 @@ export interface AdminRecipe {
   id: number;
   title: string;
   imageUrl?: string;
-  duration: string;
+  duration: number;
   condition?: string;
   description?: string;
   tools?: {
@@ -101,7 +101,7 @@ export interface RecipeUpdateRequest {
   id: number;
   title: string;
   imageUrl?: string;
-  duration: number; // 분 단위
+  duration: number;
   conditionId: number;
   description: string;
   tools: {
