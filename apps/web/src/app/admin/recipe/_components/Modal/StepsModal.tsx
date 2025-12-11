@@ -1,8 +1,8 @@
 'use client';
 
-import type { AdminRecipe, RecipeUpdateRequest } from '@recipot/api';
-
 import { StepsEditModal } from './StepsEditModal';
+
+import type { AdminRecipe, RecipeUpdateRequest } from '@recipot/api';
 
 interface StepsModalProps {
   closeModal: () => void;
@@ -34,4 +34,3 @@ export function StepsModal({
     />
   );
 }
-

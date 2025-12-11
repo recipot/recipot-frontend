@@ -7,15 +7,15 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { normalizeImageUrl } from '@/lib/url';
 
+import { ConditionSelect } from '../ConditionSelect';
+import { EditableCell } from '../EditableCell';
+import { useRecipeTableActionsContext } from '../RecipeTableActionsContext';
+import { useRecipeTableDataContext } from '../RecipeTableDataContext';
+import { ToolsSelect } from '../ToolsSelect';
 import {
   RecipeRowContext,
   useRecipeRowContextWithTable,
-} from './RecipeRow/RecipeRowContext';
-import { ConditionSelect } from './ConditionSelect';
-import { EditableCell } from './EditableCell';
-import { useRecipeTableActionsContext } from './RecipeTableActionsContext';
-import { useRecipeTableDataContext } from './RecipeTableDataContext';
-import { ToolsSelect } from './ToolsSelect';
+} from './RecipeRowContext';
 
 import type { AdminRecipe, RecipeUpdateRequest } from '@recipot/api';
 
@@ -83,7 +83,8 @@ function RecipeRowProvider({ editedData, recipeItem }: RecipeRowProps) {
         <IngredientsCell />
         <IrreplaceableIngredientsCell />
         <SeasoningsCell />
-        <StepsCell />
+        {/* TODO: Steps 기능은 기획팀과 회의 중이므로 임시 주석처리 */}
+        {/* <StepsCell /> */}
       </TableRow>
     </RecipeRowContext.Provider>
   );
@@ -529,45 +530,46 @@ function SeasoningsCell() {
   );
 }
 
-function StepsCell() {
-  const { currentValues, recipeItem } = useRecipeRowContextWithTable();
-  const { selectedCell } = useRecipeTableDataContext();
-  const { openModal, setSelectedCell } = useRecipeTableActionsContext();
+// TODO: Steps 기능은 기획팀과 회의 중이므로 임시 주석처리
+// function StepsCell() {
+//   const { currentValues, recipeItem } = useRecipeRowContextWithTable();
+//   const { selectedCell } = useRecipeTableDataContext();
+//   const { openModal, setSelectedCell } = useRecipeTableActionsContext();
 
-  const isSelected =
-    selectedCell?.recipeId === recipeItem.id && selectedCell?.field === 'steps';
+//   const isSelected =
+//     selectedCell?.recipeId === recipeItem.id && selectedCell?.field === 'steps';
 
-  return (
-    <TableCell
-      className={isSelected ? 'border-2 border-blue-500' : ''}
-      onClick={e => {
-        e.stopPropagation();
-        setSelectedCell({ field: 'steps', recipeId: recipeItem.id });
-      }}
-    >
-      <div
-        onDoubleClick={() => openModal('steps', recipeItem.id)}
-        className="cursor-pointer hover:bg-gray-50"
-      >
-        {currentValues.steps.length > 0 ? (
-          <div className="space-y-1">
-            <div className="font-medium">{currentValues.steps.length}단계</div>
-            <div className="max-w-xs truncate text-xs text-gray-600">
-              {currentValues.steps
-                .sort((a, b) => a.orderNum - b.orderNum)
-                .map(step => step.summary ?? step.content)
-                .filter(Boolean)
-                .slice(0, 3)
-                .join(' / ')}
-              {currentValues.steps.length > 3 && '...'}
-            </div>
-          </div>
-        ) : (
-          '-'
-        )}
-      </div>
-    </TableCell>
-  );
-}
+//   return (
+//     <TableCell
+//       className={isSelected ? 'border-2 border-blue-500' : ''}
+//       onClick={e => {
+//         e.stopPropagation();
+//         setSelectedCell({ field: 'steps', recipeId: recipeItem.id });
+//       }}
+//     >
+//       <div
+//         onDoubleClick={() => openModal('steps', recipeItem.id)}
+//         className="cursor-pointer hover:bg-gray-50"
+//       >
+//         {currentValues.steps.length > 0 ? (
+//           <div className="space-y-1">
+//             <div className="font-medium">{currentValues.steps.length}단계</div>
+//             <div className="max-w-xs truncate text-xs text-gray-600">
+//               {currentValues.steps
+//                 .sort((a, b) => a.orderNum - b.orderNum)
+//                 .map(step => step.summary ?? step.content)
+//                 .filter(Boolean)
+//                 .slice(0, 3)
+//                 .join(' / ')}
+//               {currentValues.steps.length > 3 && '...'}
+//             </div>
+//           </div>
+//         ) : (
+//           '-'
+//         )}
+//       </div>
+//     </TableCell>
+//   );
+// }
 
 export const RecipeRow = RecipeRowProvider;
