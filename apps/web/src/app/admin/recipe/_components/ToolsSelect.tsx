@@ -2,6 +2,9 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+
 interface Tool {
   id: number;
   name: string;
@@ -62,29 +65,30 @@ export function ToolsSelect({
   return (
     <div
       ref={containerRef}
-      className="absolute z-50 max-h-48 w-full overflow-auto border border-gray-300 bg-white shadow-lg"
+      className="absolute left-0 top-0 z-50 min-w-[200px] max-h-48 overflow-auto rounded-md border bg-white shadow-lg"
     >
-      {availableTools.map(tool => (
-        <label
-          key={tool.id}
-          className="flex cursor-pointer items-center gap-2 px-3 py-2 hover:bg-gray-100"
-        >
-          <input
-            type="checkbox"
-            checked={selectedIds.has(tool.id)}
-            onChange={() => handleToggle(tool.id)}
-            className="h-4 w-4"
-          />
-          <span>{tool.name}</span>
-        </label>
-      ))}
-      <div className="border-t p-2">
-        <button
+      <div className="divide-y">
+        {availableTools.map(tool => (
+          <label
+            key={tool.id}
+            className="flex cursor-pointer items-center gap-3 px-4 py-2.5 hover:bg-gray-50"
+          >
+            <Checkbox
+              checked={selectedIds.has(tool.id)}
+              onCheckedChange={() => handleToggle(tool.id)}
+            />
+            <span className="whitespace-nowrap text-sm">{tool.name}</span>
+          </label>
+        ))}
+      </div>
+      <div className="border-t bg-gray-50 p-2">
+        <Button
           onClick={handleSave}
-          className="bg-primary hover:bg-primary/90 w-full rounded px-3 py-1 text-sm text-white"
+          className="w-full"
+          size="sm"
         >
           확인
-        </button>
+        </Button>
       </div>
     </div>
   );
