@@ -10,10 +10,12 @@ import type { RecipeUpdateRequest } from '@recipot/api';
  * 함수는 거의 변경되지 않으므로 성능 최적화에 유리
  */
 interface RecipeTableActionsContextValue {
+  closeModal: () => void;
   getConditionId: (conditionName?: string) => number;
   onSelectOne: (id: number, checked: boolean) => void;
   openModal: (type: ModalType, recipeId: number) => void;
   setEditingCell: (cell: { field: string; recipeId: number } | null) => void;
+  setSelectedCell: (cell: { field: string; recipeId: number } | null) => void;
   setSelectedRecipeId: (id: number | null) => void;
   updateEditedRecipe: (
     recipeId: number,

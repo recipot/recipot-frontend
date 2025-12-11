@@ -32,6 +32,7 @@ export default function AdminRecipePage() {
   const { isLoading, recipes: allRecipes, refetch } = useAdminRecipes();
   const { data: foodList = [] } = useFoodList();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const tableContainerRef = useRef<HTMLDivElement>(null);
 
   // 컨디션 목록 조회
   const [conditions, setConditions] = useState<
@@ -64,7 +65,9 @@ export default function AdminRecipePage() {
     clearEdits,
     editedRecipes,
     editingCell,
+    selectedCell,
     setEditingCell,
+    setSelectedCell,
     updateEditedRecipe,
   } = useRecipeEditor();
 
@@ -136,6 +139,24 @@ export default function AdminRecipePage() {
   // 4. Toast 알림
   const { isVisible: isToastVisible, message: toastMessage } = useToast();
 
+  // 테이블 외부 클릭 시 선택된 셀 해제
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        tableContainerRef.current &&
+        !tableContainerRef.current.contains(event.target as Node) &&
+        selectedCell !== null
+      ) {
+        setSelectedCell(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [selectedCell, setSelectedCell]);
+
   // 5. Context 값 구성
   const dataContextValue = useMemo(
     () => ({
@@ -145,7 +166,9 @@ export default function AdminRecipePage() {
       editedRecipes,
       editingCell,
       foodList,
+      modalState,
       recipes,
+      selectedCell,
       selectedIds,
       selectedRecipeId,
     }),
@@ -156,7 +179,9 @@ export default function AdminRecipePage() {
       editedRecipes,
       editingCell,
       foodList,
+      modalState,
       recipes,
+      selectedCell,
       selectedIds,
       selectedRecipeId,
     ]
@@ -164,18 +189,22 @@ export default function AdminRecipePage() {
 
   const actionsContextValue = useMemo(
     () => ({
+      closeModal,
       getConditionId,
       onSelectOne: toggleSelection,
       openModal,
       setEditingCell,
+      setSelectedCell,
       setSelectedRecipeId: selectRecipe,
       updateEditedRecipe,
     }),
     [
+      closeModal,
       getConditionId,
       openModal,
       selectRecipe,
       setEditingCell,
+      setSelectedCell,
       toggleSelection,
       updateEditedRecipe,
     ]
@@ -212,53 +241,45 @@ export default function AdminRecipePage() {
       </div>
 
       {/* 레시피 테이블 */}
-      <div className="rounded-md border">
-        <div
-          ref={scrollContainerRef}
-          className="relative max-h-[calc(100vh-200px)] overflow-auto"
-        >
-          <RecipeTableDataContext.Provider value={dataContextValue}>
-            <RecipeTableActionsContext.Provider value={actionsContextValue}>
+      <RecipeTableDataContext.Provider value={dataContextValue}>
+        <RecipeTableActionsContext.Provider value={actionsContextValue}>
+          <div ref={tableContainerRef} className="rounded-md border">
+            <div
+              ref={scrollContainerRef}
+              className="relative max-h-[calc(100vh-200px)] overflow-auto"
+            >
               <RecipeTable>
                 <Table>
                   <RecipeTable.Header />
                   <RecipeTable.Body />
                 </Table>
               </RecipeTable>
-            </RecipeTableActionsContext.Provider>
-          </RecipeTableDataContext.Provider>
 
-          {/* 무한스크롤 감지용 타겟 요소 */}
-          {!isLoading && hasMore && (
-            <div
-              ref={observerTargetRef}
-              className="flex h-20 items-center justify-center"
-            >
-              {isLoadingMore && (
-                <div className="text-center text-gray-500">
-                  더 불러오는 중...
+              {/* 무한스크롤 감지용 타겟 요소 */}
+              {!isLoading && hasMore && (
+                <div
+                  ref={observerTargetRef}
+                  className="flex h-20 items-center justify-center"
+                >
+                  {isLoadingMore && (
+                    <div className="text-center text-gray-500">
+                      더 불러오는 중...
+                    </div>
+                  )}
                 </div>
               )}
             </div>
-          )}
-        </div>
-      </div>
+          </div>
+
+          {/* 모달들 */}
+          <RecipeModals />
+        </RecipeTableActionsContext.Provider>
+      </RecipeTableDataContext.Provider>
 
       {/* 로딩 상태 */}
       {isLoading && (
         <div className="mt-4 text-center text-gray-500">로딩 중...</div>
       )}
-
-      {/* 모달들 */}
-      <RecipeModals
-        availableSeasonings={availableSeasonings}
-        closeModal={closeModal}
-        editedRecipes={editedRecipes}
-        foodList={foodList}
-        modalState={modalState}
-        recipes={recipes}
-        updateEditedRecipe={updateEditedRecipe}
-      />
 
       {/* 검증 에러 모달 */}
       <Modal

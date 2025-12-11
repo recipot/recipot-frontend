@@ -4,6 +4,8 @@ import { createContext, useContext } from 'react';
 
 import type { AdminRecipe, Food, RecipeUpdateRequest } from '@recipot/api';
 
+import type { ModalType } from './RecipeModals';
+
 /**
  * 읽기 전용 데이터 Context
  * 데이터가 변경될 때만 재렌더링
@@ -15,7 +17,9 @@ interface RecipeTableDataContextValue {
   editedRecipes: Map<number, Partial<RecipeUpdateRequest>>;
   editingCell: { field: string; recipeId: number } | null;
   foodList: Food[];
+  modalState: { recipeId: number; type: ModalType } | null;
   recipes: AdminRecipe[];
+  selectedCell: { field: string; recipeId: number } | null;
   selectedIds: Set<number>;
   selectedRecipeId: number | null;
 }
@@ -35,4 +39,3 @@ export function useRecipeTableDataContext() {
 
 export { RecipeTableDataContext };
 export type { RecipeTableDataContextValue };
-
