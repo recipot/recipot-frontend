@@ -69,3 +69,7 @@ export {
   type PendingReviewsResponse,
   type PendingReviewItem,
 } from './review';
+
+// Upload API
+export { upload } from './upload';
+export type { ImageUploadResponse } from './upload';

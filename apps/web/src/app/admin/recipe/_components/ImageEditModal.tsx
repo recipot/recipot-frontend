@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+import { upload } from '@recipot/api';
 import Image from 'next/image';
 
 import { Button } from '@/components/common/Button';
@@ -30,6 +32,8 @@ export function ImageEditModal({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [imageUrlInput, setImageUrlInput] = useState<string>('');
+  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -37,6 +41,8 @@ export function ImageEditModal({
       setSelectedFile(null);
       setPreviewUrl(null);
       setImageUrlInput(currentImageUrl ?? '');
+      setErrorMessage('');
+      setIsUploading(false);
     }
   }, [isOpen, currentImageUrl]);
 
@@ -44,31 +50,59 @@ export function ImageEditModal({
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setSelectedFile(file);
-      setPreviewUrl(URL.createObjectURL(file));
-      // 파일 이름을 URL 입력 필드에 설정 (blob URL 대신 파일 이름 사용)
-      setImageUrlInput(file.name);
+    if (!file) return;
+
+    setSelectedFile(file);
+    setPreviewUrl(URL.createObjectURL(file));
+    setErrorMessage('');
+    setIsUploading(true);
+
+    try {
+      const uploadedUrl = await upload.uploadImage(file);
+      setImageUrlInput(uploadedUrl);
+    } catch (error) {
+      console.error('이미지 업로드 실패:', error);
+      setErrorMessage('이미지 업로드에 실패했습니다. 다시 시도해주세요.');
+      setImageUrlInput('');
+    } finally {
+      setIsUploading(false);
     }
   };
 
   const handleSave = () => {
+    if (isUploading) {
+      setErrorMessage('이미지 업로드 중입니다. 잠시만 기다려주세요.');
+      return;
+    }
+
     let urlToSave: string | null = null;
-    if (previewUrl) {
-      // 새로 등록하거나 수정 시
-      urlToSave = previewUrl;
-    } else if (imageUrlInput.trim()) {
-      // 이미지를 수정하지 않고 그대로 저장
-      urlToSave = imageUrlInput.trim();
+
+    if (imageUrlInput) {
+      if (imageUrlInput.startsWith('blob:')) {
+        setErrorMessage(
+          'Blob URL은 저장할 수 없습니다. 실제 이미지 URL을 입력해주세요.'
+        );
+        return;
+      }
+      urlToSave = imageUrlInput;
+    } else if (currentImageUrl) {
+      urlToSave = currentImageUrl;
+    } else {
+      setErrorMessage('이미지 URL을 입력하거나 파일을 업로드해주세요.');
+      return;
     }
 
     if (urlToSave) {
       onSave(urlToSave);
+      // 상태 초기화
       setSelectedFile(null);
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
       setPreviewUrl(null);
-      onClose();
+      setErrorMessage('');
     }
   };
 
@@ -81,20 +115,33 @@ export function ImageEditModal({
     onClose();
   };
 
-  const displayFileName = selectedFile
-    ? selectedFile.name
-    : currentImageUrl
-      ? (currentImageUrl.split('/').pop() ?? currentImageUrl)
-      : '';
+  const displayFileName = (() => {
+    if (selectedFile) return selectedFile.name;
+    if (currentImageUrl)
+      return currentImageUrl.split('/').pop() ?? currentImageUrl;
+    return '';
+  })();
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-md">
+        <VisuallyHidden asChild>
+          <DialogTitle className="text-18sb">{columnName}</DialogTitle>
+        </VisuallyHidden>
         <DialogHeader>
           <DialogTitle className="text-18sb">{columnName}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
+          <div className="flex flex-col gap-2">
+            {errorMessage && (
+              <span className="text-sm text-red-500">{errorMessage}</span>
+            )}
+            {isUploading && (
+              <span className="text-sm text-blue-600">이미지 업로드 중...</span>
+            )}
+          </div>
+
           <div className="flex flex-col items-center justify-between gap-2">
             <div className="flex-1">
               <div className="text-18sb mt-1">
@@ -114,8 +161,9 @@ export function ImageEditModal({
               shape="square"
               variant="outline"
               onClick={handleFileSelect}
+              disabled={isUploading}
             >
-              파일 선택
+              {isUploading ? '업로드 중...' : '파일 선택'}
             </Button>
           </div>
 
@@ -127,6 +175,7 @@ export function ImageEditModal({
                   alt="미리보기"
                   fill
                   className="object-contain"
+                  priority
                 />
               </div>
             ) : imageUrlInput ? (
@@ -165,7 +214,7 @@ export function ImageEditModal({
           </Button>
           <Button
             onClick={handleSave}
-            disabled={!imageUrlInput.trim() && !currentImageUrl}
+            disabled={(!imageUrlInput && !currentImageUrl) || isUploading}
           >
             저장
           </Button>

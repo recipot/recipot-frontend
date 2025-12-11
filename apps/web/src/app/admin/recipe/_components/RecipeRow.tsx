@@ -162,6 +162,7 @@ function ImageCell() {
             width={60}
             height={60}
             className="rounded object-cover"
+            style={{ height: '60px', width: '60px' }}
           />
         </div>
       </TableCell>

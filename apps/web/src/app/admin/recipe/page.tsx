@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { condition, recipe, type RecipeUpdateRequest } from '@recipot/api';
 import { Trash } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/common/Button';
 import { Modal } from '@/components/common/Modal/Modal';
@@ -36,8 +35,7 @@ import { SeasoningsEditModal } from './_components/SeasoningsEditModal';
 import { StepsEditModal } from './_components/StepsEditModal';
 
 export default function AdminRecipePage() {
-  const router = useRouter();
-  const { isLoading, recipes: allRecipes } = useAdminRecipes();
+  const { isLoading, recipes: allRecipes, refetch } = useAdminRecipes();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const filteredRecipes = useMemo(() => {
@@ -389,9 +387,10 @@ export default function AdminRecipePage() {
       }
 
       showToast('레시피가 성공적으로 저장되었습니다.');
-      setEditedRecipes(new Map()); // 저장 후 수정 내역 초기화
-      // 저장 성공 후 화면 새로고침
-      router.refresh();
+
+      await refetch();
+      // 최신 데이터 반영 후 수정 내역 초기화
+      setEditedRecipes(new Map());
     } catch (error) {
       console.error('레시피 저장 실패:', error);
       showError({
