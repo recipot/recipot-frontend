@@ -1,10 +1,10 @@
 // Compound Components
-import RecipeModalsImage from './compound/Image';
-import RecipeModalsIngredients from './compound/Ingredients';
-import RecipeModalsRoot from './compound/Root';
-import RecipeModalsSeasonings from './compound/Seasonings';
+import RecipeModalsImage from '@/app/admin/recipe/_components/RecipeModals/compound/Image';
+import RecipeModalsIngredients from '@/app/admin/recipe/_components/RecipeModals/compound/Ingredients';
+import RecipeModalsRoot from '@/app/admin/recipe/_components/RecipeModals/compound/Root';
+import RecipeModalsSeasonings from '@/app/admin/recipe/_components/RecipeModals/compound/Seasonings';
 // TODO: Steps 기능은 기획팀과 회의 중이므로 임시 주석처리
-// import RecipeModalsSteps from './compound/Steps';
+// import RecipeModalsSteps from '@/app/admin/recipe/_components/RecipeModals/compound/Steps';
 
 // Types
 /**
