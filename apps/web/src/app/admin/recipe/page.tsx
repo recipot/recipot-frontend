@@ -14,7 +14,7 @@ import { usePaginatedList } from '@/hooks/usePaginatedList';
 import { useToast } from '@/hooks/useToast';
 import { isAdminRecipeCompletelyEmpty } from '@/utils/recipeValidation';
 
-import { RecipeModals } from './_components/RecipeModals';
+import RecipeModals from './_components/RecipeModals';
 import { RecipeTable } from './_components/RecipeTable';
 import { RecipeTableActionsContext } from './_components/RecipeTableActionsContext';
 import { RecipeTableDataContext } from './_components/RecipeTableDataContext';
@@ -272,7 +272,13 @@ export default function AdminRecipePage() {
           </div>
 
           {/* 모달들 */}
-          <RecipeModals />
+          <RecipeModals>
+            <RecipeModals.Ingredients />
+            <RecipeModals.Seasonings />
+            {/* TODO: Steps 기능은 기획팀과 회의 중이므로 임시 주석처리 */}
+            {/* <RecipeModals.Steps /> */}
+            <RecipeModals.Image />
+          </RecipeModals>
         </RecipeTableActionsContext.Provider>
       </RecipeTableDataContext.Provider>
 
