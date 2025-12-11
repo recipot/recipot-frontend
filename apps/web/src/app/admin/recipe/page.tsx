@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { condition, recipe, type RecipeUpdateRequest } from '@recipot/api';
 import { Trash } from 'lucide-react';
-import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/common/Button';
 import { Modal } from '@/components/common/Modal/Modal';
@@ -12,13 +12,13 @@ import { Checkbox } from '@/components/ui/checkbox';
 import {
   Table,
   TableBody,
-  TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { useAdminRecipes } from '@/hooks/useAdminRecipes';
 import { useFoodList } from '@/hooks/useFoodList';
-import { useInfiniteRecipes } from '@/hooks/useInfiniteRecipes';
+import { usePaginatedList } from '@/hooks/usePaginatedList';
 import { useToast } from '@/hooks/useToast';
 import { useApiErrorModalStore } from '@/stores/apiErrorModalStore';
 import {
@@ -28,32 +28,39 @@ import {
   validateRecipeUpdateRequests,
 } from '@/utils/recipeValidation';
 
-import { ConditionSelect } from './_components/ConditionSelect';
-import { EditableCell } from './_components/EditableCell';
 import { ImageEditModal } from './_components/ImageEditModal';
 import { IngredientsEditModal } from './_components/IngredientsEditModal';
+import { RecipeRow } from './_components/RecipeRow';
+import { RecipeTableContext } from './_components/RecipeTableContext';
 import { SeasoningsEditModal } from './_components/SeasoningsEditModal';
 import { StepsEditModal } from './_components/StepsEditModal';
-import { ToolsSelect } from './_components/ToolsSelect';
 
 export default function AdminRecipePage() {
+  const router = useRouter();
+  const { isLoading, recipes: allRecipes } = useAdminRecipes();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  const filteredRecipes = useMemo(() => {
+    return allRecipes.filter(recipe => !isAdminRecipeCompletelyEmpty(recipe));
+  }, [allRecipes]);
+
   const {
-    hasNextPage,
-    isLoading,
-    loadMore,
-    recipes: allRecipes,
-  } = useInfiniteRecipes();
+    displayedItems: recipes,
+    hasMore,
+    isLoadingMore,
+    observerTargetRef,
+  } = usePaginatedList({
+    items: filteredRecipes,
+    itemsPerPage: 20,
+    scrollContainerRef,
+  });
+
   const { data: foodList = [] } = useFoodList();
   const {
     isVisible: isToastVisible,
     message: toastMessage,
     showToast,
   } = useToast();
-
-  // 전 컬럼 공란 행 필터링 (화면 새로고침 시)
-  const recipes = useMemo(() => {
-    return allRecipes.filter(recipe => !isAdminRecipeCompletelyEmpty(recipe));
-  }, [allRecipes]);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [editedRecipes, setEditedRecipes] = useState<
     Map<number, Partial<RecipeUpdateRequest>>
@@ -69,29 +76,19 @@ export default function AdminRecipePage() {
     isOpen: false,
     message: '',
   });
-  const observerTarget = useRef<HTMLDivElement>(null);
-
   // 편집 상태 관리
   const [editingCell, setEditingCell] = useState<{
     field: string;
     recipeId: number;
   } | null>(null);
-  const [imageModalState, setImageModalState] = useState<{
-    isOpen: boolean;
+
+  // 통합된 모달 상태
+  type ModalType = 'ingredients' | 'seasonings' | 'steps' | 'image';
+  const [modalState, setModalState] = useState<{
     recipeId: number;
+    type: ModalType;
   } | null>(null);
-  const [ingredientsModalState, setIngredientsModalState] = useState<{
-    isOpen: boolean;
-    recipeId: number;
-  } | null>(null);
-  const [seasoningsModalState, setSeasoningsModalState] = useState<{
-    isOpen: boolean;
-    recipeId: number;
-  } | null>(null);
-  const [stepsModalState, setStepsModalState] = useState<{
-    isOpen: boolean;
-    recipeId: number;
-  } | null>(null);
+
   const { showError } = useApiErrorModalStore();
 
   // 컨디션 목록 조회
@@ -107,29 +104,6 @@ export default function AdminRecipePage() {
     fetchConditions();
   }, []);
 
-  // 무한스크롤을 위한 Intersection Observer
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      entries => {
-        if (entries[0].isIntersecting && hasNextPage && !isLoading) {
-          loadMore();
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    const currentTarget = observerTarget.current;
-    if (currentTarget) {
-      observer.observe(currentTarget);
-    }
-
-    return () => {
-      if (currentTarget) {
-        observer.unobserve(currentTarget);
-      }
-    };
-  }, [hasNextPage, isLoading, loadMore]);
-
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
       setSelectedIds(new Set(recipes.map(recipe => recipe.id)));
@@ -138,44 +112,48 @@ export default function AdminRecipePage() {
     }
   };
 
-  const handleSelectOne = (id: number, checked: boolean) => {
-    const newSelected = new Set(selectedIds);
-    if (checked) {
-      newSelected.add(id);
-    } else {
-      newSelected.delete(id);
-    }
-    setSelectedIds(newSelected);
-  };
+  const handleSelectOne = useCallback((id: number, checked: boolean) => {
+    setSelectedIds(prev => {
+      const newSelected = new Set(prev);
+      if (checked) {
+        newSelected.add(id);
+      } else {
+        newSelected.delete(id);
+      }
+      return newSelected;
+    });
+  }, []);
 
   const isAllSelected =
     recipes.length > 0 && selectedIds.size === recipes.length;
 
-  // duration 문자열을 숫자로 변환 (예: "15분" -> 15)
-  const parseDuration = (duration: string): number => {
-    const match = duration.match(/(\d+)/);
-    return match ? parseInt(match[1], 10) : 0;
-  };
-
   // condition 이름을 conditionId로 변환
-  const getConditionId = (conditionName?: string): number => {
-    if (!conditionName) return 1; // 기본값
-    const found = conditions.find(c => c.name === conditionName);
-    return found?.id ?? 1;
+  const getConditionId = useCallback(
+    (conditionName?: string): number => {
+      if (!conditionName) return 1; // 기본값
+      const found = conditions.find(c => c.name === conditionName);
+      return found?.id ?? 1;
+    },
+    [conditions]
+  );
+
+  // duration 파싱 헬퍼
+  const parseDuration = (duration: string): number => {
+    return Number(duration) || 0;
   };
 
   // 레시피 수정 데이터 업데이트
-  const updateEditedRecipe = (
-    recipeId: number,
-    updates: Partial<RecipeUpdateRequest>
-  ) => {
-    setEditedRecipes(prev => {
-      const newMap = new Map(prev);
-      const existing = newMap.get(recipeId) ?? {};
-      newMap.set(recipeId, { ...existing, ...updates });
-      return newMap;
-    });
-  };
+  const updateEditedRecipe = useCallback(
+    (recipeId: number, updates: Partial<RecipeUpdateRequest>) => {
+      setEditedRecipes(prev => {
+        const newMap = new Map(prev);
+        const existing = newMap.get(recipeId) ?? {};
+        newMap.set(recipeId, { ...existing, ...updates });
+        return newMap;
+      });
+    },
+    []
+  );
 
   // 조리도구 목록 추출 (기존 레시피 데이터에서)
   const availableTools = useMemo(() => {
@@ -206,6 +184,82 @@ export default function AdminRecipePage() {
     return Array.from(seasoningsMap.values());
   }, [recipes]);
 
+  // 모달 열기 헬퍼 함수
+  const openModal = useCallback((type: ModalType, recipeId: number) => {
+    setModalState({ recipeId, type });
+  }, []);
+
+  const closeModal = useCallback(() => {
+    setModalState(null);
+  }, []);
+
+  // RecipeTableContext 값
+  const tableContextValue = useMemo(
+    () => ({
+      availableSeasonings,
+      availableTools,
+      conditions,
+      editingCell,
+      foodList,
+      getConditionId,
+      onSelectOne: handleSelectOne,
+      parseDuration,
+      selectedIds,
+      setEditingCell,
+      setImageModalState: (
+        state: { isOpen: boolean; recipeId: number } | null
+      ) => {
+        if (state?.isOpen) {
+          openModal('image', state.recipeId);
+        } else {
+          closeModal();
+        }
+      },
+      setIngredientsModalState: (
+        state: { isOpen: boolean; recipeId: number } | null
+      ) => {
+        if (state?.isOpen) {
+          openModal('ingredients', state.recipeId);
+        } else {
+          closeModal();
+        }
+      },
+      setSeasoningsModalState: (
+        state: { isOpen: boolean; recipeId: number } | null
+      ) => {
+        if (state?.isOpen) {
+          openModal('seasonings', state.recipeId);
+        } else {
+          closeModal();
+        }
+      },
+      setStepsModalState: (
+        state: { isOpen: boolean; recipeId: number } | null
+      ) => {
+        if (state?.isOpen) {
+          openModal('steps', state.recipeId);
+        } else {
+          closeModal();
+        }
+      },
+      updateEditedRecipe,
+    }),
+    [
+      availableSeasonings,
+      availableTools,
+      conditions,
+      editingCell,
+      foodList,
+      getConditionId,
+      handleSelectOne,
+      openModal,
+      closeModal,
+      selectedIds,
+      setEditingCell,
+      updateEditedRecipe,
+    ]
+  );
+
   // 저장 버튼 핸들러
   const handleSave = async () => {
     if (editedRecipes.size === 0) {
@@ -234,11 +288,9 @@ export default function AdminRecipePage() {
           description: edits.description ?? originalRecipe.description ?? '',
           duration:
             edits.duration ??
-            parseDuration(
-              typeof originalRecipe.duration === 'string'
-                ? originalRecipe.duration
-                : String(originalRecipe.duration)
-            ),
+            (typeof originalRecipe.duration === 'number'
+              ? originalRecipe.duration
+              : Number(originalRecipe.duration) || 0),
           id: recipeId,
           imageUrl: edits.imageUrl ?? originalRecipe.imageUrl,
           ingredients:
@@ -298,9 +350,48 @@ export default function AdminRecipePage() {
         return;
       }
 
-      await recipe.updateRecipes(validRequests);
+      // 수정된 레시피 개수에 따라 API 메서드 선택
+      if (validRequests.length === 1) {
+        // 단일 레시피 수정: PUT 사용 (전체 데이터 포함)
+        const singleRequest = validRequests[0];
+        const putRequestData = {
+          conditionId: singleRequest.conditionId,
+          description: singleRequest.description,
+          duration: singleRequest.duration,
+          healthPoints: [], // TODO: healthPoints 데이터 추가 필요 시 구현
+          images: singleRequest.imageUrl
+            ? [{ imageUrl: singleRequest.imageUrl }]
+            : [],
+          ingredients: singleRequest.ingredients.map(ing => ({
+            amount: ing.amount,
+            ingredientId: ing.id,
+            isAlternative: ing.isAlternative,
+          })),
+          seasonings: singleRequest.seasonings.map(sea => ({
+            amount: sea.amount,
+            seasoningId: sea.id,
+          })),
+          steps: singleRequest.steps.map(step => ({
+            content: step.content,
+            imageUrl: step.imageUrl,
+            orderNum: step.orderNum,
+            summary: step.summary,
+          })),
+          title: singleRequest.title,
+          tools: singleRequest.tools.map(tool => ({
+            toolId: tool.id,
+          })),
+        };
+        await recipe.updateRecipe(singleRequest.id, putRequestData);
+      } else {
+        // 다중 레시피 수정: POST 사용
+        await recipe.updateRecipes(validRequests);
+      }
+
       showToast('레시피가 성공적으로 저장되었습니다.');
       setEditedRecipes(new Map()); // 저장 후 수정 내역 초기화
+      // 저장 성공 후 화면 새로고침
+      router.refresh();
     } catch (error) {
       console.error('레시피 저장 실패:', error);
       showError({
@@ -335,7 +426,10 @@ export default function AdminRecipePage() {
       </div>
 
       <div className="rounded-md border">
-        <div className="relative max-h-[calc(100vh-200px)] overflow-auto">
+        <div
+          ref={scrollContainerRef}
+          className="relative max-h-[calc(100vh-200px)] overflow-auto"
+        >
           <Table>
             <TableHeader>
               <TableRow>
@@ -358,392 +452,120 @@ export default function AdminRecipePage() {
                 <TableHead>요리순서</TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody>
-              {recipes.map(recipeItem => {
-                const editedData = editedRecipes.get(recipeItem.id);
-                const currentTitle = editedData?.title ?? recipeItem.title;
-                const currentDuration = editedData?.duration
-                  ? String(editedData.duration)
-                  : recipeItem.duration;
-                const currentDescription =
-                  editedData?.description ?? recipeItem.description ?? '';
-                const currentConditionId =
-                  editedData?.conditionId ??
-                  getConditionId(recipeItem.condition);
-                const currentImageUrl =
-                  editedData?.imageUrl ?? recipeItem.imageUrl;
-                const currentTools =
-                  editedData?.tools ?? recipeItem.tools ?? [];
-                const currentIngredients =
-                  editedData?.ingredients ?? recipeItem.ingredients ?? [];
-                const currentSeasonings =
-                  editedData?.seasonings ?? recipeItem.seasonings ?? [];
-                const currentSteps =
-                  editedData?.steps ?? recipeItem.steps ?? [];
-
-                return (
-                  <TableRow key={recipeItem.id}>
-                    <TableCell>
-                      <Checkbox
-                        checked={selectedIds.has(recipeItem.id)}
-                        onCheckedChange={checked =>
-                          handleSelectOne(recipeItem.id, checked === true)
-                        }
-                      />
-                    </TableCell>
-                    <TableCell>{recipeItem.id}</TableCell>
-                    <TableCell className="font-medium">
-                      {editingCell?.recipeId === recipeItem.id &&
-                      editingCell?.field === 'title' ? (
-                        <EditableCell
-                          value={currentTitle}
-                          onSave={value => {
-                            updateEditedRecipe(recipeItem.id, {
-                              title: String(value),
-                            });
-                            setEditingCell(null);
-                          }}
-                          type="text"
-                        />
-                      ) : (
-                        <div
-                          onDoubleClick={() =>
-                            setEditingCell({
-                              field: 'title',
-                              recipeId: recipeItem.id,
-                            })
-                          }
-                          className="cursor-pointer hover:bg-gray-50"
-                        >
-                          {currentTitle && currentTitle.trim().length > 0
-                            ? currentTitle
-                            : '-'}
-                        </div>
-                      )}
-                    </TableCell>
-                    <TableCell className="relative">
-                      {currentImageUrl ? (
-                        <div
-                          onDoubleClick={() =>
-                            setImageModalState({
-                              isOpen: true,
-                              recipeId: recipeItem.id,
-                            })
-                          }
-                          className="cursor-pointer"
-                        >
-                          <Image
-                            src={currentImageUrl}
-                            alt={currentTitle}
-                            width={60}
-                            height={60}
-                            className="rounded object-cover"
-                          />
-                        </div>
-                      ) : (
-                        <span
-                          onDoubleClick={() =>
-                            setImageModalState({
-                              isOpen: true,
-                              recipeId: recipeItem.id,
-                            })
-                          }
-                          className="cursor-pointer text-gray-400 hover:bg-gray-50"
-                        >
-                          -
-                        </span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {editingCell?.recipeId === recipeItem.id &&
-                      editingCell?.field === 'duration' ? (
-                        <EditableCell
-                          value={parseDuration(String(currentDuration))}
-                          onSave={value => {
-                            updateEditedRecipe(recipeItem.id, {
-                              duration: Number(value),
-                            });
-                            setEditingCell(null);
-                          }}
-                          type="number"
-                        />
-                      ) : (
-                        <div
-                          onDoubleClick={() =>
-                            setEditingCell({
-                              field: 'duration',
-                              recipeId: recipeItem.id,
-                            })
-                          }
-                          className="cursor-pointer hover:bg-gray-50"
-                        >
-                          {currentDuration && Number(currentDuration) > 0
-                            ? currentDuration
-                            : '-'}
-                        </div>
-                      )}
-                    </TableCell>
-                    <TableCell className="relative">
-                      {editingCell?.recipeId === recipeItem.id &&
-                      editingCell?.field === 'condition' ? (
-                        <ConditionSelect
-                          conditions={conditions}
-                          currentConditionId={currentConditionId}
-                          onSelect={conditionId => {
-                            updateEditedRecipe(recipeItem.id, {
-                              conditionId,
-                            });
-                            setEditingCell(null);
-                          }}
-                          onClose={() => setEditingCell(null)}
-                        />
-                      ) : (
-                        <div
-                          onDoubleClick={() =>
-                            setEditingCell({
-                              field: 'condition',
-                              recipeId: recipeItem.id,
-                            })
-                          }
-                          className="cursor-pointer hover:bg-gray-50"
-                        >
-                          {conditions.find(c => c.id === currentConditionId)
-                            ?.name ?? '-'}
-                        </div>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {editingCell?.recipeId === recipeItem.id &&
-                      editingCell?.field === 'description' ? (
-                        <EditableCell
-                          value={currentDescription}
-                          onSave={value => {
-                            updateEditedRecipe(recipeItem.id, {
-                              description: String(value),
-                            });
-                            setEditingCell(null);
-                          }}
-                          type="text"
-                        />
-                      ) : (
-                        <div
-                          onDoubleClick={() =>
-                            setEditingCell({
-                              field: 'description',
-                              recipeId: recipeItem.id,
-                            })
-                          }
-                          className="cursor-pointer hover:bg-gray-50"
-                        >
-                          {currentDescription &&
-                          currentDescription.trim().length > 0
-                            ? currentDescription
-                            : '-'}
-                        </div>
-                      )}
-                    </TableCell>
-                    <TableCell className="relative">
-                      {editingCell?.recipeId === recipeItem.id &&
-                      editingCell?.field === 'tools' ? (
-                        <ToolsSelect
-                          availableTools={availableTools}
-                          selectedToolIds={currentTools.map(t => t.id)}
-                          onSelect={toolIds => {
-                            updateEditedRecipe(recipeItem.id, {
-                              tools: toolIds.map(id => ({ id })),
-                            });
-                            setEditingCell(null);
-                          }}
-                          onClose={() => setEditingCell(null)}
-                        />
-                      ) : (
-                        <div
-                          onDoubleClick={() =>
-                            setEditingCell({
-                              field: 'tools',
-                              recipeId: recipeItem.id,
-                            })
-                          }
-                          className="cursor-pointer hover:bg-gray-50"
-                        >
-                          {currentTools.length > 0
-                            ? availableTools
-                                .filter(t =>
-                                  currentTools.some(ct => ct.id === t.id)
-                                )
-                                .map(t => t.name)
-                                .join(', ')
-                            : '-'}
-                        </div>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <div
-                        onDoubleClick={() =>
-                          setIngredientsModalState({
-                            isOpen: true,
-                            recipeId: recipeItem.id,
-                          })
-                        }
-                        className="cursor-pointer hover:bg-gray-50"
-                      >
-                        {currentIngredients.length > 0
-                          ? foodList
-                              .filter(f =>
-                                currentIngredients.some(ci => ci.id === f.id)
-                              )
-                              .map(f => f.name)
-                              .join(', ')
-                          : '-'}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {recipeItem.irreplaceableIngredients ?? '-'}
-                    </TableCell>
-                    <TableCell>
-                      <div
-                        onDoubleClick={() =>
-                          setSeasoningsModalState({
-                            isOpen: true,
-                            recipeId: recipeItem.id,
-                          })
-                        }
-                        className="cursor-pointer hover:bg-gray-50"
-                      >
-                        {currentSeasonings.length > 0
-                          ? availableSeasonings
-                              .filter(s =>
-                                currentSeasonings.some(cs => cs.id === s.id)
-                              )
-                              .map(s => s.name)
-                              .join(', ')
-                          : '-'}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div
-                        onDoubleClick={() =>
-                          setStepsModalState({
-                            isOpen: true,
-                            recipeId: recipeItem.id,
-                          })
-                        }
-                        className="cursor-pointer hover:bg-gray-50"
-                      >
-                        {currentSteps.length > 0 ? (
-                          <div className="space-y-1">
-                            <div className="font-medium">
-                              {currentSteps.length}단계
-                            </div>
-                            <div className="max-w-xs truncate text-xs text-gray-600">
-                              {currentSteps
-                                .sort((a, b) => a.orderNum - b.orderNum)
-                                .map(step => step.summary ?? step.content)
-                                .filter(Boolean)
-                                .slice(0, 3)
-                                .join(' / ')}
-                              {currentSteps.length > 3 && '...'}
-                            </div>
-                          </div>
-                        ) : (
-                          '-'
-                        )}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
+            <RecipeTableContext.Provider value={tableContextValue}>
+              <TableBody>
+                {recipes.map(recipeItem => {
+                  const editedData = editedRecipes.get(recipeItem.id);
+                  return (
+                    <RecipeRow
+                      editedData={editedData}
+                      key={recipeItem.id}
+                      recipeItem={recipeItem}
+                    />
+                  );
+                })}
+              </TableBody>
+            </RecipeTableContext.Provider>
           </Table>
+
+          {/* 무한스크롤 감지용 타겟 요소 - 테이블 내부에 배치 */}
+          {!isLoading && hasMore && (
+            <div
+              ref={observerTargetRef}
+              className="flex h-20 items-center justify-center"
+            >
+              {isLoadingMore && (
+                <div className="text-center text-gray-500">
+                  더 불러오는 중...
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
-
-      {/* 무한스크롤 트리거 */}
-      <div ref={observerTarget} className="h-10" />
 
       {isLoading && (
         <div className="mt-4 text-center text-gray-500">로딩 중...</div>
       )}
 
-      {!hasNextPage && recipes.length > 0 && (
-        <div className="mt-4 text-center text-gray-500">
-          모든 레시피를 불러왔습니다.
-        </div>
-      )}
+      {/* 통합된 모달 렌더링 */}
+      {modalState &&
+        (() => {
+          const { recipeId, type } = modalState;
+          const targetRecipe = recipes.find(r => r.id === recipeId);
+          const editedData = editedRecipes.get(recipeId);
 
-      {/* 이미지 수정 모달 */}
-      {imageModalState && (
-        <ImageEditModal
-          isOpen={imageModalState.isOpen}
-          onClose={() => setImageModalState(null)}
-          currentImageUrl={
-            recipes.find(r => r.id === imageModalState.recipeId)?.imageUrl
-          }
-          onSave={imageUrl => {
-            updateEditedRecipe(imageModalState.recipeId, { imageUrl });
-            setImageModalState(null);
-          }}
-        />
-      )}
+          switch (type) {
+            case 'ingredients': {
+              const currentIngredients =
+                editedData?.ingredients ?? targetRecipe?.ingredients ?? [];
+              return (
+                <IngredientsEditModal
+                  availableFoods={foodList}
+                  currentIngredients={currentIngredients}
+                  isOpen
+                  onClose={closeModal}
+                  onSave={ingredients => {
+                    updateEditedRecipe(recipeId, { ingredients });
+                    closeModal();
+                  }}
+                />
+              );
+            }
 
-      {/* 재료 수정 모달 */}
-      {ingredientsModalState && (
-        <IngredientsEditModal
-          isOpen={ingredientsModalState.isOpen}
-          onClose={() => setIngredientsModalState(null)}
-          currentIngredients={
-            editedRecipes.get(ingredientsModalState.recipeId)?.ingredients ??
-            recipes.find(r => r.id === ingredientsModalState.recipeId)
-              ?.ingredients ??
-            []
-          }
-          availableFoods={foodList}
-          onSave={ingredients => {
-            updateEditedRecipe(ingredientsModalState.recipeId, {
-              ingredients,
-            });
-            setIngredientsModalState(null);
-          }}
-        />
-      )}
+            case 'seasonings': {
+              const currentSeasonings =
+                editedData?.seasonings ?? targetRecipe?.seasonings ?? [];
+              return (
+                <SeasoningsEditModal
+                  availableSeasonings={availableSeasonings}
+                  currentSeasonings={currentSeasonings}
+                  isOpen
+                  onClose={closeModal}
+                  onSave={seasonings => {
+                    updateEditedRecipe(recipeId, { seasonings });
+                    closeModal();
+                  }}
+                />
+              );
+            }
 
-      {/* 양념 수정 모달 */}
-      {seasoningsModalState && (
-        <SeasoningsEditModal
-          isOpen={seasoningsModalState.isOpen}
-          onClose={() => setSeasoningsModalState(null)}
-          currentSeasonings={
-            editedRecipes.get(seasoningsModalState.recipeId)?.seasonings ??
-            recipes.find(r => r.id === seasoningsModalState.recipeId)
-              ?.seasonings ??
-            []
-          }
-          availableSeasonings={availableSeasonings}
-          onSave={seasonings => {
-            updateEditedRecipe(seasoningsModalState.recipeId, {
-              seasonings,
-            });
-            setSeasoningsModalState(null);
-          }}
-        />
-      )}
+            case 'steps': {
+              const currentSteps =
+                editedData?.steps ?? targetRecipe?.steps ?? [];
+              return (
+                <StepsEditModal
+                  currentSteps={currentSteps}
+                  isOpen
+                  onClose={closeModal}
+                  onSave={steps => {
+                    updateEditedRecipe(recipeId, { steps });
+                    closeModal();
+                  }}
+                />
+              );
+            }
 
-      {/* 요리순서 수정 모달 */}
-      {stepsModalState && (
-        <StepsEditModal
-          isOpen={stepsModalState.isOpen}
-          onClose={() => setStepsModalState(null)}
-          currentSteps={
-            editedRecipes.get(stepsModalState.recipeId)?.steps ??
-            recipes.find(r => r.id === stepsModalState.recipeId)?.steps ??
-            []
+            case 'image':
+              return (
+                <ImageEditModal
+                  columnName="대표 이미지"
+                  currentImageUrl={
+                    editedData?.imageUrl ?? targetRecipe?.imageUrl
+                  }
+                  isOpen
+                  onClose={closeModal}
+                  onSave={imageUrl => {
+                    updateEditedRecipe(recipeId, { imageUrl });
+                    closeModal();
+                  }}
+                />
+              );
+
+            default:
+              return null;
           }
-          onSave={steps => {
-            updateEditedRecipe(stepsModalState.recipeId, { steps });
-            setStepsModalState(null);
-          }}
-        />
-      )}
+        })()}
 
       {/* 검증 에러 모달 */}
       <Modal
