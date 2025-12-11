@@ -123,7 +123,7 @@ export interface RecipeUpdateRequest {
 export interface RecipePutRequest {
   title: string;
   description: string;
-  duration: number;
+  duration: number; // API 요청 시 number 필요
   images: {
     imageUrl: string;
   }[];

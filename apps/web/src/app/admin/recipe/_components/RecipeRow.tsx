@@ -110,14 +110,34 @@ function CheckboxCell() {
 
 function IdCell() {
   const { recipeItem } = useRecipeRowContextWithTable();
+  const { selectedCell } = useRecipeTableDataContext();
+  const { setSelectedCell } = useRecipeTableActionsContext();
 
-  return <TableCell>{recipeItem.id}</TableCell>;
+  const isSelected =
+    selectedCell?.recipeId === recipeItem.id && selectedCell?.field === 'id';
+
+  return (
+    <TableCell
+      className={isSelected ? 'border-2 border-blue-500' : ''}
+      onClick={e => {
+        e.stopPropagation();
+        setSelectedCell({ field: 'id', recipeId: recipeItem.id });
+      }}
+    >
+      {recipeItem.id}
+    </TableCell>
+  );
 }
 
 function TitleCell() {
   const { currentValues, isEditing, recipeItem } =
     useRecipeRowContextWithTable();
-  const { setEditingCell, updateEditedRecipe } = useRecipeTableActionsContext();
+  const { selectedCell } = useRecipeTableDataContext();
+  const { setEditingCell, setSelectedCell, updateEditedRecipe } =
+    useRecipeTableActionsContext();
+
+  const isSelected =
+    selectedCell?.recipeId === recipeItem.id && selectedCell?.field === 'title';
 
   if (isEditing('title')) {
     return (
@@ -137,7 +157,13 @@ function TitleCell() {
   }
 
   return (
-    <TableCell className="font-medium">
+    <TableCell
+      className={`font-medium ${isSelected ? 'border-2 border-blue-500' : ''}`}
+      onClick={e => {
+        e.stopPropagation();
+        setSelectedCell({ field: 'title', recipeId: recipeItem.id });
+      }}
+    >
       <div
         onDoubleClick={() =>
           setEditingCell({
@@ -155,11 +181,21 @@ function TitleCell() {
 
 function ImageCell() {
   const { currentValues, recipeItem } = useRecipeRowContextWithTable();
-  const { openModal } = useRecipeTableActionsContext();
+  const { selectedCell } = useRecipeTableDataContext();
+  const { openModal, setSelectedCell } = useRecipeTableActionsContext();
+
+  const isSelected =
+    selectedCell?.recipeId === recipeItem.id && selectedCell?.field === 'image';
 
   if (currentValues.imageUrl) {
     return (
-      <TableCell className="relative">
+      <TableCell
+        className={`relative ${isSelected ? 'border-2 border-blue-500' : ''}`}
+        onClick={e => {
+          e.stopPropagation();
+          setSelectedCell({ field: 'image', recipeId: recipeItem.id });
+        }}
+      >
         <div
           onDoubleClick={() => openModal('image', recipeItem.id)}
           className="cursor-pointer"
@@ -177,7 +213,13 @@ function ImageCell() {
   }
 
   return (
-    <TableCell className="relative">
+    <TableCell
+      className={`relative ${isSelected ? 'border-2 border-blue-500' : ''}`}
+      onClick={e => {
+        e.stopPropagation();
+        setSelectedCell({ field: 'image', recipeId: recipeItem.id });
+      }}
+    >
       <span
         onDoubleClick={() => openModal('image', recipeItem.id)}
         className="cursor-pointer text-gray-400 hover:bg-gray-50"
@@ -191,7 +233,13 @@ function ImageCell() {
 function DurationCell() {
   const { currentValues, isEditing, recipeItem } =
     useRecipeRowContextWithTable();
-  const { setEditingCell, updateEditedRecipe } = useRecipeTableActionsContext();
+  const { selectedCell } = useRecipeTableDataContext();
+  const { setEditingCell, setSelectedCell, updateEditedRecipe } =
+    useRecipeTableActionsContext();
+
+  const isSelected =
+    selectedCell?.recipeId === recipeItem.id &&
+    selectedCell?.field === 'duration';
 
   if (isEditing('duration')) {
     return (
@@ -211,7 +259,13 @@ function DurationCell() {
   }
 
   return (
-    <TableCell>
+    <TableCell
+      className={isSelected ? 'border-2 border-blue-500' : ''}
+      onClick={e => {
+        e.stopPropagation();
+        setSelectedCell({ field: 'duration', recipeId: recipeItem.id });
+      }}
+    >
       <div
         onDoubleClick={() =>
           setEditingCell({
@@ -230,8 +284,13 @@ function DurationCell() {
 function ConditionCell() {
   const { currentValues, isEditing, recipeItem } =
     useRecipeRowContextWithTable();
-  const { conditions } = useRecipeTableDataContext();
-  const { setEditingCell, updateEditedRecipe } = useRecipeTableActionsContext();
+  const { conditions, selectedCell } = useRecipeTableDataContext();
+  const { setEditingCell, setSelectedCell, updateEditedRecipe } =
+    useRecipeTableActionsContext();
+
+  const isSelected =
+    selectedCell?.recipeId === recipeItem.id &&
+    selectedCell?.field === 'condition';
 
   if (isEditing('condition')) {
     return (
@@ -252,7 +311,13 @@ function ConditionCell() {
   }
 
   return (
-    <TableCell className="relative">
+    <TableCell
+      className={`relative ${isSelected ? 'border-2 border-blue-500' : ''}`}
+      onClick={e => {
+        e.stopPropagation();
+        setSelectedCell({ field: 'condition', recipeId: recipeItem.id });
+      }}
+    >
       <div
         onDoubleClick={() =>
           setEditingCell({
@@ -271,7 +336,13 @@ function ConditionCell() {
 function DescriptionCell() {
   const { currentValues, isEditing, recipeItem } =
     useRecipeRowContextWithTable();
-  const { setEditingCell, updateEditedRecipe } = useRecipeTableActionsContext();
+  const { selectedCell } = useRecipeTableDataContext();
+  const { setEditingCell, setSelectedCell, updateEditedRecipe } =
+    useRecipeTableActionsContext();
+
+  const isSelected =
+    selectedCell?.recipeId === recipeItem.id &&
+    selectedCell?.field === 'description';
 
   if (isEditing('description')) {
     return (
@@ -291,7 +362,13 @@ function DescriptionCell() {
   }
 
   return (
-    <TableCell>
+    <TableCell
+      className={isSelected ? 'border-2 border-blue-500' : ''}
+      onClick={e => {
+        e.stopPropagation();
+        setSelectedCell({ field: 'description', recipeId: recipeItem.id });
+      }}
+    >
       <div
         onDoubleClick={() =>
           setEditingCell({
@@ -310,8 +387,12 @@ function DescriptionCell() {
 function ToolsCell() {
   const { currentValues, isEditing, recipeItem } =
     useRecipeRowContextWithTable();
-  const { availableTools } = useRecipeTableDataContext();
-  const { setEditingCell, updateEditedRecipe } = useRecipeTableActionsContext();
+  const { availableTools, selectedCell } = useRecipeTableDataContext();
+  const { setEditingCell, setSelectedCell, updateEditedRecipe } =
+    useRecipeTableActionsContext();
+
+  const isSelected =
+    selectedCell?.recipeId === recipeItem.id && selectedCell?.field === 'tools';
 
   if (isEditing('tools')) {
     return (
@@ -332,7 +413,13 @@ function ToolsCell() {
   }
 
   return (
-    <TableCell className="relative">
+    <TableCell
+      className={`relative ${isSelected ? 'border-2 border-blue-500' : ''}`}
+      onClick={e => {
+        e.stopPropagation();
+        setSelectedCell({ field: 'tools', recipeId: recipeItem.id });
+      }}
+    >
       <div
         onDoubleClick={() =>
           setEditingCell({
@@ -355,11 +442,21 @@ function ToolsCell() {
 
 function IngredientsCell() {
   const { currentValues, recipeItem } = useRecipeRowContextWithTable();
-  const { foodList } = useRecipeTableDataContext();
-  const { openModal } = useRecipeTableActionsContext();
+  const { foodList, selectedCell } = useRecipeTableDataContext();
+  const { openModal, setSelectedCell } = useRecipeTableActionsContext();
+
+  const isSelected =
+    selectedCell?.recipeId === recipeItem.id &&
+    selectedCell?.field === 'ingredients';
 
   return (
-    <TableCell>
+    <TableCell
+      className={isSelected ? 'border-2 border-blue-500' : ''}
+      onClick={e => {
+        e.stopPropagation();
+        setSelectedCell({ field: 'ingredients', recipeId: recipeItem.id });
+      }}
+    >
       <div
         onDoubleClick={() => openModal('ingredients', recipeItem.id)}
         className="cursor-pointer hover:bg-gray-50"
@@ -377,17 +474,46 @@ function IngredientsCell() {
 
 function IrreplaceableIngredientsCell() {
   const { recipeItem } = useRecipeRowContextWithTable();
+  const { selectedCell } = useRecipeTableDataContext();
+  const { setSelectedCell } = useRecipeTableActionsContext();
 
-  return <TableCell>{recipeItem.irreplaceableIngredients ?? '-'}</TableCell>;
+  const isSelected =
+    selectedCell?.recipeId === recipeItem.id &&
+    selectedCell?.field === 'irreplaceableIngredients';
+
+  return (
+    <TableCell
+      className={isSelected ? 'border-2 border-blue-500' : ''}
+      onClick={e => {
+        e.stopPropagation();
+        setSelectedCell({
+          field: 'irreplaceableIngredients',
+          recipeId: recipeItem.id,
+        });
+      }}
+    >
+      {recipeItem.irreplaceableIngredients ?? '-'}
+    </TableCell>
+  );
 }
 
 function SeasoningsCell() {
   const { currentValues, recipeItem } = useRecipeRowContextWithTable();
-  const { availableSeasonings } = useRecipeTableDataContext();
-  const { openModal } = useRecipeTableActionsContext();
+  const { availableSeasonings, selectedCell } = useRecipeTableDataContext();
+  const { openModal, setSelectedCell } = useRecipeTableActionsContext();
+
+  const isSelected =
+    selectedCell?.recipeId === recipeItem.id &&
+    selectedCell?.field === 'seasonings';
 
   return (
-    <TableCell>
+    <TableCell
+      className={isSelected ? 'border-2 border-blue-500' : ''}
+      onClick={e => {
+        e.stopPropagation();
+        setSelectedCell({ field: 'seasonings', recipeId: recipeItem.id });
+      }}
+    >
       <div
         onDoubleClick={() => openModal('seasonings', recipeItem.id)}
         className="cursor-pointer hover:bg-gray-50"
@@ -405,10 +531,20 @@ function SeasoningsCell() {
 
 function StepsCell() {
   const { currentValues, recipeItem } = useRecipeRowContextWithTable();
-  const { openModal } = useRecipeTableActionsContext();
+  const { selectedCell } = useRecipeTableDataContext();
+  const { openModal, setSelectedCell } = useRecipeTableActionsContext();
+
+  const isSelected =
+    selectedCell?.recipeId === recipeItem.id && selectedCell?.field === 'steps';
 
   return (
-    <TableCell>
+    <TableCell
+      className={isSelected ? 'border-2 border-blue-500' : ''}
+      onClick={e => {
+        e.stopPropagation();
+        setSelectedCell({ field: 'steps', recipeId: recipeItem.id });
+      }}
+    >
       <div
         onDoubleClick={() => openModal('steps', recipeItem.id)}
         className="cursor-pointer hover:bg-gray-50"

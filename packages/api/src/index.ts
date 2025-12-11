@@ -41,6 +41,7 @@ export type {
   CompleteOnboardingData,
   ReviewData,
   ReviewOption,
+  RecipePutRequest,
   RecipeUpdateRequest,
   ReviewSubmitData,
 } from './types';
