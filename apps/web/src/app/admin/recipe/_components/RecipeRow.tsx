@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import Image from 'next/image';
 
 import { Checkbox } from '@/components/ui/checkbox';
@@ -13,25 +13,27 @@ import {
 } from './RecipeRow/RecipeRowContext';
 import { ConditionSelect } from './ConditionSelect';
 import { EditableCell } from './EditableCell';
-import { useRecipeTableContext } from './RecipeTableContext';
+import { useRecipeTableActionsContext } from './RecipeTableActionsContext';
+import { useRecipeTableDataContext } from './RecipeTableDataContext';
 import { ToolsSelect } from './ToolsSelect';
 
 import type { AdminRecipe, RecipeUpdateRequest } from '@recipot/api';
 
 interface RecipeRowProps {
-  recipeItem: AdminRecipe;
   editedData?: Partial<RecipeUpdateRequest>;
+  recipeItem: AdminRecipe;
 }
 
 function RecipeRowProvider({ editedData, recipeItem }: RecipeRowProps) {
-  const tableContext = useRecipeTableContext();
+  const dataContext = useRecipeTableDataContext();
+  const actionsContext = useRecipeTableActionsContext();
 
   // 현재 값 계산 로직을 useMemo로 최적화
   const currentValues = useMemo(() => {
     return {
       conditionId:
         editedData?.conditionId ??
-        tableContext.getConditionId(recipeItem.condition),
+        actionsContext.getConditionId(recipeItem.condition),
       description: editedData?.description ?? recipeItem.description ?? '',
       duration: editedData?.duration
         ? String(editedData.duration)
@@ -43,12 +45,12 @@ function RecipeRowProvider({ editedData, recipeItem }: RecipeRowProps) {
       title: editedData?.title ?? recipeItem.title,
       tools: editedData?.tools ?? recipeItem.tools ?? [],
     };
-  }, [editedData, recipeItem, tableContext]);
+  }, [editedData, recipeItem, actionsContext]);
 
   const contextValue = useMemo(() => {
     const isEditing = (field: string) =>
-      tableContext.editingCell?.recipeId === recipeItem.id &&
-      tableContext.editingCell?.field === field;
+      dataContext.editingCell?.recipeId === recipeItem.id &&
+      dataContext.editingCell?.field === field;
 
     return {
       currentValues,
@@ -56,11 +58,20 @@ function RecipeRowProvider({ editedData, recipeItem }: RecipeRowProps) {
       isEditing,
       recipeItem,
     };
-  }, [currentValues, editedData, recipeItem, tableContext.editingCell]);
+  }, [currentValues, editedData, recipeItem, dataContext.editingCell]);
+
+  const isSelected = dataContext.selectedRecipeId === recipeItem.id;
+
+  const handleRowClick = useCallback(() => {
+    actionsContext.setSelectedRecipeId(isSelected ? null : recipeItem.id);
+  }, [isSelected, recipeItem.id, actionsContext]);
 
   return (
     <RecipeRowContext.Provider value={contextValue}>
-      <TableRow>
+      <TableRow
+        className={isSelected ? 'bg-blue-50' : ''}
+        onClick={handleRowClick}
+      >
         <CheckboxCell />
         <IdCell />
         <TitleCell />
@@ -81,7 +92,8 @@ function RecipeRowProvider({ editedData, recipeItem }: RecipeRowProps) {
 // 하위 컴포넌트들
 function CheckboxCell() {
   const { recipeItem } = useRecipeRowContextWithTable();
-  const { onSelectOne, selectedIds } = useRecipeTableContext();
+  const { selectedIds } = useRecipeTableDataContext();
+  const { onSelectOne } = useRecipeTableActionsContext();
 
   return (
     <TableCell>
@@ -90,6 +102,7 @@ function CheckboxCell() {
         onCheckedChange={checked =>
           onSelectOne(recipeItem.id, checked === true)
         }
+        onClick={e => e.stopPropagation()}
       />
     </TableCell>
   );
@@ -104,7 +117,7 @@ function IdCell() {
 function TitleCell() {
   const { currentValues, isEditing, recipeItem } =
     useRecipeRowContextWithTable();
-  const { setEditingCell, updateEditedRecipe } = useRecipeTableContext();
+  const { setEditingCell, updateEditedRecipe } = useRecipeTableActionsContext();
 
   if (isEditing('title')) {
     return (
@@ -142,18 +155,13 @@ function TitleCell() {
 
 function ImageCell() {
   const { currentValues, recipeItem } = useRecipeRowContextWithTable();
-  const { setImageModalState } = useRecipeTableContext();
+  const { openModal } = useRecipeTableActionsContext();
 
   if (currentValues.imageUrl) {
     return (
       <TableCell className="relative">
         <div
-          onDoubleClick={() =>
-            setImageModalState({
-              isOpen: true,
-              recipeId: recipeItem.id,
-            })
-          }
+          onDoubleClick={() => openModal('image', recipeItem.id)}
           className="cursor-pointer"
         >
           <Image
@@ -161,8 +169,7 @@ function ImageCell() {
             alt={currentValues.title}
             width={60}
             height={60}
-            className="rounded object-cover"
-            style={{ height: '60px', width: '60px' }}
+            className="h-[60px] w-[60px] rounded object-cover"
           />
         </div>
       </TableCell>
@@ -172,12 +179,7 @@ function ImageCell() {
   return (
     <TableCell className="relative">
       <span
-        onDoubleClick={() =>
-          setImageModalState({
-            isOpen: true,
-            recipeId: recipeItem.id,
-          })
-        }
+        onDoubleClick={() => openModal('image', recipeItem.id)}
         className="cursor-pointer text-gray-400 hover:bg-gray-50"
       >
         -
@@ -189,14 +191,13 @@ function ImageCell() {
 function DurationCell() {
   const { currentValues, isEditing, recipeItem } =
     useRecipeRowContextWithTable();
-  const { parseDuration, setEditingCell, updateEditedRecipe } =
-    useRecipeTableContext();
+  const { setEditingCell, updateEditedRecipe } = useRecipeTableActionsContext();
 
   if (isEditing('duration')) {
     return (
       <TableCell>
         <EditableCell
-          value={parseDuration(String(currentValues.duration))}
+          value={Number(currentValues.duration) || 0}
           onSave={value => {
             updateEditedRecipe(recipeItem.id, {
               duration: Number(value),
@@ -229,8 +230,8 @@ function DurationCell() {
 function ConditionCell() {
   const { currentValues, isEditing, recipeItem } =
     useRecipeRowContextWithTable();
-  const { conditions, setEditingCell, updateEditedRecipe } =
-    useRecipeTableContext();
+  const { conditions } = useRecipeTableDataContext();
+  const { setEditingCell, updateEditedRecipe } = useRecipeTableActionsContext();
 
   if (isEditing('condition')) {
     return (
@@ -270,7 +271,7 @@ function ConditionCell() {
 function DescriptionCell() {
   const { currentValues, isEditing, recipeItem } =
     useRecipeRowContextWithTable();
-  const { setEditingCell, updateEditedRecipe } = useRecipeTableContext();
+  const { setEditingCell, updateEditedRecipe } = useRecipeTableActionsContext();
 
   if (isEditing('description')) {
     return (
@@ -309,8 +310,8 @@ function DescriptionCell() {
 function ToolsCell() {
   const { currentValues, isEditing, recipeItem } =
     useRecipeRowContextWithTable();
-  const { availableTools, setEditingCell, updateEditedRecipe } =
-    useRecipeTableContext();
+  const { availableTools } = useRecipeTableDataContext();
+  const { setEditingCell, updateEditedRecipe } = useRecipeTableActionsContext();
 
   if (isEditing('tools')) {
     return (
@@ -354,17 +355,13 @@ function ToolsCell() {
 
 function IngredientsCell() {
   const { currentValues, recipeItem } = useRecipeRowContextWithTable();
-  const { foodList, setIngredientsModalState } = useRecipeTableContext();
+  const { foodList } = useRecipeTableDataContext();
+  const { openModal } = useRecipeTableActionsContext();
 
   return (
     <TableCell>
       <div
-        onDoubleClick={() =>
-          setIngredientsModalState({
-            isOpen: true,
-            recipeId: recipeItem.id,
-          })
-        }
+        onDoubleClick={() => openModal('ingredients', recipeItem.id)}
         className="cursor-pointer hover:bg-gray-50"
       >
         {currentValues.ingredients.length > 0
@@ -386,18 +383,13 @@ function IrreplaceableIngredientsCell() {
 
 function SeasoningsCell() {
   const { currentValues, recipeItem } = useRecipeRowContextWithTable();
-  const { availableSeasonings, setSeasoningsModalState } =
-    useRecipeTableContext();
+  const { availableSeasonings } = useRecipeTableDataContext();
+  const { openModal } = useRecipeTableActionsContext();
 
   return (
     <TableCell>
       <div
-        onDoubleClick={() =>
-          setSeasoningsModalState({
-            isOpen: true,
-            recipeId: recipeItem.id,
-          })
-        }
+        onDoubleClick={() => openModal('seasonings', recipeItem.id)}
         className="cursor-pointer hover:bg-gray-50"
       >
         {currentValues.seasonings.length > 0
@@ -413,17 +405,12 @@ function SeasoningsCell() {
 
 function StepsCell() {
   const { currentValues, recipeItem } = useRecipeRowContextWithTable();
-  const { setStepsModalState } = useRecipeTableContext();
+  const { openModal } = useRecipeTableActionsContext();
 
   return (
     <TableCell>
       <div
-        onDoubleClick={() =>
-          setStepsModalState({
-            isOpen: true,
-            recipeId: recipeItem.id,
-          })
-        }
+        onDoubleClick={() => openModal('steps', recipeItem.id)}
         className="cursor-pointer hover:bg-gray-50"
       >
         {currentValues.steps.length > 0 ? (
