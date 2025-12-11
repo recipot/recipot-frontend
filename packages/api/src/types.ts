@@ -88,11 +88,6 @@ export interface AdminRecipe {
 export interface AdminRecipesResponse {
   data: {
     items: AdminRecipe[];
-    currentPage: number;
-    pageSize: number;
-    totalItems: number;
-    totalPages: number;
-    hasNextPage: boolean;
   };
 }
 
@@ -122,4 +117,52 @@ export interface RecipeUpdateRequest {
     content: string;
     imageUrl?: string;
   }[];
+}
+
+// PUT 요청용 레시피 수정 타입
+export interface RecipePutRequest {
+  title: string;
+  description: string;
+  duration: number;
+  images: {
+    imageUrl: string;
+  }[];
+  ingredients: {
+    ingredientId: number;
+    isAlternative: boolean;
+    amount: string;
+  }[];
+  seasonings: {
+    seasoningId: number;
+    amount: string;
+  }[];
+  tools: {
+    toolId: number;
+  }[];
+  steps: {
+    orderNum: number;
+    imageUrl?: string;
+    summary: string;
+    content: string;
+  }[];
+  healthPoints: {
+    content: string;
+  }[];
+  conditionId: number;
+}
+
+// PUT 요청 응답 타입
+export interface RecipePutResponse {
+  id: number;
+  title: string;
+  description: string;
+  duration: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// POST 요청 응답 타입
+export interface RecipePostResponse {
+  createdCount: number;
+  updatedCount: number;
 }

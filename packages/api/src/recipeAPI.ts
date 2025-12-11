@@ -1,6 +1,13 @@
 import { createApiInstance } from '@recipot/api';
 
-import type { ReviewSubmitData } from './types';
+import type {
+  AdminRecipesResponse,
+  RecipePostResponse,
+  RecipePutRequest,
+  RecipePutResponse,
+  RecipeUpdateRequest,
+  ReviewSubmitData,
+} from './types';
 
 const recipeAPI = createApiInstance({ apiName: 'Recipe' });
 
@@ -67,27 +74,36 @@ export const recipe = {
 
   /**
    * 모든 레시피 조회 (어드민)
-   * @param page - 페이지 번호 (기본값: 1)
-   * @param limit - 페이지당 항목 수 (기본값: 20)
    * @returns
    */
-  getAllAdminRecipes: async (page: number = 1, limit: number = 20) => {
-    const response = await recipeAPI.get(`/v1/recipes`, {
-      params: {
-        page,
-        limit,
-      },
-    });
-    return response.data;
+  getAllAdminRecipes: async (): Promise<AdminRecipesResponse['data']> => {
+    const response = await recipeAPI.get(`/v1/recipes`);
+    return response.data.data;
   },
 
   /**
-   * 레시피 수정 (어드민)
+   * 특정 레시피 수정 (어드민) - PUT
+   * @param recipeId - 레시피 ID
+   * @param recipe - 수정할 레시피 데이터 (전체 필드 포함)
+   * @returns
+   */
+  updateRecipe: async (
+    recipeId: number,
+    recipe: RecipePutRequest
+  ): Promise<RecipePutResponse> => {
+    const response = await recipeAPI.put(`/v1/recipes/${recipeId}`, recipe);
+    return response.data.data;
+  },
+
+  /**
+   * 레시피 수정 (어드민) - POST (배열로 여러 레시피를 한 번에 처리)
    * @param recipes - 수정할 레시피 배열
    * @returns
    */
-  updateRecipes: async (recipes: import('./types').RecipeUpdateRequest[]) => {
+  updateRecipes: async (
+    recipes: RecipeUpdateRequest[]
+  ): Promise<RecipePostResponse> => {
     const response = await recipeAPI.post(`/v1/recipes`, recipes);
-    return response.data;
+    return response.data.data;
   },
 };
