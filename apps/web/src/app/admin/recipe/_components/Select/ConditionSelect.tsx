@@ -30,6 +30,7 @@ export function ConditionSelect({
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const conditionId = parseInt(e.target.value, 10);
+    if (isNaN(conditionId)) return;
     onSelect(conditionId);
     onClose();
   };
