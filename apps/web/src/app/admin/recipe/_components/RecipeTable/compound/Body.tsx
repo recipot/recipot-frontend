@@ -1,9 +1,8 @@
 'use client';
 
+import { RecipeRow } from '@/app/admin/recipe/_components/RecipeRow/RecipeRow';
+import { useRecipeTableDataContext } from '@/app/admin/recipe/_components/RecipeTableDataContext';
 import { TableBody } from '@/components/ui/table';
-
-import { RecipeRow } from '../../RecipeRow';
-import { useRecipeTableDataContext } from '../../RecipeTableDataContext';
 
 /**
  * RecipeTable.Body

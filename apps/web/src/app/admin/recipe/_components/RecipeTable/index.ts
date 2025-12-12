@@ -1,7 +1,7 @@
 // Compound Components
-import RecipeTableBody from './compound/Body';
-import RecipeTableHeader from './compound/Header';
-import RecipeTableRoot from './compound/Root';
+import RecipeTableBody from '@/app/admin/recipe/_components/RecipeTable/compound/Body';
+import RecipeTableHeader from '@/app/admin/recipe/_components/RecipeTable/compound/Header';
+import RecipeTableRoot from '@/app/admin/recipe/_components/RecipeTable/compound/Root';
 
 // Compound Component 구조
 export const RecipeTable = Object.assign(RecipeTableRoot, {
@@ -12,4 +12,3 @@ export const RecipeTable = Object.assign(RecipeTableRoot, {
 
 // 기본 export (Root 컴포넌트)
 export default RecipeTable;
-

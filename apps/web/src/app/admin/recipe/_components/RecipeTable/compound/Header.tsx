@@ -1,10 +1,9 @@
 'use client';
 
+import { useRecipeTableActionsContext } from '@/app/admin/recipe/_components/RecipeTableActionsContext';
+import { useRecipeTableDataContext } from '@/app/admin/recipe/_components/RecipeTableDataContext';
 import { Checkbox } from '@/components/ui/checkbox';
 import { TableHead, TableHeader, TableRow } from '@/components/ui/table';
-
-import { useRecipeTableActionsContext } from '../../RecipeTableActionsContext';
-import { useRecipeTableDataContext } from '../../RecipeTableDataContext';
 
 /**
  * RecipeTable.Header
@@ -45,7 +44,8 @@ export default function RecipeTableHeader() {
         <TableHead>재료</TableHead>
         <TableHead>대체불가능 재료</TableHead>
         <TableHead>양념</TableHead>
-        <TableHead>요리순서</TableHead>
+        {/* TODO: Steps 기능은 기획팀과 회의 중이므로 임시 주석처리 */}
+        {/* <TableHead>요리순서</TableHead> */}
       </TableRow>
     </TableHeader>
   );

@@ -5,7 +5,10 @@ import {
   type RecipeUpdateRequest,
 } from '@recipot/api';
 
-import { useToast } from '@/hooks/useToast';
+import {
+  convertToUpdateRequests,
+  convertUpdateRequestToPutRequest,
+} from '@/app/admin/recipe/_utils/recipeTransformer';
 import { useApiErrorModalStore } from '@/stores/apiErrorModalStore';
 import {
   formatValidationErrors,
@@ -13,14 +16,10 @@ import {
   validateRecipeUpdateRequests,
 } from '@/utils/recipeValidation';
 
-import {
-  convertToUpdateRequests,
-  convertUpdateRequestToPutRequest,
-} from '../_utils/recipeTransformer';
-
 interface UseRecipeSaveOptions {
   refetch: () => Promise<unknown>;
   onSuccess?: () => void;
+  showToast: (message: string, duration?: number) => void;
 }
 
 interface UseRecipeSaveReturn {
@@ -40,6 +39,7 @@ interface UseRecipeSaveReturn {
 export function useRecipeSave({
   onSuccess,
   refetch,
+  showToast,
 }: UseRecipeSaveOptions): UseRecipeSaveReturn {
   const [isSaving, setIsSaving] = useState(false);
   const [validationError, setValidationError] = useState<{
@@ -49,7 +49,6 @@ export function useRecipeSave({
     isOpen: false,
     message: '',
   });
-  const { showToast } = useToast();
   const { showError } = useApiErrorModalStore();
 
   const saveRecipes = useCallback(

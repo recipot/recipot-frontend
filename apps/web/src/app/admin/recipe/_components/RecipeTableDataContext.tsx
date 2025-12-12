@@ -2,9 +2,9 @@
 
 import { createContext, useContext } from 'react';
 
-import type { AdminRecipe, Food, RecipeUpdateRequest } from '@recipot/api';
+import type { ModalType } from '@/app/admin/recipe/_components/RecipeModals';
 
-import type { ModalType } from './RecipeModals';
+import type { AdminRecipe, Food, RecipeUpdateRequest } from '@recipot/api';
 
 /**
  * 읽기 전용 데이터 Context

@@ -3,19 +3,18 @@
 import { useCallback, useMemo } from 'react';
 import Image from 'next/image';
 
-import { Checkbox } from '@/components/ui/checkbox';
-import { TableCell, TableRow } from '@/components/ui/table';
-import { normalizeImageUrl } from '@/lib/url';
-
-import { ConditionSelect } from '../ConditionSelect';
-import { EditableCell } from '../EditableCell';
-import { useRecipeTableActionsContext } from '../RecipeTableActionsContext';
-import { useRecipeTableDataContext } from '../RecipeTableDataContext';
-import { ToolsSelect } from '../ToolsSelect';
+import { EditableCell } from '@/app/admin/recipe/_components/Cell/EditableCell';
 import {
   RecipeRowContext,
   useRecipeRowContextWithTable,
-} from './RecipeRowContext';
+} from '@/app/admin/recipe/_components/RecipeRow/RecipeRowContext';
+import { useRecipeTableActionsContext } from '@/app/admin/recipe/_components/RecipeTableActionsContext';
+import { useRecipeTableDataContext } from '@/app/admin/recipe/_components/RecipeTableDataContext';
+import { ConditionSelect } from '@/app/admin/recipe/_components/Select/ConditionSelect';
+import { ToolsSelect } from '@/app/admin/recipe/_components/Select/ToolsSelect';
+import { Checkbox } from '@/components/ui/checkbox';
+import { TableCell, TableRow } from '@/components/ui/table';
+import { normalizeImageUrl } from '@/lib/url';
 
 import type { AdminRecipe, RecipeUpdateRequest } from '@recipot/api';
 
@@ -69,7 +68,7 @@ function RecipeRowProvider({ editedData, recipeItem }: RecipeRowProps) {
   return (
     <RecipeRowContext.Provider value={contextValue}>
       <TableRow
-        className={isSelected ? 'bg-blue-50' : ''}
+        className={`${isSelected ? 'bg-primary-pressed/50' : ''}`}
         onClick={handleRowClick}
       >
         <CheckboxCell />
@@ -111,21 +110,20 @@ function CheckboxCell() {
 
 function IdCell() {
   const { recipeItem } = useRecipeRowContextWithTable();
-  const { selectedCell } = useRecipeTableDataContext();
+
   const { setSelectedCell } = useRecipeTableActionsContext();
 
-  const isSelected =
-    selectedCell?.recipeId === recipeItem.id && selectedCell?.field === 'id';
+  // 신규 레코드(음수 ID)인 경우 공란으로 표시
+  const isNewRecord = recipeItem.id < 0;
 
   return (
     <TableCell
-      className={isSelected ? 'border-2 border-blue-500' : ''}
       onClick={e => {
         e.stopPropagation();
         setSelectedCell({ field: 'id', recipeId: recipeItem.id });
       }}
     >
-      {recipeItem.id}
+      {isNewRecord ? '' : recipeItem.id}
     </TableCell>
   );
 }
