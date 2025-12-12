@@ -45,17 +45,34 @@ export function convertToUpdateRequests(
   recipes: AdminRecipe[],
   getConditionId: (conditionName?: string) => number
 ): RecipeUpdateRequest[] {
-  return Array.from(editedRecipes.entries()).map(([recipeId, edits]) => {
-    const recipe = recipes.find(r => r.id === recipeId);
-    if (!recipe) {
-      throw new Error(`레시피 ID ${recipeId}를 찾을 수 없습니다.`);
-    }
+  return Array.from(editedRecipes.entries()).map(
+    ([recipeId, updatedValues]) => {
+      const updatedRecipes = recipes.find(recipe => recipe.id === recipeId);
 
-    return {
-      ...convertAdminRecipeToUpdateRequest(recipe, getConditionId),
-      ...edits,
-    };
-  });
+      if (!updatedRecipes) {
+        throw new Error(`레시피 ID ${recipeId}를 찾을 수 없습니다.`);
+      }
+
+      const originalRecipe = convertAdminRecipeToUpdateRequest(
+        updatedRecipes,
+        getConditionId
+      );
+
+      // 신규 레코드(음수 ID)의 경우 edits를 우선 적용
+      if (recipeId < 0) {
+        return {
+          ...originalRecipe,
+          ...updatedValues,
+          id: recipeId, // 음수 ID 유지
+        } as RecipeUpdateRequest;
+      }
+
+      return {
+        ...originalRecipe,
+        ...updatedValues,
+      };
+    }
+  );
 }
 
 /**
@@ -70,31 +87,41 @@ export function convertToUpdateRequests(
 export function convertUpdateRequestToPutRequest(
   updateRequest: RecipeUpdateRequest
 ): RecipePutRequest {
+  const {
+    conditionId,
+    description,
+    duration,
+    imageUrl,
+    ingredients,
+    seasonings,
+    steps,
+    title,
+    tools,
+  } = updateRequest;
+
   return {
-    conditionId: updateRequest.conditionId,
-    description: updateRequest.description,
-    duration: updateRequest.duration,
+    conditionId,
+    description,
+    duration,
     healthPoints: [], // TODO: healthPoints 데이터 추가 필요 시 구현
-    images: updateRequest.imageUrl
-      ? [{ imageUrl: updateRequest.imageUrl }]
-      : [],
-    ingredients: updateRequest.ingredients.map(ingredient => ({
+    images: imageUrl ? [{ imageUrl }] : [],
+    ingredients: ingredients.map(ingredient => ({
       amount: ingredient.amount,
       ingredientId: ingredient.id,
       isAlternative: ingredient.isAlternative,
     })),
-    seasonings: updateRequest.seasonings.map(seasoning => ({
+    seasonings: seasonings.map(seasoning => ({
       amount: seasoning.amount,
       seasoningId: seasoning.id,
     })),
-    steps: updateRequest.steps.map(step => ({
+    steps: steps.map(step => ({
       content: step.content,
       imageUrl: step.imageUrl,
       orderNum: step.orderNum,
       summary: step.summary,
     })),
-    title: updateRequest.title,
-    tools: updateRequest.tools.map(tool => ({
+    title,
+    tools: tools.map(tool => ({
       toolId: tool.id,
     })),
   };

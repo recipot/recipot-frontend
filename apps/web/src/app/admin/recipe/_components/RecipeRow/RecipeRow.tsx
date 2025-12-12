@@ -12,6 +12,7 @@ import { useRecipeTableActionsContext } from '@/app/admin/recipe/_components/Rec
 import { useRecipeTableDataContext } from '@/app/admin/recipe/_components/RecipeTableDataContext';
 import { ConditionSelect } from '@/app/admin/recipe/_components/Select/ConditionSelect';
 import { ToolsSelect } from '@/app/admin/recipe/_components/Select/ToolsSelect';
+import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { normalizeImageUrl } from '@/lib/url';
@@ -41,7 +42,7 @@ function RecipeRowProvider({ editedData, recipeItem }: RecipeRowProps) {
       ingredients: editedData?.ingredients ?? recipeItem.ingredients ?? [],
       seasonings: editedData?.seasonings ?? recipeItem.seasonings ?? [],
       steps: editedData?.steps ?? recipeItem.steps ?? [],
-      title: editedData?.title ?? recipeItem.title,
+      title: editedData?.title ?? recipeItem.title ?? '',
       tools: editedData?.tools ?? recipeItem.tools ?? [],
     };
   }, [editedData, recipeItem, actionsContext]);
@@ -150,6 +151,7 @@ function TitleCell() {
             setEditingCell(null);
           }}
           type="text"
+          initialEditing
         />
       </TableCell>
     );
@@ -170,9 +172,13 @@ function TitleCell() {
             recipeId: recipeItem.id,
           })
         }
-        className="cursor-pointer hover:bg-gray-50"
+        className="min-h-[1.5rem] cursor-pointer select-none hover:bg-gray-50"
       >
-        {currentValues.title}
+        {currentValues.title || (
+          <span className="pointer-events-none text-gray-400">
+            더블클릭하여 입력
+          </span>
+        )}
       </div>
     </TableCell>
   );
@@ -185,6 +191,7 @@ function ImageCell() {
 
   const isSelected =
     selectedCell?.recipeId === recipeItem.id && selectedCell?.field === 'image';
+  const isNewRecord = recipeItem.id < 0;
 
   if (currentValues.imageUrl) {
     return (
@@ -219,12 +226,25 @@ function ImageCell() {
         setSelectedCell({ field: 'image', recipeId: recipeItem.id });
       }}
     >
-      <span
-        onDoubleClick={() => openModal('image', recipeItem.id)}
-        className="cursor-pointer text-gray-400 hover:bg-gray-50"
-      >
-        -
-      </span>
+      {isNewRecord ? (
+        <Button
+          onClick={e => {
+            e.stopPropagation();
+            openModal('image', recipeItem.id);
+          }}
+          size="sm"
+          variant="outline"
+        >
+          등록
+        </Button>
+      ) : (
+        <span
+          onDoubleClick={() => openModal('image', recipeItem.id)}
+          className="cursor-pointer text-gray-400 hover:bg-gray-50"
+        >
+          -
+        </span>
+      )}
     </TableCell>
   );
 }
@@ -252,6 +272,7 @@ function DurationCell() {
             setEditingCell(null);
           }}
           type="number"
+          initialEditing
         />
       </TableCell>
     );
@@ -290,6 +311,8 @@ function ConditionCell() {
   const isSelected =
     selectedCell?.recipeId === recipeItem.id &&
     selectedCell?.field === 'condition';
+  const isNewRecord = recipeItem.id < 0;
+  const hasCondition = conditions.find(c => c.id === currentValues.conditionId);
 
   if (isEditing('condition')) {
     return (
@@ -317,17 +340,33 @@ function ConditionCell() {
         setSelectedCell({ field: 'condition', recipeId: recipeItem.id });
       }}
     >
-      <div
-        onDoubleClick={() =>
-          setEditingCell({
-            field: 'condition',
-            recipeId: recipeItem.id,
-          })
-        }
-        className="cursor-pointer hover:bg-gray-50"
-      >
-        {conditions.find(c => c.id === currentValues.conditionId)?.name ?? '-'}
-      </div>
+      {isNewRecord && !hasCondition ? (
+        <Button
+          onClick={e => {
+            e.stopPropagation();
+            setEditingCell({
+              field: 'condition',
+              recipeId: recipeItem.id,
+            });
+          }}
+          size="sm"
+          variant="outline"
+        >
+          등록
+        </Button>
+      ) : (
+        <div
+          onDoubleClick={() =>
+            setEditingCell({
+              field: 'condition',
+              recipeId: recipeItem.id,
+            })
+          }
+          className="cursor-pointer hover:bg-gray-50"
+        >
+          {hasCondition?.name ?? '-'}
+        </div>
+      )}
     </TableCell>
   );
 }
@@ -355,6 +394,7 @@ function DescriptionCell() {
             setEditingCell(null);
           }}
           type="text"
+          initialEditing
         />
       </TableCell>
     );
@@ -375,9 +415,13 @@ function DescriptionCell() {
             recipeId: recipeItem.id,
           })
         }
-        className="cursor-pointer hover:bg-gray-50"
+        className="min-h-[1.5rem] cursor-pointer select-none hover:bg-gray-50"
       >
-        {currentValues.description ?? '-'}
+        {currentValues.description || (
+          <span className="pointer-events-none text-gray-400">
+            더블클릭하여 입력
+          </span>
+        )}
       </div>
     </TableCell>
   );
@@ -392,12 +436,19 @@ function ToolsCell() {
 
   const isSelected =
     selectedCell?.recipeId === recipeItem.id && selectedCell?.field === 'tools';
+  const isNewRecord = recipeItem.id < 0;
+  const hasTools = currentValues.tools.length > 0;
 
   if (isEditing('tools')) {
     return (
-      <TableCell className="relative">
+      <TableCell
+        className="relative"
+        onClick={e => {
+          e.stopPropagation();
+        }}
+      >
         <ToolsSelect
-          availableTools={availableTools}
+          recipeId={recipeItem.id}
           selectedToolIds={currentValues.tools.map(t => t.id)}
           onSelect={toolIds => {
             updateEditedRecipe(recipeItem.id, {
@@ -419,22 +470,38 @@ function ToolsCell() {
         setSelectedCell({ field: 'tools', recipeId: recipeItem.id });
       }}
     >
-      <div
-        onDoubleClick={() =>
-          setEditingCell({
-            field: 'tools',
-            recipeId: recipeItem.id,
-          })
-        }
-        className="cursor-pointer hover:bg-gray-50"
-      >
-        {currentValues.tools.length > 0
-          ? availableTools
-              .filter(t => currentValues.tools.some(ct => ct.id === t.id))
-              .map(t => t.name)
-              .join(', ')
-          : '-'}
-      </div>
+      {isNewRecord && !hasTools ? (
+        <Button
+          onClick={e => {
+            e.stopPropagation();
+            setEditingCell({
+              field: 'tools',
+              recipeId: recipeItem.id,
+            });
+          }}
+          size="sm"
+          variant="outline"
+        >
+          등록
+        </Button>
+      ) : (
+        <div
+          onDoubleClick={() =>
+            setEditingCell({
+              field: 'tools',
+              recipeId: recipeItem.id,
+            })
+          }
+          className="cursor-pointer hover:bg-gray-50"
+        >
+          {hasTools
+            ? availableTools
+                .filter(t => currentValues.tools.some(ct => ct.id === t.id))
+                .map(t => t.name)
+                .join(', ')
+            : '-'}
+        </div>
+      )}
     </TableCell>
   );
 }
@@ -447,6 +514,8 @@ function IngredientsCell() {
   const isSelected =
     selectedCell?.recipeId === recipeItem.id &&
     selectedCell?.field === 'ingredients';
+  const isNewRecord = recipeItem.id < 0;
+  const hasIngredients = currentValues.ingredients.length > 0;
 
   return (
     <TableCell
@@ -456,17 +525,32 @@ function IngredientsCell() {
         setSelectedCell({ field: 'ingredients', recipeId: recipeItem.id });
       }}
     >
-      <div
-        onDoubleClick={() => openModal('ingredients', recipeItem.id)}
-        className="cursor-pointer hover:bg-gray-50"
-      >
-        {currentValues.ingredients.length > 0
-          ? foodList
-              .filter(f => currentValues.ingredients.some(ci => ci.id === f.id))
-              .map(f => f.name)
-              .join(', ')
-          : '-'}
-      </div>
+      {isNewRecord && !hasIngredients ? (
+        <Button
+          onClick={e => {
+            e.stopPropagation();
+            openModal('ingredients', recipeItem.id);
+          }}
+          size="sm"
+          variant="outline"
+        >
+          등록
+        </Button>
+      ) : (
+        <div
+          onDoubleClick={() => openModal('ingredients', recipeItem.id)}
+          className="cursor-pointer hover:bg-gray-50"
+        >
+          {hasIngredients
+            ? foodList
+                .filter(f =>
+                  currentValues.ingredients.some(ci => ci.id === f.id)
+                )
+                .map(f => f.name)
+                .join(', ')
+            : '-'}
+        </div>
+      )}
     </TableCell>
   );
 }
@@ -504,6 +588,8 @@ function SeasoningsCell() {
   const isSelected =
     selectedCell?.recipeId === recipeItem.id &&
     selectedCell?.field === 'seasonings';
+  const isNewRecord = recipeItem.id < 0;
+  const hasSeasonings = currentValues.seasonings.length > 0;
 
   return (
     <TableCell
@@ -513,17 +599,32 @@ function SeasoningsCell() {
         setSelectedCell({ field: 'seasonings', recipeId: recipeItem.id });
       }}
     >
-      <div
-        onDoubleClick={() => openModal('seasonings', recipeItem.id)}
-        className="cursor-pointer hover:bg-gray-50"
-      >
-        {currentValues.seasonings.length > 0
-          ? availableSeasonings
-              .filter(s => currentValues.seasonings.some(cs => cs.id === s.id))
-              .map(s => s.name)
-              .join(', ')
-          : '-'}
-      </div>
+      {isNewRecord && !hasSeasonings ? (
+        <Button
+          onClick={e => {
+            e.stopPropagation();
+            openModal('seasonings', recipeItem.id);
+          }}
+          size="sm"
+          variant="outline"
+        >
+          등록
+        </Button>
+      ) : (
+        <div
+          onDoubleClick={() => openModal('seasonings', recipeItem.id)}
+          className="cursor-pointer hover:bg-gray-50"
+        >
+          {hasSeasonings
+            ? availableSeasonings
+                .filter(s =>
+                  currentValues.seasonings.some(cs => cs.id === s.id)
+                )
+                .map(s => s.name)
+                .join(', ')
+            : '-'}
+        </div>
+      )}
     </TableCell>
   );
 }

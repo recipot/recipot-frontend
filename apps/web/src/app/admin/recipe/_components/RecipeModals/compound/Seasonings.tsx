@@ -1,6 +1,9 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+import { recipe } from '@recipot/api';
+import { useQuery } from '@tanstack/react-query';
 
 import { useRecipeTableActionsContext } from '@/app/admin/recipe/_components/RecipeTableActionsContext';
 import { useRecipeTableDataContext } from '@/app/admin/recipe/_components/RecipeTableDataContext';
@@ -10,13 +13,13 @@ import {
   Dialog,
   DialogContent,
   DialogFooter,
-  DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 
 interface Seasoning {
   id: number;
+  name: string;
   amount: string;
 }
 
@@ -51,11 +54,12 @@ const formatAmount = (quantity: string, unit: string): string => {
  * 양념 수정 모달 컴포넌트
  */
 export default function RecipeModalsSeasonings() {
-  const { availableSeasonings, editedRecipes, modalState, recipes } =
+  const { availableSeasonings, modalState, recipes } =
     useRecipeTableDataContext();
   const { closeModal, updateEditedRecipe } = useRecipeTableActionsContext();
 
   const [seasonings, setSeasonings] = useState<Seasoning[]>([]);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editingQuantity, setEditingQuantity] = useState('');
@@ -67,20 +71,37 @@ export default function RecipeModalsSeasonings() {
   const isOpen = modalState?.type === 'seasonings';
   const { recipeId } = modalState ?? {};
   const targetRecipe = recipeId ? recipes.find(r => r.id === recipeId) : null;
-  const editedData = recipeId ? editedRecipes.get(recipeId) : undefined;
-  const currentSeasonings =
-    editedData?.seasonings ?? targetRecipe?.seasonings ?? [];
+
+  // 모달이 열릴 때 API로 양념 데이터 가져오기
+  const { data: apiSeasonings, isLoading: isLoadingSeasonings } = useQuery({
+    enabled: isOpen && recipeId !== undefined && recipeId >= 0,
+    queryFn: async () => {
+      if (!recipeId || recipeId < 0) return [];
+      const { seasonings } = await recipe.getRecipeSeasonings(recipeId);
+
+      // seasonings 배열만 반환, seasoningId를 id로 매핑
+      return (
+        seasonings.map(item => ({
+          amount: item.amount,
+          id: item.seasoningId,
+          name: item.name,
+        })) ?? []
+      );
+    },
+    queryKey: ['recipe-seasonings', recipeId],
+    staleTime: 0,
+  });
 
   // 모달이 열릴 때 초기값 저장
   useEffect(() => {
-    if (isOpen && currentSeasonings !== undefined) {
-      setSeasonings(currentSeasonings);
+    if (isOpen && apiSeasonings !== undefined && !isLoadingSeasonings) {
+      setSeasonings(apiSeasonings);
       setSearchTerm('');
       setEditingId(null);
       setEditingQuantity('');
       setFocusedIndex(-1);
     }
-  }, [isOpen, currentSeasonings]);
+  }, [isOpen, apiSeasonings, isLoadingSeasonings]);
 
   // 검색어가 변경되면 포커스 인덱스 초기화
   useEffect(() => {
@@ -110,7 +131,13 @@ export default function RecipeModalsSeasonings() {
   );
 
   const handleAddSeasoning = (seasoningId: number) => {
-    setSeasonings([...seasonings, { amount: '', id: seasoningId }]);
+    const seasoning = availableSeasonings.find(s => s.id === seasoningId);
+    if (!seasoning) return;
+
+    setSeasonings([
+      ...seasonings,
+      { amount: '', id: seasoningId, name: seasoning.name },
+    ]);
     setSearchTerm('');
     setFocusedIndex(-1);
   };
@@ -212,169 +239,138 @@ export default function RecipeModalsSeasonings() {
     closeModal();
   };
 
-  const getSeasoningName = (seasoningId: number) => {
-    return availableSeasonings.find(s => s.id === seasoningId)?.name ?? '';
-  };
-
-  // 검증 로직: 양념이 없거나 amount가 비어있는 경우
-  const validateSeasonings = (): boolean => {
+  // 검증 로직: 양념이 없거나 계량량이 비어있는 경우
+  const validateSeasonings = () => {
     // 양념이 하나도 없으면 false
     if (seasonings.length === 0) {
       return false;
     }
-    // amount가 비어있는 양념이 있으면 false
-    const hasEmptyAmount = seasonings.some(
-      sea => !sea.amount || sea.amount.trim().length === 0
-    );
-    if (hasEmptyAmount) {
-      return false;
-    }
-    return true;
-  };
-
-  // 초기값과 동일한지 확인
-  const hasChanges = (): boolean => {
-    if (seasonings.length !== currentSeasonings.length) {
-      return true;
-    }
-    // ID 기준으로 정렬하여 비교
-    const sortedCurrent = [...currentSeasonings].sort((a, b) => a.id - b.id);
-    const sortedSeasonings = [...seasonings].sort((a, b) => a.id - b.id);
-
-    return sortedSeasonings.some((sea, index) => {
-      const current = sortedCurrent[index];
-      return !current || sea.id !== current.id || sea.amount !== current.amount;
+    // 모든 양념이 계량량을 가지고 있는지 확인
+    return seasonings.every(sea => {
+      if (!sea.amount || sea.amount.trim().length === 0) {
+        return false;
+      }
+      // amount를 파싱하여 quantity가 있는지 확인
+      const { quantity } = parseAmount(sea.amount);
+      return quantity.trim().length > 0;
     });
-  };
-
-  const handleClose = (open: boolean) => {
-    if (!open) {
-      // 수정 사항이 없으면 정상적으로 닫기
-      if (!hasChanges()) {
-        closeModal();
-        return;
-      }
-      // 검증 실패 시 닫기 방지
-      if (!validateSeasonings()) {
-        return;
-      }
-      // 검증 통과 시 닫기
-      closeModal();
-    }
   };
 
   if (!isOpen || !targetRecipe) return null;
 
   return (
-    <Dialog open onOpenChange={handleClose}>
+    <Dialog open onOpenChange={closeModal}>
       <DialogContent className="max-h-[80vh] max-w-2xl overflow-y-auto">
-        <DialogHeader>
+        <VisuallyHidden asChild>
           <DialogTitle>양념 수정</DialogTitle>
-        </DialogHeader>
+        </VisuallyHidden>
 
-        <div className="space-y-4">
-          {/* 양념 검색 입력 */}
-          <div className="relative">
-            <Input
-              ref={searchInputRef}
-              placeholder="양념"
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-              onKeyDown={handleKeyDown}
-            />
+        {isLoadingSeasonings ? (
+          <div className="py-8 text-center text-gray-500">로딩 중...</div>
+        ) : (
+          <div className="space-y-4">
+            {/* 양념 검색 입력 */}
+            <div className="relative">
+              <Input
+                ref={searchInputRef}
+                placeholder="양념"
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                onKeyDown={handleKeyDown}
+              />
 
-            {/* 드롭다운 목록 */}
-            {searchTerm && filteredSeasonings.length > 0 && (
-              <div
-                ref={dropdownRef}
-                className="absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded border bg-white shadow-lg"
-              >
-                {filteredSeasonings.map((seasoning, index) => (
-                  <button
-                    key={seasoning.id}
-                    ref={el => {
-                      itemRefs.current[index] = el;
-                    }}
-                    type="button"
-                    onClick={() => handleAddSeasoning(seasoning.id)}
-                    className={`w-full px-3 py-2 text-left hover:bg-gray-100 ${
-                      focusedIndex === index ? 'bg-gray-100' : ''
-                    }`}
-                    onMouseEnter={() => setFocusedIndex(index)}
-                  >
-                    <HighlightText
-                      text={seasoning.name}
-                      searchQuery={searchTerm}
-                      highlightClassName="text-primary font-bold"
-                    />
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* 선택된 양념 목록 */}
-          <div className="space-y-3">
-            {seasonings.map(seasoning => {
-              const isEditing = editingId === seasoning.id;
-              const { quantity, unit } = parseAmount(seasoning.amount);
-
-              return (
-                <div key={seasoning.id}>
-                  <div className="flex items-center gap-2">
-                    <span className="min-w-[120px] font-medium">
-                      {getSeasoningName(seasoning.id)}
-                    </span>
-                    {isEditing ? (
-                      <div className="ml-auto flex items-center gap-2">
-                        <Input
-                          placeholder="계량량"
-                          value={editingQuantity}
-                          onChange={e => handleQuantityChange(e.target.value)}
-                          onBlur={handleQuantityBlur}
-                          onKeyDown={handleQuantityKeyDown}
-                          className="w-32"
-                        />
-                        <div className="border-input flex h-9 items-center px-3 py-1 text-sm">
-                          {SEASONING_UNITS[0]}
-                        </div>
-                      </div>
-                    ) : (
-                      <>
-                        {seasoning.amount && (
-                          <span className="text-sm text-gray-600">
-                            {quantity} {unit || SEASONING_UNITS[0]}
-                          </span>
-                        )}
-                        <div className="ml-auto flex gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleStartEdit(seasoning.id)}
-                          >
-                            수정
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleRemoveSeasoning(seasoning.id)}
-                          >
-                            삭제
-                          </Button>
-                        </div>
-                      </>
-                    )}
-                  </div>
+              {/* 드롭다운 목록 */}
+              {searchTerm && filteredSeasonings.length > 0 && (
+                <div
+                  ref={dropdownRef}
+                  className="absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded border bg-white shadow-lg"
+                >
+                  {filteredSeasonings.map((seasoning, index) => (
+                    <button
+                      key={seasoning.id}
+                      ref={el => {
+                        itemRefs.current[index] = el;
+                      }}
+                      type="button"
+                      onClick={() => handleAddSeasoning(seasoning.id)}
+                      className={`w-full px-3 py-2 text-left hover:bg-gray-100 ${
+                        focusedIndex === index ? 'bg-gray-100' : ''
+                      }`}
+                      onMouseEnter={() => setFocusedIndex(index)}
+                    >
+                      <HighlightText
+                        text={seasoning.name}
+                        searchQuery={searchTerm}
+                        highlightClassName="text-primary font-bold"
+                      />
+                    </button>
+                  ))}
                 </div>
-              );
-            })}
+              )}
+            </div>
+
+            {/* 선택된 양념 목록 */}
+            <div className="space-y-3">
+              {seasonings.map(seasoning => {
+                const isEditing = editingId === seasoning.id;
+                const { quantity, unit } = parseAmount(seasoning.amount);
+
+                return (
+                  <div key={seasoning.id}>
+                    <div className="flex items-center gap-2">
+                      <span className="min-w-[120px] font-medium">
+                        {seasoning.name}
+                      </span>
+                      {isEditing ? (
+                        <div className="ml-auto flex items-center gap-2">
+                          <Input
+                            placeholder="계량량"
+                            value={editingQuantity}
+                            onChange={e => handleQuantityChange(e.target.value)}
+                            onBlur={handleQuantityBlur}
+                            onKeyDown={handleQuantityKeyDown}
+                            className="w-32"
+                          />
+                          <div className="border-input flex h-9 items-center px-3 py-1 text-sm">
+                            {SEASONING_UNITS[0]}
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          {seasoning.amount && (
+                            <span className="text-sm text-gray-600">
+                              {quantity} {unit || SEASONING_UNITS[0]}
+                            </span>
+                          )}
+                          <div className="ml-auto flex gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleStartEdit(seasoning.id)}
+                            >
+                              수정
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() =>
+                                handleRemoveSeasoning(seasoning.id)
+                              }
+                            >
+                              삭제
+                            </Button>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        )}
 
         <DialogFooter>
-          <Button variant="outline" onClick={closeModal}>
-            취소
-          </Button>
           <Button
             onClick={handleSave}
             disabled={!validateSeasonings()}

@@ -270,8 +270,19 @@ export default function AdminRecipePage() {
 
   // 6. 핸들러
   const handleSave = () => {
-    saveRecipes(editedRecipes, recipes, getConditionId);
+    saveRecipes(editedRecipes, allDisplayedRecipes, getConditionId);
   };
+
+  const validationErrorDescription = validationError.fieldNames ? (
+    <div className="text-center">
+      <span className="text-primary">
+        {validationError.fieldNames.join(', ')}
+      </span>
+      <span className="text-black"> 데이터 미등록</span>
+    </div>
+  ) : (
+    validationError.message
+  );
 
   // 7. UI 렌더링
   return (
@@ -348,18 +359,29 @@ export default function AdminRecipePage() {
       {/* 검증 에러 모달 */}
       <Modal
         contentGap={24}
-        description={validationError.message}
+        description={validationErrorDescription}
+        disableCloseButton={false}
         onOpenChange={open => {
           if (!open) {
-            setValidationError({ isOpen: false, message: '' });
+            setValidationError({
+              isOpen: false,
+              message: '',
+              showCloseButton: true,
+            });
           }
         }}
         open={validationError.isOpen}
-        title="데이터 검증 오류"
-        titleBlock
+        showDefaultCloseButton
+        // titleBlock
       >
         <Button
-          onClick={() => setValidationError({ isOpen: false, message: '' })}
+          onClick={() =>
+            setValidationError({
+              isOpen: false,
+              message: '',
+              showCloseButton: false,
+            })
+          }
           size="full"
         >
           확인

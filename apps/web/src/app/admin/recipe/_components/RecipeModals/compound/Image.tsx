@@ -29,6 +29,7 @@ export default function RecipeModalsImage() {
   const [imageUrlInput, setImageUrlInput] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [isUploading, setIsUploading] = useState(false);
+  const [initialImageUrl, setInitialImageUrl] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isOpen = modalState?.type === 'image';
@@ -39,9 +40,11 @@ export default function RecipeModalsImage() {
 
   useEffect(() => {
     if (isOpen && currentImageUrl !== undefined) {
+      const initialUrl = currentImageUrl ?? '';
       setSelectedFile(null);
       setPreviewUrl(null);
-      setImageUrlInput(currentImageUrl ?? '');
+      setImageUrlInput(initialUrl);
+      setInitialImageUrl(initialUrl);
       setErrorMessage('');
       setIsUploading(false);
     }
@@ -119,6 +122,15 @@ export default function RecipeModalsImage() {
     closeModal();
   };
 
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      // 수정사항이 없으면 X 버튼으로 닫을 수 있음
+      if (!(imageUrlInput !== initialImageUrl || selectedFile !== null)) {
+        handleClose();
+      }
+    }
+  };
+
   const displayFileName = (() => {
     if (selectedFile) return selectedFile.name;
     if (currentImageUrl)
@@ -129,7 +141,7 @@ export default function RecipeModalsImage() {
   if (!isOpen || !targetRecipe) return null;
 
   return (
-    <Dialog open onOpenChange={handleClose}>
+    <Dialog open onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-md">
         <VisuallyHidden asChild>
           <DialogTitle className="text-18sb">대표 이미지</DialogTitle>
@@ -229,3 +241,4 @@ export default function RecipeModalsImage() {
     </Dialog>
   );
 }
+

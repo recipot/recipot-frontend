@@ -1,6 +1,9 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+import { recipe } from '@recipot/api';
+import { useQuery } from '@tanstack/react-query';
 
 import { useRecipeTableActionsContext } from '@/app/admin/recipe/_components/RecipeTableActionsContext';
 import { useRecipeTableDataContext } from '@/app/admin/recipe/_components/RecipeTableDataContext';
@@ -10,13 +13,13 @@ import {
   Dialog,
   DialogContent,
   DialogFooter,
-  DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 
 interface Ingredient {
   id: number;
+  name: string;
   amount: string;
   isAlternative: boolean;
 }
@@ -76,20 +79,42 @@ export default function RecipeModalsIngredients() {
   const { recipeId } = modalState ?? {};
   const targetRecipe = recipeId ? recipes.find(r => r.id === recipeId) : null;
   const editedData = recipeId ? editedRecipes.get(recipeId) : undefined;
-  const currentIngredients =
-    editedData?.ingredients ?? targetRecipe?.ingredients ?? [];
+
+  // 모달이 열릴 때 API로 재료 데이터 가져오기
+  const { data: apiIngredients, isLoading: isLoadingIngredients } = useQuery({
+    enabled: isOpen && recipeId !== undefined && recipeId >= 0,
+    queryFn: async () => {
+      if (!recipeId || recipeId < 0) return [];
+      const { ingredients } = await recipe.getRecipeIngredients(recipeId);
+      // ingredients 배열만 반환, ingredientId를 id로 매핑
+      return (
+        ingredients.map(item => ({
+          amount: item.amount,
+          id: item.ingredientId,
+          isAlternative: item.isAlternative,
+          name: item.name,
+        })) ?? []
+      );
+    },
+    queryKey: ['recipe-ingredients', recipeId],
+    staleTime: 0,
+  });
+
+  // API에서 가져온 데이터 또는 편집 중인 데이터 사용
+  const currentIngredients = editedData?.ingredients ?? apiIngredients ?? [];
 
   // 모달이 열릴 때 초기값 저장
   useEffect(() => {
-    if (isOpen && currentIngredients !== undefined) {
+    if (isOpen && currentIngredients !== undefined && !isLoadingIngredients) {
       setIngredients(currentIngredients);
+
       setSearchTerm('');
       setEditingId(null);
       setEditingQuantity('');
       setEditingUnit('');
       setFocusedIndex(-1);
     }
-  }, [isOpen, currentIngredients]);
+  }, [isOpen, currentIngredients, isLoadingIngredients]);
 
   // 검색어가 변경되면 포커스 인덱스 초기화
   useEffect(() => {
@@ -119,9 +144,12 @@ export default function RecipeModalsIngredients() {
   );
 
   const handleAddIngredient = (foodId: number) => {
+    const food = foodList.find(f => f.id === foodId);
+    if (!food) return;
+
     setIngredients([
       ...ingredients,
-      { amount: '', id: foodId, isAlternative: false },
+      { amount: '', id: foodId, isAlternative: false, name: food.name },
     ]);
     setSearchTerm('');
     setFocusedIndex(-1);
@@ -196,7 +224,9 @@ export default function RecipeModalsIngredients() {
     // quantity와 unit을 합쳐서 저장
     const amount = formatAmount(value, editingUnit);
     setIngredients(
-      ingredients.map(ing => (ing.id === editingId ? { ...ing, amount } : ing))
+      ingredients.map(ingredient =>
+        ingredient.id === editingId ? { ...ingredient, amount } : ingredient
+      )
     );
   };
 
@@ -241,151 +271,141 @@ export default function RecipeModalsIngredients() {
     closeModal();
   };
 
-  const getFoodName = (foodId: number) => {
-    return foodList.find(f => f.id === foodId)?.name ?? '';
-  };
-
-  // 검증 로직: 재료가 없거나 amount가 비어있는 경우
+  // 검증 로직: 재료가 없거나 계량량/계량단위가 비어있는 경우
   const validateIngredients = (): boolean => {
     // 재료가 하나도 없으면 false
     if (ingredients.length === 0) {
       return false;
     }
-    // amount가 비어있는 재료가 있으면 false
-    const hasEmptyAmount = ingredients.some(
-      ing => !ing.amount || ing.amount.trim().length === 0
-    );
-    if (hasEmptyAmount) {
-      return false;
-    }
-    return true;
-  };
-
-  const handleClose = (open: boolean) => {
-    if (!open) {
-      // 검증 실패 시 닫기 방지
-      if (!validateIngredients()) {
-        return;
+    // 모든 재료가 계량량과 계량단위를 가지고 있는지 확인
+    return ingredients.every(ing => {
+      if (!ing.amount || ing.amount.trim().length === 0) {
+        return false;
       }
-      // 검증 통과 시 닫기
-      closeModal();
-    }
+      // amount를 파싱하여 quantity와 unit이 모두 있는지 확인
+      const { quantity, unit } = parseAmount(ing.amount);
+      return quantity.trim().length > 0 && unit.trim().length > 0;
+    });
   };
 
   if (!isOpen || !targetRecipe) return null;
 
   return (
-    <Dialog open onOpenChange={handleClose}>
+    <Dialog open onOpenChange={closeModal}>
       <DialogContent className="max-h-[80vh] max-w-2xl overflow-y-auto">
-        <DialogHeader>
+        <VisuallyHidden asChild>
           <DialogTitle>재료 수정</DialogTitle>
-        </DialogHeader>
+        </VisuallyHidden>
 
-        <div className="space-y-4">
-          {/* 재료 검색 입력 */}
-          <div className="relative">
-            <Input
-              ref={searchInputRef}
-              placeholder="재료"
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-              onKeyDown={handleKeyDown}
-            />
+        {isLoadingIngredients ? (
+          <div className="py-8 text-center text-gray-500">로딩 중...</div>
+        ) : (
+          <div className="space-y-4">
+            {/* 재료 검색 입력 */}
+            <div className="relative">
+              <Input
+                ref={searchInputRef}
+                placeholder="재료"
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                onKeyDown={handleKeyDown}
+              />
 
-            {/* 드롭다운 목록 */}
-            {searchTerm && filteredFoods.length > 0 && (
-              <div
-                ref={dropdownRef}
-                className="absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded border bg-white shadow-lg"
-              >
-                {filteredFoods.map((food, index) => (
-                  <button
-                    key={food.id}
-                    ref={el => {
-                      itemRefs.current[index] = el;
-                    }}
-                    type="button"
-                    onClick={() => handleAddIngredient(food.id)}
-                    className={`w-full px-3 py-2 text-left hover:bg-gray-100 ${
-                      focusedIndex === index ? 'bg-gray-100' : ''
-                    }`}
-                    onMouseEnter={() => setFocusedIndex(index)}
-                  >
-                    <HighlightText
-                      text={food.name}
-                      searchQuery={searchTerm}
-                      highlightClassName="text-primary font-bold"
-                    />
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* 선택된 재료 목록 */}
-          <div className="space-y-3">
-            {ingredients.map(ingredient => {
-              const isEditing = editingId === ingredient.id;
-              const { quantity, unit } = parseAmount(ingredient.amount);
-
-              return (
-                <div key={ingredient.id}>
-                  <div className="flex items-center gap-2">
-                    <span className="min-w-[120px] font-medium">
-                      {getFoodName(ingredient.id)}
-                    </span>
-                    {isEditing ? (
-                      <>
-                        <Input
-                          placeholder="계량량"
-                          value={editingQuantity}
-                          onChange={e => handleQuantityChange(e.target.value)}
-                          onBlur={handleEditBlur}
-                          onKeyDown={handleEditKeyDown}
-                          className="flex-1"
-                        />
-                        <Input
-                          placeholder="계량단위"
-                          value={editingUnit}
-                          onChange={e => handleUnitChange(e.target.value)}
-                          onBlur={handleEditBlur}
-                          onKeyDown={handleEditKeyDown}
-                          className="flex-1"
-                        />
-                      </>
-                    ) : (
-                      <>
-                        {ingredient.amount && (
-                          <span className="text-sm text-gray-600">
-                            {quantity} {unit}
-                          </span>
-                        )}
-                        <div className="ml-auto flex gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleStartEdit(ingredient.id)}
-                          >
-                            수정
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() =>
-                              handleRemoveIngredient(ingredient.id)
-                            }
-                          >
-                            삭제
-                          </Button>
-                        </div>
-                      </>
-                    )}
-                  </div>
+              {/* 드롭다운 목록 */}
+              {searchTerm && filteredFoods.length > 0 && (
+                <div
+                  ref={dropdownRef}
+                  className="absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded border bg-white shadow-lg"
+                >
+                  {filteredFoods.map((food, index) => (
+                    <button
+                      key={food.id}
+                      ref={el => {
+                        itemRefs.current[index] = el;
+                      }}
+                      type="button"
+                      onClick={() => handleAddIngredient(food.id)}
+                      className={`w-full px-3 py-2 text-left hover:bg-gray-100 ${
+                        focusedIndex === index ? 'bg-gray-100' : ''
+                      }`}
+                      onMouseEnter={() => setFocusedIndex(index)}
+                    >
+                      <HighlightText
+                        text={food.name}
+                        searchQuery={searchTerm}
+                        highlightClassName="text-primary font-bold"
+                      />
+                    </button>
+                  ))}
                 </div>
-              );
-            })}
+              )}
+            </div>
+
+            {/* 선택된 재료 목록 */}
+            <div className="space-y-3">
+              {ingredients.map(ingredient => {
+                const isEditing = editingId === ingredient.id;
+                const { quantity, unit } = parseAmount(ingredient.amount);
+
+                return (
+                  <div key={ingredient.id}>
+                    <div className="flex items-center gap-2">
+                      <span className="min-w-[120px] font-medium">
+                        {ingredient.name}
+                      </span>
+                      {isEditing ? (
+                        <>
+                          <Input
+                            placeholder="계량량"
+                            value={editingQuantity}
+                            onChange={e => handleQuantityChange(e.target.value)}
+                            onBlur={handleEditBlur}
+                            onKeyDown={handleEditKeyDown}
+                            className="flex-1"
+                          />
+                          <Input
+                            placeholder="계량단위"
+                            value={editingUnit}
+                            onChange={e => handleUnitChange(e.target.value)}
+                            onBlur={handleEditBlur}
+                            onKeyDown={handleEditKeyDown}
+                            className="flex-1"
+                          />
+                        </>
+                      ) : (
+                        <>
+                          {ingredient.amount && (
+                            <span className="text-sm text-gray-600">
+                              {quantity} {unit}
+                            </span>
+                          )}
+                          <div className="ml-auto flex gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleStartEdit(ingredient.id)}
+                            >
+                              수정
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() =>
+                                handleRemoveIngredient(ingredient.id)
+                              }
+                            >
+                              삭제
+                            </Button>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        )}
 
         <DialogFooter>
           <Button variant="outline" onClick={closeModal}>

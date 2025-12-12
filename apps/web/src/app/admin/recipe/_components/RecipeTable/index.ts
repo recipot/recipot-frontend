@@ -12,3 +12,4 @@ export const RecipeTable = Object.assign(RecipeTableRoot, {
 
 // 기본 export (Root 컴포넌트)
 export default RecipeTable;
+

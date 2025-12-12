@@ -1,15 +1,85 @@
+import { z } from 'zod';
+
 import type { AdminRecipe, RecipeUpdateRequest } from '@recipot/api';
 
 export interface RecipeValidationError {
   recipeId: number;
   field: string;
   message: string;
-  errorType: 'missing' | 'format'; // 'missing': 데이터 미등록, 'format': 입력 형식 오류
+  errorType: 'missing';
 }
 
 export interface RecipeValidationResult {
   isValid: boolean;
   errors: RecipeValidationError[];
+  fieldNames?: string[];
+  errorType?: 'missing'; // 에러가 있을 때만 'missing', 없으면 undefined
+}
+
+// Zod 스키마 정의
+const RecipeUpdateRequestSchema = z.object({
+  conditionId: z.number(),
+  description: z.string().min(1),
+  duration: z.number(),
+  id: z.number(),
+  imageUrl: z.string().min(1),
+  ingredients: z
+    .array(
+      z.object({
+        amount: z.string().min(1),
+        id: z.number(),
+        isAlternative: z.boolean(),
+      })
+    )
+    .min(1),
+  seasonings: z
+    .array(
+      z.object({
+        amount: z.string().min(1),
+        id: z.number(),
+      })
+    )
+    .min(1),
+  steps: z
+    .array(
+      z.object({
+        content: z.string().min(1),
+        imageUrl: z.union([z.string().min(1), z.undefined()]),
+        orderNum: z.number().min(0),
+        summary: z.string().min(1),
+      })
+    )
+    .min(1),
+  title: z.string().min(1),
+  tools: z
+    .array(
+      z.object({
+        id: z.number(),
+      })
+    )
+    .min(1),
+});
+
+/**
+ * Zod 에러 경로를 필드 경로로 변환
+ * 예: ['steps', 0, 'summary'] -> 'steps[0].summary'
+ *     ['title'] -> 'title'
+ */
+function zodPathToFieldPath(path: Array<string | number>): string {
+  if (path.length === 0) return '';
+
+  let result = String(path[0]);
+
+  for (let i = 1; i < path.length; i++) {
+    const segment = path[i];
+    if (typeof segment === 'number') {
+      result += `[${segment}]`;
+    } else {
+      result += `.${segment}`;
+    }
+  }
+
+  return result;
 }
 
 /**
@@ -20,245 +90,38 @@ export interface RecipeValidationResult {
 export function validateRecipeUpdateRequest(
   recipe: RecipeUpdateRequest
 ): RecipeValidationResult {
-  const errors: RecipeValidationError[] = [];
+  const result = RecipeUpdateRequestSchema.safeParse(recipe);
 
-  // 필수 필드 검증
-  if (
-    recipe.id === undefined ||
-    recipe.id === null ||
-    recipe.id <= 0 ||
-    typeof recipe.id !== 'number'
-  ) {
+  if (result.success) {
+    return {
+      errors: [],
+      fieldNames: [],
+      isValid: true,
+    };
+  }
+
+  const errors: RecipeValidationError[] = [];
+  const missingFields: string[] = [];
+
+  result.error.issues.forEach(issue => {
+    const fieldPath = zodPathToFieldPath(issue.path as Array<string | number>);
+    const displayName = getFieldDisplayName(fieldPath);
+
     errors.push({
-      errorType: 'format',
-      field: 'id',
-      message: '레시피 ID가 유효하지 않습니다.',
+      errorType: 'missing',
+      field: fieldPath,
+      message: issue.message,
       recipeId: recipe.id ?? 0,
     });
-  }
 
-  if (
-    !recipe.title ||
-    (typeof recipe.title === 'string' && recipe.title.trim().length === 0)
-  ) {
-    errors.push({
-      errorType: 'missing',
-      field: 'title',
-      message: '레시피 제목을 입력해주세요.',
-      recipeId: recipe.id,
-    });
-  }
-
-  if (
-    recipe.duration === undefined ||
-    recipe.duration === null ||
-    recipe.duration <= 0 ||
-    typeof recipe.duration !== 'number'
-  ) {
-    errors.push({
-      errorType: 'format',
-      field: 'duration',
-      message: '조리시간은 1분 이상이어야 합니다.',
-      recipeId: recipe.id,
-    });
-  }
-
-  if (
-    recipe.conditionId === undefined ||
-    recipe.conditionId === null ||
-    recipe.conditionId <= 0 ||
-    typeof recipe.conditionId !== 'number'
-  ) {
-    errors.push({
-      errorType: 'missing',
-      field: 'conditionId',
-      message: '유저 컨디션을 선택해주세요.',
-      recipeId: recipe.id,
-    });
-  }
-
-  if (
-    !recipe.description ||
-    (typeof recipe.description === 'string' &&
-      recipe.description.trim().length === 0)
-  ) {
-    errors.push({
-      errorType: 'missing',
-      field: 'description',
-      message: '후킹 타이틀을 입력해주세요.',
-      recipeId: recipe.id,
-    });
-  }
-
-  // 배열 필드 검증 - tools (최소 1개 이상)
-  if (!Array.isArray(recipe.tools) || recipe.tools.length === 0) {
-    errors.push({
-      errorType: 'missing',
-      field: 'tools',
-      message: '조리도구를 최소 1개 이상 선택해주세요.',
-      recipeId: recipe.id,
-    });
-  } else {
-    // tools 각 항목 검증
-    recipe.tools.forEach((tool, index) => {
-      if (
-        tool?.id === undefined ||
-        tool?.id === null ||
-        tool?.id <= 0 ||
-        typeof tool?.id !== 'number'
-      ) {
-        errors.push({
-          errorType: 'format',
-          field: `tools[${index}].id`,
-          message: `조리도구 ${index + 1}번의 ID가 유효하지 않습니다.`,
-          recipeId: recipe.id,
-        });
-      }
-    });
-  }
-
-  // 배열 필드 검증 - ingredients (최소 1개 이상)
-  if (!Array.isArray(recipe.ingredients) || recipe.ingredients.length === 0) {
-    errors.push({
-      errorType: 'missing',
-      field: 'ingredients',
-      message: '재료를 최소 1개 이상 추가해주세요.',
-      recipeId: recipe.id,
-    });
-  } else {
-    // ingredients 각 항목 검증
-    recipe.ingredients.forEach((ingredient, index) => {
-      if (
-        ingredient?.id === undefined ||
-        ingredient?.id === null ||
-        ingredient?.id <= 0 ||
-        typeof ingredient?.id !== 'number'
-      ) {
-        errors.push({
-          errorType: 'format',
-          field: `ingredients[${index}].id`,
-          message: `재료 ${index + 1}번의 ID가 유효하지 않습니다.`,
-          recipeId: recipe.id,
-        });
-      }
-      if (
-        !ingredient?.amount ||
-        (typeof ingredient.amount === 'string' &&
-          ingredient.amount.trim().length === 0)
-      ) {
-        errors.push({
-          errorType: 'missing',
-          field: `ingredients[${index}].amount`,
-          message: `재료 ${index + 1}번의 양을 입력해주세요.`,
-          recipeId: recipe.id,
-        });
-      }
-    });
-  }
-
-  // 배열 필드 검증 - seasonings (최소 1개 이상)
-  if (!Array.isArray(recipe.seasonings) || recipe.seasonings.length === 0) {
-    errors.push({
-      errorType: 'missing',
-      field: 'seasonings',
-      message: '양념을 최소 1개 이상 추가해주세요.',
-      recipeId: recipe.id,
-    });
-  } else {
-    // seasonings 각 항목 검증
-    recipe.seasonings.forEach((seasoning, index) => {
-      if (
-        seasoning?.id === undefined ||
-        seasoning?.id === null ||
-        seasoning?.id <= 0 ||
-        typeof seasoning?.id !== 'number'
-      ) {
-        errors.push({
-          errorType: 'format',
-          field: `seasonings[${index}].id`,
-          message: `양념 ${index + 1}번의 ID가 유효하지 않습니다.`,
-          recipeId: recipe.id,
-        });
-      }
-      if (
-        !seasoning?.amount ||
-        (typeof seasoning.amount === 'string' &&
-          seasoning.amount.trim().length === 0)
-      ) {
-        errors.push({
-          errorType: 'missing',
-          field: `seasonings[${index}].amount`,
-          message: `양념 ${index + 1}번의 양을 입력해주세요.`,
-          recipeId: recipe.id,
-        });
-      }
-    });
-  }
-
-  // 배열 필드 검증 - steps (최소 1개 이상)
-  if (!Array.isArray(recipe.steps) || recipe.steps.length === 0) {
-    errors.push({
-      errorType: 'missing',
-      field: 'steps',
-      message: '요리 단계를 최소 1개 이상 추가해주세요.',
-      recipeId: recipe.id,
-    });
-  } else {
-    // steps 각 항목 검증
-    recipe.steps.forEach((step, index) => {
-      if (
-        step?.orderNum === undefined ||
-        step?.orderNum === null ||
-        step?.orderNum < 0 ||
-        typeof step?.orderNum !== 'number'
-      ) {
-        errors.push({
-          errorType: 'format',
-          field: `steps[${index}].orderNum`,
-          message: `요리 단계 ${index + 1}번의 순서 번호가 유효하지 않습니다.`,
-          recipeId: recipe.id,
-        });
-      }
-      if (
-        !step?.summary ||
-        (typeof step.summary === 'string' && step.summary.trim().length === 0)
-      ) {
-        errors.push({
-          errorType: 'missing',
-          field: `steps[${index}].summary`,
-          message: `요리 단계 ${index + 1}번의 요약을 입력해주세요.`,
-          recipeId: recipe.id,
-        });
-      }
-      if (
-        !step?.content ||
-        (typeof step.content === 'string' && step.content.trim().length === 0)
-      ) {
-        errors.push({
-          errorType: 'missing',
-          field: `steps[${index}].content`,
-          message: `요리 단계 ${index + 1}번의 내용을 입력해주세요.`,
-          recipeId: recipe.id,
-        });
-      }
-      // imageUrl 검증 추가
-      if (
-        !step?.imageUrl ||
-        (typeof step.imageUrl === 'string' && step.imageUrl.trim().length === 0)
-      ) {
-        errors.push({
-          errorType: 'missing',
-          field: `steps[${index}].imageUrl`,
-          message: `요리 단계 ${index + 1}번의 이미지를 입력해주세요.`,
-          recipeId: recipe.id,
-        });
-      }
-    });
-  }
+    missingFields.push(displayName);
+  });
 
   return {
     errors,
-    isValid: errors.length === 0,
+    errorType: 'missing',
+    fieldNames: missingFields,
+    isValid: false,
   };
 }
 
@@ -343,15 +206,27 @@ export function validateRecipeUpdateRequests(
   recipes: RecipeUpdateRequest[]
 ): RecipeValidationResult {
   const allErrors: RecipeValidationError[] = [];
+  const allMissingFields: string[] = [];
 
   recipes.forEach(recipe => {
     const result = validateRecipeUpdateRequest(recipe);
     allErrors.push(...result.errors);
+
+    if (!result.isValid && result.fieldNames) {
+      allMissingFields.push(...result.fieldNames);
+    }
   });
+
+  // 중복 제거
+  const uniqueMissingFields = Array.from(new Set(allMissingFields));
+
+  const hasErrors = allErrors.length > 0;
 
   return {
     errors: allErrors,
-    isValid: allErrors.length === 0,
+    errorType: hasErrors ? 'missing' : undefined,
+    fieldNames: hasErrors ? uniqueMissingFields : [],
+    isValid: !hasErrors,
   };
 }
 
@@ -406,55 +281,10 @@ function getFieldDisplayName(field: string): string {
     return `양념${index} 양`;
   }
 
+  // 일반 필드 매핑
   if (field in fieldMap) {
     return fieldMap[field] ?? field;
   }
+
   return field;
-}
-
-/**
- * 검증 에러를 사용자 친화적인 메시지로 변환
- * @param errors - 검증 에러 배열
- * @returns 에러 메시지 문자열 배열 (각 메시지는 독립적으로 표시)
- */
-export function formatValidationErrors(
-  errors: RecipeValidationError[]
-): string[] {
-  if (errors.length === 0) {
-    return [];
-  }
-
-  // 에러 타입별로 그룹화
-  const errorsByType = errors.reduce(
-    (acc, error) => {
-      if (!acc[error.errorType]) {
-        acc[error.errorType] = [];
-      }
-      acc[error.errorType].push(error);
-      return acc;
-    },
-    {} as Record<'missing' | 'format', RecipeValidationError[]>
-  );
-
-  const messages: string[] = [];
-
-  // 'missing' 타입 에러 처리 (데이터 미등록)
-  // 형식: "#{누락 컬럼명},#{누락 컬럼명} ... 데이터 미등록"
-  if (errorsByType.missing && errorsByType.missing.length > 0) {
-    const fields = errorsByType.missing
-      .map(error => getFieldDisplayName(error.field))
-      .join(', ');
-    messages.push(`${fields} 데이터 미등록`);
-  }
-
-  // 'format' 타입 에러 처리 (입력 형식이 다릅니다)
-  // 형식: "#{오류 컬럼명}의 입력 형식이 다릅니다"
-  if (errorsByType.format && errorsByType.format.length > 0) {
-    const fields = errorsByType.format
-      .map(error => getFieldDisplayName(error.field))
-      .join(', ');
-    messages.push(`${fields}의 입력 형식이 다릅니다`);
-  }
-
-  return messages;
 }

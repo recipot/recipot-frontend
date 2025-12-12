@@ -2,9 +2,12 @@ import { createApiInstance } from '@recipot/api';
 
 import type {
   AdminRecipesResponse,
+  RecipeIngredientsResponse,
   RecipePostResponse,
   RecipePutRequest,
   RecipePutResponse,
+  RecipeSeasoningsResponse,
+  RecipeToolsResponse,
   RecipeUpdateRequest,
   ReviewSubmitData,
 } from './types';
@@ -104,6 +107,41 @@ export const recipe = {
     recipes: RecipeUpdateRequest[]
   ): Promise<RecipePostResponse> => {
     const response = await recipeAPI.post(`/v1/recipes`, recipes);
+    return response.data.data;
+  },
+
+  /**
+   * 레시피 재료 조회 (어드민)
+   * @param recipeId - 레시피 ID
+   * @returns
+   */
+  getRecipeIngredients: async (
+    recipeId: number
+  ): Promise<RecipeIngredientsResponse> => {
+    const response = await recipeAPI.get(`/v1/recipes/${recipeId}/ingredients`);
+
+    return response.data.data;
+  },
+
+  /**
+   * 레시피 양념 조회 (어드민)
+   * @param recipeId - 레시피 ID
+   * @returns
+   */
+  getRecipeSeasonings: async (
+    recipeId: number
+  ): Promise<RecipeSeasoningsResponse> => {
+    const response = await recipeAPI.get(`/v1/recipes/${recipeId}/seasonings`);
+    return response.data.data;
+  },
+
+  /**
+   * 레시피 조리도구 조회 (어드민)
+   * @param recipeId - 레시피 ID
+   * @returns
+   */
+  getRecipeTools: async (recipeId: number): Promise<RecipeToolsResponse> => {
+    const response = await recipeAPI.get(`/v1/recipes/${recipeId}/tools`);
     return response.data.data;
   },
 };

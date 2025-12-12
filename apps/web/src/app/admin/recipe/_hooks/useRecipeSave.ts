@@ -11,7 +11,6 @@ import {
 } from '@/app/admin/recipe/_utils/recipeTransformer';
 import { useApiErrorModalStore } from '@/stores/apiErrorModalStore';
 import {
-  formatValidationErrors,
   isRecipeCompletelyEmpty,
   validateRecipeUpdateRequests,
 } from '@/utils/recipeValidation';
@@ -24,13 +23,112 @@ interface UseRecipeSaveOptions {
 
 interface UseRecipeSaveReturn {
   isSaving: boolean;
-  validationError: { isOpen: boolean; message: string };
-  setValidationError: (error: { isOpen: boolean; message: string }) => void;
+  validationError: {
+    errorType?: 'missing';
+    fieldNames?: string[];
+    isOpen: boolean;
+    message: string;
+    showCloseButton?: boolean;
+  };
+  setValidationError: (error: {
+    errorType?: 'missing';
+    fieldNames?: string[];
+    isOpen: boolean;
+    message: string;
+    showCloseButton?: boolean;
+  }) => void;
   saveRecipes: (
     editedRecipes: Map<number, Partial<RecipeUpdateRequest>>,
     recipes: AdminRecipe[],
     getConditionId: (conditionName?: string) => number
   ) => Promise<void>;
+}
+
+interface ValidationError {
+  errorType?: 'missing';
+  fieldNames?: string[];
+  isOpen: boolean;
+  message: string;
+  showCloseButton?: boolean;
+}
+
+/**
+ * 신규 레시피 검증 및 에러 처리
+ */
+const validateNewRecords = (
+  newRecords: RecipeUpdateRequest[],
+  setValidationError: (error: ValidationError) => void,
+  setIsSaving: (value: boolean) => void
+) => {
+  if (newRecords.length === 0) {
+    return true;
+  }
+
+  const validationResult = validateRecipeUpdateRequests(newRecords);
+  if (validationResult.isValid) {
+    return true;
+  }
+
+  setValidationError({
+    isOpen: true,
+    fieldNames: validationResult.fieldNames,
+    errorType: validationResult.errorType,
+    message: '',
+    showCloseButton: true,
+  });
+  setIsSaving(false);
+  return false;
+};
+
+/**
+ * 기존 레시피 검증 및 에러 처리
+ */
+function validateExistingRecords(
+  existingRecords: RecipeUpdateRequest[],
+  setValidationError: (error: ValidationError) => void,
+  setIsSaving: (value: boolean) => void
+): boolean {
+  if (existingRecords.length === 0) {
+    return true;
+  }
+
+  const validationResult = validateRecipeUpdateRequests(existingRecords);
+  if (validationResult.isValid) {
+    return true;
+  }
+
+  setValidationError({
+    isOpen: true,
+    fieldNames: validationResult.fieldNames,
+    errorType: validationResult.errorType,
+    message: '',
+    showCloseButton: true,
+  });
+  setIsSaving(false);
+  return false;
+}
+
+/**
+ * 레시피 API 호출
+ */
+async function saveRecordsToApi(
+  newRecords: RecipeUpdateRequest[],
+  existingRecords: RecipeUpdateRequest[]
+): Promise<void> {
+  if (newRecords.length > 0) {
+    await recipe.updateRecipes(newRecords);
+  }
+
+  if (existingRecords.length > 0) {
+    if (existingRecords.length === 1) {
+      await recipe.updateRecipe(
+        existingRecords[0].id,
+        convertUpdateRequestToPutRequest(existingRecords[0])
+      );
+    } else {
+      await recipe.updateRecipes(existingRecords);
+    }
+  }
 }
 
 /**
@@ -42,12 +140,12 @@ export function useRecipeSave({
   showToast,
 }: UseRecipeSaveOptions): UseRecipeSaveReturn {
   const [isSaving, setIsSaving] = useState(false);
-  const [validationError, setValidationError] = useState<{
-    isOpen: boolean;
-    message: string;
-  }>({
+  const [validationError, setValidationError] = useState<ValidationError>({
+    errorType: undefined,
+    fieldNames: [],
     isOpen: false,
     message: '',
+    showCloseButton: false,
   });
   const { showError } = useApiErrorModalStore();
 
@@ -61,22 +159,20 @@ export function useRecipeSave({
         setValidationError({
           isOpen: true,
           message: '수정된 레시피가 없습니다.',
+          showCloseButton: true,
         });
         return;
       }
 
       setIsSaving(true);
       try {
-        const updateRequests = convertToUpdateRequests(
+        const savedRecipe = convertToUpdateRequests(
           editedRecipes,
           recipes,
           getConditionId
-        );
-        const validRequests = updateRequests.filter(
-          request => !isRecipeCompletelyEmpty(request)
-        );
+        ).filter(request => !isRecipeCompletelyEmpty(request));
 
-        if (validRequests.length === 0) {
+        if (savedRecipe.length === 0) {
           showError({
             message: '등록할 레시피가 없습니다.',
           });
@@ -84,25 +180,24 @@ export function useRecipeSave({
           return;
         }
 
-        const validationResult = validateRecipeUpdateRequests(validRequests);
-        if (!validationResult.isValid) {
-          const errorMessages = formatValidationErrors(validationResult.errors);
-          setValidationError({
-            isOpen: true,
-            message: errorMessages.join('\n'),
-          });
-          setIsSaving(false);
+        const newRecords = savedRecipe.filter(recipe => recipe.id < 0);
+        const existingRecords = savedRecipe.filter(recipe => recipe.id > 0);
+
+        if (!validateNewRecords(newRecords, setValidationError, setIsSaving)) {
           return;
         }
 
-        if (validRequests.length === 1) {
-          await recipe.updateRecipe(
-            validRequests[0].id,
-            convertUpdateRequestToPutRequest(validRequests[0])
-          );
-        } else {
-          await recipe.updateRecipes(validRequests);
+        if (
+          !validateExistingRecords(
+            existingRecords,
+            setValidationError,
+            setIsSaving
+          )
+        ) {
+          return;
         }
+
+        await saveRecordsToApi(newRecords, existingRecords);
 
         showToast('레시피가 성공적으로 저장되었습니다.');
         await refetch();

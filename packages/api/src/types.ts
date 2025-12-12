@@ -57,15 +57,15 @@ export interface ReviewSubmitData {
 export interface AdminRecipe {
   id: number;
   title: string;
-  imageUrl?: string;
+  imageUrl: string;
   duration: number;
-  condition?: string;
-  description?: string;
+  condition: string;
+  description: string;
   tools?: {
     id: number;
     name: string;
   }[];
-  ingredients?: {
+  ingredients: {
     id: number;
     name: string;
     amount: string;
@@ -95,7 +95,7 @@ export interface AdminRecipesResponse {
 export interface RecipeUpdateRequest {
   id: number;
   title: string;
-  imageUrl?: string;
+  imageUrl: string;
   duration: number;
   conditionId: number;
   description: string;
@@ -104,11 +104,13 @@ export interface RecipeUpdateRequest {
   }[];
   ingredients: {
     id: number;
+    name?: string;
     amount: string;
     isAlternative: boolean;
   }[];
   seasonings: {
     id: number;
+    name?: string;
     amount: string;
   }[];
   steps: {
@@ -165,4 +167,43 @@ export interface RecipePutResponse {
 export interface RecipePostResponse {
   createdCount: number;
   updatedCount: number;
+}
+
+// Recipe Ingredients API Types
+export interface RecipeIngredientItem {
+  id: number; // DB의 recipe_ingredient.id
+  ingredientId: number; // 실제 재료 ID (food.id)
+  name: string;
+  amount: string;
+  isAlternative: boolean;
+}
+
+export interface RecipeIngredientsResponse {
+  recipeId: number;
+  ingredients: RecipeIngredientItem[];
+}
+
+// Recipe Seasonings API Types
+export interface RecipeSeasoningItem {
+  id: number; // DB의 recipe_seasoning.id
+  seasoningId: number; // 실제 양념 ID
+  name: string;
+  amount: string;
+}
+
+export interface RecipeSeasoningsResponse {
+  recipeId: number;
+  seasonings: RecipeSeasoningItem[];
+}
+
+// Recipe Tools API Types
+export interface RecipeToolItem {
+  id: number; // DB의 recipe_tool.id
+  toolId: number; // 실제 조리도구 ID
+  name: string;
+}
+
+export interface RecipeToolsResponse {
+  recipeId: number;
+  tools: RecipeToolItem[];
 }
