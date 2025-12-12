@@ -9,7 +9,7 @@ import RecipeModalsSeasonings from '@/app/admin/recipe/_components/RecipeModals/
  * ModalType 타입 정의
  * 레시피 편집 모달의 타입을 정의합니다.
  */
-export type ModalType = 'ingredients' | 'seasonings' | 'steps' | 'image';
+export type ModalType = 'ingredients' | 'seasonings' | 'image';
 
 // Compound Component 구조
 export const RecipeModals = Object.assign(RecipeModalsRoot, {

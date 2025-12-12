@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 
 import { EditableCell } from '@/app/admin/recipe/_components/Cell/EditableCell';
@@ -15,6 +15,7 @@ import { ToolsSelect } from '@/app/admin/recipe/_components/Select/ToolsSelect';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { TableCell, TableRow } from '@/components/ui/table';
+import { Textarea } from '@/components/ui/textarea';
 import { normalizeImageUrl } from '@/lib/url';
 
 import type { AdminRecipe, RecipeUpdateRequest } from '@recipot/api';
@@ -66,26 +67,30 @@ function RecipeRowProvider({ editedData, recipeItem }: RecipeRowProps) {
     actionsContext.setSelectedRecipeId(isSelected ? null : recipeItem.id);
   }, [isSelected, recipeItem.id, actionsContext]);
 
+  const isStepsExpanded = dataContext.expandedStepsRecipeId === recipeItem.id;
+
   return (
     <RecipeRowContext.Provider value={contextValue}>
-      <TableRow
-        className={`${isSelected ? 'bg-primary-pressed/50' : ''}`}
-        onClick={handleRowClick}
-      >
-        <CheckboxCell />
-        <IdCell />
-        <TitleCell />
-        <ImageCell />
-        <DurationCell />
-        <ConditionCell />
-        <DescriptionCell />
-        <ToolsCell />
-        <IngredientsCell />
-        <IrreplaceableIngredientsCell />
-        <SeasoningsCell />
-        {/* TODO: Steps 기능은 기획팀과 회의 중이므로 임시 주석처리 */}
-        {/* <StepsCell /> */}
-      </TableRow>
+      <>
+        <TableRow
+          className={`${isSelected ? 'bg-primary-pressed/50' : ''}`}
+          onClick={handleRowClick}
+        >
+          <CheckboxCell />
+          <IdCell />
+          <TitleCell />
+          <ImageCell />
+          <DurationCell />
+          <ConditionCell />
+          <DescriptionCell />
+          <ToolsCell />
+          <IngredientsCell />
+          <IrreplaceableIngredientsCell />
+          <SeasoningsCell />
+          <StepsCell />
+        </TableRow>
+        {isStepsExpanded && <ExpandedStepsRow />}
+      </>
     </RecipeRowContext.Provider>
   );
 }
@@ -630,45 +635,176 @@ function SeasoningsCell() {
 }
 
 // TODO: Steps 기능은 기획팀과 회의 중이므로 임시 주석처리
-// function StepsCell() {
-//   const { currentValues, recipeItem } = useRecipeRowContextWithTable();
-//   const { selectedCell } = useRecipeTableDataContext();
-//   const { openModal, setSelectedCell } = useRecipeTableActionsContext();
+function StepsCell() {
+  const { currentValues, recipeItem } = useRecipeRowContextWithTable();
+  const { expandedStepsRecipeId, selectedCell } = useRecipeTableDataContext();
+  const { setExpandedStepsRecipeId, setSelectedCell } =
+    useRecipeTableActionsContext();
 
-//   const isSelected =
-//     selectedCell?.recipeId === recipeItem.id && selectedCell?.field === 'steps';
+  const isSelected =
+    selectedCell?.recipeId === recipeItem.id && selectedCell?.field === 'steps';
+  const isExpanded = expandedStepsRecipeId === recipeItem.id;
 
-//   return (
-//     <TableCell
-//       className={isSelected ? 'border-2 border-blue-500' : ''}
-//       onClick={e => {
-//         e.stopPropagation();
-//         setSelectedCell({ field: 'steps', recipeId: recipeItem.id });
-//       }}
-//     >
-//       <div
-//         onDoubleClick={() => openModal('steps', recipeItem.id)}
-//         className="cursor-pointer hover:bg-gray-50"
-//       >
-//         {currentValues.steps.length > 0 ? (
-//           <div className="space-y-1">
-//             <div className="font-medium">{currentValues.steps.length}단계</div>
-//             <div className="max-w-xs truncate text-xs text-gray-600">
-//               {currentValues.steps
-//                 .sort((a, b) => a.orderNum - b.orderNum)
-//                 .map(step => step.summary ?? step.content)
-//                 .filter(Boolean)
-//                 .slice(0, 3)
-//                 .join(' / ')}
-//               {currentValues.steps.length > 3 && '...'}
-//             </div>
-//           </div>
-//         ) : (
-//           '-'
-//         )}
-//       </div>
-//     </TableCell>
-//   );
-// }
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedCell({ field: 'steps', recipeId: recipeItem.id });
+    setExpandedStepsRecipeId(isExpanded ? null : recipeItem.id);
+  };
+
+  return (
+    <TableCell
+      className={isSelected ? 'border-2 border-blue-500' : ''}
+      onClick={handleClick}
+    >
+      <div className="cursor-pointer hover:bg-gray-50">
+        {currentValues.steps.length > 0 ? (
+          <div className="font-medium">{currentValues.steps.length}단계</div>
+        ) : (
+          '-'
+        )}
+      </div>
+    </TableCell>
+  );
+}
+
+function ExpandedStepsRow() {
+  const { currentValues, recipeItem } = useRecipeRowContextWithTable();
+  const { editingCell } = useRecipeTableDataContext();
+  const { openModal, setEditingCell, updateEditedRecipe } =
+    useRecipeTableActionsContext();
+  const sortedSteps = [...currentValues.steps].sort(
+    (a, b) => a.orderNum - b.orderNum
+  );
+
+  const handleStepContentSave = (orderNum: number, content: string) => {
+    const updatedSteps = currentValues.steps.map(step =>
+      step.orderNum === orderNum
+        ? { ...step, content, summary: step.summary ?? '' }
+        : { ...step, summary: step.summary ?? '' }
+    );
+    updateEditedRecipe(recipeItem.id, { steps: updatedSteps });
+    setEditingCell(null);
+  };
+
+  const isEditingStep = (orderNum: number) =>
+    editingCell?.recipeId === recipeItem.id &&
+    editingCell?.field === `step-${orderNum}`;
+
+  return (
+    <TableRow>
+      <TableCell colSpan={12} className="bg-gray-50 p-4">
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">조리 순서</h3>
+          {sortedSteps.length > 0 ? (
+            <div className="space-y-4">
+              {sortedSteps.map(step => (
+                <div
+                  key={step.orderNum}
+                  className="flex gap-4 rounded border bg-white p-4"
+                >
+                  <div
+                    className="relative h-32 w-32 flex-shrink-0 cursor-pointer"
+                    onDoubleClick={() =>
+                      openModal('image', recipeItem.id, step.orderNum)
+                    }
+                  >
+                    {step.imageUrl ? (
+                      <Image
+                        src={normalizeImageUrl(step.imageUrl)}
+                        alt={`Step ${step.orderNum}`}
+                        fill
+                        className="rounded object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center rounded border border-dashed border-gray-300 text-xs text-gray-400">
+                        더블클릭하여
+                        <br />
+                        이미지 추가
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <div className="mb-2 font-semibold">
+                      Step {step.orderNum}
+                    </div>
+                    {isEditingStep(step.orderNum) ? (
+                      <EditableTextarea
+                        value={step.content ?? step.summary ?? ''}
+                        onSave={value =>
+                          handleStepContentSave(step.orderNum, String(value))
+                        }
+                        onCancel={() => setEditingCell(null)}
+                      />
+                    ) : (
+                      <div
+                        onDoubleClick={() =>
+                          setEditingCell({
+                            field: `step-${step.orderNum}`,
+                            recipeId: recipeItem.id,
+                          })
+                        }
+                        className="min-h-[3rem] cursor-pointer rounded p-2 text-sm whitespace-pre-wrap text-gray-700 hover:bg-gray-50"
+                      >
+                        {step.content ?? step.summary ?? (
+                          <span className="text-gray-400">
+                            더블클릭하여 입력
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-gray-400">조리 순서가 없습니다.</div>
+          )}
+        </div>
+      </TableCell>
+    </TableRow>
+  );
+}
+
+function EditableTextarea({
+  onCancel,
+  onSave,
+  value,
+}: {
+  onCancel: () => void;
+  onSave: (value: string) => void;
+  value: string;
+}) {
+  const [editValue, setEditValue] = useState(value);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    textareaRef.current?.focus();
+    textareaRef.current?.select();
+  }, []);
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+      onSave(editValue);
+    } else if (e.key === 'Escape') {
+      onCancel();
+    }
+  };
+
+  const handleBlur = () => {
+    onSave(editValue);
+  };
+
+  return (
+    <Textarea
+      ref={textareaRef}
+      value={editValue}
+      onChange={e => setEditValue(e.target.value)}
+      onBlur={handleBlur}
+      onKeyDown={handleKeyDown}
+      className="min-h-[3rem] resize-none"
+      rows={3}
+    />
+  );
+}
 
 export const RecipeRow = RecipeRowProvider;
