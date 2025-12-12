@@ -42,6 +42,9 @@ export function usePaginatedList<T>({
     setDisplayedItems(firstPageItems);
     setCurrentPage(1);
     setHasMore(items.length > itemsPerPage);
+
+    setIsLoadingMore(false);
+    isLoadingRef.current = false;
   }, [items, itemsPerPage]);
 
   // 추가 데이터 로드 (클라이언트 사이드 페이지네이션)
