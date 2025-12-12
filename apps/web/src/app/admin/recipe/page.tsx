@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { type AdminRecipe, condition, recipe } from '@recipot/api';
+import { type AdminRecipe, recipe } from '@recipot/api';
 import { useQueryClient } from '@tanstack/react-query';
 import { Trash } from 'lucide-react';
 
@@ -24,6 +24,7 @@ import {
   ADMIN_RECIPES_QUERY_KEY,
   useAdminRecipes,
 } from '@/hooks/useAdminRecipes';
+import { useConditions } from '@/hooks/useConditions';
 import { useFoodList } from '@/hooks/useFoodList';
 import { usePaginatedList } from '@/hooks/usePaginatedList';
 import { useToast } from '@/hooks/useToast';
@@ -33,26 +34,24 @@ export default function AdminRecipePage() {
   // 1. 데이터 페칭
   const { isLoading, recipes: allRecipes, refetch } = useAdminRecipes();
   const { data: foodList = [] } = useFoodList();
+  const { data: conditions = [], error: conditionsError } = useConditions();
   const queryClient = useQueryClient();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const tableContainerRef = useRef<HTMLDivElement>(null);
 
-  // 컨디션 목록 조회
-  const [conditions, setConditions] = useState<
-    Array<{ id: number; name: string }>
-  >([]);
+  // 4. Toast 알림
+  const {
+    isVisible: isToastVisible,
+    message: toastMessage,
+    showToast,
+  } = useToast();
 
+  // 컨디션 조회 에러 처리
   useEffect(() => {
-    const fetchConditions = async () => {
-      try {
-        const data = await condition.getConditions();
-        setConditions(data);
-      } catch {
-        showToast('컨디션 조회 실패');
-      }
-    };
-    fetchConditions();
-  }, []);
+    if (conditionsError) {
+      showToast('컨디션 조회 실패');
+    }
+  }, [conditionsError, showToast]);
 
   const getConditionId = useCallback(
     (conditionName?: string): number => {
@@ -114,13 +113,6 @@ export default function AdminRecipePage() {
       return newSelected;
     });
   }, []);
-
-  // 4. Toast 알림
-  const {
-    isVisible: isToastVisible,
-    message: toastMessage,
-    showToast,
-  } = useToast();
 
   const { isSaving, saveRecipes, setValidationError, validationError } =
     useRecipeSave({
