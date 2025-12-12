@@ -2,7 +2,8 @@
 
 import { createContext, useContext } from 'react';
 
-import type { ModalType } from './RecipeModals';
+import type { ModalType } from '@/app/admin/recipe/_components/RecipeModals';
+
 import type { RecipeUpdateRequest } from '@recipot/api';
 
 /**
@@ -11,6 +12,7 @@ import type { RecipeUpdateRequest } from '@recipot/api';
  */
 interface RecipeTableActionsContextValue {
   closeModal: () => void;
+  createNewRecipe: () => void;
   getConditionId: (conditionName?: string) => number;
   onSelectOne: (id: number, checked: boolean) => void;
   openModal: (type: ModalType, recipeId: number) => void;

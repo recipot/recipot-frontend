@@ -1,9 +1,20 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { condition } from '@recipot/api';
+import { type AdminRecipe, condition } from '@recipot/api';
 import { Trash } from 'lucide-react';
 
+import type { ModalType } from '@/app/admin/recipe/_components/RecipeModals';
+import RecipeModals from '@/app/admin/recipe/_components/RecipeModals';
+import { RecipeTable } from '@/app/admin/recipe/_components/RecipeTable';
+import { RecipeTableActionsContext } from '@/app/admin/recipe/_components/RecipeTableActionsContext';
+import { RecipeTableDataContext } from '@/app/admin/recipe/_components/RecipeTableDataContext';
+import { useRecipeEditor } from '@/app/admin/recipe/_hooks/useRecipeEditor';
+import { useRecipeSave } from '@/app/admin/recipe/_hooks/useRecipeSave';
+import {
+  extractAvailableSeasonings,
+  extractAvailableTools,
+} from '@/app/admin/recipe/_utils/recipeExtractor';
 import { Button } from '@/components/common/Button';
 import { Modal } from '@/components/common/Modal/Modal';
 import { Toast } from '@/components/common/Toast';
@@ -13,19 +24,6 @@ import { useFoodList } from '@/hooks/useFoodList';
 import { usePaginatedList } from '@/hooks/usePaginatedList';
 import { useToast } from '@/hooks/useToast';
 import { isAdminRecipeCompletelyEmpty } from '@/utils/recipeValidation';
-
-import RecipeModals from './_components/RecipeModals';
-import { RecipeTable } from './_components/RecipeTable';
-import { RecipeTableActionsContext } from './_components/RecipeTableActionsContext';
-import { RecipeTableDataContext } from './_components/RecipeTableDataContext';
-import { useRecipeEditor } from './_hooks/useRecipeEditor';
-import { useRecipeSave } from './_hooks/useRecipeSave';
-import {
-  extractAvailableSeasonings,
-  extractAvailableTools,
-} from './_utils/recipeExtractor';
-
-import type { ModalType } from './_components/RecipeModals';
 
 export default function AdminRecipePage() {
   // 1. 데이터 페칭
@@ -105,11 +103,23 @@ export default function AdminRecipePage() {
     });
   }, []);
 
+  // 4. Toast 알림
+  const {
+    isVisible: isToastVisible,
+    message: toastMessage,
+    showToast,
+  } = useToast();
+
   const { isSaving, saveRecipes, setValidationError, validationError } =
     useRecipeSave({
       onSuccess: clearEdits,
       refetch,
+      showToast,
     });
+
+  // 신규 레코드 관리
+  const [newRecipes, setNewRecipes] = useState<AdminRecipe[]>([]);
+  const nextTempIdRef = useRef(-1);
 
   // 3. 데이터 가공
   const filteredRecipes = useMemo(() => {
@@ -127,17 +137,63 @@ export default function AdminRecipePage() {
     scrollContainerRef,
   });
 
+  // 신규 레코드와 기존 레시피 합치기
+  const allDisplayedRecipes = useMemo(() => {
+    return [...recipes, ...newRecipes];
+  }, [recipes, newRecipes]);
+
   const availableTools = useMemo(
-    () => extractAvailableTools(recipes),
-    [recipes]
+    () => extractAvailableTools(allDisplayedRecipes),
+    [allDisplayedRecipes]
   );
   const availableSeasonings = useMemo(
-    () => extractAvailableSeasonings(recipes),
-    [recipes]
+    () => extractAvailableSeasonings(allDisplayedRecipes),
+    [allDisplayedRecipes]
   );
 
-  // 4. Toast 알림
-  const { isVisible: isToastVisible, message: toastMessage } = useToast();
+  // 신규 레코드 생성 함수
+  const createNewRecipe = useCallback(() => {
+    const tempId = nextTempIdRef.current;
+    nextTempIdRef.current -= 1;
+
+    const newRecipe: AdminRecipe = {
+      condition: '',
+      description: '',
+      duration: 0,
+      id: tempId,
+      imageUrl: '',
+      ingredients: [],
+      seasonings: [],
+      steps: [],
+      title: '',
+      tools: [],
+    };
+
+    setNewRecipes(prev => [...prev, newRecipe]);
+
+    // 리스트 맨 끝으로 스크롤
+    setTimeout(() => {
+      if (scrollContainerRef.current) {
+        scrollContainerRef.current.scrollTop =
+          scrollContainerRef.current.scrollHeight;
+      }
+    }, 0);
+  }, []);
+
+  // Shift+Enter 키 이벤트   리스너
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.shiftKey && event.key === 'Enter') {
+        event.preventDefault();
+        createNewRecipe();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [createNewRecipe]);
 
   // 테이블 외부 클릭 시 선택된 셀 해제
   useEffect(() => {
@@ -167,7 +223,7 @@ export default function AdminRecipePage() {
       editingCell,
       foodList,
       modalState,
-      recipes,
+      recipes: allDisplayedRecipes,
       selectedCell,
       selectedIds,
       selectedRecipeId,
@@ -180,7 +236,7 @@ export default function AdminRecipePage() {
       editingCell,
       foodList,
       modalState,
-      recipes,
+      allDisplayedRecipes,
       selectedCell,
       selectedIds,
       selectedRecipeId,
@@ -190,6 +246,7 @@ export default function AdminRecipePage() {
   const actionsContextValue = useMemo(
     () => ({
       closeModal,
+      createNewRecipe,
       getConditionId,
       onSelectOne: toggleSelection,
       openModal,
@@ -200,6 +257,7 @@ export default function AdminRecipePage() {
     }),
     [
       closeModal,
+      createNewRecipe,
       getConditionId,
       openModal,
       selectRecipe,
