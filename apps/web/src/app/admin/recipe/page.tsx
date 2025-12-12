@@ -200,6 +200,12 @@ export default function AdminRecipePage() {
   // Shift+Enter 키 이벤트   리스너
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement;
+      const isInputField =
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.isContentEditable;
+      if (isInputField) return;
       if (event.shiftKey && event.key === 'Enter') {
         event.preventDefault();
         createNewRecipe();
