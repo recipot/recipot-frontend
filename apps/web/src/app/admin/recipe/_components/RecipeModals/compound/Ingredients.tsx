@@ -60,8 +60,7 @@ const formatAmount = (quantity: string, unit: string): string => {
  * 재료 수정 모달 컴포넌트
  */
 export default function RecipeModalsIngredients() {
-  const { editedRecipes, foodList, modalState, recipes } =
-    useRecipeTableDataContext();
+  const { foodList, modalState, recipes } = useRecipeTableDataContext();
   const { closeModal, updateEditedRecipe } = useRecipeTableActionsContext();
 
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
@@ -78,7 +77,6 @@ export default function RecipeModalsIngredients() {
   const isOpen = modalState?.type === 'ingredients';
   const { recipeId } = modalState ?? {};
   const targetRecipe = recipeId ? recipes.find(r => r.id === recipeId) : null;
-  const editedData = recipeId ? editedRecipes.get(recipeId) : undefined;
 
   // 모달이 열릴 때 API로 재료 데이터 가져오기
   const { data: apiIngredients, isLoading: isLoadingIngredients } = useQuery({
@@ -100,21 +98,12 @@ export default function RecipeModalsIngredients() {
     staleTime: 0,
   });
 
-  // API에서 가져온 데이터 또는 편집 중인 데이터 사용
-  const currentIngredients = editedData?.ingredients ?? apiIngredients ?? [];
-
   // 모달이 열릴 때 초기값 저장
   useEffect(() => {
-    if (isOpen && currentIngredients !== undefined && !isLoadingIngredients) {
-      setIngredients(currentIngredients);
-
-      setSearchTerm('');
-      setEditingId(null);
-      setEditingQuantity('');
-      setEditingUnit('');
-      setFocusedIndex(-1);
+    if (isOpen && apiIngredients !== undefined && !isLoadingIngredients) {
+      setIngredients(apiIngredients);
     }
-  }, [isOpen, currentIngredients, isLoadingIngredients]);
+  }, [isOpen, apiIngredients, isLoadingIngredients]);
 
   // 검색어가 변경되면 포커스 인덱스 초기화
   useEffect(() => {
@@ -211,8 +200,14 @@ export default function RecipeModalsIngredients() {
     if (ingredient) {
       const { quantity, unit } = parseAmount(ingredient.amount);
       setEditingId(id);
-      setEditingQuantity(quantity);
-      setEditingUnit(unit);
+      // quantity가 숫자를 포함하지 않고 unit이 비어있으면, quantity를 unit으로 이동 (단위만 있는 경우)
+      if (!/[\d./~\-\s]/.test(quantity) && !unit) {
+        setEditingQuantity('');
+        setEditingUnit(quantity);
+      } else {
+        setEditingQuantity(quantity);
+        setEditingUnit(unit);
+      }
     }
   };
 

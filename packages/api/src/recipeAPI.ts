@@ -119,7 +119,6 @@ export const recipe = {
     recipeId: number
   ): Promise<RecipeIngredientsResponse> => {
     const response = await recipeAPI.get(`/v1/recipes/${recipeId}/ingredients`);
-
     return response.data.data;
   },
 

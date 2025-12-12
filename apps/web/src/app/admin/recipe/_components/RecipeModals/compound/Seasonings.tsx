@@ -64,9 +64,15 @@ export default function RecipeModalsSeasonings() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editingQuantity, setEditingQuantity] = useState('');
   const [focusedIndex, setFocusedIndex] = useState<number>(-1);
+
   const searchInputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
   const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  const handleItemRef = (index: number, el: HTMLButtonElement | null) => {
+    itemRefs.current[index] = el;
+  };
 
   const isOpen = modalState?.type === 'seasonings';
   const { recipeId } = modalState ?? {};
@@ -96,10 +102,6 @@ export default function RecipeModalsSeasonings() {
   useEffect(() => {
     if (isOpen && apiSeasonings !== undefined && !isLoadingSeasonings) {
       setSeasonings(apiSeasonings);
-      setSearchTerm('');
-      setEditingId(null);
-      setEditingQuantity('');
-      setFocusedIndex(-1);
     }
   }, [isOpen, apiSeasonings, isLoadingSeasonings]);
 
@@ -288,9 +290,7 @@ export default function RecipeModalsSeasonings() {
                   {filteredSeasonings.map((seasoning, index) => (
                     <button
                       key={seasoning.id}
-                      ref={el => {
-                        itemRefs.current[index] = el;
-                      }}
+                      ref={el => handleItemRef(index, el)}
                       type="button"
                       onClick={() => handleAddSeasoning(seasoning.id)}
                       className={`w-full px-3 py-2 text-left hover:bg-gray-100 ${
