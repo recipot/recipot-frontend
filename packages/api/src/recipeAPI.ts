@@ -143,4 +143,15 @@ export const recipe = {
     const response = await recipeAPI.get(`/v1/recipes/${recipeId}/tools`);
     return response.data.data;
   },
+
+  /**
+   * 레시피 삭제 (어드민)
+   * @param recipeIds - 삭제할 레시피 ID 배열
+   * @returns
+   */
+  deleteRecipes: async (recipeIds: number[]): Promise<void> => {
+    await recipeAPI.delete(`/v1/recipes`, {
+      data: { recipeIds },
+    });
+  },
 };
