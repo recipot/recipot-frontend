@@ -53,46 +53,18 @@ interface ValidationError {
 }
 
 /**
- * 신규 레시피 검증 및 에러 처리
+ * 레시피 검증 및 에러 처리
  */
-const validateNewRecords = (
-  newRecords: RecipeUpdateRequest[],
-  setValidationError: (error: ValidationError) => void,
-  setIsSaving: (value: boolean) => void
-) => {
-  if (newRecords.length === 0) {
-    return true;
-  }
-
-  const validationResult = validateRecipeUpdateRequests(newRecords);
-  if (validationResult.isValid) {
-    return true;
-  }
-
-  setValidationError({
-    errorType: validationResult.errorType,
-    fieldNames: validationResult.fieldNames,
-    isOpen: true,
-    message: '',
-    showCloseButton: true,
-  });
-  setIsSaving(false);
-  return false;
-};
-
-/**
- * 기존 레시피 검증 및 에러 처리
- */
-function validateExistingRecords(
-  existingRecords: RecipeUpdateRequest[],
+function validateRecords(
+  records: RecipeUpdateRequest[],
   setValidationError: (error: ValidationError) => void,
   setIsSaving: (value: boolean) => void
 ): boolean {
-  if (existingRecords.length === 0) {
+  if (records.length === 0) {
     return true;
   }
 
-  const validationResult = validateRecipeUpdateRequests(existingRecords);
+  const validationResult = validateRecipeUpdateRequests(records);
   if (validationResult.isValid) {
     return true;
   }
@@ -183,16 +155,12 @@ export function useRecipeSave({
         const newRecords = savedRecipe.filter(recipe => recipe.id < 0);
         const existingRecords = savedRecipe.filter(recipe => recipe.id > 0);
 
-        if (!validateNewRecords(newRecords, setValidationError, setIsSaving)) {
+        if (!validateRecords(newRecords, setValidationError, setIsSaving)) {
           return;
         }
 
         if (
-          !validateExistingRecords(
-            existingRecords,
-            setValidationError,
-            setIsSaving
-          )
+          !validateRecords(existingRecords, setValidationError, setIsSaving)
         ) {
           return;
         }
