@@ -15,6 +15,14 @@ import {
   validateRecipeUpdateRequests,
 } from '@/utils/recipeValidation';
 
+interface ValidationError {
+  errorType?: 'missing';
+  fieldNames?: string[];
+  isOpen: boolean;
+  message: string;
+  showCloseButton?: boolean;
+}
+
 interface UseRecipeSaveOptions {
   refetch: () => Promise<unknown>;
   onSuccess?: () => void;
@@ -23,33 +31,13 @@ interface UseRecipeSaveOptions {
 
 interface UseRecipeSaveReturn {
   isSaving: boolean;
-  validationError: {
-    errorType?: 'missing';
-    fieldNames?: string[];
-    isOpen: boolean;
-    message: string;
-    showCloseButton?: boolean;
-  };
-  setValidationError: (error: {
-    errorType?: 'missing';
-    fieldNames?: string[];
-    isOpen: boolean;
-    message: string;
-    showCloseButton?: boolean;
-  }) => void;
+  validationError: ValidationError;
+  setValidationError: (error: ValidationError) => void;
   saveRecipes: (
     editedRecipes: Map<number, Partial<RecipeUpdateRequest>>,
     recipes: AdminRecipe[],
     getConditionId: (conditionName?: string) => number
   ) => Promise<void>;
-}
-
-interface ValidationError {
-  errorType?: 'missing';
-  fieldNames?: string[];
-  isOpen: boolean;
-  message: string;
-  showCloseButton?: boolean;
 }
 
 /**
@@ -128,10 +116,8 @@ export function useRecipeSave({
       getConditionId: (conditionName?: string) => number
     ) => {
       if (editedRecipes.size === 0) {
-        setValidationError({
-          isOpen: true,
+        showError({
           message: '수정된 레시피가 없습니다.',
-          showCloseButton: true,
         });
         return;
       }
@@ -145,9 +131,7 @@ export function useRecipeSave({
         ).filter(request => !isRecipeCompletelyEmpty(request));
 
         if (savedRecipe.length === 0) {
-          showError({
-            message: '등록할 레시피가 없습니다.',
-          });
+          showError({ message: '등록할 레시피가 없습니다.' });
           setIsSaving(false);
           return;
         }

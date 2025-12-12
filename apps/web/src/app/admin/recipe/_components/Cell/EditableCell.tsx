@@ -54,13 +54,12 @@ export function EditableCell({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
 
-    // number 타입일 때 음수 입력 방지
+    // number 타입일 때 숫자만 허용
     if (type === 'number') {
-      // 빈 문자열이거나 숫자만 허용 (음수 기호 제거)
       if (newValue === '' || /^\d+$/.test(newValue)) {
         setEditValue(newValue);
       }
-      // 음수 기호가 포함된 경우 무시
+      // 유효하지 않은 입력은 무시
     } else {
       setEditValue(newValue);
     }
@@ -111,12 +110,12 @@ export function EditableCell({
     return (
       <input
         ref={inputRef}
-        type={type}
+        type="text"
+        inputMode={type === 'number' ? 'numeric' : 'text'}
         value={editValue}
         onChange={handleChange}
         onBlur={handleBlur}
         onKeyDown={handleKeyDown}
-        min={type === 'number' ? 1 : undefined}
         className={`border-primary w-full border-b-2 focus:outline-none ${className ?? ''}`}
       />
     );

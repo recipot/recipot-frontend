@@ -678,11 +678,15 @@ function ExpandedStepsRow() {
 
   const handleStepContentSave = (orderNum: number, content: string) => {
     const updatedSteps = currentValues.steps.map(step =>
-      step.orderNum === orderNum
-        ? { ...step, content, summary: step.summary ?? '' }
-        : { ...step, summary: step.summary ?? '' }
+      step.orderNum === orderNum ? { ...step, content } : step
     );
-    updateEditedRecipe(recipeItem.id, { steps: updatedSteps });
+
+    updateEditedRecipe(recipeItem.id, {
+      steps: updatedSteps.map(step => ({
+        ...step,
+        summary: step.summary ?? '',
+      })),
+    });
     setEditingCell(null);
   };
 
