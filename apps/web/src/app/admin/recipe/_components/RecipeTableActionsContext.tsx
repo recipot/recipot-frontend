@@ -15,8 +15,13 @@ interface RecipeTableActionsContextValue {
   createNewRecipe: () => void;
   getConditionId: (conditionName?: string) => number;
   onSelectOne: (id: number, checked: boolean) => void;
-  openModal: (type: ModalType, recipeId: number) => void;
+  openModal: (
+    type: ModalType,
+    recipeId: number,
+    stepOrderNum?: number
+  ) => void;
   setEditingCell: (cell: { field: string; recipeId: number } | null) => void;
+  setExpandedStepsRecipeId: (recipeId: number | null) => void;
   setSelectedCell: (cell: { field: string; recipeId: number } | null) => void;
   setSelectedRecipeId: (id: number | null) => void;
   updateEditedRecipe: (

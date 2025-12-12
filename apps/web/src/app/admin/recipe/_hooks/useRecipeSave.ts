@@ -70,9 +70,9 @@ const validateNewRecords = (
   }
 
   setValidationError({
-    isOpen: true,
-    fieldNames: validationResult.fieldNames,
     errorType: validationResult.errorType,
+    fieldNames: validationResult.fieldNames,
+    isOpen: true,
     message: '',
     showCloseButton: true,
   });
@@ -98,9 +98,9 @@ function validateExistingRecords(
   }
 
   setValidationError({
-    isOpen: true,
-    fieldNames: validationResult.fieldNames,
     errorType: validationResult.errorType,
+    fieldNames: validationResult.fieldNames,
+    isOpen: true,
     message: '',
     showCloseButton: true,
   });
@@ -211,7 +211,7 @@ export function useRecipeSave({
         setIsSaving(false);
       }
     },
-    [refetch, onSuccess, showToast, showError]
+    [onSuccess, showToast, showError]
   );
 
   return {

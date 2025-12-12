@@ -1,7 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { type AdminRecipe, condition } from '@recipot/api';
+import { type AdminRecipe, condition, recipe } from '@recipot/api';
+import { useQueryClient } from '@tanstack/react-query';
 import { Trash } from 'lucide-react';
 
 import type { ModalType } from '@/app/admin/recipe/_components/RecipeModals';
@@ -19,7 +20,10 @@ import { Button } from '@/components/common/Button';
 import { Modal } from '@/components/common/Modal/Modal';
 import { Toast } from '@/components/common/Toast';
 import { Table } from '@/components/ui/table';
-import { useAdminRecipes } from '@/hooks/useAdminRecipes';
+import {
+  ADMIN_RECIPES_QUERY_KEY,
+  useAdminRecipes,
+} from '@/hooks/useAdminRecipes';
 import { useFoodList } from '@/hooks/useFoodList';
 import { usePaginatedList } from '@/hooks/usePaginatedList';
 import { useToast } from '@/hooks/useToast';
@@ -29,6 +33,7 @@ export default function AdminRecipePage() {
   // 1. 데이터 페칭
   const { isLoading, recipes: allRecipes, refetch } = useAdminRecipes();
   const { data: foodList = [] } = useFoodList();
+  const queryClient = useQueryClient();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const tableContainerRef = useRef<HTMLDivElement>(null);
 
@@ -73,11 +78,15 @@ export default function AdminRecipePage() {
   const [modalState, setModalState] = useState<{
     recipeId: number;
     type: ModalType;
+    stepOrderNum?: number;
   } | null>(null);
 
-  const openModal = useCallback((type: ModalType, recipeId: number) => {
-    setModalState({ recipeId, type });
-  }, []);
+  const openModal = useCallback(
+    (type: ModalType, recipeId: number, stepOrderNum?: number) => {
+      setModalState({ recipeId, stepOrderNum, type });
+    },
+    []
+  );
 
   const closeModal = useCallback(() => {
     setModalState(null);
@@ -86,6 +95,9 @@ export default function AdminRecipePage() {
   // 선택 상태 관리
   const [selectedRecipeId, setSelectedRecipeId] = useState<number | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [expandedStepsRecipeId, setExpandedStepsRecipeId] = useState<
+    number | null
+  >(null);
 
   const selectRecipe = useCallback((id: number | null) => {
     setSelectedRecipeId(id);
@@ -116,6 +128,11 @@ export default function AdminRecipePage() {
       refetch,
       showToast,
     });
+
+  // 삭제 확인 모달 상태
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [idsToDelete, setIdsToDelete] = useState<Set<number>>(new Set());
 
   // 신규 레코드 관리
   const [newRecipes, setNewRecipes] = useState<AdminRecipe[]>([]);
@@ -221,6 +238,7 @@ export default function AdminRecipePage() {
       conditions,
       editedRecipes,
       editingCell,
+      expandedStepsRecipeId,
       foodList,
       modalState,
       recipes: allDisplayedRecipes,
@@ -234,6 +252,7 @@ export default function AdminRecipePage() {
       conditions,
       editedRecipes,
       editingCell,
+      expandedStepsRecipeId,
       foodList,
       modalState,
       allDisplayedRecipes,
@@ -251,6 +270,7 @@ export default function AdminRecipePage() {
       onSelectOne: toggleSelection,
       openModal,
       setEditingCell,
+      setExpandedStepsRecipeId,
       setSelectedCell,
       setSelectedRecipeId: selectRecipe,
       updateEditedRecipe,
@@ -262,6 +282,7 @@ export default function AdminRecipePage() {
       openModal,
       selectRecipe,
       setEditingCell,
+      setExpandedStepsRecipeId,
       setSelectedCell,
       toggleSelection,
       updateEditedRecipe,
@@ -271,6 +292,56 @@ export default function AdminRecipePage() {
   // 6. 핸들러
   const handleSave = () => {
     saveRecipes(editedRecipes, allDisplayedRecipes, getConditionId);
+  };
+
+  const handleDeleteClick = () => {
+    if (selectedIds.size === 0) {
+      showToast('삭제할 레시피를 선택해주세요.');
+      return;
+    }
+    setIdsToDelete(new Set(selectedIds));
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (idsToDelete.size === 0) return;
+
+    setIsDeleting(true);
+    try {
+      const deleteCount = idsToDelete.size;
+
+      // 양수 ID만 필터링 (신규 레코드는 음수 ID이므로 제외)
+      const recipeIdsToDelete = Array.from(idsToDelete).filter(id => id > 0);
+
+      // 신규 레코드(음수 ID)는 로컬 상태에서만 제거
+      const newRecipeIdsToRemove = Array.from(idsToDelete).filter(id => id < 0);
+      if (newRecipeIdsToRemove.length > 0) {
+        setNewRecipes(prev =>
+          prev.filter(recipe => !newRecipeIdsToRemove.includes(recipe.id))
+        );
+      }
+
+      // 기존 레시피는 API로 삭제
+      if (recipeIdsToDelete.length > 0) {
+        await recipe.deleteRecipes(recipeIdsToDelete);
+      }
+
+      // React Query 캐시 무효화하여 최신 데이터 가져오기
+      await queryClient.invalidateQueries({
+        queryKey: ADMIN_RECIPES_QUERY_KEY,
+      });
+
+      // 선택 상태 초기화
+      setSelectedIds(new Set());
+      setIdsToDelete(new Set());
+      setIsDeleteModalOpen(false);
+      showToast(`${deleteCount}개의 레시피가 삭제되었습니다.`);
+    } catch (error) {
+      console.error('레시피 삭제 실패:', error);
+      showToast('레시피 삭제 중 오류가 발생했습니다.');
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const validationErrorDescription = validationError.fieldNames ? (
@@ -294,7 +365,11 @@ export default function AdminRecipePage() {
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-2xl font-bold">레시피 DB</h1>
         <div className="flex gap-2">
-          <button className="px-4 py-2 hover:bg-gray-100">
+          <button
+            onClick={handleDeleteClick}
+            disabled={selectedIds.size === 0 || isDeleting}
+            className="px-4 py-2 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+          >
             <Trash size={20} />
           </button>
           <button
@@ -344,8 +419,6 @@ export default function AdminRecipePage() {
           <RecipeModals>
             <RecipeModals.Ingredients />
             <RecipeModals.Seasonings />
-            {/* TODO: Steps 기능은 기획팀과 회의 중이므로 임시 주석처리 */}
-            {/* <RecipeModals.Steps /> */}
             <RecipeModals.Image />
           </RecipeModals>
         </RecipeTableActionsContext.Provider>
@@ -386,6 +459,52 @@ export default function AdminRecipePage() {
         >
           확인
         </Button>
+      </Modal>
+
+      {/* 삭제 확인 모달 */}
+      <Modal
+        contentGap={24}
+        description={
+          idsToDelete.size === 1
+            ? (() => {
+                const recipeId = Array.from(idsToDelete)[0];
+                const recipeToDelete = allDisplayedRecipes.find(
+                  r => r.id === recipeId
+                );
+                const recipeTitle = recipeToDelete?.title ?? '레시피';
+                return `"${recipeTitle}"를 삭제하시겠습니까?`;
+              })()
+            : `선택한 ${idsToDelete.size}개의 레시피를 삭제하시겠습니까?`
+        }
+        disableCloseButton={false}
+        onOpenChange={open => {
+          setIsDeleteModalOpen(open);
+          if (!open) {
+            setIdsToDelete(new Set());
+          }
+        }}
+        open={isDeleteModalOpen}
+        showDefaultCloseButton={false}
+        title="레시피 삭제"
+      >
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="full"
+            onClick={() => setIsDeleteModalOpen(false)}
+            disabled={isDeleting}
+          >
+            취소
+          </Button>
+          <Button
+            variant="default"
+            size="full"
+            onClick={handleDeleteConfirm}
+            disabled={isDeleting}
+          >
+            {isDeleting ? '삭제 중...' : '삭제'}
+          </Button>
+        </div>
       </Modal>
     </div>
   );

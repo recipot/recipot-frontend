@@ -16,8 +16,13 @@ interface RecipeTableDataContextValue {
   conditions: Array<{ id: number; name: string }>;
   editedRecipes: Map<number, Partial<RecipeUpdateRequest>>;
   editingCell: { field: string; recipeId: number } | null;
+  expandedStepsRecipeId: number | null;
   foodList: Food[];
-  modalState: { recipeId: number; type: ModalType } | null;
+  modalState: {
+    recipeId: number;
+    type: ModalType;
+    stepOrderNum?: number;
+  } | null;
   recipes: AdminRecipe[];
   selectedCell: { field: string; recipeId: number } | null;
   selectedIds: Set<number>;

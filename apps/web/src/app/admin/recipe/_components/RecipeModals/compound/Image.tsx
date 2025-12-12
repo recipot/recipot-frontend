@@ -29,24 +29,23 @@ export default function RecipeModalsImage() {
   const [imageUrlInput, setImageUrlInput] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [isUploading, setIsUploading] = useState(false);
-  const [initialImageUrl, setInitialImageUrl] = useState<string>('');
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isOpen = modalState?.type === 'image';
-  const { recipeId } = modalState ?? {};
+  const { recipeId, stepOrderNum } = modalState ?? {};
   const targetRecipe = recipeId ? recipes.find(r => r.id === recipeId) : null;
   const editedData = recipeId ? editedRecipes.get(recipeId) : undefined;
-  const currentImageUrl = editedData?.imageUrl ?? targetRecipe?.imageUrl;
+  const isStepImage = stepOrderNum !== undefined;
+  const currentImageUrl = isStepImage
+    ? (editedData?.steps?.find(s => s.orderNum === stepOrderNum)?.imageUrl ??
+      targetRecipe?.steps?.find(s => s.orderNum === stepOrderNum)?.imageUrl)
+    : (editedData?.imageUrl ?? targetRecipe?.imageUrl);
 
   useEffect(() => {
     if (isOpen && currentImageUrl !== undefined) {
       const initialUrl = currentImageUrl ?? '';
-      setSelectedFile(null);
-      setPreviewUrl(null);
       setImageUrlInput(initialUrl);
-      setInitialImageUrl(initialUrl);
-      setErrorMessage('');
-      setIsUploading(false);
     }
   }, [isOpen, currentImageUrl]);
 
@@ -101,7 +100,17 @@ export default function RecipeModalsImage() {
     }
 
     if (urlToSave) {
-      updateEditedRecipe(targetRecipe.id, { imageUrl: urlToSave });
+      if (isStepImage && stepOrderNum !== undefined) {
+        const currentSteps = editedData?.steps ?? targetRecipe?.steps ?? [];
+        const updatedSteps = currentSteps.map(step =>
+          step.orderNum === stepOrderNum
+            ? { ...step, imageUrl: urlToSave }
+            : step
+        );
+        updateEditedRecipe(targetRecipe.id, { steps: updatedSteps });
+      } else {
+        updateEditedRecipe(targetRecipe.id, { imageUrl: urlToSave });
+      }
       closeModal();
       // 상태 초기화
       setSelectedFile(null);
@@ -110,24 +119,6 @@ export default function RecipeModalsImage() {
       }
       setPreviewUrl(null);
       setErrorMessage('');
-    }
-  };
-
-  const handleClose = () => {
-    if (previewUrl) {
-      URL.revokeObjectURL(previewUrl);
-    }
-    setSelectedFile(null);
-    setPreviewUrl(null);
-    closeModal();
-  };
-
-  const handleOpenChange = (open: boolean) => {
-    if (!open) {
-      // 수정사항이 없으면 X 버튼으로 닫을 수 있음
-      if (!(imageUrlInput !== initialImageUrl || selectedFile !== null)) {
-        handleClose();
-      }
     }
   };
 
@@ -141,13 +132,15 @@ export default function RecipeModalsImage() {
   if (!isOpen || !targetRecipe) return null;
 
   return (
-    <Dialog open onOpenChange={handleOpenChange}>
-      <DialogContent className="max-w-md">
+    <Dialog open onOpenChange={closeModal}>
+      <DialogContent className="max-w-md" showCloseButton>
         <VisuallyHidden asChild>
           <DialogTitle className="text-18sb">대표 이미지</DialogTitle>
         </VisuallyHidden>
         <DialogHeader>
-          <DialogTitle className="text-18sb">대표 이미지</DialogTitle>
+          <DialogTitle className="text-18sb">
+            {isStepImage ? `Step ${stepOrderNum} 이미지` : '대표 이미지'}
+          </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -227,9 +220,6 @@ export default function RecipeModalsImage() {
         </div>
 
         <div className="flex justify-end gap-2 pt-4">
-          <Button variant="outline" onClick={handleClose}>
-            취소
-          </Button>
           <Button
             onClick={handleSave}
             disabled={(!imageUrlInput && !currentImageUrl) || isUploading}
@@ -241,4 +231,3 @@ export default function RecipeModalsImage() {
     </Dialog>
   );
 }
-
