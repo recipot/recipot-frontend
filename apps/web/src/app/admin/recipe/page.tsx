@@ -47,8 +47,8 @@ export default function AdminRecipePage() {
       try {
         const data = await condition.getConditions();
         setConditions(data);
-      } catch (error) {
-        console.error('컨디션 조회 실패:', error);
+      } catch {
+        showToast('컨디션 조회 실패');
       }
     };
     fetchConditions();
