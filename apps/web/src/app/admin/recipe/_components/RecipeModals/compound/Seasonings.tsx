@@ -98,12 +98,26 @@ export default function RecipeModalsSeasonings() {
     staleTime: 0,
   });
 
-  // 모달이 열릴 때 초기값 저장
+  // 모달이 열릴 때 초기값 저장 및 편집 state 초기화
   useEffect(() => {
     if (isOpen && apiSeasonings !== undefined && !isLoadingSeasonings) {
       setSeasonings(apiSeasonings);
+      setEditingId(null);
+      setEditingQuantity('');
+      setSearchTerm('');
+      setFocusedIndex(-1);
     }
   }, [isOpen, apiSeasonings, isLoadingSeasonings]);
+
+  // 모달이 닫힐 때 편집 state 초기화
+  useEffect(() => {
+    if (!isOpen) {
+      setEditingId(null);
+      setEditingQuantity('');
+      setSearchTerm('');
+      setFocusedIndex(-1);
+    }
+  }, [isOpen]);
 
   // 검색어가 변경되면 포커스 인덱스 초기화
   useEffect(() => {
@@ -128,6 +142,9 @@ export default function RecipeModalsSeasonings() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // 이미 추가된 양념 ID 목록
+  const addedSeasoningIds = new Set(seasonings.map(s => s.id));
+
   const filteredSeasonings = availableSeasonings.filter(seasoning =>
     seasoning.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -135,6 +152,11 @@ export default function RecipeModalsSeasonings() {
   const handleAddSeasoning = (seasoningId: number) => {
     const seasoning = availableSeasonings.find(s => s.id === seasoningId);
     if (!seasoning) return;
+
+    // 이미 추가된 양념인지 확인
+    if (addedSeasoningIds.has(seasoningId)) {
+      return;
+    }
 
     setSeasonings([
       ...seasonings,
@@ -144,37 +166,60 @@ export default function RecipeModalsSeasonings() {
     setFocusedIndex(-1);
   };
 
+  // 활성화된 양념만 필터링 (키보드 네비게이션용)
+  const enabledFilteredSeasonings = filteredSeasonings.filter(
+    seasoning => !addedSeasoningIds.has(seasoning.id)
+  );
+
   // 키보드 이벤트 핸들러
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (!searchTerm || filteredSeasonings.length === 0) return;
+    if (!searchTerm || enabledFilteredSeasonings.length === 0) return;
 
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
         setFocusedIndex(prev => {
-          const nextIndex = prev < filteredSeasonings.length - 1 ? prev + 1 : 0;
-          itemRefs.current[nextIndex]?.scrollIntoView({
-            behavior: 'smooth',
-            block: 'nearest',
-          });
+          const nextIndex =
+            prev < enabledFilteredSeasonings.length - 1 ? prev + 1 : 0;
+          // 실제 filteredSeasonings에서의 인덱스 찾기
+          const actualIndex = filteredSeasonings.findIndex(
+            s => s.id === enabledFilteredSeasonings[nextIndex]?.id
+          );
+          if (actualIndex >= 0) {
+            itemRefs.current[actualIndex]?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'nearest',
+            });
+          }
           return nextIndex;
         });
         break;
       case 'ArrowUp':
         e.preventDefault();
         setFocusedIndex(prev => {
-          const nextIndex = prev > 0 ? prev - 1 : filteredSeasonings.length - 1;
-          itemRefs.current[nextIndex]?.scrollIntoView({
-            behavior: 'smooth',
-            block: 'nearest',
-          });
+          const nextIndex =
+            prev > 0 ? prev - 1 : enabledFilteredSeasonings.length - 1;
+          // 실제 filteredSeasonings에서의 인덱스 찾기
+          const actualIndex = filteredSeasonings.findIndex(
+            seasoning =>
+              seasoning.id === enabledFilteredSeasonings[nextIndex]?.id
+          );
+          if (actualIndex >= 0) {
+            itemRefs.current[actualIndex]?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'nearest',
+            });
+          }
           return nextIndex;
         });
         break;
       case 'Enter':
         e.preventDefault();
-        if (focusedIndex >= 0 && focusedIndex < filteredSeasonings.length) {
-          const seasoning = filteredSeasonings[focusedIndex];
+        if (
+          focusedIndex >= 0 &&
+          focusedIndex < enabledFilteredSeasonings.length
+        ) {
+          const seasoning = enabledFilteredSeasonings[focusedIndex];
           handleAddSeasoning(seasoning.id);
         }
         break;
@@ -205,17 +250,17 @@ export default function RecipeModalsSeasonings() {
 
   const handleQuantityChange = (value: string) => {
     setEditingQuantity(value);
-    if (editingId === null) return;
-
-    // 단위는 항상 '큰술'로 고정
-    const amount = formatAmount(value, SEASONING_UNITS[0]);
-    setSeasonings(
-      seasonings.map(sea => (sea.id === editingId ? { ...sea, amount } : sea))
-    );
   };
 
   const handleQuantityBlur = () => {
     if (editingId === null) return;
+
+    // 편집 완료 시 seasonings 배열 업데이트
+    const amount = formatAmount(editingQuantity, SEASONING_UNITS[0]);
+    setSeasonings(
+      seasonings.map(sea => (sea.id === editingId ? { ...sea, amount } : sea))
+    );
+
     setEditingId(null);
     setEditingQuantity('');
   };
@@ -226,12 +271,17 @@ export default function RecipeModalsSeasonings() {
       handleQuantityBlur();
     } else if (e.key === 'Escape') {
       e.preventDefault();
+      if (editingId === null) return;
+
+      // 원본 값으로 복원
       const seasoning = seasonings.find(sea => sea.id === editingId);
       if (seasoning) {
         const { quantity } = parseAmount(seasoning.amount);
         setEditingQuantity(quantity);
       }
-      handleQuantityBlur();
+
+      setEditingId(null);
+      setEditingQuantity('');
     }
   };
 
@@ -287,24 +337,48 @@ export default function RecipeModalsSeasonings() {
                   ref={dropdownRef}
                   className="absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded border bg-white shadow-lg"
                 >
-                  {filteredSeasonings.map((seasoning, index) => (
-                    <button
-                      key={seasoning.id}
-                      ref={el => handleItemRef(index, el)}
-                      type="button"
-                      onClick={() => handleAddSeasoning(seasoning.id)}
-                      className={`w-full px-3 py-2 text-left hover:bg-gray-100 ${
-                        focusedIndex === index ? 'bg-gray-100' : ''
-                      }`}
-                      onMouseEnter={() => setFocusedIndex(index)}
-                    >
-                      <HighlightText
-                        text={seasoning.name}
-                        searchQuery={searchTerm}
-                        highlightClassName="text-primary font-bold"
-                      />
-                    </button>
-                  ))}
+                  {filteredSeasonings.map((seasoning, index) => {
+                    const isAdded = addedSeasoningIds.has(seasoning.id);
+                    // 활성화된 항목 중에서의 인덱스 찾기
+                    const enabledIndex = enabledFilteredSeasonings.findIndex(
+                      s => s.id === seasoning.id
+                    );
+                    const isFocused =
+                      enabledIndex >= 0 && focusedIndex === enabledIndex;
+
+                    return (
+                      <button
+                        key={seasoning.id}
+                        ref={el => handleItemRef(index, el)}
+                        type="button"
+                        onClick={() =>
+                          !isAdded && handleAddSeasoning(seasoning.id)
+                        }
+                        disabled={isAdded}
+                        className={`w-full px-3 py-2 text-left ${
+                          isAdded
+                            ? 'cursor-not-allowed bg-gray-50 text-gray-400'
+                            : 'hover:bg-gray-100'
+                        } ${isFocused && !isAdded ? 'bg-gray-100' : ''}`}
+                        onMouseEnter={() => {
+                          if (!isAdded && enabledIndex >= 0) {
+                            setFocusedIndex(enabledIndex);
+                          }
+                        }}
+                      >
+                        <HighlightText
+                          text={seasoning.name}
+                          searchQuery={searchTerm}
+                          highlightClassName="text-primary font-bold"
+                        />
+                        {isAdded && (
+                          <span className="ml-2 text-xs text-gray-400">
+                            (이미 추가됨)
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
               )}
             </div>

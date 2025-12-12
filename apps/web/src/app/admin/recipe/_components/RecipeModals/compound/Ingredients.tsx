@@ -98,12 +98,28 @@ export default function RecipeModalsIngredients() {
     staleTime: 0,
   });
 
-  // 모달이 열릴 때 초기값 저장
+  // 모달이 열릴 때 초기값 저장 및 편집 state 초기화
   useEffect(() => {
     if (isOpen && apiIngredients !== undefined && !isLoadingIngredients) {
       setIngredients(apiIngredients);
+      setEditingId(null);
+      setEditingQuantity('');
+      setEditingUnit('');
+      setSearchTerm('');
+      setFocusedIndex(-1);
     }
   }, [isOpen, apiIngredients, isLoadingIngredients]);
+
+  // 모달이 닫힐 때 편집 state 초기화
+  useEffect(() => {
+    if (!isOpen) {
+      setEditingId(null);
+      setEditingQuantity('');
+      setEditingUnit('');
+      setSearchTerm('');
+      setFocusedIndex(-1);
+    }
+  }, [isOpen]);
 
   // 검색어가 변경되면 포커스 인덱스 초기화
   useEffect(() => {
@@ -214,31 +230,24 @@ export default function RecipeModalsIngredients() {
   // 계량량
   const handleQuantityChange = (value: string) => {
     setEditingQuantity(value);
-    if (editingId === null) return;
-
-    // quantity와 unit을 합쳐서 저장
-    const amount = formatAmount(value, editingUnit);
-    setIngredients(
-      ingredients.map(ingredient =>
-        ingredient.id === editingId ? { ...ingredient, amount } : ingredient
-      )
-    );
   };
 
   // 계량단위
   const handleUnitChange = (value: string) => {
     setEditingUnit(value);
-    if (editingId === null) return;
-
-    // quantity와 unit을 합쳐서 저장
-    const amount = formatAmount(editingQuantity, value);
-    setIngredients(
-      ingredients.map(ing => (ing.id === editingId ? { ...ing, amount } : ing))
-    );
   };
 
   const handleEditBlur = () => {
     if (editingId === null) return;
+
+    // 편집 완료 시 ingredients 배열 업데이트
+    const amount = formatAmount(editingQuantity, editingUnit);
+    setIngredients(
+      ingredients.map(ingredient =>
+        ingredient.id === editingId ? { ...ingredient, amount } : ingredient
+      )
+    );
+
     setEditingId(null);
     setEditingQuantity('');
     setEditingUnit('');
@@ -250,6 +259,7 @@ export default function RecipeModalsIngredients() {
       handleEditBlur();
     } else if (e.key === 'Escape') {
       e.preventDefault();
+      // 원본 값으로 복원
       const ingredient = ingredients.find(ing => ing.id === editingId);
       if (ingredient) {
         const { quantity, unit } = parseAmount(ingredient.amount);
