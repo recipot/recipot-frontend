@@ -81,7 +81,7 @@ export interface AdminRecipe {
     orderNum: number;
     summary: string;
     content: string;
-    imageUrl?: string;
+    imageUrl: string;
   }[];
 }
 
@@ -117,7 +117,7 @@ export interface RecipeUpdateRequest {
     orderNum: number;
     summary: string;
     content: string;
-    imageUrl?: string;
+    imageUrl: string;
   }[];
 }
 
@@ -143,7 +143,7 @@ export interface RecipePutRequest {
   }[];
   steps: {
     orderNum: number;
-    imageUrl?: string;
+    imageUrl: string;
     summary: string;
     content: string;
   }[];

@@ -44,9 +44,9 @@ const RecipeUpdateRequestSchema = z.object({
     .array(
       z.object({
         content: z.string().min(1),
-        imageUrl: z.union([z.string().min(1), z.undefined()]),
+        imageUrl: z.string(),
         orderNum: z.number().min(0),
-        summary: z.string().min(1),
+        summary: z.string(),
       })
     )
     .min(1),

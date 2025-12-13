@@ -201,7 +201,7 @@ function ImageCell() {
   if (currentValues.imageUrl) {
     return (
       <TableCell
-        className={`relative ${isSelected ? 'border-2 border-blue-500' : ''}`}
+        className={`relative ${isSelected ? 'border-primary' : ''}`}
         onClick={e => {
           e.stopPropagation();
           setSelectedCell({ field: 'image', recipeId: recipeItem.id });
@@ -225,7 +225,7 @@ function ImageCell() {
 
   return (
     <TableCell
-      className={`relative ${isSelected ? 'border-2 border-blue-500' : ''}`}
+      className={`relative ${isSelected ? 'border-primary' : ''}`}
       onClick={e => {
         e.stopPropagation();
         setSelectedCell({ field: 'image', recipeId: recipeItem.id });
@@ -285,7 +285,7 @@ function DurationCell() {
 
   return (
     <TableCell
-      className={isSelected ? 'border-2 border-blue-500' : ''}
+      className={isSelected ? 'border-primary' : ''}
       onClick={e => {
         e.stopPropagation();
         setSelectedCell({ field: 'duration', recipeId: recipeItem.id });
@@ -339,7 +339,7 @@ function ConditionCell() {
 
   return (
     <TableCell
-      className={`relative ${isSelected ? 'border-2 border-blue-500' : ''}`}
+      className={`relative ${isSelected ? 'border-primary' : ''}`}
       onClick={e => {
         e.stopPropagation();
         setSelectedCell({ field: 'condition', recipeId: recipeItem.id });
@@ -407,7 +407,7 @@ function DescriptionCell() {
 
   return (
     <TableCell
-      className={isSelected ? 'border-2 border-blue-500' : ''}
+      className={isSelected ? 'border-primary' : ''}
       onClick={e => {
         e.stopPropagation();
         setSelectedCell({ field: 'description', recipeId: recipeItem.id });
@@ -469,7 +469,7 @@ function ToolsCell() {
 
   return (
     <TableCell
-      className={`relative ${isSelected ? 'border-2 border-blue-500' : ''}`}
+      className={`relative ${isSelected ? 'border-primary' : ''}`}
       onClick={e => {
         e.stopPropagation();
         setSelectedCell({ field: 'tools', recipeId: recipeItem.id });
@@ -524,7 +524,7 @@ function IngredientsCell() {
 
   return (
     <TableCell
-      className={isSelected ? 'border-2 border-blue-500' : ''}
+      className={isSelected ? 'border-primary' : ''}
       onClick={e => {
         e.stopPropagation();
         setSelectedCell({ field: 'ingredients', recipeId: recipeItem.id });
@@ -571,7 +571,7 @@ function IrreplaceableIngredientsCell() {
 
   return (
     <TableCell
-      className={isSelected ? 'border-2 border-blue-500' : ''}
+      className={isSelected ? 'border-primary' : ''}
       onClick={e => {
         e.stopPropagation();
         setSelectedCell({
@@ -598,7 +598,7 @@ function SeasoningsCell() {
 
   return (
     <TableCell
-      className={isSelected ? 'border-2 border-blue-500' : ''}
+      className={isSelected ? 'border-primary' : ''}
       onClick={e => {
         e.stopPropagation();
         setSelectedCell({ field: 'seasonings', recipeId: recipeItem.id });
@@ -653,7 +653,7 @@ function StepsCell() {
 
   return (
     <TableCell
-      className={isSelected ? 'border-2 border-blue-500' : ''}
+      className={isSelected ? 'border-primary' : ''}
       onClick={handleClick}
     >
       <div className="cursor-pointer hover:bg-gray-50">
@@ -684,7 +684,7 @@ function ExpandedStepsRow() {
     updateEditedRecipe(recipeItem.id, {
       steps: updatedSteps.map(step => ({
         ...step,
-        summary: step.summary ?? '',
+        summary: step.summary,
       })),
     });
     setEditingCell(null);
@@ -733,7 +733,7 @@ function ExpandedStepsRow() {
                     </div>
                     {isEditingStep(step.orderNum) ? (
                       <EditableTextarea
-                        value={step.content ?? step.summary ?? ''}
+                        value={step.content ?? step.summary}
                         onSave={value =>
                           handleStepContentSave(step.orderNum, String(value))
                         }
@@ -749,7 +749,7 @@ function ExpandedStepsRow() {
                         }
                         className="min-h-[3rem] cursor-pointer rounded p-2 text-sm whitespace-pre-wrap text-gray-700 hover:bg-gray-50"
                       >
-                        {step.content ?? step.summary ?? (
+                        {(step.content ?? step.summary) || (
                           <span className="text-gray-400">
                             더블클릭하여 입력
                           </span>

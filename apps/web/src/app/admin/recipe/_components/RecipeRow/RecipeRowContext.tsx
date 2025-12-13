@@ -9,23 +9,23 @@ interface CurrentValues {
   description: string;
   duration: string | number;
   imageUrl: string | undefined;
-  ingredients: Array<{
+  ingredients: {
     id: number;
     amount: string;
     isAlternative: boolean;
-  }>;
-  seasonings: Array<{
+  }[];
+  seasonings: {
     id: number;
     amount: string;
-  }>;
-  steps: Array<{
+  }[];
+  steps: {
     content: string;
     orderNum: number;
-    summary?: string;
-    imageUrl?: string;
-  }>;
+    summary: string;
+    imageUrl: string;
+  }[];
   title: string;
-  tools: Array<{ id: number }>;
+  tools: { id: number }[];
 }
 
 interface RecipeRowContextValue {
