@@ -36,7 +36,7 @@ describe('Modal 컴포넌트', () => {
       </Modal>
     );
 
-    const closeButton = screen.getByRole('button', { name: /close/i });
+    const closeButton = screen.getByRole('button', { name: /모달 닫기/i });
     fireEvent.click(closeButton);
 
     expect(handleOpenChange).toHaveBeenCalledWith(false);
