@@ -21,33 +21,56 @@ import { normalizeImageUrl } from '@/lib/url';
  * 이미지 수정 모달 컴포넌트
  */
 export default function RecipeModalsImage() {
-  const { editedRecipes, modalState, recipes } = useRecipeTableDataContext();
+  const { modalState, recipes } = useRecipeTableDataContext();
+
   const { closeModal, updateEditedRecipe } = useRecipeTableActionsContext();
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [imageUrlInput, setImageUrlInput] = useState<string>('');
+  const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [isUploading, setIsUploading] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const isOpen = modalState?.type === 'image';
-  const { recipeId, stepOrderNum } = modalState ?? {};
-  const targetRecipe = recipeId ? recipes.find(r => r.id === recipeId) : null;
-  const editedData = recipeId ? editedRecipes.get(recipeId) : undefined;
-  const isStepImage = stepOrderNum !== undefined;
-  const currentImageUrl = isStepImage
-    ? (editedData?.steps?.find(s => s.orderNum === stepOrderNum)?.imageUrl ??
-      targetRecipe?.steps?.find(s => s.orderNum === stepOrderNum)?.imageUrl)
-    : (editedData?.imageUrl ?? targetRecipe?.imageUrl);
+  // 모달이 이미지 모달인지 확인
+  const isImageModalOpen = modalState?.type === 'image';
 
+  // modalState에서 필요한 정보 추출
+  const recipeId = modalState?.recipeId;
+  const stepOrderNum = modalState?.stepOrderNum;
+
+  // 레시피 찾기
+  const targetRecipe = recipeId ? recipes.find(r => r.id === recipeId) : null;
+
+  // 모드 구분: stepOrderNum이 있으면 step 이미지 모드, 없으면 대표 이미지 모드
+  const isStepImageMode = stepOrderNum !== undefined;
+
+  // 대표 이미지 관련 데이터
+  const mainImageUrl = targetRecipe?.imageUrl ?? null;
+
+  // Step 이미지 관련 데이터
+
+  const targetStep = isStepImageMode
+    ? targetRecipe?.steps?.find(s => s.orderNum === stepOrderNum)
+    : null;
+  const stepImageUrl = targetStep?.imageUrl ?? null;
+
+  // 현재 모드에 맞는 이미지 URL 선택
+  const currentImageUrl = isStepImageMode ? stepImageUrl : mainImageUrl;
+
+  // 모달이 닫힐 때 상태 초기화
   useEffect(() => {
-    if (isOpen && currentImageUrl !== undefined) {
-      const initialUrl = currentImageUrl ?? '';
-      setImageUrlInput(initialUrl);
+    if (!isImageModalOpen) {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+      setSelectedFile(null);
+      setPreviewUrl(null);
+      setUploadedUrl(null);
+      setErrorMessage('');
     }
-  }, [isOpen, currentImageUrl]);
+  }, [isImageModalOpen, previewUrl]);
 
   const handleFileSelect = () => {
     fileInputRef.current?.click();
@@ -63,12 +86,12 @@ export default function RecipeModalsImage() {
     setIsUploading(true);
 
     try {
-      const uploadedUrl = await upload.uploadImage(file);
-      setImageUrlInput(uploadedUrl);
+      const url = await upload.uploadImage(file);
+      setUploadedUrl(url);
     } catch (error) {
       console.error('이미지 업로드 실패:', error);
       setErrorMessage('이미지 업로드에 실패했습니다. 다시 시도해주세요.');
-      setImageUrlInput('');
+      setUploadedUrl(null);
     } finally {
       setIsUploading(false);
     }
@@ -82,54 +105,36 @@ export default function RecipeModalsImage() {
       return;
     }
 
-    let urlToSave: string | null = null;
+    // 업로드된 URL이 있으면 우선 사용, 없으면 현재 이미지 URL 사용
+    const urlToSave = uploadedUrl ?? currentImageUrl;
 
-    if (imageUrlInput) {
-      if (imageUrlInput.startsWith('blob:')) {
-        setErrorMessage(
-          'Blob URL은 저장할 수 없습니다. 실제 이미지 URL을 입력해주세요.'
-        );
-        return;
-      }
-      urlToSave = imageUrlInput;
-    } else if (currentImageUrl) {
-      urlToSave = currentImageUrl;
-    } else {
+    if (!urlToSave) {
       setErrorMessage('이미지 URL을 입력하거나 파일을 업로드해주세요.');
       return;
     }
 
-    if (urlToSave) {
-      if (isStepImage && stepOrderNum !== undefined) {
-        const currentSteps = editedData?.steps ?? targetRecipe?.steps ?? [];
-        const updatedSteps = currentSteps.map(step =>
-          step.orderNum === stepOrderNum
-            ? { ...step, imageUrl: urlToSave }
-            : step
-        );
-        updateEditedRecipe(targetRecipe.id, { steps: updatedSteps });
-      } else {
-        updateEditedRecipe(targetRecipe.id, { imageUrl: urlToSave });
-      }
-      closeModal();
-      // 상태 초기화
-      setSelectedFile(null);
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl);
-      }
-      setPreviewUrl(null);
-      setErrorMessage('');
+    // 모드에 따라 저장 로직 분리
+    if (isStepImageMode) {
+      // Step 이미지 저장: 해당 step의 imageUrl만 업데이트
+      const currentSteps = targetRecipe?.steps ?? [];
+      const updatedSteps = currentSteps.map(step =>
+        step.orderNum === stepOrderNum ? { ...step, imageUrl: urlToSave } : step
+      );
+      updateEditedRecipe(targetRecipe.id, { steps: updatedSteps });
+    } else {
+      // 대표 이미지 저장: 레시피의 imageUrl 업데이트
+      updateEditedRecipe(targetRecipe.id, { imageUrl: urlToSave });
     }
+    closeModal();
   };
 
-  const displayFileName = (() => {
-    if (selectedFile) return selectedFile.name;
-    if (currentImageUrl)
-      return currentImageUrl.split('/').pop() ?? currentImageUrl;
-    return '';
-  })();
+  const displayFileName = selectedFile
+    ? selectedFile.name
+    : currentImageUrl
+      ? (currentImageUrl.split('/').pop() ?? currentImageUrl)
+      : '';
 
-  if (!isOpen || !targetRecipe) return null;
+  if (!isImageModalOpen || !targetRecipe) return null;
 
   return (
     <Dialog open onOpenChange={closeModal}>
@@ -139,7 +144,7 @@ export default function RecipeModalsImage() {
         </VisuallyHidden>
         <DialogHeader>
           <DialogTitle className="text-18sb">
-            {isStepImage ? `Step ${stepOrderNum} 이미지` : '대표 이미지'}
+            {isStepImageMode ? `Step ${stepOrderNum} 이미지` : '대표 이미지'}
           </DialogTitle>
         </DialogHeader>
 
@@ -154,12 +159,11 @@ export default function RecipeModalsImage() {
           </div>
 
           <div className="flex flex-col items-center justify-between gap-2">
-            <div className="flex-1">
-              <div className="text-18sb mt-1">
-                {displayFileName ?? '이미지 없음'}
+            {displayFileName && (
+              <div className="w-full">
+                <div className="text-22">{displayFileName}</div>
               </div>
-            </div>
-
+            )}
             <input
               ref={fileInputRef}
               type="file"
@@ -189,16 +193,13 @@ export default function RecipeModalsImage() {
                   priority
                 />
               </div>
-            ) : imageUrlInput ? (
+            ) : uploadedUrl ? (
               <div className="relative h-full min-h-[300px] w-full">
                 <Image
-                  src={normalizeImageUrl(imageUrlInput)}
-                  alt="이미지 미리보기"
+                  src={normalizeImageUrl(uploadedUrl)}
+                  alt="업로드된 이미지"
                   fill
                   className="object-contain"
-                  onError={() => {
-                    // 이미지 로드 실패 시 처리 (선택사항)
-                  }}
                 />
               </div>
             ) : currentImageUrl ? (
@@ -222,7 +223,7 @@ export default function RecipeModalsImage() {
         <div className="flex justify-end gap-2 pt-4">
           <Button
             onClick={handleSave}
-            disabled={(!imageUrlInput && !currentImageUrl) || isUploading}
+            disabled={(!uploadedUrl && !currentImageUrl) || isUploading}
           >
             저장
           </Button>

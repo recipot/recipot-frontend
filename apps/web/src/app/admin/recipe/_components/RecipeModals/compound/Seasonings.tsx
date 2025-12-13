@@ -19,7 +19,7 @@ import { Input } from '@/components/ui/input';
 
 interface Seasoning {
   id: number;
-  name: string;
+  name?: string;
   amount: string;
 }
 
@@ -54,8 +54,9 @@ const formatAmount = (quantity: string, unit: string): string => {
  * 양념 수정 모달 컴포넌트
  */
 export default function RecipeModalsSeasonings() {
-  const { availableSeasonings, modalState, recipes } =
+  const { availableSeasonings, editedRecipes, modalState, recipes } =
     useRecipeTableDataContext();
+
   const { closeModal, updateEditedRecipe } = useRecipeTableActionsContext();
 
   const [seasonings, setSeasonings] = useState<Seasoning[]>([]);
@@ -77,10 +78,16 @@ export default function RecipeModalsSeasonings() {
   const isOpen = modalState?.type === 'seasonings';
   const { recipeId } = modalState ?? {};
   const targetRecipe = recipeId ? recipes.find(r => r.id === recipeId) : null;
+  const editedData = recipeId ? editedRecipes.get(recipeId) : undefined;
 
   // 모달이 열릴 때 API로 양념 데이터 가져오기
+  // editedRecipes에 데이터가 있으면 API 호출하지 않음
   const { data: apiSeasonings, isLoading: isLoadingSeasonings } = useQuery({
-    enabled: isOpen && recipeId !== undefined && recipeId >= 0,
+    enabled:
+      isOpen &&
+      recipeId !== undefined &&
+      recipeId >= 0 &&
+      !editedData?.seasonings,
     queryFn: async () => {
       if (!recipeId || recipeId < 0) return [];
       const { seasonings } = await recipe.getRecipeSeasonings(recipeId);
@@ -95,29 +102,49 @@ export default function RecipeModalsSeasonings() {
       );
     },
     queryKey: ['recipe-seasonings', recipeId],
-    staleTime: 0,
+    staleTime: 5 * 60 * 1000, // 5분간 캐시 유지
   });
 
   // 모달이 열릴 때 초기값 저장 및 편집 state 초기화
-  useEffect(() => {
-    if (isOpen && apiSeasonings !== undefined && !isLoadingSeasonings) {
-      setSeasonings(apiSeasonings);
-      setEditingId(null);
-      setEditingQuantity('');
-      setSearchTerm('');
-      setFocusedIndex(-1);
-    }
-  }, [isOpen, apiSeasonings, isLoadingSeasonings]);
 
-  // 모달이 닫힐 때 편집 state 초기화
   useEffect(() => {
-    if (!isOpen) {
-      setEditingId(null);
-      setEditingQuantity('');
-      setSearchTerm('');
-      setFocusedIndex(-1);
+    if (!isOpen || !recipeId) return;
+
+    if (editedData?.seasonings) {
+      setSeasonings(editedData.seasonings as Seasoning[]);
+    } else if (apiSeasonings !== undefined && !isLoadingSeasonings) {
+      setSeasonings(recipeId < 0 ? [] : apiSeasonings);
     }
-  }, [isOpen]);
+
+    // 편집 state 초기화
+    setEditingId(null);
+    setEditingQuantity('');
+    setSearchTerm('');
+    setFocusedIndex(-1);
+  }, [
+    isOpen,
+    recipeId,
+    editedData?.seasonings,
+    apiSeasonings,
+    isLoadingSeasonings,
+  ]);
+
+  // 모달이 닫힐 때 편집 내용을 editedRecipes에 자동 저장
+  useEffect(() => {
+    if (!isOpen || !targetRecipe || seasonings.length === 0) {
+      // 편집 state만 초기화
+      if (!isOpen) {
+        setEditingId(null);
+        setEditingQuantity('');
+        setSearchTerm('');
+        setFocusedIndex(-1);
+      }
+      return;
+    }
+
+    // 모달이 닫힐 때 편집 내용을 자동 저장
+    updateEditedRecipe(targetRecipe.id, { seasonings });
+  }, [isOpen, targetRecipe, seasonings, updateEditedRecipe]);
 
   // 검색어가 변경되면 포커스 인덱스 초기화
   useEffect(() => {
@@ -351,9 +378,7 @@ export default function RecipeModalsSeasonings() {
                         key={seasoning.id}
                         ref={el => handleItemRef(index, el)}
                         type="button"
-                        onClick={() =>
-                          !isAdded && handleAddSeasoning(seasoning.id)
-                        }
+                        onClick={() => handleAddSeasoning(seasoning.id)}
                         disabled={isAdded}
                         className={`w-full px-3 py-2 text-left ${
                           isAdded
@@ -361,7 +386,7 @@ export default function RecipeModalsSeasonings() {
                             : 'hover:bg-gray-100'
                         } ${isFocused && !isAdded ? 'bg-gray-100' : ''}`}
                         onMouseEnter={() => {
-                          if (!isAdded && enabledIndex >= 0) {
+                          if (enabledIndex >= 0) {
                             setFocusedIndex(enabledIndex);
                           }
                         }}
@@ -372,7 +397,7 @@ export default function RecipeModalsSeasonings() {
                           highlightClassName="text-primary font-bold"
                         />
                         {isAdded && (
-                          <span className="ml-2 text-xs text-gray-400">
+                          <span className="ml-2 text-xs text-red-400">
                             (이미 추가됨)
                           </span>
                         )}

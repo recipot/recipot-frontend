@@ -19,7 +19,7 @@ import { Input } from '@/components/ui/input';
 
 interface Ingredient {
   id: number;
-  name: string;
+  name?: string;
   amount: string;
   isAlternative: boolean;
 }
@@ -60,7 +60,9 @@ const formatAmount = (quantity: string, unit: string): string => {
  * 재료 수정 모달 컴포넌트
  */
 export default function RecipeModalsIngredients() {
-  const { foodList, modalState, recipes } = useRecipeTableDataContext();
+  const { editedRecipes, foodList, modalState, recipes } =
+    useRecipeTableDataContext();
+
   const { closeModal, updateEditedRecipe } = useRecipeTableActionsContext();
 
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
@@ -76,11 +78,20 @@ export default function RecipeModalsIngredients() {
 
   const isOpen = modalState?.type === 'ingredients';
   const { recipeId } = modalState ?? {};
-  const targetRecipe = recipeId ? recipes.find(r => r.id === recipeId) : null;
+  const targetRecipe = recipeId ? recipes.find(r => r.id === recipeId) : null; // 선택한 레시피
+
+  const editedData = recipeId ? editedRecipes.get(recipeId) : undefined; // 수정 데이터
+
+  const isApiCall =
+    isOpen &&
+    recipeId !== undefined &&
+    recipeId >= 0 &&
+    !editedData?.ingredients;
 
   // 모달이 열릴 때 API로 재료 데이터 가져오기
+  // editedRecipes에 데이터가 있으면 API 호출하지 않음
   const { data: apiIngredients, isLoading: isLoadingIngredients } = useQuery({
-    enabled: isOpen && recipeId !== undefined && recipeId >= 0,
+    enabled: isApiCall,
     queryFn: async () => {
       if (!recipeId || recipeId < 0) return [];
       const { ingredients } = await recipe.getRecipeIngredients(recipeId);
@@ -95,31 +106,45 @@ export default function RecipeModalsIngredients() {
       );
     },
     queryKey: ['recipe-ingredients', recipeId],
-    staleTime: 0,
+    staleTime: 5 * 60 * 1000, // 5분간 캐시 유지
   });
 
   // 모달이 열릴 때 초기값 저장 및 편집 state 초기화
-  useEffect(() => {
-    if (isOpen && apiIngredients !== undefined && !isLoadingIngredients) {
-      setIngredients(apiIngredients);
-      setEditingId(null);
-      setEditingQuantity('');
-      setEditingUnit('');
-      setSearchTerm('');
-      setFocusedIndex(-1);
-    }
-  }, [isOpen, apiIngredients, isLoadingIngredients]);
 
-  // 모달이 닫힐 때 편집 state 초기화
   useEffect(() => {
-    if (!isOpen) {
-      setEditingId(null);
-      setEditingQuantity('');
-      setEditingUnit('');
-      setSearchTerm('');
-      setFocusedIndex(-1);
+    if (!isOpen || !recipeId) return;
+
+    if (editedData?.ingredients) {
+      setIngredients(editedData.ingredients as Ingredient[]);
+    } else if (apiIngredients !== undefined) {
+      setIngredients(recipeId < 0 ? [] : apiIngredients);
     }
-  }, [isOpen]);
+
+    // 편집 state 초기화
+    setEditingId(null);
+    setEditingQuantity('');
+    setEditingUnit('');
+    setSearchTerm('');
+    setFocusedIndex(-1);
+  }, [isOpen, recipeId, editedData?.ingredients, apiIngredients]);
+
+  // 모달이 닫힐 때 편집 내용을 editedRecipes에 자동 저장
+  useEffect(() => {
+    if (!isOpen || !targetRecipe || ingredients.length === 0) {
+      // 편집 state만 초기화
+      if (!isOpen) {
+        setEditingId(null);
+        setEditingQuantity('');
+        setEditingUnit('');
+        setSearchTerm('');
+        setFocusedIndex(-1);
+      }
+      return;
+    }
+
+    // 모달이 닫힐 때 편집 내용을 자동 저장
+    updateEditedRecipe(targetRecipe.id, { ingredients });
+  }, [isOpen, targetRecipe, ingredients, updateEditedRecipe]);
 
   // 검색어가 변경되면 포커스 인덱스 초기화
   useEffect(() => {
@@ -144,6 +169,9 @@ export default function RecipeModalsIngredients() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // 이미 추가된 재료 ID 목록
+  const addedIngredientIds = new Set(ingredients.map(ing => ing.id));
+
   const filteredFoods = foodList.filter(food =>
     food.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -151,6 +179,11 @@ export default function RecipeModalsIngredients() {
   const handleAddIngredient = (foodId: number) => {
     const food = foodList.find(f => f.id === foodId);
     if (!food) return;
+
+    // 이미 추가된 재료인지 확인
+    if (addedIngredientIds.has(foodId)) {
+      return;
+    }
 
     setIngredients([
       ...ingredients,
@@ -160,37 +193,56 @@ export default function RecipeModalsIngredients() {
     setFocusedIndex(-1);
   };
 
+  // 활성화된 재료만 필터링 (키보드 네비게이션용)
+  const enabledFilteredFoods = filteredFoods.filter(
+    food => !addedIngredientIds.has(food.id)
+  );
+
   // 키보드 이벤트 핸들러
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (!searchTerm || filteredFoods.length === 0) return;
+    if (!searchTerm || enabledFilteredFoods.length === 0) return;
 
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
         setFocusedIndex(prev => {
-          const nextIndex = prev < filteredFoods.length - 1 ? prev + 1 : 0;
-          itemRefs.current[nextIndex]?.scrollIntoView({
-            behavior: 'smooth',
-            block: 'nearest',
-          });
+          const nextIndex =
+            prev < enabledFilteredFoods.length - 1 ? prev + 1 : 0;
+          // 실제 filteredFoods에서의 인덱스 찾기
+          const actualIndex = filteredFoods.findIndex(
+            f => f.id === enabledFilteredFoods[nextIndex]?.id
+          );
+          if (actualIndex >= 0) {
+            itemRefs.current[actualIndex]?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'nearest',
+            });
+          }
           return nextIndex;
         });
         break;
       case 'ArrowUp':
         e.preventDefault();
         setFocusedIndex(prev => {
-          const nextIndex = prev > 0 ? prev - 1 : filteredFoods.length - 1;
-          itemRefs.current[nextIndex]?.scrollIntoView({
-            behavior: 'smooth',
-            block: 'nearest',
-          });
+          const nextIndex =
+            prev > 0 ? prev - 1 : enabledFilteredFoods.length - 1;
+          // 실제 filteredFoods에서의 인덱스 찾기
+          const actualIndex = filteredFoods.findIndex(
+            f => f.id === enabledFilteredFoods[nextIndex]?.id
+          );
+          if (actualIndex >= 0) {
+            itemRefs.current[actualIndex]?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'nearest',
+            });
+          }
           return nextIndex;
         });
         break;
       case 'Enter':
         e.preventDefault();
-        if (focusedIndex >= 0 && focusedIndex < filteredFoods.length) {
-          const food = filteredFoods[focusedIndex];
+        if (focusedIndex >= 0 && focusedIndex < enabledFilteredFoods.length) {
+          const food = enabledFilteredFoods[focusedIndex];
           handleAddIngredient(food.id);
         }
         break;
@@ -322,26 +374,48 @@ export default function RecipeModalsIngredients() {
                   ref={dropdownRef}
                   className="absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded border bg-white shadow-lg"
                 >
-                  {filteredFoods.map((food, index) => (
-                    <button
-                      key={food.id}
-                      ref={el => {
-                        itemRefs.current[index] = el;
-                      }}
-                      type="button"
-                      onClick={() => handleAddIngredient(food.id)}
-                      className={`w-full px-3 py-2 text-left hover:bg-gray-100 ${
-                        focusedIndex === index ? 'bg-gray-100' : ''
-                      }`}
-                      onMouseEnter={() => setFocusedIndex(index)}
-                    >
-                      <HighlightText
-                        text={food.name}
-                        searchQuery={searchTerm}
-                        highlightClassName="text-primary font-bold"
-                      />
-                    </button>
-                  ))}
+                  {filteredFoods.map((food, index) => {
+                    const isAdded = addedIngredientIds.has(food.id);
+                    // 활성화된 항목 중에서의 인덱스 찾기
+                    const enabledIndex = enabledFilteredFoods.findIndex(
+                      filteredFood => filteredFood.id === food.id
+                    );
+                    const isFocused =
+                      enabledIndex >= 0 && focusedIndex === enabledIndex;
+
+                    return (
+                      <button
+                        key={food.id}
+                        ref={el => {
+                          itemRefs.current[index] = el;
+                        }}
+                        type="button"
+                        onClick={() => handleAddIngredient(food.id)}
+                        disabled={isAdded}
+                        className={`w-full px-3 py-2 text-left ${
+                          isAdded
+                            ? 'cursor-not-allowed bg-gray-50 text-gray-400'
+                            : 'hover:bg-gray-100'
+                        } ${isFocused && !isAdded ? 'bg-gray-100' : ''}`}
+                        onMouseEnter={() => {
+                          if (enabledIndex >= 0) {
+                            setFocusedIndex(enabledIndex);
+                          }
+                        }}
+                      >
+                        <HighlightText
+                          text={food.name}
+                          searchQuery={searchTerm}
+                          highlightClassName="text-primary font-bold"
+                        />
+                        {isAdded && (
+                          <span className="ml-2 text-xs text-red-400">
+                            (이미 추가됨)
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
               )}
             </div>

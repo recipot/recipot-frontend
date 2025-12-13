@@ -27,29 +27,17 @@ export function EditableCell({
 
   const normalizedValue = normalizeEmptyValue(value);
   const [isEditing, setIsEditing] = useState(initialEditing);
-  const [editValue, setEditValue] = useState(normalizedValue);
+  const [editValue, setEditValue] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // value prop이 변경될 때 editValue 업데이트 (편집 중이 아닐 때만)
-  useEffect(() => {
-    if (!isEditing) {
-      setEditValue(normalizedValue);
-    }
-  }, [normalizedValue, isEditing]);
-
-  // 편집 모드 진입 시 즉시 포커스 및 선택
+  // 편집 모드 진입 시 즉시 포커스 및 선택, editValue 초기화
   useEffect(() => {
     if (isEditing && inputRef.current) {
+      setEditValue(normalizedValue);
       inputRef.current.focus();
       inputRef.current.select();
     }
-  }, [isEditing]);
-
-  const handleDoubleClick = () => {
-    setIsEditing(true);
-    // 더블클릭 시 빈 문자열로 초기화하여 즉시 입력 가능하도록
-    setEditValue(normalizedValue);
-  };
+  }, [isEditing, normalizedValue]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
@@ -84,6 +72,10 @@ export function EditableCell({
     } else {
       onSave(editValue);
     }
+  };
+
+  const handleDoubleClick = () => {
+    setIsEditing(true);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
