@@ -59,15 +59,6 @@ export function EditableCell({
       const numValue = parseInt(editValue, 10);
       if (!isNaN(numValue) && numValue > 0) {
         onSave(numValue);
-      } else {
-        // 유효하지 않은 값이면 원래 값으로 복원하거나 1로 설정
-        const originalNum = parseInt(normalizedValue, 10);
-        if (!isNaN(originalNum) && originalNum > 0) {
-          setEditValue(normalizedValue);
-        } else {
-          setEditValue('1');
-          onSave(1);
-        }
       }
     } else {
       onSave(editValue);
