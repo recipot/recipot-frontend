@@ -128,23 +128,16 @@ export default function RecipeModalsIngredients() {
     setFocusedIndex(-1);
   }, [isOpen, recipeId, editedData?.ingredients, apiIngredients]);
 
-  // 모달이 닫힐 때 편집 내용을 editedRecipes에 자동 저장
+  // 모달이 닫힐 때 편집 state 초기화
   useEffect(() => {
-    if (!isOpen || !targetRecipe || ingredients.length === 0) {
-      // 편집 state만 초기화
-      if (!isOpen) {
-        setEditingId(null);
-        setEditingQuantity('');
-        setEditingUnit('');
-        setSearchTerm('');
-        setFocusedIndex(-1);
-      }
-      return;
+    if (!isOpen) {
+      setEditingId(null);
+      setEditingQuantity('');
+      setEditingUnit('');
+      setSearchTerm('');
+      setFocusedIndex(-1);
     }
-
-    // 모달이 닫힐 때 편집 내용을 자동 저장
-    updateEditedRecipe(targetRecipe.id, { ingredients });
-  }, [isOpen, targetRecipe, ingredients, updateEditedRecipe]);
+  }, [isOpen]);
 
   // 검색어가 변경되면 포커스 인덱스 초기화
   useEffect(() => {
@@ -328,20 +321,15 @@ export default function RecipeModalsIngredients() {
     closeModal();
   };
 
-  // 검증 로직: 재료가 없거나 계량량/계량단위가 비어있는 경우
-  const validateIngredients = (): boolean => {
+  // 검증 로직: 재료가 없거나 amount가 비어있는 경우
+  const validateIngredients = () => {
     // 재료가 하나도 없으면 false
     if (ingredients.length === 0) {
       return false;
     }
-    // 모든 재료가 계량량과 계량단위를 가지고 있는지 확인
+    // 모든 재료가 amount를 가지고 있는지 확인
     return ingredients.every(ing => {
-      if (!ing.amount || ing.amount.trim().length === 0) {
-        return false;
-      }
-      // amount를 파싱하여 quantity와 unit이 모두 있는지 확인
-      const { quantity, unit } = parseAmount(ing.amount);
-      return quantity.trim().length > 0 && unit.trim().length > 0;
+      return ing.amount && ing.amount.trim().length > 0;
     });
   };
 
