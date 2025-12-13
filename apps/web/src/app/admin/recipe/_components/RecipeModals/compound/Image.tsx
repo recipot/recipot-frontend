@@ -97,6 +97,20 @@ export default function RecipeModalsImage() {
     }
   };
 
+  const updateStepImage = (urlToSave: string) => {
+    if (!targetRecipe) return;
+    const currentSteps = targetRecipe.steps ?? [];
+    const updatedSteps = currentSteps.map(step =>
+      step.orderNum === stepOrderNum ? { ...step, imageUrl: urlToSave } : step
+    );
+    updateEditedRecipe(targetRecipe.id, { steps: updatedSteps });
+  };
+
+  const updateMainImage = (urlToSave: string) => {
+    if (!targetRecipe) return;
+    updateEditedRecipe(targetRecipe.id, { imageUrl: urlToSave });
+  };
+
   const handleSave = () => {
     if (!targetRecipe) return;
 
@@ -115,26 +129,72 @@ export default function RecipeModalsImage() {
 
     // 모드에 따라 저장 로직 분리
     if (isStepImageMode) {
-      // Step 이미지 저장: 해당 step의 imageUrl만 업데이트
-      const currentSteps = targetRecipe?.steps ?? [];
-      const updatedSteps = currentSteps.map(step =>
-        step.orderNum === stepOrderNum ? { ...step, imageUrl: urlToSave } : step
-      );
-      updateEditedRecipe(targetRecipe.id, { steps: updatedSteps });
+      updateStepImage(urlToSave);
     } else {
-      // 대표 이미지 저장: 레시피의 imageUrl 업데이트
-      updateEditedRecipe(targetRecipe.id, { imageUrl: urlToSave });
+      updateMainImage(urlToSave);
     }
     closeModal();
   };
 
-  const displayFileName = selectedFile
-    ? selectedFile.name
-    : currentImageUrl
-      ? (currentImageUrl.split('/').pop() ?? currentImageUrl)
-      : '';
+  const renderImagePreview = () => {
+    if (previewUrl) {
+      return (
+        <div className="relative h-full min-h-[300px] w-full">
+          <Image
+            src={previewUrl}
+            alt="미리보기"
+            fill
+            className="object-contain"
+            priority
+          />
+        </div>
+      );
+    }
+
+    if (uploadedUrl) {
+      return (
+        <div className="relative h-full min-h-[300px] w-full">
+          <Image
+            src={normalizeImageUrl(uploadedUrl)}
+            alt="업로드된 이미지"
+            fill
+            className="object-contain"
+          />
+        </div>
+      );
+    }
+
+    if (currentImageUrl) {
+      return (
+        <div className="relative h-full min-h-[300px] w-full">
+          <Image
+            src={normalizeImageUrl(currentImageUrl)}
+            alt="현재 이미지"
+            fill
+            className="object-contain"
+          />
+        </div>
+      );
+    }
+
+    return (
+      <div className="flex flex-col items-center justify-center text-gray-400">
+        <div>이미지</div>
+        <div>미리보기</div>
+      </div>
+    );
+  };
+
+  const getDisplayFileName = () => {
+    if (selectedFile) return selectedFile.name;
+    if (currentImageUrl)
+      return currentImageUrl.split('/').pop() ?? currentImageUrl;
+    return '';
+  };
 
   if (!isImageModalOpen || !targetRecipe) return null;
+
+  const displayFileName = getDisplayFileName();
 
   return (
     <Dialog open onOpenChange={closeModal}>
@@ -183,40 +243,7 @@ export default function RecipeModalsImage() {
           </div>
 
           <div className="flex min-h-[300px] items-center justify-center">
-            {previewUrl ? (
-              <div className="relative h-full min-h-[300px] w-full">
-                <Image
-                  src={previewUrl}
-                  alt="미리보기"
-                  fill
-                  className="object-contain"
-                  priority
-                />
-              </div>
-            ) : uploadedUrl ? (
-              <div className="relative h-full min-h-[300px] w-full">
-                <Image
-                  src={normalizeImageUrl(uploadedUrl)}
-                  alt="업로드된 이미지"
-                  fill
-                  className="object-contain"
-                />
-              </div>
-            ) : currentImageUrl ? (
-              <div className="relative h-full min-h-[300px] w-full">
-                <Image
-                  src={normalizeImageUrl(currentImageUrl)}
-                  alt="현재 이미지"
-                  fill
-                  className="object-contain"
-                />
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center text-gray-400">
-                <div>이미지</div>
-                <div>미리보기</div>
-              </div>
-            )}
+            {renderImagePreview()}
           </div>
         </div>
 
