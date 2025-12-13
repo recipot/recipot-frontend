@@ -7,11 +7,6 @@ import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 
-interface Tool {
-  id: number;
-  name: string;
-}
-
 interface ToolsSelectProps {
   recipeId: number;
   selectedToolIds: number[];
