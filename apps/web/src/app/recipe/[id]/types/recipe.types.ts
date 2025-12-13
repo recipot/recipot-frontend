@@ -18,11 +18,11 @@ export interface Cookware {
 }
 
 export interface CookingStep {
-  description: string;
+  content: string;
   orderNum: number;
   step: number;
   summary: string;
-  imageUrl?: string | null;
+  imageUrl: string | null;
 }
 
 export interface HealthPoint {

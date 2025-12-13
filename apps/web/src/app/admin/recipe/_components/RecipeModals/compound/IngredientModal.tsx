@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { useRecipeTableActionsContext } from '@/app/admin/recipe/_components/RecipeTableActionsContext';
 import { useRecipeTableDataContext } from '@/app/admin/recipe/_components/RecipeTableDataContext';
+import type { Ingredient as BaseIngredient } from '@/app/recipe/[id]/types/recipe.types';
 import { HighlightText } from '@/components/common/HighlightText';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,12 +18,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 
-interface Ingredient {
-  id: number;
-  name?: string;
-  amount: string;
-  isAlternative: boolean;
-}
+type Ingredient = Omit<BaseIngredient, 'name'> & { name?: string };
 
 // amount 문자열을 quantity와 unit으로 파싱
 // 예: "3개" -> quantity: "3", unit: "개"

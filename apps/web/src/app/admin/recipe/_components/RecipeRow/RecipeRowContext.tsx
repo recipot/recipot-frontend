@@ -2,6 +2,12 @@
 
 import { createContext, useContext } from 'react';
 
+import type {
+  CookingStep,
+  Ingredient,
+  Seasoning,
+} from '@/app/recipe/[id]/types/recipe.types';
+
 import type { AdminRecipe, RecipeUpdateRequest } from '@recipot/api';
 
 interface CurrentValues {
@@ -9,21 +15,9 @@ interface CurrentValues {
   description: string;
   duration: string | number;
   imageUrl: string | undefined;
-  ingredients: {
-    id: number;
-    amount: string;
-    isAlternative: boolean;
-  }[];
-  seasonings: {
-    id: number;
-    amount: string;
-  }[];
-  steps: {
-    content: string;
-    orderNum: number;
-    summary: string;
-    imageUrl: string;
-  }[];
+  ingredients: Omit<Ingredient, 'name'>[];
+  seasonings: Omit<Seasoning, 'name'>[];
+  steps: Omit<CookingStep, 'step'>[];
   title: string;
   tools: { id: number }[];
 }

@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { useRecipeTableActionsContext } from '@/app/admin/recipe/_components/RecipeTableActionsContext';
 import { useRecipeTableDataContext } from '@/app/admin/recipe/_components/RecipeTableDataContext';
+import type { Seasoning as BaseSeasoning } from '@/app/recipe/[id]/types/recipe.types';
 import { HighlightText } from '@/components/common/HighlightText';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,11 +18,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 
-interface Seasoning {
-  id: number;
-  name?: string;
-  amount: string;
-}
+type Seasoning = Omit<BaseSeasoning, 'name'> & { name?: string };
 
 // 양념 계량 단위 목록
 const SEASONING_UNITS = ['큰술'];
