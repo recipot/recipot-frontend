@@ -164,7 +164,7 @@ function TitleCell() {
 
   return (
     <TableCell
-      className={`font-medium ${isSelected ? 'border-primary' : ''}`}
+      className={`font-medium ${isSelected ? 'border-primary border-2' : ''}`}
       onClick={e => {
         e.stopPropagation();
         setSelectedCell({ field: 'title', recipeId: recipeItem.id });
@@ -201,7 +201,7 @@ function ImageCell() {
   if (currentValues.imageUrl) {
     return (
       <TableCell
-        className={`relative ${isSelected ? 'border-primary' : ''}`}
+        className={`relative ${isSelected ? 'border-primary border-2' : ''}`}
         onClick={e => {
           e.stopPropagation();
           setSelectedCell({ field: 'image', recipeId: recipeItem.id });
@@ -225,7 +225,7 @@ function ImageCell() {
 
   return (
     <TableCell
-      className={`relative ${isSelected ? 'border-primary' : ''}`}
+      className={`relative ${isSelected ? 'border-primary border-2' : ''}`}
       onClick={e => {
         e.stopPropagation();
         setSelectedCell({ field: 'image', recipeId: recipeItem.id });
@@ -285,7 +285,7 @@ function DurationCell() {
 
   return (
     <TableCell
-      className={isSelected ? 'border-primary' : ''}
+      className={isSelected ? 'border-primary border-2' : ''}
       onClick={e => {
         e.stopPropagation();
         setSelectedCell({ field: 'duration', recipeId: recipeItem.id });
@@ -339,7 +339,7 @@ function ConditionCell() {
 
   return (
     <TableCell
-      className={`relative ${isSelected ? 'border-primary' : ''}`}
+      className={`relative ${isSelected ? 'border-primary border-2' : ''}`}
       onClick={e => {
         e.stopPropagation();
         setSelectedCell({ field: 'condition', recipeId: recipeItem.id });
@@ -407,7 +407,7 @@ function DescriptionCell() {
 
   return (
     <TableCell
-      className={isSelected ? 'border-primary' : ''}
+      className={isSelected ? 'border-primary border-2' : ''}
       onClick={e => {
         e.stopPropagation();
         setSelectedCell({ field: 'description', recipeId: recipeItem.id });
@@ -469,7 +469,7 @@ function ToolsCell() {
 
   return (
     <TableCell
-      className={`relative ${isSelected ? 'border-primary' : ''}`}
+      className={`relative ${isSelected ? 'border-primary border-2' : ''}`}
       onClick={e => {
         e.stopPropagation();
         setSelectedCell({ field: 'tools', recipeId: recipeItem.id });
@@ -524,7 +524,7 @@ function IngredientsCell() {
 
   return (
     <TableCell
-      className={isSelected ? 'border-primary' : ''}
+      className={isSelected ? 'border-primary border-2' : ''}
       onClick={e => {
         e.stopPropagation();
         setSelectedCell({ field: 'ingredients', recipeId: recipeItem.id });
@@ -571,7 +571,7 @@ function IrreplaceableIngredientsCell() {
 
   return (
     <TableCell
-      className={isSelected ? 'border-primary' : ''}
+      className={isSelected ? 'border-primary border-2' : ''}
       onClick={e => {
         e.stopPropagation();
         setSelectedCell({
@@ -598,7 +598,7 @@ function SeasoningsCell() {
 
   return (
     <TableCell
-      className={isSelected ? 'border-primary' : ''}
+      className={isSelected ? 'border-primary border-2' : ''}
       onClick={e => {
         e.stopPropagation();
         setSelectedCell({ field: 'seasonings', recipeId: recipeItem.id });
@@ -634,9 +634,9 @@ function SeasoningsCell() {
   );
 }
 
-// TODO: Steps 기능은 기획팀과 회의 중이므로 임시 주석처리
 function StepsCell() {
   const { currentValues, recipeItem } = useRecipeRowContextWithTable();
+  console.log(recipeItem, 'recipeItem');
   const { expandedStepsRecipeId, selectedCell } = useRecipeTableDataContext();
   const { setExpandedStepsRecipeId, setSelectedCell } =
     useRecipeTableActionsContext();
@@ -653,7 +653,7 @@ function StepsCell() {
 
   return (
     <TableCell
-      className={isSelected ? 'border-primary' : ''}
+      className={isSelected ? 'border-primary border-2' : ''}
       onClick={handleClick}
     >
       <div className="cursor-pointer hover:bg-gray-50">
@@ -684,6 +684,7 @@ function ExpandedStepsRow() {
     updateEditedRecipe(recipeItem.id, {
       steps: updatedSteps.map(step => ({
         ...step,
+        imageUrl: step.imageUrl ?? '',
         summary: step.summary,
       })),
     });
