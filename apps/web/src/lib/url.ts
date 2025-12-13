@@ -36,14 +36,11 @@ export const getRecipeShareUrl = (recipeId: string | number): string => {
  * @returns 정규화된 이미지 URL
  */
 export const normalizeImageUrl = (url: string | undefined): string => {
-  if (!url) {
-    return getAbsoluteUrl(url);
-  }
-
-  // blob URL은 그대로 반환
-  if (url.startsWith('blob:')) {
+  // blob URL인 경우만 특별히 처리하여 그대로 반환
+  if (url?.startsWith('blob:')) {
     return url;
   }
 
+  // 나머지 모든 경우 (url이 없거나, http/https URL이거나, 상대 경로인 경우)는 getAbsoluteUrl로 처리
   return getAbsoluteUrl(url);
 };
