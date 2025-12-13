@@ -112,7 +112,7 @@ export default function RecipeModalsSeasonings() {
 
     if (editedData?.seasonings) {
       setSeasonings(editedData.seasonings as Seasoning[]);
-    } else if (apiSeasonings !== undefined && !isLoadingSeasonings) {
+    } else if (apiSeasonings !== undefined) {
       setSeasonings(recipeId < 0 ? [] : apiSeasonings);
     }
 
@@ -121,30 +121,18 @@ export default function RecipeModalsSeasonings() {
     setEditingQuantity('');
     setSearchTerm('');
     setFocusedIndex(-1);
-  }, [
-    isOpen,
-    recipeId,
-    editedData?.seasonings,
-    apiSeasonings,
-    isLoadingSeasonings,
-  ]);
+  }, [isOpen, recipeId, editedData?.seasonings, apiSeasonings]);
 
   // 모달이 닫힐 때 편집 내용을 editedRecipes에 자동 저장
   useEffect(() => {
-    if (!isOpen || !targetRecipe || seasonings.length === 0) {
+    if (!isOpen) {
       // 편집 state만 초기화
-      if (!isOpen) {
-        setEditingId(null);
-        setEditingQuantity('');
-        setSearchTerm('');
-        setFocusedIndex(-1);
-      }
-      return;
+      setEditingId(null);
+      setEditingQuantity('');
+      setSearchTerm('');
+      setFocusedIndex(-1);
     }
-
-    // 모달이 닫힐 때 편집 내용을 자동 저장
-    updateEditedRecipe(targetRecipe.id, { seasonings });
-  }, [isOpen, targetRecipe, seasonings, updateEditedRecipe]);
+  }, [isOpen]);
 
   // 검색어가 변경되면 포커스 인덱스 초기화
   useEffect(() => {
@@ -318,20 +306,15 @@ export default function RecipeModalsSeasonings() {
     closeModal();
   };
 
-  // 검증 로직: 양념이 없거나 계량량이 비어있는 경우
+  // 검증 로직: 양념이 없거나 amount가 비어있는 경우
   const validateSeasonings = () => {
     // 양념이 하나도 없으면 false
     if (seasonings.length === 0) {
       return false;
     }
-    // 모든 양념이 계량량을 가지고 있는지 확인
+    // 모든 양념이 amount를 가지고 있는지 확인
     return seasonings.every(sea => {
-      if (!sea.amount || sea.amount.trim().length === 0) {
-        return false;
-      }
-      // amount를 파싱하여 quantity가 있는지 확인
-      const { quantity } = parseAmount(sea.amount);
-      return quantity.trim().length > 0;
+      return sea.amount && sea.amount.trim().length > 0;
     });
   };
 

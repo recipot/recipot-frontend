@@ -1,8 +1,8 @@
 // Compound Components
-import RecipeModalsImage from '@/app/admin/recipe/_components/RecipeModals/compound/Image';
-import RecipeModalsIngredients from '@/app/admin/recipe/_components/RecipeModals/compound/Ingredients';
+import RecipeModalsImage from '@/app/admin/recipe/_components/RecipeModals/compound/ImageModal';
+import RecipeModalsIngredients from '@/app/admin/recipe/_components/RecipeModals/compound/IngredientModal';
 import RecipeModalsRoot from '@/app/admin/recipe/_components/RecipeModals/compound/Root';
-import RecipeModalsSeasonings from '@/app/admin/recipe/_components/RecipeModals/compound/Seasonings';
+import RecipeModalsSeasonings from '@/app/admin/recipe/_components/RecipeModals/compound/SeasoningModal';
 
 // Types
 /**
