@@ -137,46 +137,37 @@ export default function RecipeModalsImage() {
   };
 
   const renderImagePreview = () => {
+    // 표시할 이미지 URL과 alt 텍스트 결정
+    let imageUrl: string | null = null;
+    let altText = '';
+
     if (previewUrl) {
+      imageUrl = previewUrl;
+      altText = '미리보기';
+    } else if (uploadedUrl) {
+      imageUrl = normalizeImageUrl(uploadedUrl);
+      altText = '업로드된 이미지';
+    } else if (currentImageUrl) {
+      imageUrl = normalizeImageUrl(currentImageUrl);
+      altText = '현재 이미지';
+    }
+
+    // 이미지가 있으면 Image 컴포넌트로 렌더링
+    if (imageUrl) {
       return (
         <div className="relative h-full min-h-[300px] w-full">
           <Image
-            src={previewUrl}
-            alt="미리보기"
+            src={imageUrl}
+            alt={altText}
             fill
             className="object-contain"
-            priority
+            priority={!!previewUrl}
           />
         </div>
       );
     }
 
-    if (uploadedUrl) {
-      return (
-        <div className="relative h-full min-h-[300px] w-full">
-          <Image
-            src={normalizeImageUrl(uploadedUrl)}
-            alt="업로드된 이미지"
-            fill
-            className="object-contain"
-          />
-        </div>
-      );
-    }
-
-    if (currentImageUrl) {
-      return (
-        <div className="relative h-full min-h-[300px] w-full">
-          <Image
-            src={normalizeImageUrl(currentImageUrl)}
-            alt="현재 이미지"
-            fill
-            className="object-contain"
-          />
-        </div>
-      );
-    }
-
+    // 이미지가 없으면 플레이스홀더 표시
     return (
       <div className="flex flex-col items-center justify-center text-gray-400">
         <div>이미지</div>
