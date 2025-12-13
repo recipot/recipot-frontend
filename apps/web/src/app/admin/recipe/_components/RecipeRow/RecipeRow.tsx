@@ -636,7 +636,6 @@ function SeasoningsCell() {
 
 function StepsCell() {
   const { currentValues, recipeItem } = useRecipeRowContextWithTable();
-  console.log(recipeItem, 'recipeItem');
   const { expandedStepsRecipeId, selectedCell } = useRecipeTableDataContext();
   const { setExpandedStepsRecipeId, setSelectedCell } =
     useRecipeTableActionsContext();
