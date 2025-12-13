@@ -124,7 +124,9 @@ export default function AdminRecipePage() {
   // 삭제 확인 모달 상태
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [idsToDelete, setIdsToDelete] = useState<Set<number>>(new Set());
+  const [pendingDeleteIds, setPendingDeleteIds] = useState<Set<number>>(
+    new Set()
+  );
 
   // 신규 레코드 관리
   const [newRecipes, setNewRecipes] = useState<AdminRecipe[]>([]);
@@ -297,32 +299,19 @@ export default function AdminRecipePage() {
       showToast('삭제할 레시피를 선택해주세요.');
       return;
     }
-    setIdsToDelete(new Set(selectedIds));
+    setPendingDeleteIds(new Set(selectedIds));
     setIsDeleteModalOpen(true);
   };
 
   const handleDeleteConfirm = async () => {
-    if (idsToDelete.size === 0) return;
+    if (pendingDeleteIds.size === 0) return;
 
     setIsDeleting(true);
     try {
-      const deleteCount = idsToDelete.size;
+      const deleteCount = pendingDeleteIds.size;
+      const recipeIdsToDelete = Array.from(pendingDeleteIds);
 
-      // 양수 ID만 필터링 (신규 레코드는 음수 ID이므로 제외)
-      const recipeIdsToDelete = Array.from(idsToDelete).filter(id => id > 0);
-
-      // 신규 레코드(음수 ID)는 로컬 상태에서만 제거
-      const newRecipeIdsToRemove = Array.from(idsToDelete).filter(id => id < 0);
-      if (newRecipeIdsToRemove.length > 0) {
-        setNewRecipes(prev =>
-          prev.filter(recipe => !newRecipeIdsToRemove.includes(recipe.id))
-        );
-      }
-
-      // 기존 레시피는 API로 삭제
-      if (recipeIdsToDelete.length > 0) {
-        await recipe.deleteRecipes(recipeIdsToDelete);
-      }
+      await recipe.deleteRecipes(recipeIdsToDelete);
 
       // React Query 캐시 무효화하여 최신 데이터 가져오기
       await queryClient.invalidateQueries({
@@ -331,7 +320,6 @@ export default function AdminRecipePage() {
 
       // 선택 상태 초기화
       setSelectedIds(new Set());
-      setIdsToDelete(new Set());
       setIsDeleteModalOpen(false);
       showToast(`${deleteCount}개의 레시피가 삭제되었습니다.`);
     } catch (error) {
@@ -463,22 +451,22 @@ export default function AdminRecipePage() {
       <Modal
         contentGap={24}
         description={
-          idsToDelete.size === 1
+          pendingDeleteIds.size === 1
             ? (() => {
-                const recipeId = Array.from(idsToDelete)[0];
+                const recipeId = Array.from(pendingDeleteIds)[0];
                 const recipeToDelete = allDisplayedRecipes.find(
                   r => r.id === recipeId
                 );
                 const recipeTitle = recipeToDelete?.title ?? '레시피';
                 return `"${recipeTitle}"를 삭제하시겠습니까?`;
               })()
-            : `선택한 ${idsToDelete.size}개의 레시피를 삭제하시겠습니까?`
+            : `선택한 ${pendingDeleteIds.size}개의 레시피를 삭제하시겠습니까?`
         }
         disableCloseButton={false}
         onOpenChange={open => {
           setIsDeleteModalOpen(open);
           if (!open) {
-            setIdsToDelete(new Set());
+            setPendingDeleteIds(new Set());
           }
         }}
         open={isDeleteModalOpen}
