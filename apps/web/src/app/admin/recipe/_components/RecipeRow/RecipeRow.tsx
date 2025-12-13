@@ -164,7 +164,7 @@ function TitleCell() {
 
   return (
     <TableCell
-      className={`font-medium ${isSelected ? 'border-2 border-blue-500' : ''}`}
+      className={`font-medium ${isSelected ? 'border-primary' : ''}`}
       onClick={e => {
         e.stopPropagation();
         setSelectedCell({ field: 'title', recipeId: recipeItem.id });
