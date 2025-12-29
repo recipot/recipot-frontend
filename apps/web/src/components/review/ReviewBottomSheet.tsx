@@ -6,12 +6,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { recipe } from '@recipot/api';
-import { useAuth } from '@recipot/contexts';
 import { useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
+import { useRouter } from 'next/navigation';
 
-import { isProduction } from '@/lib/env';
+import { useIsLoggedIn } from '@/hooks';
 import { useApiErrorModalStore } from '@/stores';
+import { useLoginModalStore } from '@/stores/useLoginModalStore';
 import type {
   ReviewBottomSheetProps,
   ReviewData,
@@ -43,10 +44,14 @@ export function ReviewBottomSheet({
   onClose,
   recipeId,
 }: ReviewBottomSheetProps) {
+  const router = useRouter();
   const queryClient = useQueryClient();
+
+  const isLoggedIn = useIsLoggedIn();
+  const openLoginModal = useLoginModalStore(state => state.openModal);
+
   const [reviewData, setReviewData] = useState<ReviewData | null>(null);
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
-  const { token } = useAuth();
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   // v1/reviews/preparation API 호출 - 바텀시트가 열릴 때만 데이터 로드
@@ -62,9 +67,8 @@ export function ReviewBottomSheet({
       return;
     }
 
-    // 프로덕션 환경에서는 쿠키 인증을 사용하므로 token 체크를 건너뛰고,
-    // 개발 환경에서는 token이 필요함
-    if (!isProduction && !token) {
+    if (!isLoggedIn) {
+      openLoginModal();
       return;
     }
 
@@ -80,7 +84,7 @@ export function ReviewBottomSheet({
     };
 
     getReviewData();
-  }, [isOpen, token, recipeId]);
+  }, [isOpen, recipeId, isLoggedIn, openLoginModal]);
 
   const formMethods = useForm<ReviewFormData>({
     defaultValues: {
@@ -211,6 +215,18 @@ export function ReviewBottomSheet({
     }
   };
 
+  const handleCompleteModalOpenChange = (nextOpen: boolean) => {
+    setIsCompleteModalOpen(nextOpen);
+
+    if (!nextOpen) {
+      router.push('/');
+    }
+  };
+
+  const handleCompleteModalConfirm = () => {
+    handleCompleteModalOpenChange(false);
+  };
+
   return (
     <Drawer open={isOpen}>
       <DrawerContent className="mx-auto flex w-full flex-col">
@@ -232,7 +248,7 @@ export function ReviewBottomSheet({
               <div className="flex justify-end">
                 <button
                   type="button"
-                  onClick={onClose}
+                  onClick={() => onClose(reviewData?.recipeId)}
                   className="rounded-full p-1.5"
                 >
                   <CloseIcon size={24} />
@@ -297,8 +313,8 @@ export function ReviewBottomSheet({
         </form>
         <ReviewCompleteModal
           open={isCompleteModalOpen}
-          onOpenChange={setIsCompleteModalOpen}
-          onConfirm={onClose}
+          onOpenChange={handleCompleteModalOpenChange}
+          onConfirm={handleCompleteModalConfirm}
         />
       </DrawerContent>
     </Drawer>

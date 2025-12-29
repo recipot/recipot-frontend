@@ -1,14 +1,15 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { tokenUtils } from 'packages/api/src/auth';
+import { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 
+import { useIsLoggedIn } from '@/hooks';
 import { useCompleteCooking } from '@/hooks/useCompleteCooking';
 import { useCookingOrder } from '@/hooks/useCookingOrder';
 import { useCookingOrderNavigation } from '@/hooks/useCookingOrderNavigation';
-import { isProduction } from '@/lib/env';
+import { checkIsNaN } from '@/lib/checkIsNaN';
 import { useApiErrorModalStore } from '@/stores';
+import { useLoginModalStore } from '@/stores/useLoginModalStore';
 
 import CookingOrderContent from './CookingOrderContent';
 import CookingOrderFooter from './CookingOrderFooter';
@@ -26,16 +27,46 @@ interface CookingOrderPresenterProps {
 export default function CookingOrderPresenter({
   recipeId,
 }: CookingOrderPresenterProps) {
-  const { completeStep, error, getCompletedRecipeId, isLoading, recipe } =
+  const { completeStep, getCompletedRecipeId, isLoading, recipe } =
     useCookingOrder(recipeId);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const completeCookingMutation = useCompleteCooking();
 
-  const token = tokenUtils.getToken();
-  const useCookieAuth = isProduction;
+  const isLoggedIn = useIsLoggedIn();
+  const openLoginModal = useLoginModalStore(state => state.openModal);
 
   // 모달 상태 통합 관리
   const [activeModal, setActiveModal] = useState<ModalType>(null);
+  const [hasRequestedLogin, setHasRequestedLogin] = useState(false);
+
+  const shouldShowLoginModal = !isLoading && !isLoggedIn && !hasRequestedLogin;
+
+  useEffect(() => {
+    if (shouldShowLoginModal) {
+      openLoginModal();
+      setHasRequestedLogin(true);
+    }
+  }, [shouldShowLoginModal, openLoginModal]);
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      setHasRequestedLogin(false);
+    }
+  }, [isLoggedIn]);
+
+  const stepParam = searchParams.get('step');
+  const lastStepFlag = searchParams.get('lastStep') === 'true';
+  const parsedStep = stepParam ? Number(stepParam) : null;
+  const hasValidStepParam = parsedStep ? checkIsNaN(parsedStep) : false;
+
+  let initialStep = 1;
+
+  if (hasValidStepParam && parsedStep) {
+    initialStep = parsedStep;
+  } else if (lastStepFlag && recipe?.steps?.length) {
+    initialStep = recipe.steps.length;
+  }
 
   const {
     currentStep,
@@ -43,15 +74,15 @@ export default function CookingOrderPresenter({
     handlePrevStep,
     isFirstStep,
     isLastStep,
-  } = useCookingOrderNavigation(recipe);
+  } = useCookingOrderNavigation(recipe, initialStep);
 
   // 모달 핸들러 통합
   const openModal = (modalType: ModalType) => setActiveModal(modalType);
   const closeModal = () => setActiveModal(null);
 
   const handleCookingComplete = async () => {
-    if (!useCookieAuth && !token) {
-      router.push('/signin');
+    if (!isLoggedIn) {
+      openLoginModal();
       return;
     }
 
@@ -64,7 +95,9 @@ export default function CookingOrderPresenter({
     }
     await completeCookingMutation.mutateAsync(completedRecipeId);
     completeStep(currentStep);
-    router.push(`/review?completedRecipeId=${completedRecipeId}`);
+    router.push(
+      `/review?completedRecipeId=${completedRecipeId}&recipeId=${recipeId}`
+    );
   };
   const handleBack = () => {
     openModal('warning');
@@ -82,17 +115,8 @@ export default function CookingOrderPresenter({
     );
   }
 
-  if (error) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-center">
-          <h2 className="mb-2 text-xl font-semibold text-gray-900">
-            레시피를 불러올 수 없습니다
-          </h2>
-          <p className="text-gray-600">{error}</p>
-        </div>
-      </div>
-    );
+  if (shouldShowLoginModal) {
+    return null;
   }
 
   if (!recipe) {

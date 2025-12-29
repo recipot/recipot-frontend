@@ -1,9 +1,8 @@
+import { recipesAPI } from '@recipot/api';
 import { useAuth } from '@recipot/contexts';
 import { useQuery } from '@tanstack/react-query';
-import {
-  type GetCompletedRecipesParams,
-  recipesAPI,
-} from 'packages/api/src/mypageAPI';
+
+import type { GetCompletedRecipesParams } from '@recipot/api';
 
 export const COMPLETED_RECIPES_QUERY_KEY = ['completed-recipes'] as const;
 

@@ -6,12 +6,12 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation';
 
 import { Header } from '@/components/common/Header';
-import { LoginRequiredModal } from '@/components/common/LoginRequiredModal';
 import { HeartIcon, ShareIcon } from '@/components/Icons';
 import WebShareButton from '@/components/Share/WebShareButton';
 import { useIsKakaoInApp } from '@/hooks/useIsKakaoInApp';
 import { useIsLoggedIn } from '@/hooks/useIsLoggedIn';
 import { useApiErrorModalStore } from '@/stores';
+import { useLoginModalStore } from '@/stores/useLoginModalStore';
 import { createKakaoShareData, createWebShareData } from '@/utils/shareData';
 
 import type { Recipe } from '../types/recipe.types';
@@ -27,7 +27,8 @@ export function RecipeDetailHeader({ recipe, showToast }: RecipeHeaderProps) {
 
   const [isLiked, setIsLiked] = useState(recipe.isBookmarked);
   const [isLoading, setIsLoading] = useState(false);
-  const [showLoginModal, setShowLoginModal] = useState(false);
+
+  const openLoginModal = useLoginModalStore(state => state.openModal);
   const isKakaoInApp = useIsKakaoInApp();
 
   // Web Share API용 공유 데이터 (시스템 공유 모달에서 사용)
@@ -40,7 +41,7 @@ export function RecipeDetailHeader({ recipe, showToast }: RecipeHeaderProps) {
   const handleToggleBookmark = async (recipeId: number) => {
     // 로그인하지 않은 경우에만 모달 표시
     if (!isLoggedIn) {
-      setShowLoginModal(true);
+      openLoginModal();
       return;
     }
 
@@ -59,7 +60,7 @@ export function RecipeDetailHeader({ recipe, showToast }: RecipeHeaderProps) {
       }
     } catch (error: unknown) {
       if (axios.isAxiosError(error) && error.response?.status === 401) {
-        setShowLoginModal(true);
+        openLoginModal();
         return;
       }
       useApiErrorModalStore.getState().showError({
@@ -77,17 +78,6 @@ export function RecipeDetailHeader({ recipe, showToast }: RecipeHeaderProps) {
 
   return (
     <>
-      {/* Login Modal */}
-      <LoginRequiredModal
-        description={
-          isKakaoInApp
-            ? '로그인하면 더 많은 기능을 사용할 수 있어요.'
-            : '로그인하면 북마크 기능을 사용할 수 있어요.'
-        }
-        onOpenChange={setShowLoginModal}
-        open={showLoginModal}
-      />
-
       {/* Header */}
       <Header className="px-4 py-3">
         <Header.Back onClick={handleBack} />
@@ -98,7 +88,7 @@ export function RecipeDetailHeader({ recipe, showToast }: RecipeHeaderProps) {
             enableKakao
             className="p-2"
             onKakaoInAppClick={
-              isKakaoInApp ? () => setShowLoginModal(true) : undefined
+              isKakaoInApp ? () => openLoginModal() : undefined
             }
             onShareSuccess={showToast}
           >
