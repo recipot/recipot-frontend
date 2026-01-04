@@ -1,6 +1,9 @@
 // Auth API
 export { authService, tokenUtils } from './auth';
 
+// Guest Session API
+export { guestSession, guestSessionUtils } from './guestSession';
+
 // Allergy API
 export { allergy } from './allergy';
 

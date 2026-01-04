@@ -1,8 +1,11 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: ['class'],
-  content: ['./src/**/*.{ts,tsx}'  ,'!./src/**/*.stories.{ts,tsx}', 
-    '!./src/**/__tests__/**/*',],
+  content: [
+    './src/**/*.{ts,tsx}',
+    '!./src/**/*.stories.{ts,tsx}',
+    '!./src/**/__tests__/**/*',
+  ],
   theme: {
     extend: {
       screens: {
@@ -104,6 +107,7 @@ module.exports = {
         '12sb': ['0.75rem', { lineHeight: '150%', fontWeight: '600' }], // text-12sb
         13: ['0.8125rem', { lineHeight: '150%', fontWeight: '400' }], // text-13
         '13sb': ['0.8125rem', { lineHeight: '150%', fontWeight: '600' }], // text-13sb
+        '13r': ['0.8125rem', { lineHeight: '150%', fontWeight: '400' }], // text-13r
         14: ['0.875rem', { lineHeight: '150%', fontWeight: '400' }], // text-14
         '14sb': ['0.875rem', { lineHeight: '150%', fontWeight: '600' }], // text-14sb
         '14b': ['0.875rem', { lineHeight: '150%', fontWeight: '700' }], // text-14b
@@ -118,9 +122,11 @@ module.exports = {
         18: ['1.125rem', { lineHeight: '150%' }], // text-18
         '18sb': ['1.125rem', { lineHeight: '150%', fontWeight: '600' }], // text-18sb
         20: ['1.25rem', { lineHeight: '140%', fontWeight: '700' }], // text-20
+        '20r': ['1.25rem', { lineHeight: '140%', fontWeight: '400' }], // text-20r
         22: ['1.375rem', { lineHeight: '140%', fontWeight: '600' }], // text-22
         '22sb': ['1.375rem', { lineHeight: '140%', fontWeight: '600' }], // text-22sb
         24: ['1.5rem', { lineHeight: '140%', fontWeight: '600' }], // text-24
+        '24b': ['1.5rem', { lineHeight: '140%', fontWeight: '700' }], // text-24b
         28: ['1.75rem', { lineHeight: '100%', fontWeight: '700' }], // text-28
       },
     },

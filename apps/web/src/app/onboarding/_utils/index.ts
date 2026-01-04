@@ -1,4 +1,8 @@
-export { conditionIdToMood, moodToConditionId } from './conditionMapper';
+export {
+  conditionIdToMood,
+  getEmojiByConditionId,
+  moodToConditionId,
+} from './conditionMapper';
 export {
   getNavigationButtonClass,
   getNavigationItemClass,

@@ -4,6 +4,13 @@ import { tokenUtils } from './auth';
 
 type ApiErrorHandler = ((error: unknown) => void) | null;
 
+const GUEST_SESSION_KEY = 'guest-session-id';
+
+const getGuestSessionId = (): string | null => {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem(GUEST_SESSION_KEY);
+};
+
 let globalApiErrorHandler: ApiErrorHandler = null;
 
 export const setApiErrorHandler = (handler: ApiErrorHandler) => {
@@ -110,6 +117,12 @@ export const createApiInstance = (
       const token = getAuthToken();
       if (!useCookieAuth && token) {
         config.headers.Authorization = `Bearer ${token}`;
+      } else if (!token) {
+        // 비로그인 상태: 게스트 세션 헤더 추가
+        const guestSessionId = getGuestSessionId();
+        if (guestSessionId) {
+          config.headers['X-Guest-Session'] = guestSessionId;
+        }
       }
 
       if (process.env.NODE_ENV === 'development') {
