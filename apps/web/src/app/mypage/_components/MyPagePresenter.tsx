@@ -19,10 +19,12 @@ interface MyPagePresenterProps {
   user: User | null;
   restrictions: DietaryRestriction[];
   cookedRecipes: CompletedRecipe[];
+  isGuest?: boolean;
 }
 
 export function MyPagePresenter({
   cookedRecipes,
+  isGuest = false,
   restrictions,
   user,
 }: MyPagePresenterProps) {
@@ -54,7 +56,7 @@ export function MyPagePresenter({
         <PageHeader title="마이페이지" />
       </div>
       <main className="px-5">
-        <UserProfile user={user} />
+        <UserProfile user={user} isGuest={isGuest} />
         <QuickLinks />
         <MyRecipesLink cookedRecipes={cookedRecipes} />
         <DietaryRestrictions

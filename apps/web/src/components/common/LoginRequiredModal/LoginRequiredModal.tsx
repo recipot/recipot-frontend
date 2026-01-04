@@ -1,35 +1,91 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+import { useAuth } from '@recipot/contexts';
+import Image from 'next/image';
 
 import { Button } from '@/components/common/Button';
-import { Modal } from '@/components/common/Modal/Modal';
+import { CloseIcon, GoogleIcon, KakaoIcon } from '@/components/Icons';
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerTitle,
+} from '@/components/ui/drawer';
 import { useLoginModalStore } from '@/stores/useLoginModalStore';
 
-/**
- * 전역 로그인 필요 모달 컴포넌트.
- * 이 컴포넌트는 앱의 최상위 레벨 (e.g., layout.tsx)에 한 번만 렌더링되어야 합니다.
- * useLoginModalStore를 통해 어디서든 모달을 열 수 있습니다.
- */
-export function LoginRequiredModal() {
-  const router = useRouter();
-  const { isOpen, closeModal } = useLoginModalStore();
+import Logo from '../../../../public/img-splash.png';
 
-  const handleLogin = () => {
-    closeModal(); // 로그인 버튼 클릭 시 모달을 닫고
-    router.push('/signin'); // 로그인 페이지로 이동
+export function LoginRequiredModal() {
+  const { closeModal, isOpen } = useLoginModalStore();
+  const { googleLogin, login } = useAuth();
+
+  const handleKakaoLogin = () => {
+    closeModal();
+    login();
+  };
+
+  const handleGoogleLogin = () => {
+    closeModal();
+    googleLogin();
   };
 
   return (
-    <Modal
-      open={isOpen}
-      onOpenChange={closeModal}
-      title="로그인이 필요한 서비스입니다."
-      description="로그인이 필요한 서비스입니다."
-    >
-      <Button onClick={handleLogin} size="full" variant="default">
-        로그인
-      </Button>
-    </Modal>
+    <Drawer open={isOpen} onOpenChange={open => !open && closeModal()}>
+      <DrawerContent className="mx-auto flex w-full flex-col pb-8">
+        <VisuallyHidden asChild>
+          <DrawerTitle>로그인</DrawerTitle>
+        </VisuallyHidden>
+        <VisuallyHidden asChild>
+          <DrawerDescription>
+            로그인하면 레시피를 저장할 수 있고 추천이 더 정확해져요!
+          </DrawerDescription>
+        </VisuallyHidden>
+
+        <div className="flex justify-end">
+          <DrawerClose asChild>
+            <button type="button" className="rounded-full p-1.5">
+              <CloseIcon size={24} />
+            </button>
+          </DrawerClose>
+        </div>
+
+        <div className="flex flex-col items-center gap-4 pt-2 pb-8">
+          <Image
+            src={Logo}
+            alt="레시팟 마스코트"
+            width={152}
+            height={152}
+            className="object-contain"
+          />
+          <div className="text-22sb w-full px-[10px] text-center text-gray-900">
+            로그인하면 레시피를 저장할 수 있고
+            <br />
+            추천이 더 정확해져요!
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-3 px-6">
+          <Button
+            onClick={handleKakaoLogin}
+            size="full"
+            className="bg-kakao active:bg-kakao-pressed text-gray-900"
+          >
+            <KakaoIcon />
+            <span className="ml-2">카카오로 시작하기</span>
+          </Button>
+          <Button
+            onClick={handleGoogleLogin}
+            size="full"
+            variant="outline"
+            className="bg-white"
+          >
+            <GoogleIcon />
+            <span className="ml-2">Google로 시작하기</span>
+          </Button>
+        </div>
+      </DrawerContent>
+    </Drawer>
   );
 }

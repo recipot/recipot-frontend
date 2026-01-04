@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
-import { allergy } from '@recipot/api';
+import { allergy, guestSession } from '@recipot/api';
 
 import { Allergy, useAllergyContext } from '@/components/Allergy';
 import type { AllergyFormSchema } from '@/components/Allergy/constants/constants';
@@ -14,6 +14,7 @@ import {
   DrawerDescription,
   DrawerTitle,
 } from '@/components/ui/drawer';
+import { useIsLoggedIn } from '@/hooks/useIsLoggedIn';
 import { useApiErrorModalStore } from '@/stores/apiErrorModalStore';
 
 import type { z } from 'zod';
@@ -28,10 +29,12 @@ interface DietaryRestrictionsSheetProps {
 const EMPTY_ARRAY: number[] = [];
 
 function DietaryRestrictionsContent({
+  isLoggedIn,
   onClose,
   onSave,
   scrollContainerRef,
 }: {
+  isLoggedIn: boolean;
   onClose: () => void;
   onSave?: (selectedItems: number[]) => void;
   scrollContainerRef: React.RefObject<HTMLDivElement>;
@@ -118,7 +121,13 @@ function DietaryRestrictionsContent({
 
   const handleSubmit = async (data: z.infer<typeof AllergyFormSchema>) => {
     try {
+      // 비로그인 상태: 게스트 세션 확인/생성
+      if (!isLoggedIn) {
+        await guestSession.getOrCreateSessionId();
+      }
+
       await allergy.updateRestrictedIngredients(data.items);
+
       onSave?.(data.items);
       onClose();
     } catch (error) {
@@ -188,6 +197,7 @@ export default function DietaryRestrictionsSheet({
   onSave,
 }: DietaryRestrictionsSheetProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const isLoggedIn = useIsLoggedIn();
 
   const scrollConfig = React.useMemo(
     () => ({
@@ -200,14 +210,15 @@ export default function DietaryRestrictionsSheet({
 
   return (
     <Drawer open={isOpen} onOpenChange={onClose}>
-      <DrawerContent className="flex h-[90vh] w-full flex-col rounded-3xl">
-        <div className="flex h-full flex-col">
+      <DrawerContent className="flex max-h-[90dvh] flex-col rounded-3xl">
+        <div className="flex min-h-0 flex-1 flex-col">
           <Allergy
             formId="dietary-restrictions-form"
             initialSelectedItems={initialSelectedItems}
             scrollConfig={scrollConfig}
           >
             <DietaryRestrictionsContent
+              isLoggedIn={isLoggedIn}
               onClose={onClose}
               onSave={onSave}
               scrollContainerRef={scrollContainerRef}
