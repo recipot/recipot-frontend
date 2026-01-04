@@ -1,6 +1,9 @@
 import React from 'react';
 
-import { moodToConditionId } from '@/app/onboarding/_utils';
+import {
+  getEmojiByConditionId,
+  moodToConditionId,
+} from '@/app/onboarding/_utils';
 import type { Condition } from '@/app/recipe/[id]/types/recipe.types';
 import type { MoodType } from '@/components/EmotionState';
 
@@ -28,28 +31,11 @@ const RecipeTitle = ({ condition }: RecipeTitleProps) => {
     }
   };
 
-  // 조건에 따른 이모지 매핑 (유니코드 사용)
-  const getEmojiByCondition = (condition: Condition | null | undefined) => {
-    if (!condition?.name) {
-      return '\u{1F611}';
-    }
-
-    const conditionId = moodToConditionId(condition.name as MoodType);
-    switch (conditionId) {
-      case 1:
-        return '\u{1F623}';
-      case 2:
-        return '\u{1F611}';
-      case 3:
-        return '\u{1F60A}';
-
-      default:
-        return '\u{1F611}';
-    }
-  };
-
   const title = getTitleByCondition(condition);
-  const emoji = getEmojiByCondition(condition);
+  const conditionId = condition?.name
+    ? moodToConditionId(condition.name as MoodType)
+    : 2;
+  const emoji = getEmojiByConditionId(conditionId);
 
   return (
     <div className="mb-5 flex w-full items-center justify-center self-stretch">
