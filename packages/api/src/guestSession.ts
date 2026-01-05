@@ -51,7 +51,6 @@ export const guestSession = {
     const response = await guestApi.post<CreateGuestSessionResponse>(
       '/v1/auth/guest-session'
     );
-    console.log(response);
 
     const sessionId = response.data.data.guestSessionId;
     storage.saveSessionId(sessionId);
