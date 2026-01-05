@@ -16,7 +16,10 @@ interface ConditionStepProps {
  * A/B 테스트 B안 Step 1: 컨디션 선택
  * 기존 EmotionSelector 컴포넌트를 재사용합니다.
  */
-export default function ConditionStep({ onNext, onStepClick }: ConditionStepProps) {
+export default function ConditionStep({
+  onNext,
+  onStepClick,
+}: ConditionStepProps) {
   const mood = useMoodStore(state => state.mood);
   const setMood = useMoodStore(state => state.setMood);
 

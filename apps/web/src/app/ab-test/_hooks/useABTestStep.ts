@@ -9,7 +9,7 @@ import { TOTAL_STEPS } from '@/app/ab-test/_constants';
  * 로컬 상태로 관리하여 로그인 없이도 동작합니다.
  */
 export function useABTestStep() {
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(0);
 
   /** 다음 스텝으로 이동 */
   const goToNextStep = useCallback(() => {
@@ -23,7 +23,7 @@ export function useABTestStep() {
 
   /** 특정 스텝으로 이동 */
   const goToStep = useCallback((step: number) => {
-    if (step >= 1 && step <= TOTAL_STEPS) {
+    if (step >= 0 && step <= TOTAL_STEPS) {
       setCurrentStep(step);
     }
   }, []);

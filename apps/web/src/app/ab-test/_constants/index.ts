@@ -2,6 +2,13 @@
  * A/B 테스트 B안 상수 정의
  */
 
+/** 알러지 스텝 설정 (못 먹는 재료 선택) */
+export const AB_ALLERGY_STEP_CONFIG = {
+  buttonText: '안 맞는 재료 선택했어요',
+  description: '알려주시면 그 재료는 빼고 추천해드릴게요',
+  title: '몸에 안 맞는 재료가 있나요?',
+} as const;
+
 /** 스텝별 설정 */
 export const AB_STEP_CONFIG = [
   {

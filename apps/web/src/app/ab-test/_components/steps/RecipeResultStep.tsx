@@ -8,7 +8,6 @@ import { Loader2 } from 'lucide-react';
 import { EffectCards, Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
-import DietaryRestrictionsSheet from '@/app/mypage/_components/DietaryRestrictionsSheet';
 import {
   getEmojiByConditionId,
   moodToConditionId,
@@ -60,7 +59,6 @@ export default function RecipeResultStep({
   const swiperRef = useRef<SwiperType | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const lastFetchKeyRef = useRef<string | null>(null);
-  const [isRestrictionsSheetOpen, setIsRestrictionsSheetOpen] = useState(false);
 
   // 저장된 상태 가져오기
   const mood = useMoodStore(state => state.mood);
@@ -108,17 +106,10 @@ export default function RecipeResultStep({
     updateRecipeBookmark(recipeId, isBookmarked);
   };
 
-  // 메뉴 추천받기 버튼 클릭 - 못 먹는 재료 선택 시트 열기
+  // 메뉴 추천받기 버튼 클릭 - 못 먹는 재료 선택 페이지로 이동
   const handleGetRecommendation = () => {
-    setIsRestrictionsSheetOpen(true);
+    onStepClick?.(0);
   };
-
-  // 못 먹는 재료 선택 완료 후 처리
-  const handleRestrictionsClose = () => {
-    setIsRestrictionsSheetOpen(false);
-  };
-
-  // 못 먹는 재료 저장 후 처리
 
   const conditionId = moodToConditionId(userSelectedMood);
   const statusText = CONDITION_STATUS[moodKey];
@@ -215,12 +206,6 @@ export default function RecipeResultStep({
           </Button>
         </div>
       </ABCardContainer>
-
-      {/* 못 먹는 재료 선택 시트 */}
-      <DietaryRestrictionsSheet
-        isOpen={isRestrictionsSheetOpen}
-        onClose={handleRestrictionsClose}
-      />
     </div>
   );
 }
