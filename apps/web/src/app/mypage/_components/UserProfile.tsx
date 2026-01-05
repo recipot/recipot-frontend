@@ -6,20 +6,20 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/common/Button';
 import { PersistentTooltip } from '@/components/common/PersistentTooltip';
 import { SettingsIcon } from '@/components/Icons';
+import { useGuestGuard } from '@/hooks';
 import type { User } from '@/types/MyPage.types';
 
 interface UserProfileProps {
   user: User | null;
   showSettingsButton?: boolean;
-  isGuest?: boolean;
 }
 
 export default function UserProfile({
-  isGuest = false,
   showSettingsButton = true,
   user,
 }: UserProfileProps) {
   const router = useRouter();
+  const { isGuest } = useGuestGuard();
 
   const handleNavigateToSettings = () => {
     router.push('/mypage/settings');

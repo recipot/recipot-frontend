@@ -1,27 +1,16 @@
 'use client';
 
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useAuth } from '@recipot/contexts';
 
 import { MyPagePresenter } from '@/app/mypage/_components/MyPagePresenter';
 import { useAllergyData } from '@/components/Allergy';
-import { useIsLoggedIn } from '@/hooks';
 import { useCompletedRecipes } from '@/hooks/useCompletedRecipes';
 import { mockRestrictions } from '@/mocks/data/myPage.mock';
 import { useAllergiesStore } from '@/stores/allergiesStore';
-import { useLoginModalStore } from '@/stores/useLoginModalStore';
 
 export function MyPageContainer() {
   const { user } = useAuth();
-  const isLoggedIn = useIsLoggedIn();
-  const openLoginModal = useLoginModalStore(state => state.openModal);
-
-  // 게스트 상태일 때 로그인 모달 표시
-  useEffect(() => {
-    if (!isLoggedIn) {
-      openLoginModal();
-    }
-  }, [isLoggedIn, openLoginModal]);
 
   // 완료한 요리 데이터
   const { data: completedRecipesData, isLoading: isLoadingRecipes } =
@@ -64,7 +53,6 @@ export function MyPageContainer() {
       user={user ?? null}
       restrictions={restrictions}
       cookedRecipes={cookedRecipes}
-      isGuest={!isLoggedIn}
     />
   );
 }
