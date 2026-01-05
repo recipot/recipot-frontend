@@ -237,9 +237,6 @@ export const authService = {
     storage.saveTokens(data.accessToken, data.refreshToken);
     const user = await this.getUserInfo();
 
-    // 게스트 세션 데이터 마이그레이션
-    await guestSession.migrateToUser();
-
     try {
       await guestSession.migrateToUser();
     } catch (error) {
@@ -268,13 +265,11 @@ export const authService = {
     // 토큰 저장 후 게스트 세션 데이터 마이그레이션
     if (data.accessToken && data.refreshToken) {
       storage.saveTokens(data.accessToken, data.refreshToken);
-      await guestSession.migrateToUser();
-    }
-
-    try {
-      await guestSession.migrateToUser();
-    } catch (error) {
-      throw new Error('게스트 세션 마이그레이션 실패');
+      try {
+        await guestSession.migrateToUser();
+      } catch (error) {
+        throw new Error('게스트 세션 마이그레이션 실패');
+      }
     }
 
     return data;
