@@ -7,6 +7,7 @@ import { Button } from '@/components/common/Button';
 import { PersistentTooltip } from '@/components/common/PersistentTooltip';
 import { SettingsIcon } from '@/components/Icons';
 import { useGuestGuard } from '@/hooks';
+import { useLoginModalStore } from '@/stores/useLoginModalStore';
 import type { User } from '@/types/MyPage.types';
 
 interface UserProfileProps {
@@ -20,8 +21,12 @@ export default function UserProfile({
 }: UserProfileProps) {
   const router = useRouter();
   const { isGuest } = useGuestGuard();
-
+  const openLoginModal = useLoginModalStore(state => state.openModal);
   const handleNavigateToSettings = () => {
+    if (isGuest) {
+      openLoginModal();
+      return;
+    }
     router.push('/mypage/settings');
   };
 
