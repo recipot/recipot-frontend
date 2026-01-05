@@ -35,13 +35,6 @@ export const CONDITION_STATUS = {
   neutral: '요리할 여유가 그저 그래요',
 } as const;
 
-/** 컨디션별 이모지 */
-export const CONDITION_EMOJIS = {
-  bad: '\u{1F623}',
-  good: '\u{1F60A}',
-  neutral: '\u{1F611}',
-} as const;
-
 /** 최소 선택 재료 개수 */
 export const MIN_SELECTED_FOODS = 2;
 
