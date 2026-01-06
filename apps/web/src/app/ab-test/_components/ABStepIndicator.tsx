@@ -6,7 +6,6 @@ import { TOTAL_STEPS } from '../_constants';
 
 interface ABStepIndicatorProps {
   currentStep: number;
-  onStepClick?: (step: number) => void;
 }
 
 /**
@@ -14,16 +13,7 @@ interface ABStepIndicatorProps {
  * 3개의 점으로 현재 진행 단계를 표시합니다.
  * 각 dot 클릭 시 해당 스텝으로 이동할 수 있습니다.
  */
-export default function ABStepIndicator({
-  currentStep,
-  onStepClick,
-}: ABStepIndicatorProps) {
-  const handleStepClick = (step: number) => {
-    if (onStepClick) {
-      onStepClick(step);
-    }
-  };
-
+export default function ABStepIndicator({ currentStep }: ABStepIndicatorProps) {
   return (
     <div className="mb-6 flex gap-2">
       {Array.from({ length: TOTAL_STEPS }, (_, index) => {
@@ -35,11 +25,11 @@ export default function ABStepIndicator({
             type="button"
             key={stepNumber}
             className={cn(
-              'h-2 w-2 cursor-pointer rounded-[50%] border-none bg-gray-300 p-0 transition duration-300 ease-in-out active:bg-gray-900',
+              'h-2 w-2 cursor-pointer rounded-[50%] border-none bg-gray-300 p-0',
               isActive && 'bg-gray-900'
             )}
             aria-label={`Step ${stepNumber} ${isActive ? '(현재)' : ''}`}
-            onClick={() => handleStepClick(stepNumber)}
+            // onClick={() => handleStepClick(stepNumber)}
           />
         );
       })}

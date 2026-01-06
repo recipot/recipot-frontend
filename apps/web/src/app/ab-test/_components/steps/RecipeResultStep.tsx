@@ -125,7 +125,7 @@ export default function RecipeResultStep({
 
       {/* 상단 헤더 영역 */}
       <div className="flex flex-col items-center px-4 pt-6 pb-8">
-        <ABStepIndicator currentStep={3} onStepClick={onStepClick} />
+        <ABStepIndicator currentStep={3} />
       </div>
 
       {/* 카드 컨테이너 */}

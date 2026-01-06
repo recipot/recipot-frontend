@@ -16,7 +16,6 @@ interface ABPageLayoutProps {
   onButtonClick: () => void;
   showButton?: boolean;
   mood?: MoodType | null;
-  onStepClick?: (step: number) => void;
 }
 
 /**
@@ -30,7 +29,6 @@ export default function ABPageLayout({
   currentStep,
   mood,
   onButtonClick,
-  onStepClick,
   question,
   showButton = true,
   title,
@@ -42,7 +40,7 @@ export default function ABPageLayout({
 
       {/* 상단 헤더 영역 */}
       <div className="flex flex-col items-center px-4 pt-6 pb-8">
-        <ABStepIndicator currentStep={currentStep} onStepClick={onStepClick} />
+        <ABStepIndicator currentStep={currentStep} />
         <h1 className="text-24b text-center whitespace-pre-line text-gray-900">
           {title}
         </h1>

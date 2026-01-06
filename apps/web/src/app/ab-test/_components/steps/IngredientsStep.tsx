@@ -18,10 +18,7 @@ interface IngredientsStepProps {
  * A/B 테스트 B안 Step 2: 재료 검색
  * 기존 IngredientsSearch 컴포넌트를 재사용합니다.
  */
-export default function IngredientsStep({
-  onNext,
-  onStepClick,
-}: IngredientsStepProps) {
+export default function IngredientsStep({ onNext }: IngredientsStepProps) {
   const searchRef = useRef<IngredientsSearchRef>(null);
   const mood = useMoodStore(state => state.mood);
   const selectedFoodIds = useSelectedFoodsStore(state => state.selectedFoodIds);
@@ -44,7 +41,6 @@ export default function IngredientsStep({
       buttonDisabled={!hasEnoughFoods}
       onButtonClick={handleNext}
       mood={mood}
-      onStepClick={onStepClick}
     >
       <div className="-mx-6">
         <IngredientsSearch ref={searchRef} variant="onboarding" />
