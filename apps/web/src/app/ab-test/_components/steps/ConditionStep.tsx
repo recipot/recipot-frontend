@@ -13,7 +13,7 @@ interface ConditionStepProps {
 }
 
 /**
- * A/B 테스트 B안 Step 1: 컨디션 선택
+ * A/B 테스트 B안 Step 2: 컨디션 선택
  * 기존 EmotionSelector 컴포넌트를 재사용합니다.
  */
 export default function ConditionStep({ onNext }: ConditionStepProps) {
@@ -34,7 +34,7 @@ export default function ConditionStep({ onNext }: ConditionStepProps) {
 
   return (
     <ABPageLayout
-      currentStep={1}
+      currentStep={2}
       title={stepConfig.title}
       question={stepConfig.question}
       buttonText="다음으로"

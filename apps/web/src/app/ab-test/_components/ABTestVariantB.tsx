@@ -7,13 +7,15 @@ import {
   ABAllergyStep,
   ConditionStep,
   IngredientsStep,
+  IntroStep,
   RecipeResultStep,
 } from '@/app/ab-test/_components/steps';
 import { useABTestStep } from '@/app/ab-test/_hooks';
 
 /**
  * A/B 테스트 B안 메인 컴포넌트
- * 플로우: 못먹는음식(0) -> 컨디션(1) -> 재료입력(2) -> 결과(3)
+ * 플로우: 인트로(0) -> 못먹는음식(1) -> 컨디션(2) -> 재료입력(3) -> 결과(4)
+ * 비로그인 유저는 항상 인트로(A화면)부터 시작합니다.
  */
 export default function ABTestVariantB() {
   const { currentStep, goToNextStep, goToStep } = useABTestStep();
@@ -21,15 +23,17 @@ export default function ABTestVariantB() {
   const renderCurrentStep = () => {
     switch (currentStep) {
       case 0:
-        return <ABAllergyStep onNext={goToNextStep} />;
+        return <IntroStep onNext={goToNextStep} />;
       case 1:
-        return <ConditionStep onNext={goToNextStep} onStepClick={goToStep} />;
+        return <ABAllergyStep onNext={goToNextStep} />;
       case 2:
-        return <IngredientsStep onNext={goToNextStep} onStepClick={goToStep} />;
+        return <ConditionStep onNext={goToNextStep} onStepClick={goToStep} />;
       case 3:
+        return <IngredientsStep onNext={goToNextStep} onStepClick={goToStep} />;
+      case 4:
         return <RecipeResultStep onStepClick={goToStep} />;
       default:
-        return <ABAllergyStep onNext={goToNextStep} />;
+        return <IntroStep onNext={goToNextStep} />;
     }
   };
 

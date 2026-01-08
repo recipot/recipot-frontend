@@ -45,5 +45,8 @@ export const CONDITION_STATUS = {
 /** 최소 선택 재료 개수 */
 export const MIN_SELECTED_FOODS = 2;
 
-/** 스텝 총 개수 */
-export const TOTAL_STEPS = 3;
+/** 설문 스텝 개수 (알러지, 컨디션, 재료) - 진행률 표시에 사용 */
+export const SURVEY_STEPS = 3;
+
+/** 마지막 스텝 인덱스 (Intro(0) -> Allergy(1) -> Condition(2) -> Ingredients(3) -> Result(4)) */
+export const TOTAL_STEPS = 4;
