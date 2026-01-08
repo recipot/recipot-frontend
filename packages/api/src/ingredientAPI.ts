@@ -5,9 +5,10 @@ export interface HealthInfo {
 }
 
 export interface Ingredient {
-  id: number;
+  id?: number;
   name: string;
-  ingredient_category_id: number;
+  categoryId: number | null;
+  categoryName: string;
   health_infos: HealthInfo[];
   createdAt?: string;
   updatedAt?: string;
@@ -42,7 +43,7 @@ export interface GetIngredientsParams {
 }
 
 export interface CreateIngredientData {
-  ingredient_category_id: number;
+  ingredient_category_id: number | null;
   name: string;
   health_infos: HealthInfo[];
 }

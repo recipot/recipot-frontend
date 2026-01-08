@@ -3,10 +3,10 @@ export interface HealthInfo {
 }
 
 export interface Ingredient {
-  id?: number;
+  id: number;
   name: string; // 재료
-  ingredient_category_id: number | null; // 대분류 ID
-  categoryName?: string; // 대분류 이름 (UI용)
+  categoryId: number | null; // 대분류 ID
+  categoryName: string; // 대분류 이름 (UI용)
   health_infos: HealthInfo[]; // 건강 정보 배열
   isNew?: boolean;
   isModified?: boolean;

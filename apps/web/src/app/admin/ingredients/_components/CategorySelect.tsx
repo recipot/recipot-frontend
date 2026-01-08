@@ -61,7 +61,11 @@ export function CategorySelect({
 
   return (
     <div className="flex min-h-[40px] items-center">
-      {displayValue ?? <span className="text-gray-400">더블클릭하여 선택</span>}
+      {displayValue ? (
+        displayValue
+      ) : (
+        <span className="text-gray-400">더블클릭하여 선택</span>
+      )}
     </div>
   );
 }

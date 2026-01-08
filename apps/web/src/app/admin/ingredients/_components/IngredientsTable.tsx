@@ -3,7 +3,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/common/Button';
+import { Modal } from '@/components/common/Modal/Modal';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 import {
@@ -15,7 +16,6 @@ import {
 } from '@/hooks/useIngredients';
 
 import { CategorySelect } from './CategorySelect';
-import { DeleteConfirmModal } from './DeleteConfirmModal';
 import { EditableCell } from './EditableCell';
 import { HealthInfosCell } from './HealthInfoCell';
 
@@ -25,7 +25,12 @@ import type {
   UpdateIngredientData,
 } from 'packages/api/src/ingredientAPI';
 
-interface LocalIngredient extends Ingredient {
+// ✅ id를 optional로 변경, categoryId를 nullable로 변경
+interface LocalIngredient
+  extends Omit<Ingredient, 'id' | 'categoryId' | 'isUserRestricted'> {
+  id?: number;
+  categoryId: number | null;
+  isUserRestricted?: boolean;
   isNew?: boolean;
   isModified?: boolean;
 }
@@ -37,10 +42,14 @@ export function IngredientsTable() {
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [editingCell, setEditingCell] = useState<{
-    id: number | string;
-    field: keyof Ingredient;
+    id?: number;
+    field: keyof LocalIngredient;
   } | null>(null);
-  const [errors, setErrors] = useState<Record<string | number, string>>({});
+  const [selectedCell, setSelectedCell] = useState<{
+    id?: number;
+    field: keyof LocalIngredient;
+  } | null>(null); // ✅ 선택된 셀 추적
+  const [errors, setErrors] = useState<Record<number, string>>({});
   const [page, setPage] = useState(1);
   const observerTarget = useRef<HTMLDivElement>(null);
   const prevIngredientsRef = useRef<Ingredient[]>([]);
@@ -67,15 +76,15 @@ export function IngredientsTable() {
 
     if (hasChanged && ingredients.length > 0) {
       setLocalIngredients(prev => {
-        // 새로운 데이터인 경우에만 추가
+        // ✅ id가 있는 항목만 필터링
         const existingIds = new Set(
-          prev.filter(i => typeof i.id === 'number').map(i => i.id)
+          prev.filter(i => i.id !== undefined).map(i => i.id!)
         );
         const newItems = ingredients.filter(i => !existingIds.has(i.id));
 
         if (page === 1) {
           // 첫 페이지는 교체 (편집 중인 항목은 유지)
-          const editingItems = prev.filter(i => i.isNew ?? i.isModified);
+          const editingItems = prev.filter(i => i.isNew || i.isModified);
           return [...editingItems, ...ingredients];
         } else {
           // 다음 페이지는 추가
@@ -129,19 +138,21 @@ export function IngredientsTable() {
   }, []);
 
   const addNewRow = () => {
+    // ✅ id 없이 새 행 추가
     const newIngredient: LocalIngredient = {
+      categoryId: null,
+      categoryName: '',
       health_infos: [],
-      id: `new-${Date.now()}` as any,
-      ingredient_category_id: 0,
       isNew: true,
+      isUserRestricted: false,
       name: '',
     };
     setLocalIngredients(prev => [newIngredient, ...prev]);
   };
 
   // 체크박스 선택
-  const toggleSelection = (id: number | string) => {
-    if (typeof id === 'string') return;
+  const toggleSelection = (id?: number) => {
+    if (id === undefined) return;
 
     const newSelected = new Set(selectedIds);
     if (newSelected.has(id)) {
@@ -154,7 +165,7 @@ export function IngredientsTable() {
 
   const toggleSelectAll = () => {
     const existingIngredients = localIngredients.filter(
-      i => typeof i.id === 'number'
+      i => i.id !== undefined
     );
 
     if (
@@ -163,7 +174,7 @@ export function IngredientsTable() {
     ) {
       setSelectedIds(new Set());
     } else {
-      const allIds = existingIngredients.map(i => i.id);
+      const allIds = existingIngredients.map(i => i.id!);
       setSelectedIds(new Set(allIds));
     }
   };
@@ -182,7 +193,7 @@ export function IngredientsTable() {
       await deleteMutation.mutateAsync(Array.from(selectedIds));
 
       setLocalIngredients(prev =>
-        prev.filter(item => !selectedIds.has(item.id))
+        prev.filter(item => item.id === undefined || !selectedIds.has(item.id))
       );
       setSelectedIds(new Set());
       setIsDeleteModalOpen(false);
@@ -195,35 +206,50 @@ export function IngredientsTable() {
 
   // 셀 편집
   const handleCellDoubleClick = (
-    id: number | string,
-    field: keyof Ingredient
+    id: number | undefined,
+    field: keyof LocalIngredient
   ) => {
     if (field === 'id') return;
     setEditingCell({ field, id });
   };
 
+  // ✅ 셀 클릭 핸들러 (단일 클릭)
+  const handleCellClick = (
+    id: number | undefined,
+    field: keyof LocalIngredient
+  ) => {
+    if (field === 'id') return;
+    setSelectedCell({ field, id });
+  };
+
   const handleCellChange = (
-    id: number | string,
-    field: keyof Ingredient,
+    id: number | undefined,
+    field: keyof LocalIngredient,
     value: any
   ) => {
     setLocalIngredients(prev =>
-      prev.map(item => {
-        if (item.id === id) {
+      prev.map((item, index) => {
+        // ✅ id가 있으면 id로 비교, 없으면 인덱스로 비교
+        const isMatch =
+          id !== undefined
+            ? item.id === id
+            : index === prev.findIndex(i => i.id === undefined && i.isNew);
+
+        if (isMatch) {
           const updates: Partial<LocalIngredient> = { [field]: value };
 
           return {
             ...item,
             ...updates,
-            isModified: !item.isNew,
+            isModified: !item.isNew && item.id !== undefined,
           };
         }
         return item;
       })
     );
 
-    // 에러 제거
-    if (errors[id]) {
+    // 에러 제거 (id가 있는 경우만)
+    if (id !== undefined && errors[id]) {
       setErrors(prev => {
         const newErrors = { ...prev };
         delete newErrors[id];
@@ -239,31 +265,39 @@ export function IngredientsTable() {
   // 중복 체크
   const checkDuplicateName = (
     name: string,
-    currentId: number | string
+    currentId: number | undefined,
+    currentIndex: number
   ): boolean => {
-    return localIngredients.some(
-      item => item.name.trim() === name.trim() && item.id !== currentId
-    );
+    return localIngredients.some((item, index) => {
+      // ✅ id가 있으면 id로 비교, 없으면 인덱스로 비교
+      const isSameItem =
+        currentId !== undefined
+          ? item.id === currentId
+          : index === currentIndex;
+
+      return item.name.trim() === name.trim() && !isSameItem;
+    });
   };
 
   // 저장 처리
   const handleSave = async () => {
-    const newErrors: Record<string | number, string> = {};
+    const newErrors: Record<number, string> = {};
 
     // 신규와 수정 항목 분리
     const newItems = localIngredients.filter(item => item.isNew);
     const modifiedItems = localIngredients.filter(item => item.isModified);
 
     // 유효성 검사
-    [...newItems, ...modifiedItems].forEach(item => {
-      const itemId = item.id as string | number;
+    [...newItems, ...modifiedItems].forEach((item, index) => {
+      // ✅ 새 항목은 임시 ID 사용, 기존 항목은 실제 ID 사용
+      const itemKey = item.id ?? -(index + 1);
 
       if (!item.name.trim()) {
-        newErrors[itemId] = '재료명은 필수입니다.';
-      } else if (checkDuplicateName(item.name, item.id as any)) {
-        newErrors[itemId] = `${item.name}이(가) 이미 존재합니다.`;
-      } else if (!item.ingredient_category_id) {
-        newErrors[itemId] = '대분류는 필수입니다.';
+        newErrors[itemKey] = '재료명은 필수입니다.';
+      } else if (checkDuplicateName(item.name, item.id, index)) {
+        newErrors[itemKey] = `${item.name}이(가) 이미 존재합니다.`;
+      } else if (!item.categoryId) {
+        newErrors[itemKey] = '대분류는 필수입니다.';
       }
     });
 
@@ -276,8 +310,8 @@ export function IngredientsTable() {
       // 신규 항목 생성
       if (newItems.length > 0) {
         const createData: CreateIngredientData[] = newItems.map(item => ({
-          health_infos: item.health_infos || [], // ✅ 안전한 접근
-          ingredient_category_id: item.ingredient_category_id,
+          health_infos: item.health_infos || [],
+          ingredient_category_id: item.categoryId!,
           name: item.name,
         }));
 
@@ -288,8 +322,8 @@ export function IngredientsTable() {
       if (modifiedItems.length > 0) {
         const updateData: UpdateIngredientData[] = modifiedItems.map(item => ({
           health_infos: item.health_infos || [],
-          id: item.id,
-          ingredient_category_id: item.ingredient_category_id,
+          id: item.id!,
+          ingredient_category_id: item.categoryId!,
           name: item.name,
         }));
 
@@ -312,13 +346,26 @@ export function IngredientsTable() {
   const displayIngredients = useMemo(() => {
     return localIngredients.map(item => ({
       ...item,
-      categoryName:
-        categories.find(c => c.id === item.ingredient_category_id)?.name ?? '',
+      categoryName: categories.find(c => c.id === item.categoryId)?.name ?? '',
     }));
   }, [localIngredients, categories]);
 
+  // ✅ 삭제 모달 메시지 생성
+  const deleteModalDescription = useMemo(() => {
+    if (selectedIds.size === 1) {
+      const selectedId = Array.from(selectedIds)[0];
+      const selectedItem = localIngredients.find(
+        item => item.id === selectedId
+      );
+      return selectedItem
+        ? `"${selectedItem.name}" 재료를 삭제하시겠습니까?`
+        : '선택한 항목을 삭제하시겠습니까?';
+    }
+    return `선택한 ${selectedIds.size}개의 항목을 삭제하시겠습니까?`;
+  }, [selectedIds, localIngredients]);
+
   return (
-    <div className="space-y-[1.875rem]">
+    <div>
       <div className="sticky top-0 z-20 bg-white pt-14">
         <div className="mr-9 mb-[1.0625rem] flex justify-end gap-[1.6875rem]">
           <Button
@@ -365,73 +412,89 @@ export function IngredientsTable() {
         {/* 테이블 바디 */}
         <Table className="w-full border-collapse">
           <TableBody>
-            {displayIngredients.map(ingredient => (
+            {displayIngredients.map((ingredient, index) => (
               <TableRow
-                key={ingredient.id}
-                className={errors[ingredient.id] ? 'bg-red-50' : ''}
+                key={ingredient.id ?? `new-${index}`}
+                className={` ${ingredient.id && errors[ingredient.id] ? 'bg-red-50' : ''} ${selectedCell?.id === ingredient.id ? 'bg-[#A8C67F]' : ''} `}
               >
                 <TableCell
                   className="w-12 border border-gray-300"
                   style={{ width: '4%' }}
                 >
                   <Checkbox
-                    checked={selectedIds.has(ingredient.id)}
+                    checked={
+                      ingredient.id !== undefined &&
+                      selectedIds.has(ingredient.id)
+                    }
                     onCheckedChange={() => toggleSelection(ingredient.id)}
-                    disabled={typeof ingredient.id === 'string'}
+                    disabled={ingredient.id === undefined}
                   />
                 </TableCell>
                 <TableCell
-                  className="border border-gray-300"
+                  className="w-12 border border-gray-300"
                   style={{ width: '4%' }}
                 >
-                  {ingredient.id}
+                  {ingredient.id ?? '-'}
                 </TableCell>
                 <TableCell
                   className="border border-gray-300"
                   style={{ width: '15%' }}
+                  onClick={() => handleCellClick(ingredient.id, 'name')}
                   onDoubleClick={() =>
                     handleCellDoubleClick(ingredient.id, 'name')
                   }
                 >
-                  <EditableCell
-                    value={ingredient.name}
-                    isEditing={
-                      editingCell?.id === ingredient.id &&
-                      editingCell?.field === 'name'
-                    }
-                    onChange={value =>
-                      handleCellChange(ingredient.id, 'name', value)
-                    }
-                    onBlur={handleCellBlur}
-                    error={errors[ingredient.id]}
-                  />
+                  <div
+                    className={`${
+                      selectedCell?.id === ingredient.id &&
+                      selectedCell?.field === 'name'
+                        ? 'ring-1 ring-blue-500'
+                        : ''
+                    }`}
+                  >
+                    <EditableCell
+                      value={ingredient.name}
+                      isEditing={
+                        editingCell?.id === ingredient.id &&
+                        editingCell?.field === 'name'
+                      }
+                      onChange={value =>
+                        handleCellChange(ingredient.id, 'name', value)
+                      }
+                      onBlur={handleCellBlur}
+                      error={ingredient.id ? errors[ingredient.id] : undefined}
+                    />
+                  </div>
                 </TableCell>
                 <TableCell
                   className="border border-gray-300"
                   style={{ width: '15%' }}
+                  onClick={() => handleCellClick(ingredient.id, 'categoryId')}
                   onDoubleClick={() =>
-                    handleCellDoubleClick(
-                      ingredient.id,
-                      'ingredient_category_id'
-                    )
+                    handleCellDoubleClick(ingredient.id, 'categoryId')
                   }
                 >
-                  <CategorySelect
-                    value={ingredient.ingredient_category_id}
-                    categories={categories}
-                    isEditing={
-                      editingCell?.id === ingredient.id &&
-                      editingCell?.field === 'ingredient_category_id'
-                    }
-                    onChange={value =>
-                      handleCellChange(
-                        ingredient.id,
-                        'ingredient_category_id',
-                        value
-                      )
-                    }
-                    onBlur={handleCellBlur}
-                  />
+                  <div
+                    className={`${
+                      selectedCell?.id === ingredient.id &&
+                      selectedCell?.field === 'categoryId'
+                        ? 'ring-2 ring-blue-500 ring-inset'
+                        : ''
+                    }`}
+                  >
+                    <CategorySelect
+                      value={ingredient.categoryId}
+                      categories={categories}
+                      isEditing={
+                        editingCell?.id === ingredient.id &&
+                        editingCell?.field === 'categoryId'
+                      }
+                      onChange={value =>
+                        handleCellChange(ingredient.id, 'categoryId', value)
+                      }
+                      onBlur={handleCellBlur}
+                    />
+                  </div>
                 </TableCell>
                 <TableCell
                   className="border border-gray-300"
@@ -449,21 +512,31 @@ export function IngredientsTable() {
                 <TableCell
                   className="border border-gray-300"
                   style={{ width: '42%' }}
+                  onClick={() => handleCellClick(ingredient.id, 'health_infos')}
                   onDoubleClick={() =>
                     handleCellDoubleClick(ingredient.id, 'health_infos')
                   }
                 >
-                  <HealthInfosCell
-                    value={ingredient.health_infos ?? []}
-                    isEditing={
-                      editingCell?.id === ingredient.id &&
-                      editingCell?.field === 'health_infos'
-                    }
-                    onChange={value =>
-                      handleCellChange(ingredient.id, 'health_infos', value)
-                    }
-                    onBlur={handleCellBlur}
-                  />
+                  <div
+                    className={`${
+                      selectedCell?.id === ingredient.id &&
+                      selectedCell?.field === 'health_infos'
+                        ? 'ring-2 ring-blue-500 ring-inset'
+                        : ''
+                    }`}
+                  >
+                    <HealthInfosCell
+                      value={ingredient.health_infos ?? []}
+                      isEditing={
+                        editingCell?.id === ingredient.id &&
+                        editingCell?.field === 'health_infos'
+                      }
+                      onChange={value =>
+                        handleCellChange(ingredient.id, 'health_infos', value)
+                      }
+                      onBlur={handleCellBlur}
+                    />
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
@@ -479,13 +552,35 @@ export function IngredientsTable() {
       {/* 무한 스크롤 트리거 */}
       <div ref={observerTarget} className="h-4" />
 
-      {/* 삭제 확인 모달 */}
-      <DeleteConfirmModal
-        isOpen={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
-        onConfirm={handleDeleteConfirm}
-        count={selectedIds.size}
-      />
+      {/* ✅ 삭제 확인 모달 - Modal 컴포넌트 사용 */}
+      <Modal
+        open={isDeleteModalOpen}
+        onOpenChange={setIsDeleteModalOpen}
+        description={deleteModalDescription}
+        contentGap={24}
+      >
+        <div className="flex justify-center gap-2">
+          <Button
+            variant="outline"
+            size="full"
+            shape="square"
+            onClick={() => setIsDeleteModalOpen(false)}
+            disabled={deleteMutation.isPending}
+            className="text-15sb h-10 py-[0.5313rem]"
+          >
+            취소
+          </Button>
+          <Button
+            size="full"
+            shape="square"
+            onClick={handleDeleteConfirm}
+            disabled={deleteMutation.isPending}
+            className="text-15sb h-10 py-[0.5313rem]"
+          >
+            {deleteMutation.isPending ? '삭제 중...' : '삭제'}
+          </Button>
+        </div>
+      </Modal>
     </div>
   );
 }
