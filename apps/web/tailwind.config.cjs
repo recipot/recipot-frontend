@@ -103,6 +103,7 @@ module.exports = {
         },
       },
       fontSize: {
+        12.75: ['0.796875rem', { lineHeight: '150%', fontWeight: '400' }], // text-12.75 (12.75px)
         12: ['0.75rem', { lineHeight: '150%', fontWeight: '400' }], // text-12
         '12sb': ['0.75rem', { lineHeight: '150%', fontWeight: '600' }], // text-12sb
         13: ['0.8125rem', { lineHeight: '150%', fontWeight: '400' }], // text-13
@@ -122,11 +123,13 @@ module.exports = {
         18: ['1.125rem', { lineHeight: '150%' }], // text-18
         '18sb': ['1.125rem', { lineHeight: '150%', fontWeight: '600' }], // text-18sb
         20: ['1.25rem', { lineHeight: '140%', fontWeight: '700' }], // text-20
+        '20sb': ['1.25rem', { lineHeight: '140%', fontWeight: '600' }], // text-20sb
         '20r': ['1.25rem', { lineHeight: '140%', fontWeight: '400' }], // text-20r
         22: ['1.375rem', { lineHeight: '140%', fontWeight: '600' }], // text-22
         '22sb': ['1.375rem', { lineHeight: '140%', fontWeight: '600' }], // text-22sb
         24: ['1.5rem', { lineHeight: '140%', fontWeight: '600' }], // text-24
         '24b': ['1.5rem', { lineHeight: '140%', fontWeight: '700' }], // text-24b
+        '26b': ['1.625rem', { lineHeight: '100%', fontWeight: '700' }], // text-26b
         28: ['1.75rem', { lineHeight: '100%', fontWeight: '700' }], // text-28
       },
     },

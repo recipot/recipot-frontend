@@ -10,7 +10,7 @@
   border: 1px solid #ecf1fa;
   border-bottom: none;
   background: transparent;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 /* 인트로 페이지네이션 스타일 - 밝은 배경용 (슬라이드 2,3) */

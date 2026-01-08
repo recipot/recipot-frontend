@@ -27,7 +27,7 @@ function ABTestContent() {
   }
 
   return (
-    <div className="flex min-h-screen justify-center">
+    <div className="flex justify-center">
       <ABTestVariantB />
     </div>
   );

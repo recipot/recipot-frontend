@@ -34,7 +34,7 @@ export default function ABPageLayout({
   title,
 }: ABPageLayoutProps) {
   return (
-    <div className="flex flex-col bg-transparent">
+    <div className="flex h-screen flex-col overflow-hidden bg-transparent">
       {/* 배경 그래디언트 - mood에 따라 변경 */}
       <EmotionBackground mood={mood ?? null} className="fixed inset-0 -z-10" />
 

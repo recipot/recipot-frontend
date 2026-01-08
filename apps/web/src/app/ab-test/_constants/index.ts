@@ -23,8 +23,8 @@ export const AB_STEP_CONFIG = [
   },
   {
     id: 3,
-    question: '',
-    title: '', // 동적으로 생성됨 (컨디션에 따라)
+    question: '힘들어도 해먹을 수 있는\n초간단 레시피',
+    title: '',
   },
 ] as const;
 
