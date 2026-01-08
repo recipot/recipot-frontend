@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { storedAPI } from '@recipot/api';
-import { useRouter } from 'next/navigation';
-import { tokenUtils } from 'packages/api/src/auth';
+import axios from 'axios';
 
-import { isProduction } from '@/lib/env';
-import { handleAuthError } from '@/utils/errorHandler';
+import { useIsLoggedIn } from '@/hooks/useIsLoggedIn';
+import { useLoginModalStore } from '@/stores/useLoginModalStore';
 
 interface UseBookmarkParams {
   showToast: (message: string) => void;
@@ -34,19 +33,16 @@ export const useBookmark = ({
       : Array.from(initialBookmarkedIds);
   };
 
-  const router = useRouter();
+  const isLoggedIn = useIsLoggedIn();
+  const openLoginModal = useLoginModalStore(state => state.openModal);
   const [bookmarkedRecipes, setBookmarkedRecipes] = useState<number[]>(
     getInitialBookmarkedRecipes
   );
   const [isLoading, setIsLoading] = useState(false);
 
   const checkAuthentication = (): boolean => {
-    const token = tokenUtils.getToken();
-    const useCookieAuth = isProduction;
-
-    if (!useCookieAuth && !token) {
-      console.error('인증 토큰이 없어 북마크를 변경할 수 없습니다.');
-      router.push('/signin');
+    if (!isLoggedIn) {
+      openLoginModal();
       return false;
     }
     return true;
@@ -70,7 +66,9 @@ export const useBookmark = ({
     isCurrentlyBookmarked: boolean
   ): void => {
     console.error('북마크 토글 실패:', error);
-    if (handleAuthError(error, router)) {
+    // 401 에러 시 로그인 모달 표시
+    if (axios.isAxiosError(error) && error.response?.status === 401) {
+      openLoginModal();
       return;
     }
     showToast(

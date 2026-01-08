@@ -18,14 +18,16 @@ export const CARD_DIMENSIONS = {
 export const CARD_STYLES = {
   card: {
     aspectRatio: '310 / 460',
-    height: 'auto',
+    height: '100%',
     maxHeight: '100%',
-    width: '100%',
+    maxWidth: '100%',
+    width: 'auto',
   },
   container: {
     aspectRatio: '310 / 460',
-    height: 'auto',
+    height: '100%',
     maxHeight: '100%',
-    width: '100%',
+    maxWidth: '100%',
+    width: 'auto',
   },
 };

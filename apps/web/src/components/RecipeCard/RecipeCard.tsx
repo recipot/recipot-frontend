@@ -18,16 +18,20 @@ interface RecipeCardProps {
   onBookmarkChange?: (recipeId: number, isBookmarked: boolean) => void;
   isMainCard?: boolean;
   mood?: MoodType;
+  className?: string;
+  variant?: 'default' | 'compact';
 }
 
 export const RecipeCard = memo(
   ({
+    className,
     index,
     isBookmarked,
     isMainCard = false,
     mood = 'neutral',
     onBookmarkChange,
     recipe,
+    variant = 'default',
   }: RecipeCardProps) => {
     const router = useRouter();
 
@@ -75,7 +79,7 @@ export const RecipeCard = memo(
 
               {/* 하단 컨텐츠 영역 */}
               <div className="z-10">
-                <RecipeContent recipe={recipe} />
+                <RecipeContent className={className} recipe={recipe} variant={variant} />
                 <RecipeActions
                   isBookmarked={isBookmarked}
                   onBookmarkChange={onBookmarkChange}

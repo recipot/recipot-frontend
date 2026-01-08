@@ -3,7 +3,8 @@ import './globals.css';
 
 import localFont from 'next/font/local';
 
-import { LoginRequiredModal } from '@/components/common/LoginRequiredModal/LoginRequiredModal';
+import { LoginRequiredModal } from '@/components/common/LoginRequiredModal';
+
 import Providers from './providers';
 
 import type { Metadata } from 'next';
@@ -144,8 +145,10 @@ export default function RootLayout({
         </noscript>
         {/* <!-- End Google Tag Manager (noscript) --> */}
         <div id="root">
-          <Providers>{children}</Providers>
-          <LoginRequiredModal />
+          <Providers>
+            {children}
+            <LoginRequiredModal />
+          </Providers>
         </div>
       </body>
     </html>

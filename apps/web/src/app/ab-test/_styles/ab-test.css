@@ -1,0 +1,36 @@
+/**
+ * A/B 테스트 B안 전용 스타일
+ * border와 rounded corners 스타일
+ */
+
+/* 카드 컨테이너 - border 처리 */
+.ab-card-container {
+  position: relative;
+  border-radius: 40px 40px 0 0;
+  border: 1px solid #ecf1fa;
+  border-bottom: none;
+  background: transparent;
+  overflow: hidden;
+}
+
+/* 인트로 페이지네이션 스타일 - 밝은 배경용 (슬라이드 2,3) */
+.ab-intro-pagination .swiper-pagination-bullet {
+  width: 8px;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.2);
+  opacity: 1;
+  margin: 0 4px;
+}
+
+.ab-intro-pagination .swiper-pagination-bullet-active {
+  background: #666;
+}
+
+/* 인트로 페이지네이션 - 어두운 배경용 (슬라이드 1) */
+.ab-intro-pagination-dark .swiper-pagination-bullet {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.ab-intro-pagination-dark .swiper-pagination-bullet-active {
+  background: #fff;
+}

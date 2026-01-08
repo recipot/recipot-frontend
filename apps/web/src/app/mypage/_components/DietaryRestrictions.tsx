@@ -1,15 +1,25 @@
+'use client';
+
 import { Button } from '@/components/common/Button';
 import { AddIcon } from '@/components/Icons';
+import { useGuestGuard } from '@/hooks';
 import type { DietaryRestriction } from '@/types/MyPage.types';
+
+interface DietaryRestrictionsProps {
+  restrictions: DietaryRestriction[];
+  onOpenSheet: () => void;
+}
 
 export default function DietaryRestrictions({
   onOpenSheet,
   restrictions,
-}: {
-  restrictions: DietaryRestriction[];
-  onOpenSheet: () => void;
-}) {
+}: DietaryRestrictionsProps) {
+  const { guardAction } = useGuestGuard();
   const hasRestrictions = restrictions.length > 0;
+
+  const handleButtonClick = () => {
+    guardAction(onOpenSheet);
+  };
 
   return (
     <div className="mb-10 flex flex-col gap-5">
@@ -38,7 +48,7 @@ export default function DietaryRestrictions({
                 shape="round"
                 className="bg-primary-subGreen flex h-12 w-12 items-center justify-center p-0"
                 size="md"
-                onClick={onOpenSheet}
+                onClick={handleButtonClick}
               >
                 <AddIcon size={22} color="white" />
               </Button>
@@ -54,7 +64,7 @@ export default function DietaryRestrictions({
         <Button
           shape="square"
           className="flex h-[4.313rem] items-center gap-1 rounded-[0.875rem] bg-gray-100 py-[1.563rem] active:bg-gray-200"
-          onClick={onOpenSheet}
+          onClick={handleButtonClick}
         >
           <AddIcon size={18} />
           <p className="text-16 text-gray-600">
