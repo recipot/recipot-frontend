@@ -42,9 +42,7 @@ export default function IngredientsStep({ onNext }: IngredientsStepProps) {
       onButtonClick={handleNext}
       mood={mood}
     >
-      <div className="-mx-6">
-        <IngredientsSearch ref={searchRef} variant="onboarding" />
-      </div>
+      <IngredientsSearch ref={searchRef} variant="onboarding" />
     </ABPageLayout>
   );
 }

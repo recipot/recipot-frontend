@@ -50,7 +50,7 @@ export default function ABPageLayout({
       <ABCardContainer>
         {/* 질문 텍스트 */}
         {question && (
-          <div className="text-20r mx-auto mt-[70px] w-full max-w-[390px] text-center whitespace-pre-wrap text-gray-600">
+          <div className="text-20r mt-[70px] w-full text-center whitespace-pre-wrap text-gray-600">
             {question}
           </div>
         )}

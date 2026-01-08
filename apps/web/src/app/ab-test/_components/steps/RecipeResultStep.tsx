@@ -124,7 +124,7 @@ export default function RecipeResultStep({
       />
 
       {/* 상단 헤더 영역 */}
-      <div className="flex flex-col items-center px-4 pt-6 pb-8">
+      <div className="flex h-2 flex-col items-center">
         <ABStepIndicator currentStep={3} />
       </div>
 
@@ -187,6 +187,7 @@ export default function RecipeResultStep({
                       isBookmarked={recipe.isBookmarked}
                       isMainCard={index === activeIndex}
                       mood={userSelectedMood}
+                      variant="compact"
                     />
                   </SwiperSlide>
                 ))}
@@ -196,7 +197,7 @@ export default function RecipeResultStep({
         </div>
 
         {/* 버튼 영역 */}
-        <div className="mt-[30px]">
+        <div className="mt-[30px] px-8 py-[10px]">
           <Button
             size="full"
             onClick={handleGetRecommendation}
