@@ -32,11 +32,11 @@ export const RecipeActions = ({
 
   return (
     <div className="px-5 pb-6">
-      <div className="flex gap-2">
+      <div className="flex justify-center gap-2">
         <Button
           variant="ghost"
           size="icon"
-          className="rounded-full border border-white bg-transparent hover:bg-transparent hover:text-white focus:bg-transparent focus:outline-none active:bg-transparent"
+          className="shrink-0 rounded-full border border-white bg-transparent hover:bg-transparent hover:text-white focus:bg-transparent focus:outline-none active:bg-transparent"
           onClick={e => {
             e.stopPropagation(); // 이벤트 전파 방지
             toggleBookmark(recipeId);

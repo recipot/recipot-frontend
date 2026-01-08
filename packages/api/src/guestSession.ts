@@ -85,8 +85,8 @@ export const guestSession = {
       await guestApi.post<MigrateGuestResponse>('/v1/auth/migrate-guest', {
         guestSessionId: sessionId,
       });
-    } finally {
       storage.clearSessionId();
+    } finally {
     }
   },
 
