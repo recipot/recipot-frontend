@@ -34,7 +34,7 @@ export default function ABPageLayout({
   title,
 }: ABPageLayoutProps) {
   return (
-    <div className="flex flex-col bg-transparent">
+    <div className="flex h-screen flex-col overflow-hidden bg-transparent">
       {/* 배경 그래디언트 - mood에 따라 변경 */}
       <EmotionBackground mood={mood ?? null} className="fixed inset-0 -z-10" />
 
@@ -50,7 +50,7 @@ export default function ABPageLayout({
       <ABCardContainer>
         {/* 질문 텍스트 */}
         {question && (
-          <div className="text-20r mx-auto mt-[70px] w-full max-w-[390px] text-center whitespace-pre-wrap text-gray-600">
+          <div className="text-20r mt-[70px] w-full text-center whitespace-pre-wrap text-gray-600">
             {question}
           </div>
         )}

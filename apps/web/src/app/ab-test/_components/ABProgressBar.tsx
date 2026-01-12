@@ -24,7 +24,7 @@ export default function ABProgressBar({
             <div
               key={stepNumber}
               className={`h-1 flex-1 rounded-sm transition-all duration-300 ${
-                isCompleted ? 'bg-black' : 'bg-gray-200'
+                isCompleted ? 'bg-gray-900' : 'bg-gray-500'
               }`}
             />
           );
@@ -33,4 +33,3 @@ export default function ABProgressBar({
     </div>
   );
 }
-

@@ -15,7 +15,7 @@ interface IngredientsStepProps {
 }
 
 /**
- * A/B 테스트 B안 Step 2: 재료 검색
+ * A/B 테스트 B안 Step 3: 재료 검색
  * 기존 IngredientsSearch 컴포넌트를 재사용합니다.
  */
 export default function IngredientsStep({ onNext }: IngredientsStepProps) {
@@ -34,7 +34,7 @@ export default function IngredientsStep({ onNext }: IngredientsStepProps) {
 
   return (
     <ABPageLayout
-      currentStep={2}
+      currentStep={3}
       title={stepConfig.title}
       question={stepConfig.question}
       buttonText="다음으로"
@@ -42,9 +42,7 @@ export default function IngredientsStep({ onNext }: IngredientsStepProps) {
       onButtonClick={handleNext}
       mood={mood}
     >
-      <div className="-mx-6">
-        <IngredientsSearch ref={searchRef} variant="onboarding" />
-      </div>
+      <IngredientsSearch ref={searchRef} variant="onboarding" />
     </ABPageLayout>
   );
 }

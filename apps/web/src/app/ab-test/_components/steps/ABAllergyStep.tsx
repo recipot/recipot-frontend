@@ -6,6 +6,7 @@ import RecipeHeader from '@/app/(recipeRecommend)/recipeRecommend/_components/Re
 import { ABProgressBar } from '@/app/ab-test/_components';
 import { AB_ALLERGY_STEP_CONFIG } from '@/app/ab-test/_constants';
 import { Allergy, useAllergyContext } from '@/components/Allergy';
+import { Header } from '@/components/common/Header';
 import { useAllergiesStore } from '@/stores/allergiesStore';
 
 interface ABAllergyStepProps {
@@ -47,6 +48,7 @@ function ABAllergyStepContent({ onNext }: ABAllergyStepProps) {
   return (
     <div className="container mx-auto max-w-4xl">
       <RecipeHeader disabled />
+      <Header.Spacer />
       <ABProgressBar currentStep={1} totalSteps={3} />
 
       <div className="mt-10 mb-4 text-center">

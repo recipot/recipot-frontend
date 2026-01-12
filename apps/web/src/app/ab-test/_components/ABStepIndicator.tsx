@@ -2,7 +2,7 @@
 
 import { cn } from '@/lib/utils';
 
-import { TOTAL_STEPS } from '../_constants';
+import { SURVEY_STEPS } from '../_constants';
 
 interface ABStepIndicatorProps {
   currentStep: number;
@@ -16,7 +16,7 @@ interface ABStepIndicatorProps {
 export default function ABStepIndicator({ currentStep }: ABStepIndicatorProps) {
   return (
     <div className="mb-6 flex gap-2">
-      {Array.from({ length: TOTAL_STEPS }, (_, index) => {
+      {Array.from({ length: SURVEY_STEPS }, (_, index) => {
         const stepNumber = index + 1;
         const isActive = currentStep === stepNumber;
 
@@ -25,11 +25,10 @@ export default function ABStepIndicator({ currentStep }: ABStepIndicatorProps) {
             type="button"
             key={stepNumber}
             className={cn(
-              'h-2 w-2 cursor-pointer rounded-[50%] border-none bg-gray-300 p-0',
+              'h-2 w-2 cursor-pointer rounded-[50%] border-none bg-gray-200 p-0',
               isActive && 'bg-gray-900'
             )}
             aria-label={`Step ${stepNumber} ${isActive ? '(현재)' : ''}`}
-            // onClick={() => handleStepClick(stepNumber)}
           />
         );
       })}

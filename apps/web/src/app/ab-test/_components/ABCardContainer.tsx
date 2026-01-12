@@ -16,8 +16,8 @@ export default function ABCardContainer({
   className,
 }: ABCardContainerProps) {
   return (
-    <div className={cn('ab-card-container flex-1', className)}>
-      <div className="relative z-1 flex min-h-[calc(100vh-250px)] flex-col">
+    <div className={cn('ab-card-container flex-1 overflow-hidden', className)}>
+      <div className="relative z-1 flex h-full min-h-0 flex-col overflow-hidden">
         {children}
       </div>
     </div>

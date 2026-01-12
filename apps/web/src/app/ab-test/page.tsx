@@ -28,8 +28,8 @@ function ABTestContent() {
   }
 
   return (
-    <div className="flex min-h-screen justify-center bg-white">
-      {variant === 'A' ? <ABTestVariantA /> : <ABTestVariantB />}
+    <div className="flex justify-center">
+      <ABTestVariantB />
     </div>
   );
 }
