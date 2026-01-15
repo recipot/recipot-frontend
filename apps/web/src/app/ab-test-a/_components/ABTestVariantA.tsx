@@ -3,17 +3,14 @@
 import '@/app/ab-test/_styles/ab-test.css';
 import '@/components/EmotionState/styles.css';
 
-import {
-  ConditionStep,
-  IngredientsStep,
-  RecipeResultStep,
-} from '@/app/ab-test/_components/steps';
+import { RecipeResultStep } from '@/app/ab-test/_components/steps';
 import { useABTestStep } from '@/app/ab-test/_hooks';
 
-import AllergyStep from './steps/A/ABAllergyStep';
-import CookStateStep from './steps/A/ABCookstatestep';
-import ABIntroStep from './steps/A/ABIntroStep';
-import RefrigeratorStep from './steps/A/ABRefrigeratorStep';
+import ABAllergyStep from './steps/aAllergyStep';
+import ConditionStep from './steps/aConditionStep';
+import CookStateStep from './steps/aCookstatestep';
+import ABIntroStep from './steps/aIntroStep';
+import { IngredientsStep } from './steps';
 
 /**
  * A/B 테스트 A안 메인 컴포넌트
@@ -27,18 +24,14 @@ export default function ABTestVariantA() {
       case 0:
         return <ABIntroStep onNext={goToNextStep} />;
       case 1:
-        return <AllergyStep onNext={goToNextStep} />;
+        return <ABAllergyStep onNext={goToNextStep} />;
       case 2:
         return <ConditionStep onNext={goToNextStep} onStepClick={goToStep} />;
       case 3:
         return <IngredientsStep onNext={goToNextStep} onStepClick={goToStep} />;
       case 4:
-        return (
-          <RefrigeratorStep onNext={goToNextStep} onStepClick={goToStep} />
-        );
-      case 5:
         return <CookStateStep onNext={goToNextStep} onStepClick={goToStep} />;
-      case 6:
+      case 5:
         return <RecipeResultStep onStepClick={goToStep} />;
       default:
         return;
