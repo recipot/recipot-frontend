@@ -35,6 +35,9 @@ export default function IntroSlider({
   const swiperRef = useRef<SwiperType | null>(null);
   const paginationRef = useRef<HTMLDivElement>(null);
   const [isMounted, setIsMounted] = useState(false);
+  
+  // 현재 활성화된 슬라이드 인덱스를 관리하는 상태
+  const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
     setIsMounted(true);
@@ -47,17 +50,15 @@ export default function IntroSlider({
     <div className="h-full w-full">
       {/* 배경 이미지 */}
       {item.backSrc ? (
-        <div>
-          <div>
-            <Image
-              src={item.backSrc}
-              alt={`${item.alt} 배경`}
-              fill
-              className="object-cover"
-              sizes="100vw"
-              priority={isPriority}
-            />
-          </div>
+        <div className="absolute inset-0">
+          <Image
+            src={item.backSrc}
+            alt={`${item.alt} 배경`}
+            fill
+            className="object-cover"
+            sizes="100vw"
+            priority={isPriority}
+          />
         </div>
       ) : null}
 
@@ -82,7 +83,6 @@ export default function IntroSlider({
     </div>
   );
 
-  // 페이지네이션을 상단에 위치
   const paginationStyle = useMemo(
     () => ({
       alignItems: 'center',
@@ -99,12 +99,15 @@ export default function IntroSlider({
     []
   );
 
+  const paginationThemeClass = activeIndex === 0 
+    ? 'ab-intro-pagination-dark' 
+    : 'ab-intro-pagination';
+
   return (
     <div className="relative h-full w-full">
-      {/* Pagination을 Swiper 밖으로 먼저 배치 */}
       <div
         ref={paginationRef}
-        className="intro-pagination h-3"
+        className={`intro-pagination h-3 ${paginationThemeClass}`}
         style={paginationStyle}
       />
 
@@ -114,7 +117,10 @@ export default function IntroSlider({
           modules={SWIPER_MODULES}
           className="h-full w-full"
           style={{ height: '100%', width: '100%' }}
-          onSlideChange={onSlideChange}
+          onSlideChange={(swiper) => {
+            setActiveIndex(swiper.realIndex);
+            onSlideChange(swiper); 
+          }}
           onSwiper={swiper => {
             swiperRef.current = swiper;
             onSwiper?.(swiper);
