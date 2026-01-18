@@ -4,11 +4,10 @@ import { useEffect, useMemo, useState } from 'react';
 
 import RecipeHeader from '@/app/(recipeRecommend)/recipeRecommend/_components/RecipeHeader';
 import { ABProgressBar } from '@/app/ab-test/_components';
+import { A_ALLERGY_STEP_CONFIG } from '@/app/ab-test/_constants';
 import { Allergy, useAllergyContext } from '@/components/Allergy';
 import { Header } from '@/components/common/Header';
 import { useAllergiesStore } from '@/stores/allergiesStore';
-
-import { AB_ALLERGY_STEP_CONFIG } from '../../_constants';
 
 interface ABAllergyStepProps {
   onNext: () => void;
@@ -26,6 +25,9 @@ function ABAllergyStepContent({ onNext }: ABAllergyStepProps) {
 
   const setAllergies = useAllergiesStore(state => state.setAllergies);
   const setSelectedItems = useAllergiesStore(state => state.setSelectedItems);
+
+  // 선택된 항목이 있는지 확인
+  const hasSelectedItems = selectedItems.length > 0;
 
   useEffect(() => {
     setSelectedItems(selectedItems);
@@ -48,16 +50,16 @@ function ABAllergyStepContent({ onNext }: ABAllergyStepProps) {
 
   return (
     <div className="container mx-auto max-w-4xl">
-      <RecipeHeader disabled />
+      <RecipeHeader disabled={!hasSelectedItems} />
       <Header.Spacer />
       <ABProgressBar currentStep={1} totalSteps={3} />
 
       <div className="mt-10 mb-4 text-center">
         <h1 className="text-24b mb-1 whitespace-pre-line">
-          {AB_ALLERGY_STEP_CONFIG.title}
+          {A_ALLERGY_STEP_CONFIG.title}
         </h1>
         <p className="text-18 text-gray-600">
-          {AB_ALLERGY_STEP_CONFIG.description}
+          {A_ALLERGY_STEP_CONFIG.description}
         </p>
       </div>
 
@@ -82,7 +84,7 @@ function ABAllergyStepContent({ onNext }: ABAllergyStepProps) {
           className="w-full max-w-md"
           disabled={isSubmitting}
         >
-          {isSubmitting ? '저장 중...' : AB_ALLERGY_STEP_CONFIG.buttonText}
+          {isSubmitting ? '저장 중...' : A_ALLERGY_STEP_CONFIG.buttonText}
         </Allergy.SubmitButton>
       </div>
     </div>

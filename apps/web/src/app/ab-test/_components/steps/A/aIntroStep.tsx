@@ -3,7 +3,7 @@
 import { useCallback, useMemo, useRef } from 'react';
 
 import IntroSlider from './aIntroSlider';
-import ABuseIntroSlider from './aUseIntroSlider';
+import useIntroSlider from './aUseIntroSlider';
 
 import type { Swiper as SwiperType } from 'swiper';
 
@@ -12,7 +12,7 @@ interface ABIntroStepProps {
 }
 
 export default function ABIntroStep({ onNext }: ABIntroStepProps) {
-  const { activeIndex, handleSlideChange, intro } = ABuseIntroSlider();
+  const { activeIndex, handleSlideChange, intro } = useIntroSlider();
   const swiperRef = useRef<SwiperType | null>(null);
 
   // 버튼 클릭 핸들러

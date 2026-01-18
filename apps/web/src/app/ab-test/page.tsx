@@ -27,9 +27,14 @@ function ABTestContent() {
     return null;
   }
 
+  // A는 바로 반환
+  if (variant === 'A') {
+    return <ABTestVariantA />;
+  }
+
   return (
     <div className="flex justify-center">
-      {variant === 'A' ? <ABTestVariantA /> : <ABTestVariantB />}
+      <ABTestVariantB />
     </div>
   );
 }

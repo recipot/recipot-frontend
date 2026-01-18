@@ -29,8 +29,10 @@
 /* 인트로 페이지네이션 - 어두운 배경용 (슬라이드 1) */
 .ab-intro-pagination-dark .swiper-pagination-bullet {
   background: rgba(255, 255, 255, 0.4);
+  margin: 0 4px;
 }
 
 .ab-intro-pagination-dark .swiper-pagination-bullet-active {
   background: #fff;
+  margin: 0 4px;
 }

@@ -1,5 +1,7 @@
 'use client';
 
+import { useSearchParams } from 'next/navigation';
+
 interface ABProgressBarProps {
   currentStep: number;
   totalSteps: number;
@@ -13,12 +15,18 @@ export default function ABProgressBar({
   currentStep,
   totalSteps,
 }: ABProgressBarProps) {
+  const searchParams = useSearchParams();
+  const variant = searchParams.get('variant');
+
   return (
     <div className="fixed top-14 right-0 left-0 z-10 flex w-full justify-center">
       <div className="flex w-full">
         {Array.from({ length: totalSteps }, (_, index) => {
           const stepNumber = index + 1;
-          const isCompleted = stepNumber <= currentStep;
+          const isCompleted =
+            variant === 'A'
+              ? stepNumber === currentStep
+              : stepNumber <= currentStep;
 
           return (
             <div

@@ -1,14 +1,13 @@
 'use client';
 
 import RecipeHeader from '@/app/(recipeRecommend)/recipeRecommend/_components/RecipeHeader';
-import { Header } from '@/components/common/Header';
+import { A_STEP_CONFIG } from '@/app/ab-test/_constants';
 import type { MoodType } from '@/components/EmotionState';
 import EmotionSelector from '@/components/EmotionState/EmotionSelector';
 import { useMoodStore } from '@/stores/moodStore';
 
-import { AB_STEP_CONFIG } from '../../_constants';
-import ABPageLayout from '../ABPageLayout';
-import ABProgressBar from '../ABProgressBar';
+import ABProgressBar from '../../ABProgressBar';
+import ABPageLayout from './aPageLayout';
 
 interface ConditionStepProps {
   onNext: () => void;
@@ -19,7 +18,7 @@ export default function ConditionStep({ onNext }: ConditionStepProps) {
   const mood = useMoodStore(state => state.mood);
   const setMood = useMoodStore(state => state.setMood);
 
-  const stepConfig = AB_STEP_CONFIG[0];
+  const stepConfig = A_STEP_CONFIG[0];
 
   const handleMoodSelect = (selectedMood: MoodType) => {
     setMood(selectedMood);
@@ -34,7 +33,7 @@ export default function ConditionStep({ onNext }: ConditionStepProps) {
   return (
     <>
       <RecipeHeader disabled />
-      <Header.Spacer />
+
       <ABProgressBar currentStep={2} totalSteps={3} />
       <ABPageLayout
         currentStep={2}

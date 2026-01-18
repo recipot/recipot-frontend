@@ -3,15 +3,14 @@
 import { useRef } from 'react';
 
 import RecipeHeader from '@/app/(recipeRecommend)/recipeRecommend/_components/RecipeHeader';
-import { AB_STEP_CONFIG, MIN_SELECTED_FOODS } from '@/app/ab-test-a/_constants';
-import { Header } from '@/components/common/Header';
+import { A_MIN_SELECTED_FOODS, A_STEP_CONFIG } from '@/app/ab-test/_constants';
 import type { IngredientsSearchRef } from '@/components/IngredientsSearch/IngredientsSearch';
 import IngredientsSearch from '@/components/IngredientsSearch/IngredientsSearch';
 import { useMoodStore } from '@/stores/moodStore';
 import { useSelectedFoodsStore } from '@/stores/selectedFoodsStore';
 
-import ABPageLayout from '../ABPageLayout';
-import ABProgressBar from '../ABProgressBar';
+import ABProgressBar from '../../ABProgressBar';
+import ABPageLayout from './aPageLayout';
 
 interface IngredientsStepProps {
   onNext: () => void;
@@ -23,8 +22,11 @@ export default function IngredientsStep({ onNext }: IngredientsStepProps) {
   const mood = useMoodStore(state => state.mood);
   const selectedFoodIds = useSelectedFoodsStore(state => state.selectedFoodIds);
 
-  const stepConfig = AB_STEP_CONFIG[1];
-  const hasEnoughFoods = selectedFoodIds.length >= MIN_SELECTED_FOODS;
+  const stepConfig = A_STEP_CONFIG[1];
+
+  // 선택된 재료가 있는지 확인
+  const hasSelectedFoods = selectedFoodIds.length > 0;
+  const hasEnoughFoods = selectedFoodIds.length >= A_MIN_SELECTED_FOODS;
 
   const handleNext = () => {
     if (hasEnoughFoods) {
@@ -34,8 +36,7 @@ export default function IngredientsStep({ onNext }: IngredientsStepProps) {
 
   return (
     <>
-      <RecipeHeader disabled />
-      <Header.Spacer />
+      <RecipeHeader disabled={!hasSelectedFoods} />
       <ABProgressBar currentStep={3} totalSteps={3} />
       <ABPageLayout
         currentStep={3}

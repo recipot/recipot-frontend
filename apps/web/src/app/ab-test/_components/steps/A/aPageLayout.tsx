@@ -16,14 +16,13 @@ interface ABPageLayoutProps {
 }
 
 /**
- * A/B 테스트 B안 페이지 레이아웃
+ * A/B 테스트 A안 페이지 레이아웃
  * 상단 헤더 (인디케이터 + 제목) + 카드 컨테이너 (질문 + 콘텐츠 + 버튼)
  */
 export default function ABPageLayout({
   buttonDisabled = false,
   buttonText,
   children,
-  currentStep,
   mood,
   onButtonClick,
   question,
@@ -36,13 +35,11 @@ export default function ABPageLayout({
       <EmotionBackground mood={mood ?? null} className="fixed inset-0 -z-10" />
 
       {/* 상단 헤더 영역 */}
-      <div className="flex flex-col items-center px-4 pt-6">
+      <div className="mt-14 flex flex-col items-center px-4 pt-10">
         <h1 className="text-24b text-center whitespace-pre-line text-gray-900">
           {title}
         </h1>
       </div>
-
-      {/* 카드 컨테이너 */}
 
       {/* 질문 텍스트 */}
       {question && (
