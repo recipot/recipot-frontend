@@ -31,7 +31,7 @@ export default function IntroSlider({
   intro,
   onSlideChange,
   onSwiper,
-}: Omit<IntroSliderProps, 'current'>) {
+}: IntroSliderProps) {
   const swiperRef = useRef<SwiperType | null>(null);
   const paginationRef = useRef<HTMLDivElement>(null);
   const [isMounted, setIsMounted] = useState(false);

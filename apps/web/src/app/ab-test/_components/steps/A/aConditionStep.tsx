@@ -11,7 +11,6 @@ import ABPageLayout from './aPageLayout';
 
 interface ConditionStepProps {
   onNext: () => void;
-  onStepClick?: (step: number) => void;
 }
 
 export default function ConditionStep({ onNext }: ConditionStepProps) {

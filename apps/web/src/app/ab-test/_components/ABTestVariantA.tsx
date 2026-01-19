@@ -13,7 +13,7 @@ import RecipeResultStep from './steps/A/aRecipeResultStep';
 
 /**
  * A/B 테스트 A안 메인 컴포넌트
- * 플로우: 인트로 슬라이드(0) -> 못먹는음식(1) -> 재료입력(2) -> 컨디션(3) -> 결과(4)
+ * 플로우: 인트로 슬라이드(0) -> 못먹는음식(1) -> 컨디션(2) -> 재료입력(3) -> 결과(4)
  */
 export default function ABTestVariantA() {
   const { currentStep, goToNextStep, goToStep } = useABTestStep();
@@ -25,9 +25,9 @@ export default function ABTestVariantA() {
       case 1:
         return <ABAllergyStep onNext={goToNextStep} />;
       case 2:
-        return <ConditionStep onNext={goToNextStep} onStepClick={goToStep} />;
+        return <ConditionStep onNext={goToNextStep} />;
       case 3:
-        return <IngredientsStep onNext={goToNextStep} onStepClick={goToStep} />;
+        return <IngredientsStep onNext={goToNextStep} />;
       case 4:
         return <RecipeResultStep onStepClick={goToStep} />;
       default:

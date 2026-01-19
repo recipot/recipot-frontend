@@ -58,7 +58,7 @@ interface RecipeResultStepProps {
 }
 
 /**
- * A/B 테스트 B안 : 레시피 추천 결과
+ * A/B 테스트 A안 : 레시피 추천 결과
  * 선택한 컨디션과 재료를 기반으로 레시피를 추천합니다.
  */
 export default function RecipeResultStep({
@@ -140,7 +140,7 @@ export default function RecipeResultStep({
     updateRecipeBookmark(recipeId, isBookmarked);
   };
 
-  // 메뉴 추천받기 버튼 클릭 - 못 먹는 재료 선택 페이지로 이동
+  // 메뉴 추천받기 버튼 클릭 - 인트로 슬라이드 페이지로 이동
   const handleGetRecommendation = () => {
     onStepClick?.(0);
   };

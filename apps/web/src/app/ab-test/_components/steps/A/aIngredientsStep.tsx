@@ -14,7 +14,6 @@ import ABPageLayout from './aPageLayout';
 
 interface IngredientsStepProps {
   onNext: () => void;
-  onStepClick?: (step: number) => void;
 }
 
 export default function IngredientsStep({ onNext }: IngredientsStepProps) {
