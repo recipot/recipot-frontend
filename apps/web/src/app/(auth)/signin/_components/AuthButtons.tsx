@@ -1,17 +1,36 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 import { Button } from '@/components/common/Button/Button';
+import { Modal } from '@/components/common/Modal/Modal';
 import { GoogleIcon, KakaoIcon } from '@/components/Icons';
 
-export function AuthButtons({
-  activeIndex,
-  googleLogin,
-  kakaoLogin,
-}: {
+interface AuthButtonsProps {
   activeIndex: number;
-  googleLogin: () => void;
-  kakaoLogin: () => void;
-}) {
+  googleLogin?: () => void;
+  kakaoLogin?: () => void;
+}
+
+export function AuthButtons({ activeIndex }: AuthButtonsProps) {
+  const [isMaintenanceModalOpen, setIsMaintenanceModalOpen] = useState(false);
+
+  const maintenanceDescription = useMemo(
+    () => (
+      <div className="flex flex-col gap-2">
+        <p>긴급 점검 중입니다.</p>
+        <p>이용에 불편을 드려 죄송합니다.</p>
+        <p className="mt-2 text-sm text-gray-500">2026.01.21 03:35 ~ 22:00</p>
+      </div>
+    ),
+    []
+  );
+
+  const handleLoginClick = () => {
+    setIsMaintenanceModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsMaintenanceModalOpen(false);
+  };
   // 첫 번째 슬라이드(index 0)일 때는 #3D2A58, 아닐 때는 #FFEFC7
   const containerStyle = useMemo(() => {
     const isFirstSlide = activeIndex === 0;
@@ -30,7 +49,7 @@ export function AuthButtons({
         size="full"
         shape="round"
         className="bg-kakao active:bg-kakao-pressed text-gray-900"
-        onClick={kakaoLogin}
+        onClick={handleLoginClick}
       >
         <KakaoIcon size={28} />
         카카오로 시작하기
@@ -40,11 +59,23 @@ export function AuthButtons({
         shape="round"
         variant="outline"
         className="bg-white"
-        onClick={googleLogin}
+        onClick={handleLoginClick}
       >
         <GoogleIcon />
         Google로 시작하기
       </Button>
+
+      <Modal
+        open={isMaintenanceModalOpen}
+        onOpenChange={setIsMaintenanceModalOpen}
+        title="점검 안내"
+        titleBlock
+        description={maintenanceDescription}
+      >
+        <Button size="full" shape="round" onClick={handleCloseModal}>
+          확인
+        </Button>
+      </Modal>
     </div>
   );
 }
