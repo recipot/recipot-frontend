@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 
 import { DesktopLanding } from '@/app/(auth)/signin/_components/DesktopLanding';
+import ABTestVariantA from '@/app/ab-test/_components/ABTestVariantA';
 import ABTestVariantB from '@/app/ab-test/_components/ABTestVariantB';
 
 import SignInMobileView from './_components/SignInMobileView';
@@ -50,6 +51,10 @@ function SignInContent() {
   // A/B 테스트 B안: 로그인 없이 바로 컨디션 선택 플로우
   if (variant === 'B') {
     return <ABTestVariantB />;
+  }
+
+  if (variant === 'A') {
+    return <ABTestVariantA />;
   }
 
   if (!isDesktop) {
