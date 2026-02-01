@@ -22,7 +22,7 @@ export function useABTestStep() {
       // popstate 이벤트 발생 시 이전 step으로 이동하거나 step 0이면 variant 유지한 상태로 유지
       if (event.state?.step !== undefined) {
         setCurrentStep(event.state.step);
-      } else if (currentStep > 0) {
+      } else {
         // 히스토리에 step 정보가 없으면 이전 step으로
         setCurrentStep(prev => Math.max(prev - 1, 0));
       }
@@ -30,7 +30,7 @@ export function useABTestStep() {
 
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
-  }, [currentStep]);
+  }, []);
 
   /** 다음 스텝으로 이동 */
   const goToNextStep = useCallback(() => {
@@ -66,7 +66,7 @@ export function useABTestStep() {
   );
 
   /** 이전 스텝으로 이동 가능 여부 */
-  const canGoBack = currentStep > 1;
+  const canGoBack = currentStep > 0;
 
   /** 다음 스텝으로 이동 가능 여부 */
   const canGoNext = currentStep < TOTAL_STEPS;
