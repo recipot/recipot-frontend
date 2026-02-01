@@ -1,49 +1,84 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 import { TOTAL_STEPS } from '@/app/ab-test/_constants';
 
 /**
- * A/B 테스트 B안 스텝 관리 훅
- * 로컬 상태로 관리하여 로그인 없이도 동작합니다.
+ * A/B 테스트 스텝 관리 훅
+ *
+ * 히스토리 전략:
+ * - step 0: replaceState (히스토리 추가 X)
+ * - step 1+: pushState (뒤로가기 가능)
+ * - step 0에서 뒤로가기 → 이전 페이지
  */
 export function useABTestStep() {
+  const searchParams = useSearchParams();
+  const variant = searchParams.get('variant');
+
   const [currentStep, setCurrentStep] = useState(0);
+  const isInitialized = useRef(false);
 
-  /** 다음 스텝으로 이동 */
+  const getUrl = useCallback(
+    () => `/signin?variant=${variant}`,
+    [variant]
+  );
+
+  useEffect(() => {
+    if (isInitialized.current || !variant) return;
+    isInitialized.current = true;
+
+    window.history.replaceState({ step: 0, variant }, '', getUrl());
+  }, [variant, getUrl]);
+
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const currentVariant = urlParams.get('variant');
+
+      if (!currentVariant || !window.location.pathname.endsWith('/signin')) {
+        return;
+      }
+
+      setCurrentStep(event.state?.step ?? 0);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   const goToNextStep = useCallback(() => {
-    setCurrentStep(prev => Math.min(prev + 1, TOTAL_STEPS));
-  }, []);
+    if (!variant || currentStep >= TOTAL_STEPS) return;
 
-  /** 이전 스텝으로 이동 */
+    const nextStep = currentStep + 1;
+    window.history.pushState({ step: nextStep, variant }, '', getUrl());
+    setCurrentStep(nextStep);
+  }, [variant, currentStep, getUrl]);
+
   const goToPreviousStep = useCallback(() => {
-    setCurrentStep(prev => Math.max(prev - 1, 1));
-  }, []);
-
-  /** 특정 스텝으로 이동 */
-  const goToStep = useCallback((step: number) => {
-    if (step >= 0 && step <= TOTAL_STEPS) {
-      setCurrentStep(step);
+    if (currentStep > 0) {
+      window.history.back();
     }
-  }, []);
+  }, [currentStep]);
 
-  /** 이전 스텝으로 이동 가능 여부 */
-  const canGoBack = currentStep > 1;
+  const goToStep = useCallback(
+    (step: number) => {
+      if (!variant || step < 0 || step > TOTAL_STEPS) return;
 
-  /** 다음 스텝으로 이동 가능 여부 */
-  const canGoNext = currentStep < TOTAL_STEPS;
-
-  /** 마지막 스텝 여부 */
-  const isLastStep = currentStep === TOTAL_STEPS;
+      window.history.replaceState({ step, variant }, '', getUrl());
+      setCurrentStep(step);
+    },
+    [variant, getUrl]
+  );
 
   return {
-    canGoBack,
-    canGoNext,
+    canGoBack: currentStep > 0,
+    canGoNext: currentStep < TOTAL_STEPS,
     currentStep,
     goToNextStep,
     goToPreviousStep,
     goToStep,
-    isLastStep,
+    isLastStep: currentStep === TOTAL_STEPS,
   };
 }
