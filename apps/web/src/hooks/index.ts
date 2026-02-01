@@ -1,4 +1,5 @@
 export * from './useCompletedRecipesCache';
+export * from './useGuestGuard';
 export * from './useIsKakaoInApp';
 export * from './useIsLoggedIn';
 export * from './useScrollSpy';

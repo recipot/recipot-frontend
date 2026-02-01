@@ -6,7 +6,7 @@ import { useAuth } from '@recipot/contexts';
 import { MyPagePresenter } from '@/app/mypage/_components/MyPagePresenter';
 import { useAllergyData } from '@/components/Allergy';
 import { useCompletedRecipes } from '@/hooks/useCompletedRecipes';
-import { mockRestrictions, mockUser } from '@/mocks/data/myPage.mock';
+import { mockRestrictions } from '@/mocks/data/myPage.mock';
 import { useAllergiesStore } from '@/stores/allergiesStore';
 
 export function MyPageContainer() {
@@ -50,7 +50,7 @@ export function MyPageContainer() {
 
   return (
     <MyPagePresenter
-      user={user ?? mockUser}
+      user={user ?? null}
       restrictions={restrictions}
       cookedRecipes={cookedRecipes}
     />

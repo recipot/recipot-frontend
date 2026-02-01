@@ -4,6 +4,13 @@ import { tokenUtils } from './auth';
 
 type ApiErrorHandler = ((error: unknown) => void) | null;
 
+const GUEST_SESSION_KEY = 'guest-session-id';
+
+const getGuestSessionId = (): string | null => {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem(GUEST_SESSION_KEY);
+};
+
 let globalApiErrorHandler: ApiErrorHandler = null;
 
 export const setApiErrorHandler = (handler: ApiErrorHandler) => {
@@ -110,6 +117,12 @@ export const createApiInstance = (
       const token = getAuthToken();
       if (!useCookieAuth && token) {
         config.headers.Authorization = `Bearer ${token}`;
+      } else if (!token) {
+        // 비로그인 상태: 게스트 세션 헤더 추가
+        const guestSessionId = getGuestSessionId();
+        if (guestSessionId) {
+          config.headers['X-Guest-Session'] = guestSessionId;
+        }
       }
 
       if (process.env.NODE_ENV === 'development') {
@@ -155,10 +168,14 @@ export const createApiInstance = (
       const originalRequest: any = error.config ?? {};
       const requestUrl = originalRequest.url ?? '';
 
-      if (
-        requestUrl.includes('/v1/auth/refresh') ||
-        requestUrl.includes('/v1/login')
-      ) {
+      // 공개 엔드포인트는 401 에러가 발생해도 리다이렉트하지 않음
+      const publicEndpoints = [
+        '/v1/auth/refresh',
+        '/v1/login',
+        '/v1/recipes/public/',
+      ];
+
+      if (publicEndpoints.some(endpoint => requestUrl.includes(endpoint))) {
         if (globalApiErrorHandler) {
           try {
             globalApiErrorHandler(error);
@@ -222,10 +239,7 @@ export const createApiInstance = (
           try {
             globalApiErrorHandler(refreshError);
           } catch (handlerError) {
-            console.error(
-              'API error handler execution failed:',
-              handlerError
-            );
+            console.error('API error handler execution failed:', handlerError);
           }
         }
 

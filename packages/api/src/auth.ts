@@ -3,6 +3,8 @@ import axios, { AxiosInstance } from 'axios';
 import { getCookie } from '@recipot/utils';
 import { UserInfo, TokenResponse } from '@recipot/types';
 
+import { guestSession } from './guestSession';
+
 const AUTH_STORAGE_KEY = 'auth-storage';
 const STORAGE_VERSION = 0;
 
@@ -235,6 +237,12 @@ export const authService = {
     storage.saveTokens(data.accessToken, data.refreshToken);
     const user = await this.getUserInfo();
 
+    try {
+      await guestSession.migrateToUser();
+    } catch (error) {
+      throw new Error('게스트 세션 마이그레이션 실패');
+    }
+
     return {
       accessToken: data.accessToken,
       refreshToken: data.refreshToken,
@@ -252,7 +260,19 @@ export const authService = {
     const response = await authApi.get(
       `/v1/login/google/callback?code=${code}`
     );
-    return response.data.data;
+    const data = response.data.data;
+
+    // 토큰 저장 후 게스트 세션 데이터 마이그레이션
+    if (data.accessToken && data.refreshToken) {
+      storage.saveTokens(data.accessToken, data.refreshToken);
+      try {
+        await guestSession.migrateToUser();
+      } catch (error) {
+        throw new Error('게스트 세션 마이그레이션 실패');
+      }
+    }
+
+    return data;
   },
 
   async verifyToken(token?: string): Promise<{

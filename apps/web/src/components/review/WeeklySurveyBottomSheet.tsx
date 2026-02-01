@@ -149,30 +149,10 @@ export function WeeklySurveyBottomSheet({
       setLoading(false);
       isFetchingRef.current = false;
     }
-  }, [token, useCookieAuth]);
+  }, [token, useCookieAuth, onClose]);
 
   useEffect(() => {
     void initializeData();
-  }, [initializeData]);
-
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        void initializeData();
-      }
-    };
-
-    const handleWindowFocus = () => {
-      void initializeData();
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('focus', handleWindowFocus);
-
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('focus', handleWindowFocus);
-    };
   }, [initializeData]);
 
   const { handleSubmit, register, setValue, watch } = useForm<SurveyFormData>({

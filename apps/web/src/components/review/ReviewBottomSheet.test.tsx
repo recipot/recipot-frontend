@@ -7,6 +7,19 @@ import type { ReviewData } from '@/types/review.types';
 
 import { ReviewBottomSheet } from '.';
 
+const mockRouterPush = vi.fn();
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    back: vi.fn(),
+    forward: vi.fn(),
+    prefetch: vi.fn(),
+    push: mockRouterPush,
+    refresh: vi.fn(),
+    replace: vi.fn(),
+  }),
+}));
+
 // QueryClient 생성 함수
 const createTestQueryClient = () =>
   new QueryClient({
@@ -24,6 +37,22 @@ const wrapper = ({ children }: { children: React.ReactNode }) => {
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );
 };
+
+type MockAuthStoreState = {
+  token: string | null;
+  user: unknown;
+};
+
+const mockUseAuthStore = vi.hoisted(() => {
+  const state: MockAuthStoreState = {
+    token: 'mock-token',
+    user: { id: 1, name: '테스터' },
+  };
+
+  return vi.fn((selector?: (state: MockAuthStoreState) => unknown) =>
+    selector ? selector(state) : state
+  );
+});
 
 // axios 모킹
 // vi.hoisted를 사용하여 모킹 함수 내부에서 사용할 수 있는 변수 생성
@@ -86,6 +115,7 @@ vi.mock('@recipot/contexts', () => ({
     token: 'mock-token',
     user: null,
   })),
+  useAuthStore: mockUseAuthStore,
 }));
 
 // Drawer 컴포넌트를 간단한 div로 모킹

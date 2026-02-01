@@ -4,10 +4,10 @@ import { foodHandlers } from './food.handlers';
 
 import { moodHandlers } from './mood.handlers';
 import { recipeRecommendHandlers } from './recipeRecommend.handlers';
+import { recipeHandlers } from './recipe.handlers';
 import { mypageHandlers } from './mypage.handlers';
 // 추후 다른 도메인 핸들러들을 추가할 예정
 // import { ingredientHandlers } from './ingredient.handlers';
-// import { recipeHandlers } from './recipe.handlers';
 // import { profileHandlers } from './profile.handlers';
 
 export const handlers = [
@@ -16,9 +16,9 @@ export const handlers = [
   ...foodHandlers, // 재료 관련 핸들러 추가
   ...moodHandlers, // 기분 상태 관련 핸들러 추가
   ...recipeRecommendHandlers, // 레시피 추천 핸들러 추가
+  ...recipeHandlers, // 레시피 상세 조회 핸들러 추가
   ...mypageHandlers,
   // ...ingredientHandlers,    // B 담당자가 완성 후 추가
-  // ...recipeHandlers,        // C 담당자가 완성 후 추가
   // ...profileHandlers,       // D 담당자가 완성 후 추가
 ];
 
@@ -28,9 +28,9 @@ export { allergyCheckHandlers };
 export { foodHandlers };
 export { moodHandlers };
 export { recipeRecommendHandlers };
+export { recipeHandlers };
 export { mypageHandlers };
 // export { ingredientHandlers };
-// export { recipeHandlers };
 // export { profileHandlers };
 
 // 핸들러 개수 확인용 (개발 시 유용)
@@ -39,9 +39,10 @@ export const handlerCounts = {
   allergyCheck: allergyCheckHandlers.length,
   food: foodHandlers.length,
   mood: moodHandlers.length,
+  recipeRecommend: recipeRecommendHandlers.length,
+  recipe: recipeHandlers.length,
   mypage: mypageHandlers.length,
   // ingredient: ingredientHandlers.length,
-  // recipe: recipeHandlers.length,
   // profile: profileHandlers.length,
   total: handlers.length,
 };
@@ -55,6 +56,7 @@ export const getMswStatus = () => {
       'food',
       'mood',
       'recipeRecommend',
+      'recipe',
       'mypage',
     ], // 완성된 도메인들
     handlersCount: handlers.length,

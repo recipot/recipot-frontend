@@ -1,7 +1,10 @@
+'use client';
+
 import Link from 'next/link';
 
 import { Button } from '@/components/common/Button';
 import { MyFileIcon, MyOpenFileIcon } from '@/components/Icons';
+import { useGuestGuard } from '@/hooks';
 
 const QUICK_LINKS_DATA = [
   {
@@ -31,10 +34,17 @@ const QUICK_LINKS_DATA = [
 ];
 
 export default function QuickLinks() {
+  const { guardNavigation } = useGuestGuard();
+
   return (
     <div className="mb-3 flex w-full items-center gap-3">
       {QUICK_LINKS_DATA.map(({ colors, href, Icon, paddingX, text }) => (
-        <Link key={href} href={href} className="flex min-w-0 flex-1">
+        <Link
+          key={href}
+          href={href}
+          className="flex min-w-0 flex-1"
+          onClick={guardNavigation}
+        >
           <Button
             size="lg"
             shape="square"

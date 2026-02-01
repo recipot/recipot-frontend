@@ -13,6 +13,6 @@ export interface ReviewFormData {
 // 컴포넌트 props 타입
 export interface ReviewBottomSheetProps {
   isOpen: boolean;
-  onClose: () => void;
+  onClose: (recipeId?: number) => void;
   recipeId: number; // 후기 제출 시 completedRecipeId로 사용
 }
