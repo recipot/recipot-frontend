@@ -2,6 +2,8 @@
 
 import { useCallback, useMemo, useRef } from 'react';
 
+import { Button } from '@/components/common/Button';
+
 import IntroSlider from './aIntroSlider';
 import useIntroSlider from './aUseIntroSlider';
 
@@ -47,13 +49,10 @@ export default function ABIntroStep({ onNext }: ABIntroStepProps) {
         />
 
         {/* 하단 버튼 영역 - 슬라이더 위에 absolute로 오버레이 */}
-        <div className="fixed right-0 bottom-0 left-0 z-50 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
-          <button
-            onClick={handleNext}
-            className="w-full rounded-lg bg-[#6B9E3E] py-4 text-center text-base font-semibold text-white transition-colors hover:bg-[#5a8533] active:bg-[#4d7229]"
-          >
+        <div className="fixed right-0 bottom-0 left-0 z-50 flex justify-center px-6 py-[10px] pb-[calc(0.625rem+env(safe-area-inset-bottom))]">
+          <Button size="full" onClick={handleNext}>
             {buttonText}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

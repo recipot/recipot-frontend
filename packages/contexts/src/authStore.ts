@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { authService } from '../../api/src';
+import { authService, guestSession } from '../../api/src';
 import { UserInfo } from '../../types/src/auth.types';
 
 interface AuthState {
@@ -159,6 +159,12 @@ export const useAuthStore = create<AuthState>()(
           const cookieAuth = isCookieAuthMode();
 
           if (!token) {
+            // 게스트 세션 사용자는 인증 시도 없이 바로 완료
+            if (guestSession.getSessionId()) {
+              set({ loading: false });
+              return;
+            }
+
             if (cookieAuth) {
               try {
                 const verified = await authService.verifyToken();

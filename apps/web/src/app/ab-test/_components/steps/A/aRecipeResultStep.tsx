@@ -8,7 +8,6 @@ import { Loader2 } from 'lucide-react';
 import { EffectCards, Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
-import RecipeHeader from '@/app/(recipeRecommend)/recipeRecommend/_components/RecipeHeader';
 import {
   A_CONDITION_STATUS,
   type A_CONDITION_TITLES,
@@ -20,6 +19,7 @@ import {
 import { Button } from '@/components/common/Button';
 import { Header } from '@/components/common/Header';
 import { type MoodType } from '@/components/EmotionState';
+import { RefreshIcon, UserIcon } from '@/components/Icons';
 import { RecipeCard } from '@/components/RecipeCard';
 import { useToastContext } from '@/contexts/ToastContext';
 import { useFoodList } from '@/hooks/useFoodList';
@@ -77,13 +77,19 @@ export default function RecipeResultStep({
   const userSelectedMood: MoodType = mood ?? 'neutral';
   const moodKey = userSelectedMood as keyof typeof A_CONDITION_TITLES;
 
-  const { fetchRecipes, hasFetched, isLoading, recipes, updateRecipeBookmark } =
-    useRecipeRecommend({
-      enabled: true,
-      selectedFoodIds,
-      showToast,
-      userSelectedMood,
-    });
+  const {
+    fetchRecipes,
+    hasFetched,
+    isLoading,
+    recipes,
+    refreshRecipes,
+    updateRecipeBookmark,
+  } = useRecipeRecommend({
+    enabled: true,
+    selectedFoodIds,
+    showToast,
+    userSelectedMood,
+  });
 
   // 조건 변경 시 레시피 조회
   useEffect(() => {
@@ -140,6 +146,24 @@ export default function RecipeResultStep({
     updateRecipeBookmark(recipeId, isBookmarked);
   };
 
+  // 뒤로가기 - 재료선택 화면(step 3)으로 이동
+  const handleBack = () => {
+    onStepClick?.(3);
+  };
+
+  // 프로필 페이지로 이동
+  const handleProfile = () => {
+    window.location.href = '/mypage';
+  };
+
+  // 새로고침 핸들러
+  const handleRefresh = async () => {
+    swiperRef.current?.slideTo(0);
+    setActiveIndex(0);
+    await refreshRecipes();
+    showToast('새로운 레시피가 추천되었어요');
+  };
+
   // 메뉴 추천받기 버튼 클릭 - 인트로 슬라이드 페이지로 이동
   const handleGetRecommendation = () => {
     onStepClick?.(0);
@@ -164,7 +188,17 @@ export default function RecipeResultStep({
   return (
     <div className="flex h-screen flex-col overflow-hidden">
       {/* 상단 헤더 영역 */}
-      <RecipeHeader />
+      <Header>
+        <Header.Back onClick={handleBack} />
+        <div className="flex items-center">
+          <Header.Action onClick={handleProfile} ariaLabel="프로필">
+            <UserIcon size={24} />
+          </Header.Action>
+          <Header.Action onClick={handleRefresh} ariaLabel="새로고침">
+            <RefreshIcon size={24} />
+          </Header.Action>
+        </div>
+      </Header>
       <Header.Spacer />
 
       {/* 메인 컨텐츠 영역 */}

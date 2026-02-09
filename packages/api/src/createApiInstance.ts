@@ -11,6 +11,8 @@ const getGuestSessionId = (): string | null => {
   return localStorage.getItem(GUEST_SESSION_KEY);
 };
 
+const hasGuestSession = (): boolean => !!getGuestSessionId();
+
 let globalApiErrorHandler: ApiErrorHandler = null;
 
 export const setApiErrorHandler = (handler: ApiErrorHandler) => {
@@ -183,6 +185,11 @@ export const createApiInstance = (
             console.error('API error handler execution failed:', handlerError);
           }
         }
+        return Promise.reject(error);
+      }
+
+      // 게스트 세션 사용자는 토큰 refresh 없이 에러를 그대로 전파
+      if (hasGuestSession() && !getAuthToken()) {
         return Promise.reject(error);
       }
 

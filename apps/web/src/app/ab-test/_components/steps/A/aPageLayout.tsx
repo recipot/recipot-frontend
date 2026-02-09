@@ -51,9 +51,9 @@ export default function ABPageLayout({
       {/* 콘텐츠 영역 */}
       <div className="flex-1">{children}</div>
 
-      {/* 버튼 영역 */}
+      {/* 버튼 영역 - 하단 고정 */}
       {showButton && (
-        <div className="mt-auto px-[10px] py-8 pt-6">
+        <div className="fixed right-0 bottom-0 left-0 flex justify-center bg-gradient-to-t from-white via-white to-transparent px-6 py-[10px] pt-8">
           <Button size="full" onClick={onButtonClick} disabled={buttonDisabled}>
             {buttonText}
           </Button>

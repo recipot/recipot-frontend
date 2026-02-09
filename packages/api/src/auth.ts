@@ -76,7 +76,17 @@ const storage = {
   },
 };
 
+const GUEST_SESSION_KEY = 'guest-session-id';
+
+const hasGuestSession = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  return !!localStorage.getItem(GUEST_SESSION_KEY);
+};
+
 const redirectToSignIn = (): void => {
+  // 게스트 세션이 있는 경우 리다이렉트하지 않음
+  if (hasGuestSession()) return;
+
   if (
     typeof window !== 'undefined' &&
     !window.location.pathname.includes('/signin')
@@ -140,6 +150,11 @@ const createAuthApiInstance = (): AxiosInstance => {
       if (requestUrl.includes('/v1/auth/refresh')) {
         storage.clear();
         redirectToSignIn();
+        return Promise.reject(error);
+      }
+
+      // 게스트 세션 사용자는 토큰 refresh 없이 에러를 그대로 전파
+      if (hasGuestSession() && !storage.getToken()) {
         return Promise.reject(error);
       }
 

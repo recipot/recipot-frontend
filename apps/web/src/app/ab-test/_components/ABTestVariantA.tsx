@@ -16,18 +16,19 @@ import RecipeResultStep from './steps/A/aRecipeResultStep';
  * 플로우: 인트로 슬라이드(0) -> 못먹는음식(1) -> 컨디션(2) -> 재료입력(3) -> 결과(4)
  */
 export default function ABTestVariantA() {
-  const { currentStep, goToNextStep, goToStep } = useABTestStep();
+  const { currentStep, goToNextStep, goToPreviousStep, goToStep } =
+    useABTestStep();
 
   const renderCurrentStep = () => {
     switch (currentStep) {
       case 0:
         return <ABIntroStep onNext={goToNextStep} />;
       case 1:
-        return <ABAllergyStep onNext={goToNextStep} />;
+        return <ABAllergyStep onNext={goToNextStep} onBack={goToPreviousStep} />;
       case 2:
-        return <ConditionStep onNext={goToNextStep} />;
+        return <ConditionStep onNext={goToNextStep} onBack={goToPreviousStep} />;
       case 3:
-        return <IngredientsStep onNext={goToNextStep} />;
+        return <IngredientsStep onNext={goToNextStep} onBack={goToPreviousStep} />;
       case 4:
         return <RecipeResultStep onStepClick={goToStep} />;
       default:

@@ -73,7 +73,7 @@ export function RecipeDetailHeader({ recipe, showToast }: RecipeHeaderProps) {
   };
 
   const handleBack = () => {
-    router.push('/recipeRecommend');
+    router.back();
   };
 
   return (

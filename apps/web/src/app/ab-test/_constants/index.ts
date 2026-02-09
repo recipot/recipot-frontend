@@ -72,7 +72,7 @@ export const A_STEP_CONFIG = [
   {
     id: 2,
     question: '두 가지만 골라도 요리를 찾아드려요',
-    title: '현재 냉장고에 어떤 재료를 가지고 계신가요?',
+    title: '현재 냉장고에 어떤 재료를\n가지고 계신가요?',
   },
   {
     id: 3,

@@ -2,8 +2,8 @@
 
 import { useRef } from 'react';
 
-import RecipeHeader from '@/app/(recipeRecommend)/recipeRecommend/_components/RecipeHeader';
 import { A_MIN_SELECTED_FOODS, A_STEP_CONFIG } from '@/app/ab-test/_constants';
+import { Header } from '@/components/common/Header';
 import type { IngredientsSearchRef } from '@/components/IngredientsSearch/IngredientsSearch';
 import IngredientsSearch from '@/components/IngredientsSearch/IngredientsSearch';
 import { useMoodStore } from '@/stores/moodStore';
@@ -14,9 +14,10 @@ import ABPageLayout from './aPageLayout';
 
 interface IngredientsStepProps {
   onNext: () => void;
+  onBack?: () => void;
 }
 
-export default function IngredientsStep({ onNext }: IngredientsStepProps) {
+export default function IngredientsStep({ onBack, onNext }: IngredientsStepProps) {
   const searchRef = useRef<IngredientsSearchRef>(null);
   const mood = useMoodStore(state => state.mood);
   const selectedFoodIds = useSelectedFoodsStore(state => state.selectedFoodIds);
@@ -35,8 +36,11 @@ export default function IngredientsStep({ onNext }: IngredientsStepProps) {
 
   return (
     <>
-      <RecipeHeader disabled={!hasSelectedFoods} />
-      <ABProgressBar currentStep={3} totalSteps={3} />
+      <Header>
+        <Header.Back onClick={onBack} />
+      </Header>
+      <Header.Spacer />
+      <ABProgressBar currentStep={3} totalSteps={3} currentOnly />
       <ABPageLayout
         currentStep={3}
         title={stepConfig.title}

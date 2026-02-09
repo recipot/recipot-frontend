@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from 'react';
 
-import RecipeHeader from '@/app/(recipeRecommend)/recipeRecommend/_components/RecipeHeader';
 import { ABProgressBar } from '@/app/ab-test/_components';
 import { A_ALLERGY_STEP_CONFIG } from '@/app/ab-test/_constants';
 import { Allergy, useAllergyContext } from '@/components/Allergy';
@@ -11,6 +10,7 @@ import { useAllergiesStore } from '@/stores/allergiesStore';
 
 interface ABAllergyStepProps {
   onNext: () => void;
+  onBack?: () => void;
 }
 
 const SCROLLBAR_HIDE_STYLE: React.CSSProperties = {
@@ -18,7 +18,7 @@ const SCROLLBAR_HIDE_STYLE: React.CSSProperties = {
   scrollbarWidth: 'none',
 };
 
-function ABAllergyStepContent({ onNext }: ABAllergyStepProps) {
+function ABAllergyStepContent({ onBack, onNext }: ABAllergyStepProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { selectedItems } = useAllergyContext();
@@ -50,9 +50,11 @@ function ABAllergyStepContent({ onNext }: ABAllergyStepProps) {
 
   return (
     <div className="container mx-auto max-w-4xl">
-      <RecipeHeader disabled={!hasSelectedItems} />
+      <Header>
+        <Header.Back onClick={onBack} />
+      </Header>
       <Header.Spacer />
-      <ABProgressBar currentStep={1} totalSteps={3} />
+      <ABProgressBar currentStep={1} totalSteps={3} currentOnly />
 
       <div className="mt-10 mb-4 text-center">
         <h1 className="text-24b mb-1 whitespace-pre-line">
@@ -91,7 +93,7 @@ function ABAllergyStepContent({ onNext }: ABAllergyStepProps) {
   );
 }
 
-export default function ABAllergyStep({ onNext }: ABAllergyStepProps) {
+export default function ABAllergyStep({ onBack, onNext }: ABAllergyStepProps) {
   const persistedSelectedItems = useAllergiesStore(
     state => state.selectedItems
   );
@@ -116,7 +118,7 @@ export default function ABAllergyStep({ onNext }: ABAllergyStepProps) {
       isOnboarding
       scrollConfig={scrollConfig}
     >
-      <ABAllergyStepContent onNext={onNext} />
+      <ABAllergyStepContent onNext={onNext} onBack={onBack} />
     </Allergy>
   );
 }

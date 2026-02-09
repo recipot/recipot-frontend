@@ -6,6 +6,7 @@ import './styles.css';
 import '@/components/EmotionState/styles.css';
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { guestSession } from '@recipot/api';
 import { useAuth } from '@recipot/contexts';
 import { useRouter } from 'next/navigation';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -40,10 +41,18 @@ export default function RecipeRecommend() {
   const swiperRef = useRef<SwiperType | null>(null);
   const lastFetchKeyRef = useRef<string | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [hasGuestSession, setHasGuestSession] = useState(false);
 
   // 인증 상태 확인 및 리다이렉트
   useEffect(() => {
     if (loading) {
+      return;
+    }
+
+    // 게스트 세션 확인
+    const guestSessionId = guestSession.getSessionId();
+    if (guestSessionId) {
+      setHasGuestSession(true);
       return;
     }
 
@@ -56,7 +65,7 @@ export default function RecipeRecommend() {
   const mood = useMoodStore(state => state.mood);
   const selectedFoodIds = useSelectedFoodsStore(state => state.selectedFoodIds);
   const userSelectedMood: MoodType = mood ?? 'neutral';
-  const enabled = !loading && !!user;
+  const enabled = !loading && (!!user || hasGuestSession);
 
   // 레시피 추천 훅
   const {
@@ -106,7 +115,7 @@ export default function RecipeRecommend() {
     showBetaNotice,
     showTutorial,
   } = useTutorial({
-    enabled: !loading && !!user,
+    enabled: !loading && (!!user || hasGuestSession),
     hasRecipesAvailable: hasFetched && recipes.length > 0,
   });
 
@@ -140,8 +149,8 @@ export default function RecipeRecommend() {
     }
   }, [activeIndex, recipes]);
 
-  // 로딩 중이거나 비로그인 사용자인 경우 빈 화면 표시
-  if (loading || !user) {
+  // 로딩 중이거나 인증되지 않은 사용자인 경우 빈 화면 표시
+  if (loading || (!user && !hasGuestSession)) {
     return null;
   }
 
