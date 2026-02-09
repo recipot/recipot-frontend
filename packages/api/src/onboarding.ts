@@ -1,5 +1,6 @@
 import { allergy } from './allergy';
 import { createApiInstance } from './createApiInstance';
+import { guestSessionUtils } from './guestSession';
 import type { CompleteOnboardingData } from './types';
 
 const onboardingApi = createApiInstance({ apiName: 'Onboarding' });
@@ -9,11 +10,15 @@ const isProduction = () => {
   return env !== 'development' && env !== 'local';
 };
 
+const isGuestUser = (): boolean => !!guestSessionUtils.getSessionId();
+
 export const onboarding = {
   async submitComplete(data: CompleteOnboardingData): Promise<void> {
     const apiCalls: Promise<unknown>[] = [];
 
-    if (isProduction()) {
+    // 게스트 사용자는 /v1/users/onboarding/complete 호출 스킵
+    // 로그인 후 게스트 데이터 마이그레이션 시 처리됨
+    if (isProduction() && !isGuestUser()) {
       apiCalls.push(onboardingApi.post('/v1/users/onboarding/complete'));
     }
 
