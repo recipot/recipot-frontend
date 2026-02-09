@@ -34,9 +34,9 @@ export function useViewportBasedPadding(
   options: UseViewportBasedPaddingOptions = {}
 ) {
   const {
-    ratio = 0.8,
-    minPadding = 400,
     initialPadding = 500,
+    minPadding = 400,
+    ratio = 0.8,
   } = options;
 
   const [bottomPadding, setBottomPadding] = useState(initialPadding);

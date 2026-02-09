@@ -82,6 +82,7 @@ export const groupIngredientsByCategory = (
     const existingIndex = labelIndex.get(normalizedLabel);
 
     if (existingIndex !== undefined) {
+      // eslint-disable-next-line security/detect-object-injection
       const existingItem = categoryItems[existingIndex];
       if (!existingItem.linkedIngredientIds.includes(ingredient.id)) {
         existingItem.linkedIngredientIds.push(ingredient.id);

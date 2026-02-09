@@ -1,5 +1,6 @@
-import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import axios from 'axios';
+
+import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 
 /**
  * 인증 에러(401) 처리 및 리다이렉트

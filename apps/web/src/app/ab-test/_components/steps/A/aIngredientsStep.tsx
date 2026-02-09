@@ -24,8 +24,6 @@ export default function IngredientsStep({ onBack, onNext }: IngredientsStepProps
 
   const stepConfig = A_STEP_CONFIG[1];
 
-  // 선택된 재료가 있는지 확인
-  const hasSelectedFoods = selectedFoodIds.length > 0;
   const hasEnoughFoods = selectedFoodIds.length >= A_MIN_SELECTED_FOODS;
 
   const handleNext = () => {

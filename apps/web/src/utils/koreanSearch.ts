@@ -126,8 +126,11 @@ export function separateKorean(char: string): {
   const jongsungIndex = code % KOREAN_UNICODE.JONGSUNG_COUNT;
 
   return {
+    // eslint-disable-next-line security/detect-object-injection
     chosung: CHOSUNG_LIST[chosungIndex] || '',
+    // eslint-disable-next-line security/detect-object-injection
     jongsung: JONGSUNG_LIST[jongsungIndex] || '',
+    // eslint-disable-next-line security/detect-object-injection
     jungsung: JUNGSUNG_LIST[jungsungIndex] || '',
   };
 }

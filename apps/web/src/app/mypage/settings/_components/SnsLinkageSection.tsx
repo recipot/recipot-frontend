@@ -1,22 +1,22 @@
 'use client';
 
 import { useState } from 'react';
+import { useAuth } from '@recipot/contexts';
 
 import { Button } from '@/components/common/Button';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import { GoogleIcon, KakaoIcon } from '@/components/Icons';
 import type { ProfileSectionProps } from '@/types/MyPage.types';
-import { useAuth } from '@recipot/contexts';
 
 type ProviderType = 'kakao' | 'google';
 
 const PROVIDER_LABEL: Record<ProviderType, string> = {
-  kakao: '카카오',
   google: '구글',
+  kakao: '카카오',
 };
 
 export default function SnsLinkageSection({ user }: ProfileSectionProps) {
-  const { login: kakaoLogin, googleLogin, logout } = useAuth();
+  const { googleLogin, login: kakaoLogin, logout } = useAuth();
   const isKakaoLinked = user.platform === 'kakao';
   const isGoogleLinked = user.platform === 'google';
   const [pendingProvider, setPendingProvider] = useState<ProviderType | null>(

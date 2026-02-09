@@ -12,6 +12,7 @@ export const getEmotionGradient = (mood: MoodType): string => {
     good: 'emotion-gradient-good',
     neutral: 'emotion-gradient-neutral',
   };
+  // eslint-disable-next-line security/detect-object-injection
   return gradientMap[mood];
 };
 
@@ -31,6 +32,7 @@ export const getEmotionGradientOverlay = (
       neutral: { b: 42, g: 170, r: 189 }, // #BDAA2A - 노란색 계열
     };
 
+  // eslint-disable-next-line security/detect-object-injection
   const color = gradientColors[mood];
   const background = `linear-gradient(180deg, rgba(${color.r}, ${color.g}, ${color.b}, 0) 0%, rgba(${color.r}, ${color.g}, ${color.b}, 0.8) 50%, rgba(${color.r}, ${color.g}, ${color.b}, 0.95) 100%)`;
 

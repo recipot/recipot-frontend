@@ -1,4 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+
+import type { NextRequest} from 'next/server';
 
 const AB_COOKIE_NAME = 'ab-onboarding-variant';
 const AB_COOKIE_MAX_AGE = 60 * 60 * 24 * 30; // 30일

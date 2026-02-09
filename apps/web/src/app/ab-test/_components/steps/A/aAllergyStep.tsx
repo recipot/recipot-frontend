@@ -26,9 +26,6 @@ function ABAllergyStepContent({ onBack, onNext }: ABAllergyStepProps) {
   const setAllergies = useAllergiesStore(state => state.setAllergies);
   const setSelectedItems = useAllergiesStore(state => state.setSelectedItems);
 
-  // 선택된 항목이 있는지 확인
-  const hasSelectedItems = selectedItems.length > 0;
-
   useEffect(() => {
     setSelectedItems(selectedItems);
   }, [selectedItems, setSelectedItems]);

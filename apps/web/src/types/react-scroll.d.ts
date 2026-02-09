@@ -24,7 +24,7 @@ declare module 'react-scroll' {
     className?: string;
     style?: React.CSSProperties;
     children?: ReactNode;
-    [key: string]: any;
+    [key: string]: unknown;
   }
 
   export class Link extends Component<LinkProps> {}
@@ -35,7 +35,7 @@ declare module 'react-scroll' {
     className?: string;
     style?: React.CSSProperties;
     children?: ReactNode;
-    [key: string]: any;
+    [key: string]: unknown;
   }
 
   export class Element extends Component<ElementProps> {}
@@ -46,7 +46,7 @@ declare module 'react-scroll' {
     className?: string;
     style?: React.CSSProperties;
     children?: ReactNode;
-    [key: string]: any;
+    [key: string]: unknown;
   }
 
   export class ScrollElement extends Component<ScrollElementProps> {}

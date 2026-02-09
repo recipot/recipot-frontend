@@ -5,14 +5,14 @@ import { guestSession } from '@recipot/api';
 import { useAuth } from '@recipot/contexts';
 import { useRouter } from 'next/navigation';
 
-import { Header } from '@/components/common/Header';
-import { RefreshIcon } from '@/components/Icons';
 import StepIndicator from '@/app/onboarding/_components/StepIndicator';
 import AllergyStep from '@/app/onboarding/_components/steps/AllergyStep';
 import CookStateStep from '@/app/onboarding/_components/steps/CookStateStep';
 import RefrigeratorStep from '@/app/onboarding/_components/steps/RefrigeratorStep';
 import { STEP_CONFIG } from '@/app/onboarding/_constants';
 import { onboardingStyles } from '@/app/onboarding/_utils';
+import { Header } from '@/components/common/Header';
+import { RefreshIcon } from '@/components/Icons';
 import { useAllergiesStore } from '@/stores/allergiesStore';
 import { useMoodStore } from '@/stores/moodStore';
 import { useCurrentStep, useOnboardingStore } from '@/stores/onboardingStore';

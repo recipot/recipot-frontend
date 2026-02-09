@@ -1,6 +1,7 @@
 'use client';
 
 import 'swiper/css';
+
 import { useEffect, useRef, useState } from 'react';
 import Lottie from 'lottie-react';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -19,9 +20,9 @@ interface IntroStepProps {
 }
 
 const SLIDES = [
-  { animation: mainAnimation, alt: '집밥 해먹으려고 했는데.. 결국 시켜먹었나요?' },
-  { animation: searchAnimation, alt: '나의 요리할 여유에 따라 지금 있는 재료로 딱 한끼!' },
-  { animation: resultAnimation, alt: '한끼의 시작이 이렇게 건강하게 만든다고...?!' },
+  { alt: '집밥 해먹으려고 했는데.. 결국 시켜먹었나요?', animation: mainAnimation },
+  { alt: '나의 요리할 여유에 따라 지금 있는 재료로 딱 한끼!', animation: searchAnimation },
+  { alt: '한끼의 시작이 이렇게 건강하게 만든다고...?!', animation: resultAnimation },
 ];
 
 /**
