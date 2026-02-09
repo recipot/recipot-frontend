@@ -22,7 +22,8 @@ export const onboarding = {
       apiCalls.push(onboardingApi.post('/v1/users/onboarding/complete'));
     }
 
-    if (data.allergies?.length > 0) {
+    // 게스트 사용자는 /v1/users/ingredients/unavailable 호출 스킵
+    if (data.allergies?.length > 0 && !isGuestUser()) {
       apiCalls.push(allergy.updateRestrictedIngredients(data.allergies));
     }
 

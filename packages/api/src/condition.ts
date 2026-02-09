@@ -1,9 +1,12 @@
 import axios from 'axios';
 
 import { createApiInstance } from './createApiInstance';
+import { guestSessionUtils } from './guestSession';
 
 // API 인스턴스
 const conditionApi = createApiInstance({ apiName: 'Condition' });
+
+const isGuestUser = (): boolean => !!guestSessionUtils.getSessionId();
 
 /**
  * 일일 컨디션 저장 요청 타입
@@ -37,6 +40,11 @@ export const condition = {
   saveDailyCondition: async (
     data: SaveDailyConditionRequest
   ): Promise<SaveDailyConditionResponse> => {
+    // 게스트 사용자는 /v1/users/conditions/daily 호출 스킵
+    if (isGuestUser()) {
+      return { success: true, message: '게스트 세션 - 컨디션 저장 스킵' };
+    }
+
     try {
       console.info('🚀 일일 컨디션 저장 요청:', data);
 

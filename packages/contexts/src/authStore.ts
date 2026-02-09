@@ -29,6 +29,12 @@ const isProduction = () =>
 
 const isCookieAuthMode = () => isProduction();
 
+/** 게스트 전용 경로 (인증 API 호출 스킵) */
+const isGuestOnlyPath = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  return window.location.pathname.startsWith('/ab-test');
+};
+
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => {
@@ -154,6 +160,12 @@ export const useAuthStore = create<AuthState>()(
 
         initializeAuth: async () => {
           set({ loading: true });
+
+          // 게스트 전용 경로에서는 인증 API 호출 없이 바로 완료
+          if (isGuestOnlyPath()) {
+            set({ loading: false });
+            return;
+          }
 
           const { token, user } = get();
           const cookieAuth = isCookieAuthMode();
