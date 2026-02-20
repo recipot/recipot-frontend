@@ -114,7 +114,7 @@ export default function IntroStep({ onNext }: IntroStepProps) {
           onClick={handleButtonClick}
           className={cn(!isLastSlide && currentIndex === 0 && 'bg-primary')}
         >
-          {isLastSlide ? '레시피 추천받을래요' : '다음으로'}
+          {isLastSlide ? '한끼부터 시작하기' : '다음으로'}
         </Button>
       </div>
     </div>

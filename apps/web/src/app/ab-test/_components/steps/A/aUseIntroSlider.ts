@@ -13,12 +13,12 @@ const INTRO = [
     contentSrc: '/auth/intro-img2a-content.png',
     id: 2,
   },
-  {
-    alt: '내가.. 한끼 잘먹고 이렇게까나 클 수 있다니...?! 상상하니 기분좋다',
-    backSrc: '/auth/intro-img3-back.png',
-    contentSrc: '/auth/intro-img3a-content.png',
-    id: 3,
-  },
+  // {
+  //   alt: '내가.. 한끼 잘먹고 이렇게까나 클 수 있다니...?! 상상하니 기분좋다',
+  //   backSrc: '/auth/intro-img3-back.png',
+  //   contentSrc: '/auth/intro-img3a-content.png',
+  //   id: 3,
+  // },
 ];
 
 export default function useIntroSlider() {

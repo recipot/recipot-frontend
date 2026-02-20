@@ -62,6 +62,19 @@ export default function IntroSlider({
         </div>
       ) : null}
 
+      {/* 두 번째 슬라이드 상단 로고 */}
+      {item.id === 2 ? (
+        <div className="absolute top-12 left-0 z-20 flex w-full justify-center">
+          <Image
+            src="/logo.png"
+            alt="한끼부터 로고"
+            width={120}
+            height={40}
+            priority={false}
+          />
+        </div>
+      ) : null}
+
       {/* 콘텐츠 이미지 - 중앙에 배치 */}
       {item.contentSrc ? (
         <div className="relative z-10 flex h-full w-full items-center justify-center px-4 pb-32">
@@ -86,12 +99,13 @@ export default function IntroSlider({
   const paginationStyle = useMemo(
     () => ({
       alignItems: 'center',
+      bottom: 'calc(7rem + env(safe-area-inset-bottom))',
       display: 'flex',
       justifyContent: 'center',
       left: '0',
       position: 'absolute' as const,
       right: '0',
-      top: '10%',
+      top: 'auto',
       transform: 'none',
       width: '100%',
       zIndex: 40,
