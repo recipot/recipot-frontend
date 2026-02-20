@@ -1,12 +1,12 @@
 import { useState } from 'react';
 
 const INTRO = [
-  {
-    alt: '야악!',
-    backSrc: '/auth/intro-img1-back.png',
-    contentSrc: '/auth/intro-img1a-content.png',
-    id: 1,
-  },
+  // {
+  //   alt: '야악!',
+  //   backSrc: '/auth/intro-img1-back.png',
+  //   contentSrc: '/auth/intro-img1a-content.png',
+  //   id: 1,
+  // },
   {
     alt: '오늘의 요리 여유에 따라 냉장고에 있는 재료로 한끼!',
     backSrc: '/auth/intro-img2-back.png',
